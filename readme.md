@@ -3,7 +3,8 @@
 # Harbour web server
 
 This is a web server designed to launch a powerful server from the first click that will help you 
-quickly create your web pages, web services, etc. without any dependencies.
+quickly create your web pages, web services, etc. without any dependencies. It uses the power of 
+Harbour and xBase for the backend.
 
 [Wiki](https://github.com/carles9000/hix/wiki) 
 
