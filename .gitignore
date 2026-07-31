@@ -1,0 +1,11 @@
+# Build cache Harbour
+**/.hbmk/*
+**/.cached/*
+**/.log.syncro/*
+**/tmp/*
+
+# Binaries compiled
+*.exe
+*.lib
+*.dll
+

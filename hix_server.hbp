@@ -1,0 +1,130 @@
+# ============================================================
+# hix.hbp - HIX Web Server project
+# ============================================================
+
+-n
+-w1
+-es2
+-inc
+-head=full
+-mt
+-isrc/include
+-workdir=.hbmk/${hb_compiler}/server
+
+
+# Create library
+-hblib
+-ohix_server
+
+
+# Core (sin dependencias entre ellas)
+src/hix_trace.prg
+src/hix_logger.prg
+src/hix_data_pool.prg
+src/hix_bootlog.prg
+src/hix_gzip.prg
+src/hix_accesslog.prg
+src/hix_echo.prg
+src/hix_config.prg
+src/hix_config_data.prg
+src/hix_config_app.prg
+src/hix_keys.prg
+src/hix_metrics.prg
+src/hix_error.prg
+src/hix_socket.prg
+src/hix_ip.prg
+src/hix_firewall.prg
+src/hix_proxy.prg
+src/hix_response.prg
+
+# Pools & Workers
+src/hix_pool.prg
+src/hix_io.prg
+src/hix_multipart.prg
+src/hix_request.prg
+src/hix_context.prg
+src/hix_middleware.prg
+src/hix_jwt.prg
+src/mw/hix_mw_cors.prg
+src/mw/hix_mw_jwt.prg
+src/mw/hix_mw_ratelimit.prg
+src/mw/hix_mw_secheaders.prg
+src/mw/hix_mw_apikey.prg
+src/mw/hix_mw_reqlog.prg
+src/mw/hix_mw_maintenance.prg
+src/mw/hix_mw_bodylimit.prg
+src/mw/hix_mw_methodfilter.prg
+src/mw/hix_mw_anomaly.prg
+src/mw/hix_mw_auth.prg
+src/mw/hix_mw_session_auth.prg
+src/hix_token.prg
+src/hix_csrf.prg
+src/hix_resource.prg
+src/mw/hix_mw_csrf.prg
+src/mw/hix_mw_web_session.prg
+src/mw/hix_mw_web_auth.prg
+src/mw/hix_mw_web_edit.prg
+src/mw/hix_mw_web_admin.prg
+src/mw/hix_mw_api_jwt.prg
+src/mw/hix_mw_api_admin.prg
+src/hix_mw_loader.prg
+src/hix_loader.prg
+src/hix_session.prg
+src/hix_admin.prg
+src/hix_router.prg
+src/hix_dispatcher.prg
+src/hix_worker_http.prg
+src/hix_worker_ws.prg
+src/hix_longpoll.prg
+src/hix_sse.prg
+src/hix_worker_otros.prg
+src/hix_zombie.prg
+src/hix_block.prg
+src/hix_prepro.prg
+src/hix_helpers.prg
+#src/hix_hrb_exports.prg
+
+# Monitor & Server
+src/hix_server.prg
+src/hix_monitor.prg
+
+# View 
+src/hix_view_viewer.prg
+src/hix_view_params.prg
+src/hix_view_tools.prg
+src/hix_view_parser.prg
+src/hix_view_transpile.prg
+src/hix_errorsys.prg
+src/hix_view.prg
+src/hix_view_support.prg
+
+# Style
+src/hix_flash.prg
+src/hix_validator.prg
+
+# Validator
+src/validator/hix_val_cast.prg
+src/validator/hix_val_rules.prg
+src/validator/hix_val_sanitize.prg
+src/validator/hix_val_helpers.prg
+
+# RDD Dbf 
+src/dbf/hix_dbf.prg
+
+# Pdf 
+src/pdf/tpdf.prg
+
+# Lang
+src/lang/hix_lang.prg
+src/lang/hix_lang_en.prg
+src/lang/hix_lang_es.prg
+
+
+# Libs
+-lhbwin
+-lxhb
+-lhbct
+-lhbssl
+-ldflag=/NODEFAULTLIB:libucrt
+-ldflag=/NODEFAULTLIB:msvcrt
+-lucrt

@@ -1,0 +1,46 @@
+# ============================================================
+# hix_app.hbp — Example HIX Web Server
+# ============================================================
+
+-n
+-w1
+-es2
+-inc
+-head=full
+-mt
+-isrc/include
+-workdir=.hbmk/${hb_compiler}/app
+
+-hbexe
+-ohix_app
+
+# Main Test 
+src.app/app.prg
+
+# Resources file
+hix_app.res
+
+# Libs
+-lhix_server
+
+# OpensSSL
+-lhbssl
+-lhbssls
+-llibcrypto-3-x64
+-llibssl-3-x64 
+
+
+# Curl
+hbcurl.hbc
+
+# PDF 
+hbhpdf.hbc
+
+# WAPI_OutputDebugString()
+-lhbwin
+-lxhb
+-lhbct
+
+-ldflag=/NODEFAULTLIB:libucrt
+-ldflag=/NODEFAULTLIB:msvcrt
+-lucrt
