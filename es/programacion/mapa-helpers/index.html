@@ -1,0 +1,4569 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentación del servidor web HIX para Harbour">
+      
+      
+        <meta name="author" content="Charly Nou mil">
+      
+      
+      
+        <link rel="prev" href="../../primeros-pasos/config/hix.json/">
+      
+      
+        <link rel="next" href="../modo-dev-prod/">
+      
+      
+        
+          <link rel="alternate" href="./" hreflang="es">
+        
+          <link rel="alternate" href="../../../programacion/mapa-helpers/" hreflang="en">
+        
+      
+      
+      <link rel="icon" href="../../../assets/hix.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Helpers - Web Server</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#hix-referencia-completa-de-helpers-u" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href="../../" title="Web Server" class="md-header__button md-logo" aria-label="Web Server" data-md-component="logo">
+      
+  <img src="../../../assets/hix_white.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Web Server
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Helpers
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Seleccionar idioma">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="es" class="md-select__link">
+              Español
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../programacion/mapa-helpers/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="Web Server" class="md-nav__button md-logo" aria-label="Web Server" data-md-component="logo">
+      
+  <img src="../../../assets/hix_white.png" alt="logo">
+
+    </a>
+    Web Server
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introducción
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Introducción
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../intro/intro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bienvenido a HIX
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../intro/modo-basico/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modo Básico
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../intro/hixstyle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modo HIX Style
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../intro/data-driven/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hoja de ruta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Primeros pasos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Primeros pasos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../primeros-pasos/compile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Compila proyecto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../primeros-pasos/config/hix.json/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuración hix.json
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Programacion
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Programacion
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Helpers
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Helpers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-lectura-del-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Lectura del request
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Lectura del request">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#datos-de-entrada" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Datos de entrada
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tipo-y-negociacion-de-contenido" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tipo y negociacion de contenido
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datos-del-cliente" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Datos del cliente
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uploads-multipart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Uploads multipart
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-enviar-respuestas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Enviar respuestas
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Enviar respuestas">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#respuestas-directas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Respuestas directas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#control-fino-del-buffer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Control fino del buffer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cookies-en-respuesta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cookies en respuesta
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-streaming-chunked" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Streaming chunked
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-sesion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Sesion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-jwt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. JWT
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-autenticacion-y-roles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Autenticacion y roles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-validacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Validacion
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Validacion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#construir-un-validador" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Construir un validador
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flujo-tipico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flujo tipico
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manejo-manual-de-errores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manejo manual de errores
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reglas-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reglas disponibles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#predicados-rapidos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Predicados rapidos
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-vistas-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Vistas / Templates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-herramientas-de-vista" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Herramientas de vista
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Herramientas de vista">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#conversion-de-tipos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conversion de tipos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#select-html" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Select HTML
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rutas-nombradas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rutas nombradas
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-csrf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. CSRF
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-resource-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Resource ID
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-flash-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Flash messages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-entorno-y-configuracion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Entorno y configuracion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-tabla-rapida-de-referencia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Tabla rapida de referencia
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="14. Tabla rapida de referencia">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#leer-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Leer request
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#detectar-tipo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detectar tipo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enviar-respuesta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enviar respuesta
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#controlar-buffer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Controlar buffer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#streaming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Streaming
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sesion-y-auth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sesion y auth
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validacion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vistas-y-herramientas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vistas y herramientas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csrf-resource-flash-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CSRF, Resource, Flash, Config
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modo-dev-prod/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modo Dev / Modo Prod
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../errorsys/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Errorsys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error-handling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error Handling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error_codes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error Code
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HIX Style
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    HIX Style
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/routes/routes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rutas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Middleware
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/middleware/middleware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introducción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/middleware/contexto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contexto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/middleware/mw_dessign/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diseño
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/middleware/mw_list/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catálogo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/middleware/mw_loader/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loader
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/middleware/mw_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ejemplo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Controllers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Controllers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/controllers/controllers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Controllers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/controllers/requests/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requests
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/controllers/validator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_4" id="__nav_5_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/models/udbf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UDbf
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_5" id="__nav_5_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Response
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/response/encoding-decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Encoding/Decoding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/response/cookies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/response/cabeceras/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cabeceras
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/response/flash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Motor de vistas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Motor de vistas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/views/mambo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mambo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/views/directives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Directivas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_6_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6_3" id="__nav_5_6_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ejemplos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_6_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Ejemplos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/views/example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introducción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/views/example1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ejemplo 1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/views/example2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ejemplo 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/views/example3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ejemplo 3
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/views/example4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ejemplo 4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_7" id="__nav_5_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seguridad
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Seguridad
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/claves/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claves y secretos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/cors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CORS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/firewall/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firewall
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/ratelimit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ratelimit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/sesiones/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sesiones
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/autenticacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autenticacion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/jwt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JWT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/csrf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CSRF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/resources-ids/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resources IDs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/ssl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistema/loaders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loaders y hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tiempo Real
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tiempo Real
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tiempo-real/sse/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tiempo-real/ws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tiempo-real/longpolling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LongPolling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/admin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sistema
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Sistema
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistema/traceando/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Traceando
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistema/logger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistema/bootlog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Boot Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistema/metricas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Métricas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistema/hix-admin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HIX Admin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistema/apache-proxy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Apache proxy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-lectura-del-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Lectura del request
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Lectura del request">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#datos-de-entrada" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Datos de entrada
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tipo-y-negociacion-de-contenido" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tipo y negociacion de contenido
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datos-del-cliente" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Datos del cliente
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uploads-multipart" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Uploads multipart
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-enviar-respuestas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Enviar respuestas
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Enviar respuestas">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#respuestas-directas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Respuestas directas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#control-fino-del-buffer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Control fino del buffer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cookies-en-respuesta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cookies en respuesta
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-streaming-chunked" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Streaming chunked
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-sesion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Sesion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-jwt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. JWT
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-autenticacion-y-roles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Autenticacion y roles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-validacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Validacion
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Validacion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#construir-un-validador" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Construir un validador
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flujo-tipico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flujo tipico
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manejo-manual-de-errores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manejo manual de errores
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reglas-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reglas disponibles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#predicados-rapidos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Predicados rapidos
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-vistas-templates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Vistas / Templates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-herramientas-de-vista" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Herramientas de vista
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Herramientas de vista">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#conversion-de-tipos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conversion de tipos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#select-html" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Select HTML
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rutas-nombradas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rutas nombradas
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-csrf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. CSRF
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-resource-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Resource ID
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-flash-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Flash messages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-entorno-y-configuracion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Entorno y configuracion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-tabla-rapida-de-referencia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Tabla rapida de referencia
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="14. Tabla rapida de referencia">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#leer-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Leer request
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#detectar-tipo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detectar tipo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enviar-respuesta" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enviar respuesta
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#controlar-buffer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Controlar buffer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#streaming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Streaming
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sesion-y-auth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sesion y auth
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validacion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vistas-y-herramientas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vistas y herramientas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csrf-resource-flash-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CSRF, Resource, Flash, Config
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="hix-referencia-completa-de-helpers-u">📘 HIX - Referencia completa de helpers U*<a class="headerlink" href="#hix-referencia-completa-de-helpers-u" title="Permanent link">&para;</a></h1>
+<p>Los helpers <code>U*</code> son funciones globales accesibles desde cualquier ruta, controlador o
+archivo <code>.hrb</code> sin necesidad de pasar <code>oReq</code> como parámetro. El dispatcher llama
+<code>HIX_SetRequest(oReq)</code> antes de ejecutar cada acción, de modo que los helpers siempre
+tienen acceso al request del hilo actual.</p>
+<hr />
+<h2 id="1-lectura-del-request">1. Lectura del request<a class="headerlink" href="#1-lectura-del-request" title="Permanent link">&para;</a></h2>
+<h3 id="datos-de-entrada">Datos de entrada<a class="headerlink" href="#datos-de-entrada" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Retorna</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UMethod()</code></td>
+<td><code>C</code></td>
+<td>Metodo HTTP en mayusculas: <code>"GET"</code>, <code>"POST"</code>, <code>"PUT"</code>, <code>"DELETE"</code>, <code>"PATCH"</code></td>
+</tr>
+<tr>
+<td><code>UPath()</code></td>
+<td><code>C</code></td>
+<td>Path sin query string: <code>"/api/users/42"</code></td>
+</tr>
+<tr>
+<td><code>UQuery()</code></td>
+<td><code>C</code></td>
+<td>Query string raw: <code>"page=1&amp;limit=10"</code></td>
+</tr>
+<tr>
+<td><code>UGet(cKey, xDef)</code></td>
+<td><code>X</code></td>
+<td>Parametro de query string. Sin argumentos devuelve hash completo</td>
+</tr>
+<tr>
+<td><code>UPost(cKey, xDef)</code></td>
+<td><code>X</code></td>
+<td>Campo de body POST (form o JSON). Sin argumentos devuelve hash completo</td>
+</tr>
+<tr>
+<td><code>UParam(cKey, xDef)</code></td>
+<td><code>C</code></td>
+<td>Variable de ruta <code>:var</code>. Sin default lanza error 400 si no existe</td>
+</tr>
+<tr>
+<td><code>UHeader(cKey, xDef)</code></td>
+<td><code>C</code></td>
+<td>Cabecera HTTP (case-insensitive)</td>
+</tr>
+<tr>
+<td><code>UCookie(cName, xDef)</code></td>
+<td><code>C</code></td>
+<td>Cookie del request (parseada una sola vez, lazy)</td>
+</tr>
+<tr>
+<td><code>UBody()</code></td>
+<td><code>C</code></td>
+<td>Body raw como string</td>
+</tr>
+<tr>
+<td><code>UJson()</code></td>
+<td><code>H</code>/<code>A</code></td>
+<td>Body parseado como JSON; <code>NIL</code> si el body no es JSON valido</td>
+</tr>
+<tr>
+<td><code>UContentType()</code></td>
+<td><code>C</code></td>
+<td>Content-Type en minusculas: <code>"application/json"</code></td>
+</tr>
+<tr>
+<td><code>UContentLength()</code></td>
+<td><code>N</code></td>
+<td>Longitud en bytes del body</td>
+</tr>
+<tr>
+<td><code>UFiles()</code></td>
+<td><code>A</code></td>
+<td>Array de hashes de archivos subidos (multipart). Ver seccion uploads</td>
+</tr>
+<tr>
+<td><code>URequest()</code></td>
+<td><code>O</code></td>
+<td>Objeto <code>THixRequest</code> del hilo actual (acceso de bajo nivel)</td>
+</tr>
+<tr>
+<td><code>UContext()</code></td>
+<td><code>O</code></td>
+<td><code>THixContext</code> del middleware actual (acceso a <code>oCtx:hData</code>); <code>NIL</code> si no esta en cadena MW</td>
+</tr>
+</tbody>
+</table>
+<p><strong>UGet / UPost sin argumentos</strong>: devuelven un hash con todos los campos.</p>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos=" 1 "></span></a>// Obtener todos los parametros GET de una vez
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="nv">hParams</span> := UGet()   // { <span class="s">&quot;page&quot;</span> =&gt; <span class="s">&quot;1&quot;</span>, <span class="s">&quot;limit&quot;</span> =&gt; <span class="s">&quot;10&quot;</span> }
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos=" 4 "></span></a>// Obtener un campo con default
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="nv">cNombre</span> := UPost( <span class="s">&quot;nombre&quot;</span>, <span class="s">&quot;Anonimo&quot;</span> )
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos=" 6 "></span></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos=" 7 "></span></a>// Variable de ruta con default seguro
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="nv">nId</span> := <span class="nf">Val</span>( UParam( <span class="s">&quot;id&quot;</span>, <span class="s">&quot;0&quot;</span> ) )
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9"></a><a href="#__codelineno-0-9"><span class="linenos" data-linenos=" 9 "></span></a>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10"></a><a href="#__codelineno-0-10"><span class="linenos" data-linenos="10 "></span></a>// Variable de ruta sin default — lanza 400 si falta
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11"></a><a href="#__codelineno-0-11"><span class="linenos" data-linenos="11 "></span></a><span class="nv">cSlug</span> := UParam( <span class="s">&quot;slug&quot;</span> )
+</span></code></pre></div>
+<p><strong>UParam con indice numerico</strong>: cuando la ruta usa <code>*</code> el comodin se captura como <code>_1</code>.</p>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">&quot;static&quot;</span>, <span class="s">&quot;/static/*&quot;</span>, {||
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><a href="#__codelineno-1-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">cFile</span> := UParam( 1 )   // equivale a UParam(<span class="s">&quot;_1&quot;</span>)
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a><a href="#__codelineno-1-3"><span class="linenos" data-linenos="3 "></span></a>} )
+</span></code></pre></div>
+<h3 id="tipo-y-negociacion-de-contenido">Tipo y negociacion de contenido<a class="headerlink" href="#tipo-y-negociacion-de-contenido" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Retorna</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UIsGet()</code></td>
+<td><code>L</code></td>
+<td><code>.T.</code> si el metodo es GET</td>
+</tr>
+<tr>
+<td><code>UIsPost()</code></td>
+<td><code>L</code></td>
+<td><code>.T.</code> si el metodo es POST</td>
+</tr>
+<tr>
+<td><code>UIsAjax()</code></td>
+<td><code>L</code></td>
+<td><code>.T.</code> si <code>X-Requested-With: XMLHttpRequest</code></td>
+</tr>
+<tr>
+<td><code>UIsHttps()</code></td>
+<td><code>L</code></td>
+<td><code>.T.</code> si la conexion es HTTPS</td>
+</tr>
+<tr>
+<td><code>UScheme()</code></td>
+<td><code>C</code></td>
+<td><code>"http"</code> o <code>"https"</code></td>
+</tr>
+<tr>
+<td><code>UIsJson()</code></td>
+<td><code>L</code></td>
+<td><code>.T.</code> si el Content-Type es <code>application/json</code></td>
+</tr>
+<tr>
+<td><code>UIsForm()</code></td>
+<td><code>L</code></td>
+<td><code>.T.</code> si el Content-Type es <code>application/x-www-form-urlencoded</code></td>
+</tr>
+<tr>
+<td><code>UIsMultipart()</code></td>
+<td><code>L</code></td>
+<td><code>.T.</code> si el Content-Type es <code>multipart/form-data</code></td>
+</tr>
+<tr>
+<td><code>UWantsJson()</code></td>
+<td><code>L</code></td>
+<td><code>.T.</code> si el cliente prefiere JSON (cabecera Accept o AJAX)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="datos-del-cliente">Datos del cliente<a class="headerlink" href="#datos-del-cliente" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Retorna</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UIP()</code></td>
+<td><code>C</code></td>
+<td>IP real del cliente (respeta <code>X-Forwarded-For</code> si <code>mode=proxied</code>)</td>
+</tr>
+<tr>
+<td><code>UHost()</code></td>
+<td><code>C</code></td>
+<td>Hostname del request (cabecera <code>Host</code>)</td>
+</tr>
+<tr>
+<td><code>UPort()</code></td>
+<td><code>N</code></td>
+<td>Puerto del servidor</td>
+</tr>
+</tbody>
+</table>
+<h3 id="uploads-multipart">Uploads multipart<a class="headerlink" href="#uploads-multipart" title="Permanent link">&para;</a></h3>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">aFiles</span> := U<span class="nc">Files</span>()
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">FOR</span> EACH h<span class="nc">File</span> IN a<span class="nc">Files</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos="3 "></span></a>   // h<span class="nc">File</span>[<span class="s">&quot;name&quot;</span>]  -&gt; nombre del campo
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos="4 "></span></a>   // h<span class="nc">File</span>[<span class="s">&quot;data&quot;</span>]  -&gt; contenido binario
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos="5 "></span></a>   // h<span class="nc">File</span>[<span class="s">&quot;mime&quot;</span>]  -&gt; Content-Type del archivo
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6"></a><a href="#__codelineno-2-6"><span class="linenos" data-linenos="6 "></span></a>   // h<span class="nc">File</span>[<span class="s">&quot;size&quot;</span>]  -&gt; tamano en bytes
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7"></a><a href="#__codelineno-2-7"><span class="linenos" data-linenos="7 "></span></a>   <span class="nv">hb_MemoWrit</span>( <span class="s">&quot;uploads/&quot;</span> + h<span class="nc">File</span>[<span class="s">&quot;name&quot;</span>], h<span class="nc">File</span>[<span class="s">&quot;data&quot;</span>] )
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8"></a><a href="#__codelineno-2-8"><span class="linenos" data-linenos="8 "></span></a><span class="kr">NEXT</span>
+</span></code></pre></div>
+<hr />
+<h2 id="2-enviar-respuestas">2. Enviar respuestas<a class="headerlink" href="#2-enviar-respuestas" title="Permanent link">&para;</a></h2>
+<h3 id="respuestas-directas">Respuestas directas<a class="headerlink" href="#respuestas-directas" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>USendJson(xData [, nStatus])</code></td>
+<td>JSON 200. <code>xData</code> puede ser hash, array o string</td>
+</tr>
+<tr>
+<td><code>USendHtml(cHtml [, nStatus])</code></td>
+<td>HTML 200</td>
+</tr>
+<tr>
+<td><code>USendText(cText [, nStatus])</code></td>
+<td><code>text/plain</code> 200</td>
+</tr>
+<tr>
+<td><code>USendView(cView [, hVars])</code></td>
+<td>Renderiza template y envia HTML</td>
+</tr>
+<tr>
+<td><code>USendEmpty()</code></td>
+<td>204 No Content</td>
+</tr>
+<tr>
+<td><code>USendError(nStatus, cDetail)</code></td>
+<td>Error HTTP con mensaje de detalle</td>
+</tr>
+<tr>
+<td><code>URedirect(cUrl [, nStatus])</code></td>
+<td>Redireccion (302 por defecto)</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos=" 1 "></span></a>// Respuesta JSON simple
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;ok&quot;</span> =&gt; <span class="ow">.T.</span> } )
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos=" 3 "></span></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos=" 4 "></span></a>// Con status <span class="nc">custom</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;id&quot;</span> =&gt; 42, <span class="s">&quot;name&quot;</span> =&gt; <span class="s">&quot;Test&quot;</span> }, 201 )
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos=" 7 "></span></a>// Redireccion permanente
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="nv">URedirect</span>( <span class="s">&quot;/nueva-url&quot;</span>, 301 )
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9"></a><a href="#__codelineno-3-9"><span class="linenos" data-linenos=" 9 "></span></a>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10"></a><a href="#__codelineno-3-10"><span class="linenos" data-linenos="10 "></span></a>// Error HTTP
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11"></a><a href="#__codelineno-3-11"><span class="linenos" data-linenos="11 "></span></a><span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">&quot;Sin permisos&quot;</span> )
+</span></code></pre></div>
+<h3 id="control-fino-del-buffer">Control fino del buffer<a class="headerlink" href="#control-fino-del-buffer" title="Permanent link">&para;</a></h3>
+<p>Cuando necesitas construir la respuesta paso a paso antes de enviarla:</p>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UWrite(cText)</code></td>
+<td>Acumula texto en el buffer de respuesta</td>
+</tr>
+<tr>
+<td><code>UEcho(cText)</code></td>
+<td>Alias de <code>UWrite</code></td>
+</tr>
+<tr>
+<td><code>USetStatus(nStatus)</code></td>
+<td>Fija el status HTTP del buffer</td>
+</tr>
+<tr>
+<td><code>USetMime(cMime)</code></td>
+<td>Fija el MIME del buffer (<code>"json"</code>, <code>"html"</code>, <code>"text"</code> o MIME completo)</td>
+</tr>
+<tr>
+<td><code>UGetMime()</code></td>
+<td>Retorna el MIME configurado actualmente</td>
+</tr>
+<tr>
+<td><code>USetHeader(cKey, cVal)</code></td>
+<td>Agrega cabecera extra a la respuesta</td>
+</tr>
+<tr>
+<td><code>UFlush()</code></td>
+<td>Envia el buffer acumulado como chunk (inicia streaming si es la primera vez)</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a>// Construir JSON manualmente
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>tStatus( 201 )
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>tMime( <span class="s">&quot;json&quot;</span> )
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><a href="#__codelineno-4-4"><span class="linenos" data-linenos="4 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;X-Request-Id&quot;</span>, <span class="s">&quot;abc123&quot;</span> )
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5"></a><a href="#__codelineno-4-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">UWrite</span>( hb_jsonEncode( { <span class="s">&quot;created&quot;</span> =&gt; <span class="ow">.T.</span> } ) )
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6"></a><a href="#__codelineno-4-6"><span class="linenos" data-linenos="6 "></span></a>// El dispatcher envia el buffer al terminar la accion
+</span></code></pre></div>
+<h3 id="cookies-en-respuesta">Cookies en respuesta<a class="headerlink" href="#cookies-en-respuesta" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>USetCookie(cName, cVal, nMaxAge)</code></td>
+<td>Escribe <code>Set-Cookie</code> en la respuesta</td>
+</tr>
+</tbody>
+</table>
+<p><code>nMaxAge</code>:
+- <code>0</code> — cookie de sesion (sin <code>Max-Age</code>)
+- <code>-1</code> — expirar inmediatamente (<code>Max-Age=0</code>)
+- <code>&gt; 0</code> — duracion en segundos</p>
+<p>Los flags <code>HttpOnly; SameSite=Lax; Path=/</code> se agregan automaticamente.</p>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;session_id&quot;</span>, cSid, 3600 )   // 1 hora
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;pref&quot;</span>, <span class="s">&quot;dark&quot;</span>, 0 )          // sesion
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;old_cookie&quot;</span>, <span class="s">&quot;&quot;</span>, -1 )       // expirar
+</span></code></pre></div>
+<hr />
+<h2 id="3-streaming-chunked">3. Streaming chunked<a class="headerlink" href="#3-streaming-chunked" title="Permanent link">&para;</a></h2>
+<p>Para SSE, descargas progresivas o respuestas de larga duracion:</p>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>USendStreamStart(cMime, nStatus, hExtra)</code></td>
+<td>Inicia respuesta chunked; cabeceras extras en <code>hExtra</code></td>
+</tr>
+<tr>
+<td><code>USendChunk(cData)</code></td>
+<td>Envia un fragmento de datos</td>
+</tr>
+<tr>
+<td><code>USendStreamEnd()</code></td>
+<td>Cierra el stream (chunk de longitud cero)</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos=" 1 "></span></a>// SSE — <span class="nc">Server</span>-Sent Events
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">&quot;events&quot;</span>, <span class="s">&quot;/events&quot;</span>, {||
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="nv">LOCAL</span> i := 0
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="kr">USe</span>ndStreamStart( <span class="s">&quot;text/event-stream&quot;</span>, 200, <span class="p">;</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5"></a><a href="#__codelineno-6-5"><span class="linenos" data-linenos=" 5 "></span></a>      { <span class="s">&quot;Cache-Control&quot;</span> =&gt; <span class="s">&quot;no-cache&quot;</span>, <span class="s">&quot;X-Accel-Buffering&quot;</span> =&gt; <span class="s">&quot;no&quot;</span> } )
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6"></a><a href="#__codelineno-6-6"><span class="linenos" data-linenos=" 6 "></span></a>   <span class="kr">DO</span> WHILE i &lt; 10
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7"></a><a href="#__codelineno-6-7"><span class="linenos" data-linenos=" 7 "></span></a>      <span class="nv">i</span>++
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8"></a><a href="#__codelineno-6-8"><span class="linenos" data-linenos=" 8 "></span></a>      <span class="kr">USe</span>ndChunk( <span class="s">&quot;data: &quot;</span> + hb_jsonEncode( { <span class="s">&quot;n&quot;</span> =&gt; i } ) + hb_eol() + hb_eol() )
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9"></a><a href="#__codelineno-6-9"><span class="linenos" data-linenos=" 9 "></span></a>      <span class="nv">hb_idleSleep</span>( 1 )
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10"></a><a href="#__codelineno-6-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="kr">ENDDO</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11"></a><a href="#__codelineno-6-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="kr">USe</span>ndStreamEnd()
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12"></a><a href="#__codelineno-6-12"><span class="linenos" data-linenos="12 "></span></a>} )
+</span></code></pre></div>
+<hr />
+<h2 id="4-sesion">4. Sesion<a class="headerlink" href="#4-sesion" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>USession()</code></td>
+<td>Devuelve un objeto proxy con metodos <code>Get/Set/Save/Destroy</code></td>
+</tr>
+<tr>
+<td><code>USession(cKey)</code></td>
+<td>Lee un valor de la sesion; <code>NIL</code> si no existe</td>
+</tr>
+<tr>
+<td><code>USession(cKey, xDef)</code></td>
+<td>Lee un valor con default</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos=" 1 "></span></a>// Leer un campo
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="nv">cUser</span> := U<span class="nc">Session</span>( <span class="s">&quot;user&quot;</span> )
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos=" 3 "></span></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4"></a><a href="#__codelineno-7-4"><span class="linenos" data-linenos=" 4 "></span></a>// Escribir y guardar
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5"></a><a href="#__codelineno-7-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="kr">USe</span>ssi<span class="nf">on</span>():<span class="nf">Set</span>( <span class="s">&quot;user&quot;</span>, <span class="s">&quot;carles&quot;</span> )
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6"></a><a href="#__codelineno-7-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="kr">USe</span>ssi<span class="nf">on</span>():<span class="nf">Set</span>( <span class="s">&quot;role&quot;</span>, <span class="s">&quot;admin&quot;</span> )
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7"></a><a href="#__codelineno-7-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="kr">USe</span>ssi<span class="nf">on</span>():Save()   // renueva TTL y emite Set-Cookie
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8"></a><a href="#__codelineno-7-8"><span class="linenos" data-linenos=" 8 "></span></a>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9"></a><a href="#__codelineno-7-9"><span class="linenos" data-linenos=" 9 "></span></a>// Destruir sesion
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10"></a><a href="#__codelineno-7-10"><span class="linenos" data-linenos="10 "></span></a><span class="kr">USe</span>ssi<span class="nf">on</span>():Destroy()
+</span></code></pre></div>
+<blockquote>
+<p>Requiere que <code>HIX_MwSession</code> este registrado como middleware en la ruta.</p>
+</blockquote>
+<hr />
+<h2 id="5-jwt">5. JWT<a class="headerlink" href="#5-jwt" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UJwt()</code></td>
+<td>Devuelve el hash completo del payload JWT; <code>NIL</code> si no hay JWT</td>
+</tr>
+<tr>
+<td><code>UJwt(cKey)</code></td>
+<td>Devuelve un claim del payload; <code>NIL</code> si no existe</td>
+</tr>
+<tr>
+<td><code>UJwt(cKey, xDef)</code></td>
+<td>Devuelve un claim con default</td>
+</tr>
+<tr>
+<td><code>UHasScope(cScope)</code></td>
+<td><code>.T.</code> si el JWT incluye el scope indicado en el campo <code>scope</code></td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a>// Leer claim
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">cSub</span>  := UJwt( <span class="s">&quot;sub&quot;</span> )
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3"></a><a href="#__codelineno-8-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">nExp</span>  := UJwt( <span class="s">&quot;exp&quot;</span>, 0 )
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4"></a><a href="#__codelineno-8-4"><span class="linenos" data-linenos="4 "></span></a>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5"></a><a href="#__codelineno-8-5"><span class="linenos" data-linenos="5 "></span></a>// Verificar scope
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6"></a><a href="#__codelineno-8-6"><span class="linenos" data-linenos="6 "></span></a><span class="kr">IF</span> ! UHasScope( <span class="s">&quot;read:products&quot;</span> )
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7"></a><a href="#__codelineno-8-7"><span class="linenos" data-linenos="7 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">&quot;Scope insuficiente&quot;</span> )
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8"></a><a href="#__codelineno-8-8"><span class="linenos" data-linenos="8 "></span></a>   <span class="kr">RETURN</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9"></a><a href="#__codelineno-8-9"><span class="linenos" data-linenos="9 "></span></a><span class="kr">ENDIF</span>
+</span></code></pre></div>
+<blockquote>
+<p>Requiere que <code>HixMwJwt</code> este registrado como middleware en la ruta.</p>
+</blockquote>
+<hr />
+<h2 id="6-autenticacion-y-roles">6. Autenticacion y roles<a class="headerlink" href="#6-autenticacion-y-roles" title="Permanent link">&para;</a></h2>
+<p>Disponibles cuando el middleware <code>HIX_MwAuth</code> o <code>HIX_MwIsAuth</code> esta activo.</p>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UCurrentUser()</code></td>
+<td>Hash completo del usuario autenticado; <code>NIL</code> si no hay sesion</td>
+</tr>
+<tr>
+<td><code>UAuthUser()</code></td>
+<td>Hash del usuario del request (set por middleware); <code>NIL</code> si no autenticado</td>
+</tr>
+<tr>
+<td><code>UAuthUser(cKey)</code></td>
+<td>Campo del hash del usuario</td>
+</tr>
+<tr>
+<td><code>UAuthUser(cKey, xDef)</code></td>
+<td>Campo del hash con default</td>
+</tr>
+<tr>
+<td><code>UHasRole(cRole)</code></td>
+<td><code>.T.</code> si el usuario tiene el rol (acceso completo)</td>
+</tr>
+<tr>
+<td><code>UHasRole(cRole, cOp)</code></td>
+<td><code>.T.</code> si el usuario tiene el rol con la operacion indicada</td>
+</tr>
+<tr>
+<td><code>UGetRoles()</code></td>
+<td>Hash de roles del usuario: <code>{ "admin" =&gt; "", "editor" =&gt; "read;write" }</code></td>
+</tr>
+<tr>
+<td><code>UAuthLogout()</code></td>
+<td>Destruye la sesion y limpia el usuario actual</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos=" 1 "></span></a>// Verificar rol
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="kr">IF</span> ! UHasRole( <span class="s">&quot;admin&quot;</span> )
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3"></a><a href="#__codelineno-9-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">&quot;Solo administradores&quot;</span> )
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4"></a><a href="#__codelineno-9-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="kr">RETURN</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5"></a><a href="#__codelineno-9-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="kr">ENDIF</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6"></a><a href="#__codelineno-9-6"><span class="linenos" data-linenos=" 6 "></span></a>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7"></a><a href="#__codelineno-9-7"><span class="linenos" data-linenos=" 7 "></span></a>// Verificar rol con operacion granular
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8"></a><a href="#__codelineno-9-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="kr">IF</span> ! UHasRole( <span class="s">&quot;products&quot;</span>, <span class="s">&quot;delete&quot;</span> )
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9"></a><a href="#__codelineno-9-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">&quot;Sin permiso de borrado&quot;</span> )
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10"></a><a href="#__codelineno-9-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="kr">RETURN</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11"></a><a href="#__codelineno-9-11"><span class="linenos" data-linenos="11 "></span></a><span class="kr">ENDIF</span>
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12"></a><a href="#__codelineno-9-12"><span class="linenos" data-linenos="12 "></span></a>
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13"></a><a href="#__codelineno-9-13"><span class="linenos" data-linenos="13 "></span></a>// Leer datos del usuario
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14"></a><a href="#__codelineno-9-14"><span class="linenos" data-linenos="14 "></span></a><span class="nv">hUser</span> := UAuthUser()
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15"></a><a href="#__codelineno-9-15"><span class="linenos" data-linenos="15 "></span></a><span class="nv">cEmail</span> := UAuthUser( <span class="s">&quot;email&quot;</span>, <span class="s">&quot;&quot;</span> )
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16"></a><a href="#__codelineno-9-16"><span class="linenos" data-linenos="16 "></span></a>
+</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17"></a><a href="#__codelineno-9-17"><span class="linenos" data-linenos="17 "></span></a>// Cerrar sesion
+</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18"></a><a href="#__codelineno-9-18"><span class="linenos" data-linenos="18 "></span></a><span class="nv">UAuthLogout</span>()
+</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19"></a><a href="#__codelineno-9-19"><span class="linenos" data-linenos="19 "></span></a><span class="nv">URedirect</span>( <span class="s">&quot;/login&quot;</span> )
+</span></code></pre></div>
+<hr />
+<h2 id="7-validacion">7. Validacion<a class="headerlink" href="#7-validacion" title="Permanent link">&para;</a></h2>
+<h3 id="construir-un-validador">Construir un validador<a class="headerlink" href="#construir-un-validador" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Fuente de datos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UValidate(hRules)</code></td>
+<td>POST (form o JSON)</td>
+</tr>
+<tr>
+<td><code>UValidatePost(hRules)</code></td>
+<td>POST explicito</td>
+</tr>
+<tr>
+<td><code>UValidateGet(hRules)</code></td>
+<td>Query string</td>
+</tr>
+<tr>
+<td><code>UValidateParams(hRules)</code></td>
+<td>Query string + variables de ruta fusionadas</td>
+</tr>
+<tr>
+<td><code>UValidateJson(hRules)</code></td>
+<td>Body JSON explicito</td>
+</tr>
+<tr>
+<td><code>UValidateInput(hRules)</code></td>
+<td>Equivalente a <code>UValidatePost</code> (form body POST)</td>
+</tr>
+<tr>
+<td><code>UValidateOrFail(hRules)</code></td>
+<td>POST — responde 422 automaticamente si falla; devuelve <code>NIL</code></td>
+</tr>
+</tbody>
+</table>
+<p>Todas aceptan un segundo parametro opcional <code>hSanitate</code> con reglas de sanitizacion.</p>
+<h3 id="flujo-tipico">Flujo tipico<a class="headerlink" href="#flujo-tipico" title="Permanent link">&para;</a></h3>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a><a href="#__codelineno-10-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> _CreateUser()
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2"></a><a href="#__codelineno-10-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oVal := UValidateOrFail( { <span class="p">;</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3"></a><a href="#__codelineno-10-3"><span class="linenos" data-linenos=" 3 "></span></a>      &quot;name<span class="s">&quot;  =&gt; &quot;</span>required|string|max:100&quot;, <span class="p">;</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4"></a><a href="#__codelineno-10-4"><span class="linenos" data-linenos=" 4 "></span></a>      &quot;email<span class="s">&quot; =&gt; &quot;</span>required|string|email&quot;,   <span class="p">;</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5"></a><a href="#__codelineno-10-5"><span class="linenos" data-linenos=" 5 "></span></a>      &quot;age<span class="s">&quot;   =&gt; &quot;</span>required|integer|min:18&quot;  <span class="p">;</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6"></a><a href="#__codelineno-10-6"><span class="linenos" data-linenos=" 6 "></span></a>   } )
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7"></a><a href="#__codelineno-10-7"><span class="linenos" data-linenos=" 7 "></span></a>   <span class="kr">IF</span> oVal == NIL ; RETURN NIL ; ENDIF   // ya respondio 422
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8"></a><a href="#__codelineno-10-8"><span class="linenos" data-linenos=" 8 "></span></a>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9"></a><a href="#__codelineno-10-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="nv">cName</span>  := oVal:Get( <span class="s">&quot;name&quot;</span> )
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10"></a><a href="#__codelineno-10-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="nv">cEmail</span> := oVal:Get( <span class="s">&quot;email&quot;</span> )
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11"></a><a href="#__codelineno-10-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="nv">nAge</span>   := oVal:Get( <span class="s">&quot;age&quot;</span> )
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12"></a><a href="#__codelineno-10-12"><span class="linenos" data-linenos="12 "></span></a>   // ...
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13"></a><a href="#__codelineno-10-13"><span class="linenos" data-linenos="13 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;ok&quot;</span> =&gt; <span class="ow">.T.</span> }, 201 )
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14"></a><a href="#__codelineno-10-14"><span class="linenos" data-linenos="14 "></span></a><span class="kr">RETURN</span> NIL
+</span></code></pre></div>
+<h3 id="manejo-manual-de-errores">Manejo manual de errores<a class="headerlink" href="#manejo-manual-de-errores" title="Permanent link">&para;</a></h3>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> oVal := UValidatePost( hRules )
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">IF</span> ! oVal:Make()
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3"></a><a href="#__codelineno-11-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;errors&quot;</span> =&gt; oVal:GetErrorsJs<span class="nf">on</span>() }, 422 )
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4"></a><a href="#__codelineno-11-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="kr">RETURN</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5"></a><a href="#__codelineno-11-5"><span class="linenos" data-linenos="5 "></span></a><span class="kr">ENDIF</span>
+</span></code></pre></div>
+<h3 id="reglas-disponibles">Reglas disponibles<a class="headerlink" href="#reglas-disponibles" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a><a href="#__codelineno-12-1"><span class="linenos" data-linenos=" 1 "></span></a>required            campo obligatorio (no vacio)
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2"></a><a href="#__codelineno-12-2"><span class="linenos" data-linenos=" 2 "></span></a>string              tipo string
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3"></a><a href="#__codelineno-12-3"><span class="linenos" data-linenos=" 3 "></span></a>integer             entero
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4"></a><a href="#__codelineno-12-4"><span class="linenos" data-linenos=" 4 "></span></a>numeric             numero (int o decimal)
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5"></a><a href="#__codelineno-12-5"><span class="linenos" data-linenos=" 5 "></span></a>boolean             logico
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6"></a><a href="#__codelineno-12-6"><span class="linenos" data-linenos=" 6 "></span></a>array               array
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7"></a><a href="#__codelineno-12-7"><span class="linenos" data-linenos=" 7 "></span></a>min:N               string: longitud &gt;= N  /  numero: valor &gt;= N
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8"></a><a href="#__codelineno-12-8"><span class="linenos" data-linenos=" 8 "></span></a>max:N               string: longitud &lt;= N  /  numero: valor &lt;= N
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9"></a><a href="#__codelineno-12-9"><span class="linenos" data-linenos=" 9 "></span></a>minlen:N            longitud string &gt;= N
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10"></a><a href="#__codelineno-12-10"><span class="linenos" data-linenos="10 "></span></a>maxlen:N            longitud string &lt;= N
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11"></a><a href="#__codelineno-12-11"><span class="linenos" data-linenos="11 "></span></a>between:N:M         numero entre N y M
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12"></a><a href="#__codelineno-12-12"><span class="linenos" data-linenos="12 "></span></a>email               formato email
+</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13"></a><a href="#__codelineno-12-13"><span class="linenos" data-linenos="13 "></span></a>url                 empieza por http:// o https://
+</span><span id="__span-12-14"><a id="__codelineno-12-14" name="__codelineno-12-14"></a><a href="#__codelineno-12-14"><span class="linenos" data-linenos="14 "></span></a>ip                  IPv4 valida
+</span><span id="__span-12-15"><a id="__codelineno-12-15" name="__codelineno-12-15"></a><a href="#__codelineno-12-15"><span class="linenos" data-linenos="15 "></span></a>regex:PATRON        expresion regular Harbour
+</span><span id="__span-12-16"><a id="__codelineno-12-16" name="__codelineno-12-16"></a><a href="#__codelineno-12-16"><span class="linenos" data-linenos="16 "></span></a>in:a,b,c            valor en lista
+</span><span id="__span-12-17"><a id="__codelineno-12-17" name="__codelineno-12-17"></a><a href="#__codelineno-12-17"><span class="linenos" data-linenos="17 "></span></a>notin:a,b           valor no en lista
+</span><span id="__span-12-18"><a id="__codelineno-12-18" name="__codelineno-12-18"></a><a href="#__codelineno-12-18"><span class="linenos" data-linenos="18 "></span></a>field               incluye el campo en DataFields() si valido
+</span></code></pre></div>
+<p>Sanitizacion (se aplican antes de validar):</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a><a href="#__codelineno-13-1"><span class="linenos" data-linenos="1 "></span></a>trim                AllTrim()
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2"></a><a href="#__codelineno-13-2"><span class="linenos" data-linenos="2 "></span></a>lower               Lower()
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3"></a><a href="#__codelineno-13-3"><span class="linenos" data-linenos="3 "></span></a>upper               Upper()
+</span></code></pre></div>
+<h3 id="predicados-rapidos">Predicados rapidos<a class="headerlink" href="#predicados-rapidos" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UIsMail(cStr)</code></td>
+<td><code>.T.</code> si <code>cStr</code> tiene formato de email</td>
+</tr>
+<tr>
+<td><code>UIsNumeric(uValue)</code></td>
+<td><code>.T.</code> si el valor es numerico (numero o string numerico)</td>
+</tr>
+<tr>
+<td><code>UIsInteger(uValue)</code></td>
+<td><code>.T.</code> si el valor es un entero</td>
+</tr>
+<tr>
+<td><code>UIsUrl(cStr)</code></td>
+<td><code>.T.</code> si empieza por <code>http://</code> o <code>https://</code></td>
+</tr>
+<tr>
+<td><code>UIsIp(cStr)</code></td>
+<td><code>.T.</code> si es una IPv4 valida</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-vistas-templates">8. Vistas / Templates<a class="headerlink" href="#8-vistas-templates" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>USendView(cView [, hVars])</code></td>
+<td>Renderiza el template y envia la respuesta HTML</td>
+</tr>
+<tr>
+<td><code>UView(cView [, hVars])</code></td>
+<td>Renderiza el template y devuelve el HTML como string</td>
+</tr>
+</tbody>
+</table>
+<p>Los templates se ubican en <code>www/views/</code> con extension <code>.html</code>.</p>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1"></a><a href="#__codelineno-14-1"><span class="linenos" data-linenos=" 1 "></span></a>// Renderizar y enviar
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2"></a><a href="#__codelineno-14-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="kr">USe</span>ndView( <span class="s">&quot;users/list.html&quot;</span> )
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3"></a><a href="#__codelineno-14-3"><span class="linenos" data-linenos=" 3 "></span></a>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4"></a><a href="#__codelineno-14-4"><span class="linenos" data-linenos=" 4 "></span></a>// Con variables
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5"></a><a href="#__codelineno-14-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="kr">USe</span>ndView( <span class="s">&quot;users/edit.html&quot;</span>, { <span class="p">;</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6"></a><a href="#__codelineno-14-6"><span class="linenos" data-linenos=" 6 "></span></a>   &quot;cName<span class="s">&quot; =&gt; &quot;</span>Carles&quot;, <span class="p">;</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7"></a><a href="#__codelineno-14-7"><span class="linenos" data-linenos=" 7 "></span></a>   &quot;nAge&quot;  =&gt; 42        <span class="p">;</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8"></a><a href="#__codelineno-14-8"><span class="linenos" data-linenos=" 8 "></span></a>} )
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9"></a><a href="#__codelineno-14-9"><span class="linenos" data-linenos=" 9 "></span></a>
+</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10"></a><a href="#__codelineno-14-10"><span class="linenos" data-linenos="10 "></span></a>// Solo obtener el HTML (para componer partials)
+</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11"></a><a href="#__codelineno-14-11"><span class="linenos" data-linenos="11 "></span></a><span class="nv">cPartial</span> := UView( <span class="s">&quot;partials/header.html&quot;</span>, { <span class="s">&quot;cTitle&quot;</span> =&gt; <span class="s">&quot;Mi app&quot;</span> } )
+</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12"></a><a href="#__codelineno-14-12"><span class="linenos" data-linenos="12 "></span></a><span class="kr">USe</span>ndHtml( cPartial + <span class="s">&quot;&lt;main&gt;contenido&lt;/main&gt;&quot;</span> )
+</span></code></pre></div>
+<p>Formato del template:</p>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1"></a><a href="#__codelineno-15-1"><span class="linenos" data-linenos="1 "></span></a>@args cName, nAge
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2"></a><a href="#__codelineno-15-2"><span class="linenos" data-linenos="2 "></span></a>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3"></a><a href="#__codelineno-15-3"><span class="linenos" data-linenos="3 "></span></a><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4"></a><a href="#__codelineno-15-4"><span class="linenos" data-linenos="4 "></span></a><span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5"></a><a href="#__codelineno-15-5"><span class="linenos" data-linenos="5 "></span></a>  <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Editar: {{ cName }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6"></a><a href="#__codelineno-15-6"><span class="linenos" data-linenos="6 "></span></a>  <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Edad: {{ hb_NToS(nAge) }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7"></a><a href="#__codelineno-15-7"><span class="linenos" data-linenos="7 "></span></a><span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8"></a><a href="#__codelineno-15-8"><span class="linenos" data-linenos="8 "></span></a><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</span></code></pre></div>
+<hr />
+<h2 id="9-herramientas-de-vista">9. Herramientas de vista<a class="headerlink" href="#9-herramientas-de-vista" title="Permanent link">&para;</a></h2>
+<h3 id="conversion-de-tipos">Conversion de tipos<a class="headerlink" href="#conversion-de-tipos" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UStr(u)</code></td>
+<td>Convierte cualquier tipo Harbour a string (C, N, L, D, A, H)</td>
+</tr>
+<tr>
+<td><code>UDateToHtml(dFecha)</code></td>
+<td>Fecha Harbour a string <code>"YYYY-MM-DD"</code> para inputs HTML</td>
+</tr>
+<tr>
+<td><code>ULogicToHtmlChecked(lValue)</code></td>
+<td><code>.T.</code> → <code>"checked"</code>, <code>.F.</code> → <code>""</code> (para checkboxes)</td>
+</tr>
+<tr>
+<td><code>UHtmlEncode(cText)</code></td>
+<td>Escapa entidades HTML (<code>&amp;</code>, <code>&lt;</code>, <code>&gt;</code>, <code>"</code>, <code>'</code>) en una pasada</td>
+</tr>
+<tr>
+<td><code>UOsFileName(cFileName)</code></td>
+<td>Normaliza separadores de path al separador del sistema operativo</td>
+</tr>
+</tbody>
+</table>
+<h3 id="select-html">Select HTML<a class="headerlink" href="#select-html" title="Permanent link">&para;</a></h3>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1"></a><a href="#__codelineno-16-1"><span class="linenos" data-linenos=" 1 "></span></a>// UHashToHtml<span class="nf">Select</span>( aHash, cSelect, cKey, cValue )
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2"></a><a href="#__codelineno-16-2"><span class="linenos" data-linenos=" 2 "></span></a>// aHash: array de hashes con campos clave y valor
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3"></a><a href="#__codelineno-16-3"><span class="linenos" data-linenos=" 3 "></span></a>// cSelect: valor actualmente seleccionado
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4"></a><a href="#__codelineno-16-4"><span class="linenos" data-linenos=" 4 "></span></a>// cKey: nombre del campo clave en cada hash (default <span class="s">&quot;key&quot;</span>)
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5"></a><a href="#__codelineno-16-5"><span class="linenos" data-linenos=" 5 "></span></a>// cValue: nombre del campo valor en cada hash (default <span class="s">&quot;value&quot;</span>)
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6"></a><a href="#__codelineno-16-6"><span class="linenos" data-linenos=" 6 "></span></a>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7"></a><a href="#__codelineno-16-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="nv">aItems</span> := { { <span class="s">&quot;key&quot;</span> =&gt; <span class="s">&quot;es&quot;</span>, <span class="s">&quot;value&quot;</span> =&gt; <span class="s">&quot;Espanol&quot;</span> }, <span class="p">;</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8"></a><a href="#__codelineno-16-8"><span class="linenos" data-linenos=" 8 "></span></a>            { <span class="s">&quot;key&quot;</span> =&gt; <span class="s">&quot;en&quot;</span>, <span class="s">&quot;value&quot;</span> =&gt; <span class="s">&quot;English&quot;</span> } }
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9"></a><a href="#__codelineno-16-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="nv">cHtml</span> := UHashToHtml<span class="nf">Select</span>( aItems, <span class="s">&quot;es&quot;</span>, <span class="s">&quot;key&quot;</span>, <span class="s">&quot;value&quot;</span> )
+</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10"></a><a href="#__codelineno-16-10"><span class="linenos" data-linenos="10 "></span></a>// &lt;option value=<span class="s">&quot;&quot;</span> &gt;&lt;/option&gt;
+</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11"></a><a href="#__codelineno-16-11"><span class="linenos" data-linenos="11 "></span></a>// &lt;option value=<span class="s">&quot;es&quot;</span> selected&gt;Espanol&lt;/option&gt;
+</span><span id="__span-16-12"><a id="__codelineno-16-12" name="__codelineno-16-12"></a><a href="#__codelineno-16-12"><span class="linenos" data-linenos="12 "></span></a>// &lt;option value=<span class="s">&quot;en&quot;</span>&gt;English&lt;/option&gt;
+</span></code></pre></div>
+<h3 id="rutas-nombradas">Rutas nombradas<a class="headerlink" href="#rutas-nombradas" title="Permanent link">&para;</a></h3>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1"></a><a href="#__codelineno-17-1"><span class="linenos" data-linenos="1 "></span></a>// URoute( cName, param1, param2, ... )
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2"></a><a href="#__codelineno-17-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">cUrl</span> := URoute( <span class="s">&quot;user&quot;</span>, 42 )       // -&gt; <span class="s">&quot;/users/42&quot;</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3"></a><a href="#__codelineno-17-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">cUrl</span> := URoute( <span class="s">&quot;post&quot;</span>, <span class="s">&quot;mi-slug&quot;</span> ) // -&gt; <span class="s">&quot;/posts/mi-slug&quot;</span>
+</span></code></pre></div>
+<hr />
+<h2 id="10-csrf">10. CSRF<a class="headerlink" href="#10-csrf" title="Permanent link">&para;</a></h2>
+<p>Para proteger formularios HTML contra ataques Cross-Site Request Forgery.</p>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UCsrfToHtml([cToken])</code></td>
+<td>Genera <code>&lt;input type="hidden" name="_csrf" value="..."&gt;</code></td>
+</tr>
+<tr>
+<td><code>HIX_CsrfMakeToken([cData])</code></td>
+<td>Genera un token CSRF firmado con la clave <code>csrf</code> del store <code>HIX_Keys</code></td>
+</tr>
+<tr>
+<td><code>HIX_CsrfValidToken(cToken [, nLapsus])</code></td>
+<td><code>.T.</code> si el token es valido. <code>nLapsus</code> en segundos (0 = sin expiracion)</td>
+</tr>
+<tr>
+<td><code>HIX_CsrfGenRandom([nLen])</code></td>
+<td>Genera un string aleatorio de <code>nLen</code> bytes</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1"></a><a href="#__codelineno-18-1"><span class="linenos" data-linenos=" 1 "></span></a>// En la accion GET que sirve el <span class="nc">form</span>ulario
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2"></a><a href="#__codelineno-18-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="kr">USe</span>ndView( <span class="s">&quot;form.html&quot;</span>, { <span class="s">&quot;cCsrf&quot;</span> =&gt; UCsrfToHtml() } )
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3"></a><a href="#__codelineno-18-3"><span class="linenos" data-linenos=" 3 "></span></a>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4"></a><a href="#__codelineno-18-4"><span class="linenos" data-linenos=" 4 "></span></a>// En el template
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5"></a><a href="#__codelineno-18-5"><span class="linenos" data-linenos=" 5 "></span></a>// {{ cCsrf }}   -- emite el &lt;input hidden&gt;
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6"></a><a href="#__codelineno-18-6"><span class="linenos" data-linenos=" 6 "></span></a>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7"></a><a href="#__codelineno-18-7"><span class="linenos" data-linenos=" 7 "></span></a>// En la accion POST que procesa el <span class="nc">form</span>ulario
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8"></a><a href="#__codelineno-18-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="kr">IF</span> ! HIX_CsrfValidToken( UPost( <span class="s">&quot;_csrf&quot;</span> ), 3600 )
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9"></a><a href="#__codelineno-18-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">&quot;Token CSRF invalido&quot;</span> )
+</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10"></a><a href="#__codelineno-18-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="kr">RETURN</span>
+</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11"></a><a href="#__codelineno-18-11"><span class="linenos" data-linenos="11 "></span></a><span class="kr">ENDIF</span>
+</span></code></pre></div>
+<hr />
+<h2 id="11-resource-id">11. Resource ID<a class="headerlink" href="#11-resource-id" title="Permanent link">&para;</a></h2>
+<p>Firma un ID opaco para que no sea predecible en formularios HTML.</p>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UResourceToHtml(cId)</code></td>
+<td>Genera <code>&lt;input type="hidden" name="_resource_id" value="..."&gt;</code> con el ID firmado</td>
+</tr>
+<tr>
+<td><code>UGetResource([cToken])</code></td>
+<td>Valida el token y devuelve el ID original; <code>""</code> si invalido</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1"></a><a href="#__codelineno-19-1"><span class="linenos" data-linenos=" 1 "></span></a>// En la vista (lista de registros)
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2"></a><a href="#__codelineno-19-2"><span class="linenos" data-linenos=" 2 "></span></a>// {{ UResourceToHtml( hb_NT<span class="nf">oS</span>(nId) ) }}
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3"></a><a href="#__codelineno-19-3"><span class="linenos" data-linenos=" 3 "></span></a>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4"></a><a href="#__codelineno-19-4"><span class="linenos" data-linenos=" 4 "></span></a>// En la accion POST (eliminar, editar, ...)
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5"></a><a href="#__codelineno-19-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="nv">cId</span> := UGetResource()   // lee _resource_id del POST automaticamente
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6"></a><a href="#__codelineno-19-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="kr">IF</span> <span class="nf">Empty</span>( cId )
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7"></a><a href="#__codelineno-19-7"><span class="linenos" data-linenos=" 7 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 400, <span class="s">&quot;ID de recurso invalido&quot;</span> )
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8"></a><a href="#__codelineno-19-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="kr">RETURN</span>
+</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9"></a><a href="#__codelineno-19-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="kr">ENDIF</span>
+</span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10"></a><a href="#__codelineno-19-10"><span class="linenos" data-linenos="10 "></span></a><span class="nv">nId</span> := <span class="nf">Val</span>( cId )
+</span></code></pre></div>
+<hr />
+<h2 id="12-flash-messages">12. Flash messages<a class="headerlink" href="#12-flash-messages" title="Permanent link">&para;</a></h2>
+<p>Mensajes temporales de validacion por formulario, almacenados en sesion y destruidos al leerlos.</p>
+<table>
+<thead>
+<tr>
+<th>Metodo</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UFlash([cFormId])</code></td>
+<td>Crea un objeto <code>TFlash</code> para el formulario indicado</td>
+</tr>
+<tr>
+<td><code>oFlash:Set(cKey, xVal)</code></td>
+<td>Guarda un valor flash</td>
+</tr>
+<tr>
+<td><code>oFlash:Get(cKey [, xDef])</code></td>
+<td>Lee y elimina el valor flash</td>
+</tr>
+<tr>
+<td><code>oFlash:Has(cKey)</code></td>
+<td><code>.T.</code> si existe el valor</td>
+</tr>
+<tr>
+<td><code>oFlash:Delete(cKey)</code></td>
+<td>Elimina un valor sin leerlo</td>
+</tr>
+<tr>
+<td><code>oFlash:Clear()</code></td>
+<td>Limpia todos los valores del formulario</td>
+</tr>
+<tr>
+<td><code>oFlash:Save()</code></td>
+<td>Persiste los cambios en sesion</td>
+</tr>
+<tr>
+<td><code>oFlash:Destroy()</code></td>
+<td>Destructor: guarda automaticamente al salir de scope</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1"></a><a href="#__codelineno-20-1"><span class="linenos" data-linenos=" 1 "></span></a>// Guardar error en el POST
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2"></a><a href="#__codelineno-20-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="nv">oFlash</span> := UFlash( <span class="s">&quot;login-form&quot;</span> )
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3"></a><a href="#__codelineno-20-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="nv">oFlash</span>:<span class="nf">Set</span>( <span class="s">&quot;error&quot;</span>, <span class="s">&quot;Credenciales incorrectas&quot;</span> )
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4"></a><a href="#__codelineno-20-4"><span class="linenos" data-linenos=" 4 "></span></a><span class="nv">oFlash</span>:<span class="nf">Set</span>( <span class="s">&quot;email&quot;</span>, UPost( <span class="s">&quot;email&quot;</span> ) )
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5"></a><a href="#__codelineno-20-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="nv">oFlash</span>:Save()
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6"></a><a href="#__codelineno-20-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="nv">URedirect</span>( <span class="s">&quot;/login&quot;</span> )
+</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7"></a><a href="#__codelineno-20-7"><span class="linenos" data-linenos=" 7 "></span></a>
+</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8"></a><a href="#__codelineno-20-8"><span class="linenos" data-linenos=" 8 "></span></a>// Leer en el GET siguiente
+</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9"></a><a href="#__codelineno-20-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="nv">oFlash</span> := UFlash( <span class="s">&quot;login-form&quot;</span> )
+</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10"></a><a href="#__codelineno-20-10"><span class="linenos" data-linenos="10 "></span></a><span class="nv">cError</span> := oFlash:Get( <span class="s">&quot;error&quot;</span>, <span class="s">&quot;&quot;</span> )
+</span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11"></a><a href="#__codelineno-20-11"><span class="linenos" data-linenos="11 "></span></a><span class="nv">cEmail</span> := oFlash:Get( <span class="s">&quot;email&quot;</span>, <span class="s">&quot;&quot;</span> )
+</span></code></pre></div>
+<hr />
+<h2 id="13-entorno-y-configuracion">13. Entorno y configuracion<a class="headerlink" href="#13-entorno-y-configuracion" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UEnv()</code></td>
+<td>Entorno actual: <code>"dev"</code> o <code>"prod"</code></td>
+</tr>
+<tr>
+<td><code>UIsDev()</code></td>
+<td><code>.T.</code> si <code>UEnv() == "dev"</code></td>
+</tr>
+<tr>
+<td><code>UIsProd()</code></td>
+<td><code>.T.</code> si <code>UEnv() == "prod"</code></td>
+</tr>
+<tr>
+<td><code>UConfig(cKey [, xDef])</code></td>
+<td>Valor de <code>THixConfig</code> por nombre de campo</td>
+</tr>
+<tr>
+<td><code>UMwConfig(cSection, cKey [, xDef])</code></td>
+<td>Valor de <code>www/middlewares/config.json</code> seccion <code>setup</code></td>
+</tr>
+<tr>
+<td><code>UNow()</code></td>
+<td>Timestamp actual como string <code>"YYYYMMDDHHmmss"</code></td>
+</tr>
+<tr>
+<td><code>URoot()</code></td>
+<td>Nombre de la carpeta web root (por defecto <code>"www"</code>)</td>
+</tr>
+<tr>
+<td><code>URootPath()</code></td>
+<td>Path absoluto al web root con separador final</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1"></a><a href="#__codelineno-21-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">IF</span> UIsDev()
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2"></a><a href="#__codelineno-21-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">l</span>( <span class="s">&quot;Debug: &quot;</span> + hb_jsonEncode( hData ) )
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3"></a><a href="#__codelineno-21-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">ENDIF</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4"></a><a href="#__codelineno-21-4"><span class="linenos" data-linenos="4 "></span></a>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5"></a><a href="#__codelineno-21-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">cPort</span> := UConfig( <span class="s">&quot;nPort&quot;</span>, <span class="s">&quot;8080&quot;</span> )
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6"></a><a href="#__codelineno-21-6"><span class="linenos" data-linenos="6 "></span></a><span class="nv">cKey</span>  := UMwConfig( <span class="s">&quot;auth&quot;</span>, <span class="s">&quot;session_user_key&quot;</span>, <span class="s">&quot;_auth_user&quot;</span> )
+</span></code></pre></div>
+<hr />
+<h2 id="14-tabla-rapida-de-referencia">14. Tabla rapida de referencia<a class="headerlink" href="#14-tabla-rapida-de-referencia" title="Permanent link">&para;</a></h2>
+<h3 id="leer-request">Leer request<a class="headerlink" href="#leer-request" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1"></a><a href="#__codelineno-22-1"><span class="linenos" data-linenos="1 "></span></a>UMethod()           UPath()             UQuery()
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2"></a><a href="#__codelineno-22-2"><span class="linenos" data-linenos="2 "></span></a>UGet(k,d)           UPost(k,d)          UParam(k,d)
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3"></a><a href="#__codelineno-22-3"><span class="linenos" data-linenos="3 "></span></a>UHeader(k,d)        UCookie(k,d)        UBody()
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4"></a><a href="#__codelineno-22-4"><span class="linenos" data-linenos="4 "></span></a>UJson()             UContentType()      UContentLength()
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5"></a><a href="#__codelineno-22-5"><span class="linenos" data-linenos="5 "></span></a>UFiles()            URequest()          UContext()
+</span></code></pre></div>
+<h3 id="detectar-tipo">Detectar tipo<a class="headerlink" href="#detectar-tipo" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1"></a><a href="#__codelineno-23-1"><span class="linenos" data-linenos="1 "></span></a>UIsGet()    UIsPost()   UIsAjax()   UIsHttps()
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2"></a><a href="#__codelineno-23-2"><span class="linenos" data-linenos="2 "></span></a>UIsJson()   UIsForm()   UIsMultipart()  UWantsJson()
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3"></a><a href="#__codelineno-23-3"><span class="linenos" data-linenos="3 "></span></a>UScheme()   UIP()       UHost()         UPort()
+</span></code></pre></div>
+<h3 id="enviar-respuesta">Enviar respuesta<a class="headerlink" href="#enviar-respuesta" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1"></a><a href="#__codelineno-24-1"><span class="linenos" data-linenos="1 "></span></a>USendJson(x,n)      USendHtml(c,n)      USendText(c,n)
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2"></a><a href="#__codelineno-24-2"><span class="linenos" data-linenos="2 "></span></a>USendView(v,h)      USendEmpty()        USendError(n,c)
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3"></a><a href="#__codelineno-24-3"><span class="linenos" data-linenos="3 "></span></a>URedirect(u,n)      USend(x,n,m,h)
+</span></code></pre></div>
+<h3 id="controlar-buffer">Controlar buffer<a class="headerlink" href="#controlar-buffer" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1"></a><a href="#__codelineno-25-1"><span class="linenos" data-linenos="1 "></span></a>UWrite(c)   UEcho(c)    USetStatus(n)   USetMime(c)
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2"></a><a href="#__codelineno-25-2"><span class="linenos" data-linenos="2 "></span></a>UGetMime()  USetHeader(k,v)  USetCookie(k,v,n)  UFlush()
+</span></code></pre></div>
+<h3 id="streaming">Streaming<a class="headerlink" href="#streaming" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1"></a><a href="#__codelineno-26-1"><span class="linenos" data-linenos="1 "></span></a>USendStreamStart(m,n,h)   USendChunk(c)   USendStreamEnd()
+</span></code></pre></div>
+<h3 id="sesion-y-auth">Sesion y auth<a class="headerlink" href="#sesion-y-auth" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1"></a><a href="#__codelineno-27-1"><span class="linenos" data-linenos="1 "></span></a>USession()  USession(k)  USession(k,d)
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2"></a><a href="#__codelineno-27-2"><span class="linenos" data-linenos="2 "></span></a>UJwt()      UJwt(k)      UJwt(k,d)     UHasScope(s)
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3"></a><a href="#__codelineno-27-3"><span class="linenos" data-linenos="3 "></span></a>UCurrentUser()  UAuthUser(k,d)
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4"></a><a href="#__codelineno-27-4"><span class="linenos" data-linenos="4 "></span></a>UHasRole(r)     UHasRole(r,op)  UGetRoles()  UAuthLogout()
+</span></code></pre></div>
+<h3 id="validacion">Validacion<a class="headerlink" href="#validacion" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1"></a><a href="#__codelineno-28-1"><span class="linenos" data-linenos="1 "></span></a>UValidate(h)    UValidatePost(h)  UValidateGet(h)
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2"></a><a href="#__codelineno-28-2"><span class="linenos" data-linenos="2 "></span></a>UValidateParams(h)  UValidateJson(h)  UValidateInput(h)  UValidateOrFail(h)
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3"></a><a href="#__codelineno-28-3"><span class="linenos" data-linenos="3 "></span></a>UIsMail(s)  UIsNumeric(v)  UIsInteger(v)  UIsUrl(s)  UIsIp(s)
+</span></code></pre></div>
+<h3 id="vistas-y-herramientas">Vistas y herramientas<a class="headerlink" href="#vistas-y-herramientas" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1"></a><a href="#__codelineno-29-1"><span class="linenos" data-linenos="1 "></span></a>USendView(v,h)  UView(v,h)
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2"></a><a href="#__codelineno-29-2"><span class="linenos" data-linenos="2 "></span></a>UStr(u)  UDateToHtml(d)  ULogicToHtmlChecked(l)  UHtmlEncode(c)
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3"></a><a href="#__codelineno-29-3"><span class="linenos" data-linenos="3 "></span></a>UHashToHtmlSelect(a,s,k,v)  URoute(name, ...)  UOsFileName(f)
+</span></code></pre></div>
+<h3 id="csrf-resource-flash-config">CSRF, Resource, Flash, Config<a class="headerlink" href="#csrf-resource-flash-config" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1"></a><a href="#__codelineno-30-1"><span class="linenos" data-linenos="1 "></span></a>UCsrfToHtml()       HIX_CsrfValidToken(t,n)
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2"></a><a href="#__codelineno-30-2"><span class="linenos" data-linenos="2 "></span></a>UResourceToHtml(id) UGetResource()
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3"></a><a href="#__codelineno-30-3"><span class="linenos" data-linenos="3 "></span></a>UFlash(id)
+</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4"></a><a href="#__codelineno-30-4"><span class="linenos" data-linenos="4 "></span></a>UEnv()  UIsDev()  UIsProd()  UConfig(k,d)  UMwConfig(s,k,d)
+</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5"></a><a href="#__codelineno-30-5"><span class="linenos" data-linenos="5 "></span></a>UNow()  URoot()   URootPath()
+</span></code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  <span class="md-footer-text"><span class="myinfo">HIX</span>  was developed with <a href="https://harbour.github.io/">Harbour</a></span>
+  <span class="md-footer-copy">&copy; 2026 Charly Aubia Floresvi</span>
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.top", "navigation.instant", "navigation.instant.progress", "navigation.tracking", "toc.follow", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../../javascripts/extra.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,4219 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentación del servidor web HIX para Harbour">
+      
+      
+        <meta name="author" content="Charly Nou mil">
+      
+      
+      
+        <link rel="prev" href="../requests/">
+      
+      
+        <link rel="next" href="../../models/udbf/">
+      
+      
+        
+          <link rel="alternate" href="./" hreflang="es">
+        
+          <link rel="alternate" href="../../../../hixstyle/controllers/validator/" hreflang="en">
+        
+      
+      
+      <link rel="icon" href="../../../../assets/hix.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Validator - Web Server</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#hix-validator-tutorial-completo" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href="../../../" title="Web Server" class="md-header__button md-logo" aria-label="Web Server" data-md-component="logo">
+      
+  <img src="../../../../assets/hix_white.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Web Server
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Validator
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Seleccionar idioma">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="es" class="md-select__link">
+              Español
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../../hixstyle/controllers/validator/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../" title="Web Server" class="md-nav__button md-logo" aria-label="Web Server" data-md-component="logo">
+      
+  <img src="../../../../assets/hix_white.png" alt="logo">
+
+    </a>
+    Web Server
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introducción
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Introducción
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../intro/intro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bienvenido a HIX
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../intro/modo-basico/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modo Básico
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../intro/hixstyle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modo HIX Style
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../intro/data-driven/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hoja de ruta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Primeros pasos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Primeros pasos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../primeros-pasos/compile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Compila proyecto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../primeros-pasos/config/hix.json/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuración hix.json
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Programacion
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Programacion
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../programacion/mapa-helpers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Helpers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../programacion/modo-dev-prod/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modo Dev / Modo Prod
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../programacion/errorsys/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Errorsys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../programacion/error-handling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error Handling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../programacion/error_codes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error Code
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HIX Style
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    HIX Style
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../routes/routes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rutas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Middleware
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../middleware/middleware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introducción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../middleware/contexto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contexto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../middleware/mw_dessign/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diseño
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../middleware/mw_list/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catálogo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../middleware/mw_loader/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loader
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../middleware/mw_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ejemplo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Controllers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Controllers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../controllers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Controllers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../requests/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Requests
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validator
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-concepto-basico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Concepto basico
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-fuentes-de-entrada" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Fuentes de entrada
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Fuentes de entrada">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#uvalidatepost-vs-uvalidatejson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UValidatePost vs UValidateJson
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uvalidateget-query-string-y-route-params" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UValidateGet — query string y route params
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-flujo-completo-con-make" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Flujo completo con Make()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-reglas-de-validacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Reglas de validacion
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Reglas de validacion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#presencia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Presencia
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tipos-tambien-hacen-cast-ver-seccion-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tipos (tambien hacen cast, ver seccion 5)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#longitud-y-rango" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Longitud y rango
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#formato" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formato
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#listas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Listas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fechas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fechas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#confirmacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Confirmacion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reglas-con-codeblock-personalizado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reglas con codeblock personalizado
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-cast-de-tipos-fase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Cast de tipos (fase 1)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-sanitizacion-fase-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Sanitizacion (fase 3)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Sanitizacion (fase 3)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#transformaciones-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transformaciones disponibles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-marcadores-especiales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Marcadores especiales
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Marcadores especiales">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#field-y-escapedfield" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        field y escapedfield
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resume" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        resume
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-leer-los-datos-validados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Leer los datos validados
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-gestionar-errores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Gestionar errores
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-etiquetas-y-defaults-en-los-campos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Etiquetas y defaults en los campos
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-validar-un-solo-valor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Validar un solo valor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-anadir-campos-sobre-la-marcha" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Anadir campos sobre la marcha
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-patrones-completos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Patrones completos
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="13. Patrones completos">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#api-rest-crear-recurso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API REST - crear recurso
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#formulario-html-con-re-llenado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formulario HTML con re-llenado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validar-query-string-para-busqueda-paginada" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validar query string para busqueda paginada
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validacion-con-regla-personalizada-contra-bd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validacion con regla personalizada contra BD
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-referencia-rapida-de-reglas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Referencia rapida de reglas
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_4" id="__nav_5_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../models/udbf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UDbf
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_5" id="__nav_5_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Response
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../response/encoding-decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Encoding/Decoding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../response/cookies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../response/cabeceras/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cabeceras
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../response/flash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Motor de vistas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Motor de vistas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../views/mambo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mambo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../views/directives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Directivas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_6_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6_3" id="__nav_5_6_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ejemplos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_6_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Ejemplos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../views/example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introducción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../views/example1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ejemplo 1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../views/example2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ejemplo 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../views/example3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ejemplo 3
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../views/example4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ejemplo 4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_7" id="__nav_5_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seguridad
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Seguridad
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../seguridad/claves/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claves y secretos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../seguridad/cors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CORS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../seguridad/firewall/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firewall
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../seguridad/ratelimit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ratelimit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../seguridad/sesiones/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sesiones
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../seguridad/autenticacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autenticacion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../seguridad/jwt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JWT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../seguridad/csrf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CSRF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../seguridad/resources-ids/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resources IDs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../seguridad/ssl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../sistema/loaders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loaders y hooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tiempo Real
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tiempo Real
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tiempo-real/sse/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tiempo-real/ws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tiempo-real/longpolling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LongPolling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../api/admin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sistema
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Sistema
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../sistema/traceando/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Traceando
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../sistema/logger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../sistema/bootlog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Boot Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../sistema/metricas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Métricas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../sistema/hix-admin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HIX Admin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../sistema/apache-proxy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Apache proxy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-concepto-basico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Concepto basico
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-fuentes-de-entrada" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Fuentes de entrada
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Fuentes de entrada">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#uvalidatepost-vs-uvalidatejson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UValidatePost vs UValidateJson
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uvalidateget-query-string-y-route-params" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UValidateGet — query string y route params
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-flujo-completo-con-make" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Flujo completo con Make()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-reglas-de-validacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Reglas de validacion
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Reglas de validacion">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#presencia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Presencia
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tipos-tambien-hacen-cast-ver-seccion-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tipos (tambien hacen cast, ver seccion 5)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#longitud-y-rango" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Longitud y rango
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#formato" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formato
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#listas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Listas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fechas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fechas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#confirmacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Confirmacion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reglas-con-codeblock-personalizado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reglas con codeblock personalizado
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-cast-de-tipos-fase-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Cast de tipos (fase 1)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-sanitizacion-fase-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Sanitizacion (fase 3)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Sanitizacion (fase 3)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#transformaciones-disponibles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transformaciones disponibles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-marcadores-especiales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Marcadores especiales
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Marcadores especiales">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#field-y-escapedfield" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        field y escapedfield
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resume" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        resume
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-leer-los-datos-validados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Leer los datos validados
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-gestionar-errores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Gestionar errores
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-etiquetas-y-defaults-en-los-campos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Etiquetas y defaults en los campos
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-validar-un-solo-valor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Validar un solo valor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-anadir-campos-sobre-la-marcha" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Anadir campos sobre la marcha
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-patrones-completos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Patrones completos
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="13. Patrones completos">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#api-rest-crear-recurso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API REST - crear recurso
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#formulario-html-con-re-llenado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formulario HTML con re-llenado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validar-query-string-para-busqueda-paginada" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validar query string para busqueda paginada
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validacion-con-regla-personalizada-contra-bd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validacion con regla personalizada contra BD
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-referencia-rapida-de-reglas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Referencia rapida de reglas
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="hix-validator-tutorial-completo">✔️ HIX Validator - Tutorial completo<a class="headerlink" href="#hix-validator-tutorial-completo" title="Permanent link">&para;</a></h1>
+<p>El validador de <strong>HIX</strong> permite validar y limpiar los datos de entrada HTTP en tres fases
+ordenadas: <strong>cast</strong> (conversion de tipo), <strong>validacion</strong> (reglas) y <strong>sanitizacion</strong>
+(transformaciones de limpieza). Todo se encadena con una sintaxis de reglas en string
+separadas por <code>|</code>.</p>
+<hr />
+<h2 id="1-concepto-basico">1. Concepto basico<a class="headerlink" href="#1-concepto-basico" title="Permanent link">&para;</a></h2>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="nv">LOCAL</span> oVal := UValidateOrFail( {
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos=" 2 "></span></a>   &quot;name<span class="s">&quot;  =&gt; &quot;</span>required|string|max:100&quot;,
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a>   &quot;email<span class="s">&quot; =&gt; &quot;</span>required|string|email&quot;,
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos=" 4 "></span></a>   &quot;age<span class="s">&quot;   =&gt; &quot;</span>required|integer|min:18&quot;
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a>} )
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="kr">IF</span> oVal == NIL ; RETURN NIL ; ENDIF   // ya respondio 422
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos=" 7 "></span></a>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="nv">cName</span>  := oVal:Get( <span class="s">&quot;name&quot;</span> )
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9"></a><a href="#__codelineno-0-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="nv">cEmail</span> := oVal:Get( <span class="s">&quot;email&quot;</span> )
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10"></a><a href="#__codelineno-0-10"><span class="linenos" data-linenos="10 "></span></a><span class="nv">nAge</span>   := oVal:Get( <span class="s">&quot;age&quot;</span> )           // tipo N, no string
+</span></code></pre></div>
+<p><code>UValidateOrFail</code> es el camino mas corto: ejecuta <code>Make()</code>, y si hay errores envia
+automaticamente un JSON 422 y devuelve <code>NIL</code>. Si pasa, devuelve el objeto validador
+con los valores ya convertidos al tipo correcto.</p>
+<hr />
+<h2 id="2-fuentes-de-entrada">2. Fuentes de entrada<a class="headerlink" href="#2-fuentes-de-entrada" title="Permanent link">&para;</a></h2>
+<p>Cada helper captura los datos de entrada de una fuente distinta del request actual.</p>
+<table>
+<thead>
+<tr>
+<th>Funcion</th>
+<th>Fuente primaria</th>
+<th>Route params <code>:var</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UValidatePost(hRules)</code></td>
+<td>POST body: form-urlencoded primero, JSON como fallback</td>
+<td>incluidos</td>
+</tr>
+<tr>
+<td><code>UValidateGet(hRules)</code></td>
+<td>Query string (<code>?key=val</code>)</td>
+<td>incluidos</td>
+</tr>
+<tr>
+<td><code>UValidateJson(hRules)</code></td>
+<td>JSON body unicamente</td>
+<td>incluidos</td>
+</tr>
+<tr>
+<td><code>UValidateOrFail(hRules)</code></td>
+<td>POST body — ejecuta Make() y responde 422 si falla</td>
+<td>incluidos</td>
+</tr>
+<tr>
+<td><code>UValidateParams(hRules)</code></td>
+<td>Alias de <code>UValidateGet</code> (compatibilidad)</td>
+<td>incluidos</td>
+</tr>
+</tbody>
+</table>
+<p>Todos aceptan un segundo parametro opcional <code>hSanitate</code> (ver seccion 6).</p>
+<p>Todos los helpers fusionan siempre las variables de ruta (<code>:id</code>, <code>:slug</code>...) en
+<code>hInput</code> despues de leer la fuente primaria. Si una misma clave existe en ambas
+fuentes se lanza un error 500 para evidenciar el conflicto de nombres.</p>
+<h3 id="uvalidatepost-vs-uvalidatejson">UValidatePost vs UValidateJson<a class="headerlink" href="#uvalidatepost-vs-uvalidatejson" title="Permanent link">&para;</a></h3>
+<p><code>UValidatePost</code> auto-detecta el formato: intenta leer form-urlencoded primero
+y, si esta vacio, intenta JSON. Es el helper universal para endpoints que aceptan
+ambos formatos.</p>
+<p><code>UValidateJson</code> lee exclusivamente el body como JSON. Si el body no es JSON
+valido, <code>hInput</code> queda vacio y los campos <code>required</code> fallan con un 422 normal.
+Usar cuando el endpoint es una API pura que exige JSON.</p>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a>// Endpoint que acepta <span class="nc">form</span> Y json
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><a href="#__codelineno-1-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">oVal</span> := UValidatePost( hRules )
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a><a href="#__codelineno-1-3"><span class="linenos" data-linenos="3 "></span></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4"></a><a href="#__codelineno-1-4"><span class="linenos" data-linenos="4 "></span></a>// API pura — solo JSON
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5"></a><a href="#__codelineno-1-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">oVal</span> := UValidateJs<span class="nf">on</span>( hRules )
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6"></a><a href="#__codelineno-1-6"><span class="linenos" data-linenos="6 "></span></a><span class="kr">IF</span> ! oVal:Make()
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7"></a><a href="#__codelineno-1-7"><span class="linenos" data-linenos="7 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;errors&quot;</span> =&gt; oVal:GetErrors() }, 422 )
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8"></a><a href="#__codelineno-1-8"><span class="linenos" data-linenos="8 "></span></a>   <span class="kr">RETURN</span> NIL
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9"></a><a href="#__codelineno-1-9"><span class="linenos" data-linenos="9 "></span></a><span class="kr">ENDIF</span>
+</span></code></pre></div>
+<h3 id="uvalidateget-query-string-y-route-params">UValidateGet — query string y route params<a class="headerlink" href="#uvalidateget-query-string-y-route-params" title="Permanent link">&para;</a></h3>
+<p><code>UValidateGet</code> fusiona la query string con las variables de ruta en un unico
+hash. Cubra todos los casos de un endpoint GET:</p>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a>// GET /products?<span class="nc">page</span>=2&amp;q=book  (sin :vars)
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">oVal</span> := UValidateGet( { <span class="s">&quot;page&quot;</span> =&gt; <span class="s">&quot;optional|integer|min:1&quot;</span>, <span class="s">&quot;q&quot;</span> =&gt; <span class="s">&quot;optional|string&quot;</span> } )
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos="3 "></span></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos="4 "></span></a>// GET /users/:id?expand=roles  (query + :id combinados)
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">oVal</span> := UValidateGet( { <span class="s">&quot;id&quot;</span> =&gt; <span class="s">&quot;required|integer|positive&quot;</span>, <span class="s">&quot;expand&quot;</span> =&gt; <span class="s">&quot;optional|string&quot;</span> } )
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6"></a><a href="#__codelineno-2-6"><span class="linenos" data-linenos="6 "></span></a>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7"></a><a href="#__codelineno-2-7"><span class="linenos" data-linenos="7 "></span></a>// POST /resource/:id con body JS<span class="nf">ON</span>  (body + :id combinados)
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8"></a><a href="#__codelineno-2-8"><span class="linenos" data-linenos="8 "></span></a><span class="nv">oVal</span> := UValidatePost( { <span class="s">&quot;id&quot;</span> =&gt; <span class="s">&quot;required|integer&quot;</span>, <span class="s">&quot;name&quot;</span> =&gt; <span class="s">&quot;required|string&quot;</span> } )
+</span></code></pre></div>
+<hr />
+<h2 id="3-flujo-completo-con-make">3. Flujo completo con Make()<a class="headerlink" href="#3-flujo-completo-con-make" title="Permanent link">&para;</a></h2>
+<p>Cuando necesitas controlar la respuesta de error manualmente:</p>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> _UpdateUser()
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oVal, hData
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos=" 3 "></span></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">oVal</span> := UValidatePost( {
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a>      &quot;name<span class="s">&quot;  =&gt; &quot;</span>required|string|max:100&quot;,
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a>      &quot;email<span class="s">&quot; =&gt; &quot;</span>required|string|email&quot;
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos=" 7 "></span></a>   } )
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos=" 8 "></span></a>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9"></a><a href="#__codelineno-3-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="kr">IF</span> ! oVal:Make()
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10"></a><a href="#__codelineno-3-10"><span class="linenos" data-linenos="10 "></span></a>      // opcion A - respuesta JSON estandar
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11"></a><a href="#__codelineno-3-11"><span class="linenos" data-linenos="11 "></span></a>      <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;errors&quot;</span> =&gt; oVal:GetErrors() }, 422 )
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12"></a><a href="#__codelineno-3-12"><span class="linenos" data-linenos="12 "></span></a>      <span class="kr">RETURN</span> NIL
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13"></a><a href="#__codelineno-3-13"><span class="linenos" data-linenos="13 "></span></a>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14"></a><a href="#__codelineno-3-14"><span class="linenos" data-linenos="14 "></span></a>      // opcion B - solo el primer error
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15"></a><a href="#__codelineno-3-15"><span class="linenos" data-linenos="15 "></span></a>      <span class="kr">USe</span>nd<span class="nf">Error</span>( 422, oVal:GetFirst<span class="nf">Error</span>() )
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16"></a><a href="#__codelineno-3-16"><span class="linenos" data-linenos="16 "></span></a>      <span class="kr">RETURN</span> NIL
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17"></a><a href="#__codelineno-3-17"><span class="linenos" data-linenos="17 "></span></a>   <span class="kr">ENDIF</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18"></a><a href="#__codelineno-3-18"><span class="linenos" data-linenos="18 "></span></a>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19"></a><a href="#__codelineno-3-19"><span class="linenos" data-linenos="19 "></span></a>   <span class="nv">hData</span> := oVal:Validated()   // hash con todos los campos validados
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20"></a><a href="#__codelineno-3-20"><span class="linenos" data-linenos="20 "></span></a>   // ... guardar hData ...
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21"></a><a href="#__codelineno-3-21"><span class="linenos" data-linenos="21 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;ok&quot;</span> =&gt; <span class="ow">.T.</span> } )
+</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22"></a><a href="#__codelineno-3-22"><span class="linenos" data-linenos="22 "></span></a><span class="kr">RETURN</span> NIL
+</span></code></pre></div>
+<hr />
+<h2 id="4-reglas-de-validacion">4. Reglas de validacion<a class="headerlink" href="#4-reglas-de-validacion" title="Permanent link">&para;</a></h2>
+<p>Las reglas se escriben separadas por <code>|</code> en un string. El orden importa: las reglas
+se evaluan de izquierda a derecha y se detienen en el primer error del campo.</p>
+<h3 id="presencia">Presencia<a class="headerlink" href="#presencia" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Regla</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>required</code></td>
+<td>El campo debe existir y no estar vacio</td>
+</tr>
+<tr>
+<td><code>optional</code></td>
+<td>Si el campo esta vacio, se omite sin error. Debe ir primero</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a>// Campo requerido
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a>&quot;name<span class="s">&quot; =&gt; &quot;</span>required|string&quot;
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><a href="#__codelineno-4-4"><span class="linenos" data-linenos="4 "></span></a>// Campo opcional - solo valida si viene relleno
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5"></a><a href="#__codelineno-4-5"><span class="linenos" data-linenos="5 "></span></a>&quot;nickname<span class="s">&quot; =&gt; &quot;</span>optional|string|max:50&quot;
+</span></code></pre></div>
+<h3 id="tipos-tambien-hacen-cast-ver-seccion-5">Tipos (tambien hacen cast, ver seccion 5)<a class="headerlink" href="#tipos-tambien-hacen-cast-ver-seccion-5" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Regla</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>string</code></td>
+<td>Convierte a string y hace <code>AllTrim</code></td>
+</tr>
+<tr>
+<td><code>integer</code></td>
+<td>Convierte a entero; falla si no es numero entero</td>
+</tr>
+<tr>
+<td><code>numeric</code> / <code>decimal</code></td>
+<td>Convierte a numero; acepta decimales</td>
+</tr>
+<tr>
+<td><code>boolean</code> / <code>bool</code></td>
+<td>Convierte a logico <code>.T.</code>/<code>.F.</code></td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td>Convierte a fecha Harbour desde <code>YYYY-MM-DD</code></td>
+</tr>
+<tr>
+<td><code>positive</code></td>
+<td>El valor debe ser <code>N &gt; 0</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="longitud-y-rango">Longitud y rango<a class="headerlink" href="#longitud-y-rango" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Regla</th>
+<th>Se aplica a</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>min:N</code></td>
+<td>string: longitud &gt;= N / numero: valor &gt;= N</td>
+<td></td>
+</tr>
+<tr>
+<td><code>max:N</code></td>
+<td>string: longitud &lt;= N / numero: valor &lt;= N</td>
+<td></td>
+</tr>
+<tr>
+<td><code>minlen:N</code></td>
+<td>string</td>
+<td>longitud &gt;= N (independiente del tipo)</td>
+</tr>
+<tr>
+<td><code>maxlen:N</code></td>
+<td>string</td>
+<td>longitud &lt;= N</td>
+</tr>
+<tr>
+<td><code>between:N,M</code></td>
+<td>string o numero</td>
+<td>entre N y M (longitud o valor)</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a>&quot;title<span class="s">&quot;    =&gt; &quot;</span>required|string|min:3|max:200&quot;
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a>&quot;price<span class="s">&quot;    =&gt; &quot;</span>required|numeric|min:0|max:9999&quot;
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a>&quot;score<span class="s">&quot;    =&gt; &quot;</span>required|integer|between:1,10&quot;
+</span></code></pre></div>
+<h3 id="formato">Formato<a class="headerlink" href="#formato" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Regla</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>email</code></td>
+<td>Formato de email valido</td>
+</tr>
+<tr>
+<td><code>url</code></td>
+<td>Empieza por <code>http://</code> o <code>https://</code></td>
+</tr>
+<tr>
+<td><code>ip</code></td>
+<td>IPv4 valida (cuatro octetos 0-255)</td>
+</tr>
+<tr>
+<td><code>regex:PATRON</code></td>
+<td>El valor debe coincidir con la expresion regular Harbour</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a>&quot;email<span class="s">&quot;    =&gt; &quot;</span>required|string|email&quot;
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos="2 "></span></a>&quot;web<span class="s">&quot;      =&gt; &quot;</span>optional|string|url&quot;
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos="3 "></span></a>&quot;subnet<span class="s">&quot;   =&gt; &quot;</span>required|ip&quot;
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos="4 "></span></a>&quot;code<span class="s">&quot;     =&gt; &quot;</span>required|regex:[A-Z]{3}[0-9]{4}&quot;
+</span></code></pre></div>
+<h3 id="listas">Listas<a class="headerlink" href="#listas" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Regla</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>in:a,b,c</code></td>
+<td>El valor debe estar en la lista</td>
+</tr>
+<tr>
+<td><code>notin:a,b,c</code></td>
+<td>El valor no debe estar en la lista</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a>&quot;role<span class="s">&quot;     =&gt; &quot;</span>required|string|in:admin,editor,viewer&quot;
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a>&quot;status<span class="s">&quot;   =&gt; &quot;</span>required|string|notin:deleted,banned&quot;
+</span></code></pre></div>
+<h3 id="fechas">Fechas<a class="headerlink" href="#fechas" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Regla</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mindate:YYYY-MM-DD</code></td>
+<td>La fecha debe ser &gt;= a la indicada</td>
+</tr>
+<tr>
+<td><code>maxdate:YYYY-MM-DD</code></td>
+<td>La fecha debe ser &lt;= a la indicada</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a>&quot;birthday<span class="s">&quot; =&gt; &quot;</span>required|date|maxdate:2010-01-01&quot;
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a>&quot;start<span class="s">&quot;    =&gt; &quot;</span>required|date|mindate:2026-01-01&quot;
+</span></code></pre></div>
+<h3 id="confirmacion">Confirmacion<a class="headerlink" href="#confirmacion" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Regla</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>confirmed</code></td>
+<td>Busca en el input un campo <code>&lt;campo&gt;_confirmation</code> y lo compara</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a>// El <span class="nc">form</span>ulario debe enviar <span class="s">&quot;password&quot;</span> y <span class="s">&quot;password_confirmation&quot;</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos="2 "></span></a>&quot;password<span class="s">&quot; =&gt; &quot;</span>required|string|min:8|confirmed&quot;
+</span></code></pre></div>
+<h3 id="reglas-con-codeblock-personalizado">Reglas con codeblock personalizado<a class="headerlink" href="#reglas-con-codeblock-personalizado" title="Permanent link">&para;</a></h3>
+<p>Cuando ninguna regla estandar se ajusta, puedes pasar un codeblock directamente:</p>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a><a href="#__codelineno-10-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oVal</span> := UValidatePost( {
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2"></a><a href="#__codelineno-10-2"><span class="linenos" data-linenos="2 "></span></a>   &quot;username<span class="s">&quot; =&gt; { &quot;</span>required|string&quot;,
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3"></a><a href="#__codelineno-10-3"><span class="linenos" data-linenos="3 "></span></a>                   &quot;Username&quot;,   // etiqueta para el mensaje de error
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4"></a><a href="#__codelineno-10-4"><span class="linenos" data-linenos="4 "></span></a>                   &quot;&quot;,           // valor por defecto
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5"></a><a href="#__codelineno-10-5"><span class="linenos" data-linenos="5 "></span></a>                   {|v| <span class="nf">iif</span>( _UserExists(v), <span class="s">&quot;El usuario ya existe&quot;</span>, <span class="ow">.T.</span> ) }
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6"></a><a href="#__codelineno-10-6"><span class="linenos" data-linenos="6 "></span></a>                 }
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7"></a><a href="#__codelineno-10-7"><span class="linenos" data-linenos="7 "></span></a>} )
+</span></code></pre></div>
+<p>El codeblock recibe el valor y debe retornar:
+- <code>.T.</code> si pasa la validacion
+- <code>.F.</code> si falla (mensaje generico)
+- <code>C</code> con el mensaje de error si falla (mensaje personalizado)</p>
+<hr />
+<h2 id="5-cast-de-tipos-fase-1">5. Cast de tipos (fase 1)<a class="headerlink" href="#5-cast-de-tipos-fase-1" title="Permanent link">&para;</a></h2>
+<p>El cast convierte el valor del string HTTP al tipo Harbour correcto <strong>antes</strong> de validar.
+Esto significa que despues de <code>Make()</code>, <code>oVal:Get("age")</code> devuelve un <code>N</code>, no un <code>C</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Regla de cast</th>
+<th>Conversion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>string</code></td>
+<td><code>AllTrim( UStr(v) )</code></td>
+</tr>
+<tr>
+<td><code>integer</code></td>
+<td><code>Val(v)</code> truncado a entero</td>
+</tr>
+<tr>
+<td><code>numeric</code> / <code>decimal</code></td>
+<td><code>Val(v)</code> con punto decimal</td>
+</tr>
+<tr>
+<td><code>boolean</code> / <code>bool</code></td>
+<td><code>"1","true","yes","on",".t."</code> → <code>.T.</code>; resto → <code>.F.</code></td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td><code>"YYYY-MM-DD"</code> o <code>"YYYY/MM/DD"</code> → fecha Harbour</td>
+</tr>
+</tbody>
+</table>
+<p><strong>El cast y la validacion se pueden combinar</strong>:</p>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos="1 "></span></a>// <span class="s">&quot;integer&quot;</span> convierte Y valida que sea entero
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos="2 "></span></a>&quot;qty<span class="s">&quot;  =&gt; &quot;</span>required|integer|min:1|max:999&quot;
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3"></a><a href="#__codelineno-11-3"><span class="linenos" data-linenos="3 "></span></a>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4"></a><a href="#__codelineno-11-4"><span class="linenos" data-linenos="4 "></span></a>// <span class="s">&quot;boolean&quot;</span> convierte; sin required, un <span class="nc">checkbox</span> no enviado sera <span class="ow">.F.</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5"></a><a href="#__codelineno-11-5"><span class="linenos" data-linenos="5 "></span></a>&quot;active<span class="s">&quot; =&gt; &quot;</span>boolean&quot;
+</span></code></pre></div>
+<hr />
+<h2 id="6-sanitizacion-fase-3">6. Sanitizacion (fase 3)<a class="headerlink" href="#6-sanitizacion-fase-3" title="Permanent link">&para;</a></h2>
+<p>La sanitizacion se ejecuta <strong>despues</strong> de que todas las validaciones han pasado.
+Se define en el segundo parametro del helper (<code>hSanitate</code>):</p>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a><a href="#__codelineno-12-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oVal</span> := UValidatePost(
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2"></a><a href="#__codelineno-12-2"><span class="linenos" data-linenos="2 "></span></a>   { <span class="s">&quot;name&quot;</span> =&gt; <span class="s">&quot;required|string&quot;</span>, <span class="s">&quot;bio&quot;</span> =&gt; <span class="s">&quot;optional|string&quot;</span> },
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3"></a><a href="#__codelineno-12-3"><span class="linenos" data-linenos="3 "></span></a>   { <span class="s">&quot;name&quot;</span> =&gt; <span class="s">&quot;trim|upper&quot;</span>,      <span class="s">&quot;bio&quot;</span> =&gt; <span class="s">&quot;trim|strip_tags&quot;</span> }
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4"></a><a href="#__codelineno-12-4"><span class="linenos" data-linenos="4 "></span></a>)
+</span></code></pre></div>
+<blockquote>
+<p><strong>Nota:</strong> Los tokens de sanitizacion escritos inline en la cadena de reglas
+(<code>"required|string|trim|upper"</code>) son ignorados por el motor. La unica forma
+de aplicar sanitizacion es mediante el segundo parametro <code>hSanitate</code>.
+El cast <code>string</code> aplica <code>AllTrim()</code> internamente, pero <code>upper</code>/<code>lower</code>/etc.
+requieren <code>hSanitate</code>.</p>
+</blockquote>
+<h3 id="transformaciones-disponibles">Transformaciones disponibles<a class="headerlink" href="#transformaciones-disponibles" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Regla</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>trim</code></td>
+<td><code>AllTrim()</code> - elimina espacios al inicio y al final</td>
+</tr>
+<tr>
+<td><code>ltrim</code></td>
+<td><code>LTrim()</code> - solo espacios a la izquierda</td>
+</tr>
+<tr>
+<td><code>rtrim</code></td>
+<td><code>RTrim()</code> - solo espacios a la derecha</td>
+</tr>
+<tr>
+<td><code>upper</code></td>
+<td><code>Upper()</code></td>
+</tr>
+<tr>
+<td><code>lower</code></td>
+<td><code>Lower()</code></td>
+</tr>
+<tr>
+<td><code>strip_tags</code></td>
+<td>Elimina etiquetas HTML (<code>&lt;tag&gt;</code> → <code>""</code>)</td>
+</tr>
+<tr>
+<td><code>slug</code></td>
+<td>Convierte a slug URL-safe: <code>"Mi Titulo"</code> → <code>"mi-titulo"</code></td>
+</tr>
+<tr>
+<td><code>nl2br</code></td>
+<td>Convierte saltos de linea en <code>&lt;br&gt;</code></td>
+</tr>
+<tr>
+<td><code>escape</code></td>
+<td>Codifica caracteres HTML (<code>&lt;</code>, <code>&gt;</code>, <code>&amp;</code>, <code>"</code>)</td>
+</tr>
+<tr>
+<td><code>abs</code></td>
+<td>Valor absoluto de un numero</td>
+</tr>
+<tr>
+<td><code>round:N</code></td>
+<td>Redondea un numero a N decimales</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a><a href="#__codelineno-13-1"><span class="linenos" data-linenos="1 "></span></a>&quot;title<span class="s">&quot;   =&gt; &quot;</span>required|string|trim|slug<span class="s">&quot;      // &quot;</span>Mi Articulo!<span class="s">&quot; -&gt; &quot;</span>mi-articulo&quot;
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2"></a><a href="#__codelineno-13-2"><span class="linenos" data-linenos="2 "></span></a>&quot;content<span class="s">&quot; =&gt; &quot;</span>required|string|trim|strip_tags&quot;
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3"></a><a href="#__codelineno-13-3"><span class="linenos" data-linenos="3 "></span></a>&quot;price<span class="s">&quot;   =&gt; &quot;</span>required|numeric|abs|round:2&quot;
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4"></a><a href="#__codelineno-13-4"><span class="linenos" data-linenos="4 "></span></a>&quot;email<span class="s">&quot;   =&gt; &quot;</span>required|string|trim|lower|email&quot;
+</span></code></pre></div>
+<hr />
+<h2 id="7-marcadores-especiales">7. Marcadores especiales<a class="headerlink" href="#7-marcadores-especiales" title="Permanent link">&para;</a></h2>
+<h3 id="field-y-escapedfield"><code>field</code> y <code>escapedfield</code><a class="headerlink" href="#field-y-escapedfield" title="Permanent link">&para;</a></h3>
+<p>Marcan los campos que deben incluirse en <code>oVal:DataFields()</code>. Util para rellenar
+formularios HTML tras un error de validacion.</p>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1"></a><a href="#__codelineno-14-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oVal</span> := UValidatePost( {
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2"></a><a href="#__codelineno-14-2"><span class="linenos" data-linenos="2 "></span></a>   &quot;name<span class="s">&quot;  =&gt; &quot;</span>required|string|max:100|field&quot;,
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3"></a><a href="#__codelineno-14-3"><span class="linenos" data-linenos="3 "></span></a>   &quot;email<span class="s">&quot; =&gt; &quot;</span>required|string|email|escapedfield&quot;   // HTML-encoded
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4"></a><a href="#__codelineno-14-4"><span class="linenos" data-linenos="4 "></span></a>} )
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5"></a><a href="#__codelineno-14-5"><span class="linenos" data-linenos="5 "></span></a>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6"></a><a href="#__codelineno-14-6"><span class="linenos" data-linenos="6 "></span></a>// Si la validacion falla, los datos originales estan disponibles
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7"></a><a href="#__codelineno-14-7"><span class="linenos" data-linenos="7 "></span></a><span class="nv">hData</span> := oVal:Dat<span class="nf">aFields</span>()  // { <span class="s">&quot;name&quot;</span> =&gt; <span class="s">&quot;Carles&quot;</span>, <span class="s">&quot;email&quot;</span> =&gt; <span class="s">&quot;c&amp;lt;a&amp;gt;@...&quot;</span> }
+</span></code></pre></div>
+<h3 id="resume"><code>resume</code><a class="headerlink" href="#resume" title="Permanent link">&para;</a></h3>
+<p>Marca campos que se deben incluir en <code>oVal:Resume()</code>. Se usa para re-rellenar formularios
+devolviendo los datos (ya casteados) al template incluso cuando hay error.</p>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1"></a><a href="#__codelineno-15-1"><span class="linenos" data-linenos="1 "></span></a>&quot;name<span class="s">&quot;  =&gt; &quot;</span>required|string|max:100|resume&quot;
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2"></a><a href="#__codelineno-15-2"><span class="linenos" data-linenos="2 "></span></a>&quot;email<span class="s">&quot; =&gt; &quot;</span>required|string|email|resume&quot;
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3"></a><a href="#__codelineno-15-3"><span class="linenos" data-linenos="3 "></span></a>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4"></a><a href="#__codelineno-15-4"><span class="linenos" data-linenos="4 "></span></a>// Resume incluye los campos marcados con el valor ya convertido al tipo correcto.
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5"></a><a href="#__codelineno-15-5"><span class="linenos" data-linenos="5 "></span></a>// Sin marcadores resume, Resume() devuelve el hash de input original sin convertir.
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6"></a><a href="#__codelineno-15-6"><span class="linenos" data-linenos="6 "></span></a><span class="nv">hResume</span> := oVal:Resume()
+</span></code></pre></div>
+<hr />
+<h2 id="8-leer-los-datos-validados">8. Leer los datos validados<a class="headerlink" href="#8-leer-los-datos-validados" title="Permanent link">&para;</a></h2>
+<p>Despues de un <code>Make()</code> exitoso:</p>
+<table>
+<thead>
+<tr>
+<th>Metodo</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>oVal:Get(cKey)</code></td>
+<td>Valor de un campo; <code>NIL</code> si no existe</td>
+</tr>
+<tr>
+<td><code>oVal:Get(cKey, xDef)</code></td>
+<td>Valor de un campo con default</td>
+</tr>
+<tr>
+<td><code>oVal:Validated()</code></td>
+<td>Hash completo con todos los campos validados</td>
+</tr>
+<tr>
+<td><code>oVal:Validated(aFields)</code></td>
+<td>Hash filtrado a los campos indicados</td>
+</tr>
+<tr>
+<td><code>oVal:DataFields()</code></td>
+<td>Hash de los campos marcados con <code>field</code>/<code>escapedfield</code></td>
+</tr>
+<tr>
+<td><code>oVal:Resume()</code></td>
+<td>Hash para re-rellenar formularios (ver marcador <code>resume</code>)</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1"></a><a href="#__codelineno-16-1"><span class="linenos" data-linenos="1 "></span></a>// Obtener campos individuales
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2"></a><a href="#__codelineno-16-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">cName</span>  := oVal:Get( <span class="s">&quot;name&quot;</span> )
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3"></a><a href="#__codelineno-16-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">nAge</span>   := oVal:Get( <span class="s">&quot;age&quot;</span>, 0 )
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4"></a><a href="#__codelineno-16-4"><span class="linenos" data-linenos="4 "></span></a>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5"></a><a href="#__codelineno-16-5"><span class="linenos" data-linenos="5 "></span></a>// Obtener todos los campos validados
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6"></a><a href="#__codelineno-16-6"><span class="linenos" data-linenos="6 "></span></a><span class="nv">hAll</span>   := oVal:Validated()
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7"></a><a href="#__codelineno-16-7"><span class="linenos" data-linenos="7 "></span></a>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8"></a><a href="#__codelineno-16-8"><span class="linenos" data-linenos="8 "></span></a>// Obtener solo los campos que interesan
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9"></a><a href="#__codelineno-16-9"><span class="linenos" data-linenos="9 "></span></a><span class="nv">hSaved</span> := oVal:Validated( { <span class="s">&quot;name&quot;</span>, <span class="s">&quot;email&quot;</span>, <span class="s">&quot;age&quot;</span> } )
+</span></code></pre></div>
+<hr />
+<h2 id="9-gestionar-errores">9. Gestionar errores<a class="headerlink" href="#9-gestionar-errores" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Metodo</th>
+<th>Retorna</th>
+<th>Descripcion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>oVal:Passes()</code></td>
+<td><code>L</code></td>
+<td><code>.T.</code> si no hay errores</td>
+</tr>
+<tr>
+<td><code>oVal:Fails()</code></td>
+<td><code>L</code></td>
+<td><code>.T.</code> si hay algún error</td>
+</tr>
+<tr>
+<td><code>oVal:IsValid()</code></td>
+<td><code>L</code></td>
+<td>Alias de <code>Passes()</code></td>
+</tr>
+<tr>
+<td><code>oVal:GetErrors()</code></td>
+<td><code>H</code></td>
+<td>Hash <code>{ "campo" =&gt; "mensaje" }</code></td>
+</tr>
+<tr>
+<td><code>oVal:GetFirstError()</code></td>
+<td><code>C</code></td>
+<td>Mensaje del primer error</td>
+</tr>
+<tr>
+<td><code>oVal:GetErrorsJson()</code></td>
+<td><code>C</code></td>
+<td><code>GetErrors()</code> serializado como JSON</td>
+</tr>
+<tr>
+<td><code>oVal:GetErrorsTxt()</code></td>
+<td><code>C</code></td>
+<td>Tabla HTML con los errores</td>
+</tr>
+<tr>
+<td><code>oVal:SendErrors(nStatus)</code></td>
+<td>-</td>
+<td>Responde JSON <code>{ errors }</code> con el status indicado</td>
+</tr>
+<tr>
+<td><code>oVal:Formatter()</code></td>
+<td><code>H</code></td>
+<td>Hash <code>{ "success", "errors" }</code> listo para JSON</td>
+</tr>
+</tbody>
+</table>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1"></a><a href="#__codelineno-17-1"><span class="linenos" data-linenos=" 1 "></span></a>// Respuesta JSON estandar de errores
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2"></a><a href="#__codelineno-17-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="kr">IF</span> oVal:Fails()
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3"></a><a href="#__codelineno-17-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( oVal:<span class="nc">Form</span>atter(), 422 )
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4"></a><a href="#__codelineno-17-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="kr">RETURN</span> NIL
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5"></a><a href="#__codelineno-17-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="kr">ENDIF</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6"></a><a href="#__codelineno-17-6"><span class="linenos" data-linenos=" 6 "></span></a>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7"></a><a href="#__codelineno-17-7"><span class="linenos" data-linenos=" 7 "></span></a>// Solo el primer <span class="nf">error</span> (para respuestas simples)
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8"></a><a href="#__codelineno-17-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="kr">IF</span> oVal:Fails()
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9"></a><a href="#__codelineno-17-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 422, oVal:GetFirst<span class="nf">Error</span>() )
+</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10"></a><a href="#__codelineno-17-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="kr">RETURN</span> NIL
+</span><span id="__span-17-11"><a id="__codelineno-17-11" name="__codelineno-17-11"></a><a href="#__codelineno-17-11"><span class="linenos" data-linenos="11 "></span></a><span class="kr">ENDIF</span>
+</span><span id="__span-17-12"><a id="__codelineno-17-12" name="__codelineno-17-12"></a><a href="#__codelineno-17-12"><span class="linenos" data-linenos="12 "></span></a>
+</span><span id="__span-17-13"><a id="__codelineno-17-13" name="__codelineno-17-13"></a><a href="#__codelineno-17-13"><span class="linenos" data-linenos="13 "></span></a>// Errores por campo (para AJAX con feedback por campo)
+</span><span id="__span-17-14"><a id="__codelineno-17-14" name="__codelineno-17-14"></a><a href="#__codelineno-17-14"><span class="linenos" data-linenos="14 "></span></a><span class="kr">IF</span> oVal:Fails()
+</span><span id="__span-17-15"><a id="__codelineno-17-15" name="__codelineno-17-15"></a><a href="#__codelineno-17-15"><span class="linenos" data-linenos="15 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;errors&quot;</span> =&gt; oVal:GetErrors() }, 422 )
+</span><span id="__span-17-16"><a id="__codelineno-17-16" name="__codelineno-17-16"></a><a href="#__codelineno-17-16"><span class="linenos" data-linenos="16 "></span></a>   <span class="kr">RETURN</span> NIL
+</span><span id="__span-17-17"><a id="__codelineno-17-17" name="__codelineno-17-17"></a><a href="#__codelineno-17-17"><span class="linenos" data-linenos="17 "></span></a><span class="kr">ENDIF</span>
+</span></code></pre></div>
+<hr />
+<h2 id="10-etiquetas-y-defaults-en-los-campos">10. Etiquetas y defaults en los campos<a class="headerlink" href="#10-etiquetas-y-defaults-en-los-campos" title="Permanent link">&para;</a></h2>
+<p>La regla de un campo puede ser un array de hasta 4 elementos:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1"></a><a href="#__codelineno-18-1"><span class="linenos" data-linenos="1 "></span></a>{ &quot;reglas&quot;, &quot;Etiqueta&quot;, valorDefault, codeblock }
+</span></code></pre></div>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1"></a><a href="#__codelineno-19-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oVal</span> := UValidatePost( {
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2"></a><a href="#__codelineno-19-2"><span class="linenos" data-linenos="2 "></span></a>   &quot;name<span class="s">&quot;  =&gt; { &quot;</span>required|string|max:100<span class="s">&quot;, &quot;</span>Nombre completo&quot; },
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3"></a><a href="#__codelineno-19-3"><span class="linenos" data-linenos="3 "></span></a>   &quot;age<span class="s">&quot;   =&gt; { &quot;</span>required|integer|min:18<span class="s">&quot;, &quot;</span>Edad&quot;, 0 },
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4"></a><a href="#__codelineno-19-4"><span class="linenos" data-linenos="4 "></span></a>   &quot;token<span class="s">&quot; =&gt; { &quot;</span>required|string<span class="s">&quot;, &quot;</span>Token&quot;, NIL,
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5"></a><a href="#__codelineno-19-5"><span class="linenos" data-linenos="5 "></span></a>                {|v| <span class="nf">iif</span>( HIX_TokenValid(v, 3600), <span class="ow">.T.</span>, <span class="s">&quot;Token expirado&quot;</span> ) }
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6"></a><a href="#__codelineno-19-6"><span class="linenos" data-linenos="6 "></span></a>              }
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7"></a><a href="#__codelineno-19-7"><span class="linenos" data-linenos="7 "></span></a>} )
+</span></code></pre></div>
+<ul>
+<li>El segundo elemento es la etiqueta que aparece en los mensajes de error.</li>
+<li>El tercero es el valor por defecto cuando el campo no existe en el input.</li>
+<li>El cuarto es un codeblock de validacion personalizado.</li>
+</ul>
+<hr />
+<h2 id="11-validar-un-solo-valor">11. Validar un solo valor<a class="headerlink" href="#11-validar-un-solo-valor" title="Permanent link">&para;</a></h2>
+<p><code>UValidatorOne</code> valida un unico valor sin necesidad de construir un hash:</p>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1"></a><a href="#__codelineno-20-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oVal</span> := UValidatorOne( <span class="s">&quot;Email&quot;</span>, cEmail, <span class="s">&quot;required|string|email&quot;</span> )
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2"></a><a href="#__codelineno-20-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">IF</span> oVal:Fails()
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3"></a><a href="#__codelineno-20-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 422, oVal:GetFirst<span class="nf">Error</span>() )
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4"></a><a href="#__codelineno-20-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="kr">RETURN</span> NIL
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5"></a><a href="#__codelineno-20-5"><span class="linenos" data-linenos="5 "></span></a><span class="kr">ENDIF</span>
+</span></code></pre></div>
+<hr />
+<h2 id="12-anadir-campos-sobre-la-marcha">12. Anadir campos sobre la marcha<a class="headerlink" href="#12-anadir-campos-sobre-la-marcha" title="Permanent link">&para;</a></h2>
+<p>Puedes enriquecer un validador despues de crearlo con <code>Add()</code>:</p>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1"></a><a href="#__codelineno-21-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oVal</span> := UValidatePost( { <span class="s">&quot;name&quot;</span> =&gt; <span class="s">&quot;required|string&quot;</span> } )
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2"></a><a href="#__codelineno-21-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">oVal</span>:Add( { <span class="s">&quot;extra&quot;</span> =&gt; <span class="s">&quot;optional|integer&quot;</span> }, UGet(<span class="s">&quot;extra&quot;</span>) )
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3"></a><a href="#__codelineno-21-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">oVal</span>:Make()
+</span></code></pre></div>
+<hr />
+<h2 id="13-patrones-completos">13. Patrones completos<a class="headerlink" href="#13-patrones-completos" title="Permanent link">&para;</a></h2>
+<h3 id="api-rest-crear-recurso">API REST - crear recurso<a class="headerlink" href="#api-rest-crear-recurso" title="Permanent link">&para;</a></h3>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1"></a><a href="#__codelineno-22-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> _ProductCreate()
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2"></a><a href="#__codelineno-22-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oVal, hProd
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3"></a><a href="#__codelineno-22-3"><span class="linenos" data-linenos=" 3 "></span></a>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4"></a><a href="#__codelineno-22-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">oVal</span> := UValidateOrFail( {
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5"></a><a href="#__codelineno-22-5"><span class="linenos" data-linenos=" 5 "></span></a>      &quot;name<span class="s">&quot;        =&gt; { &quot;</span>required|string|max:200|trim<span class="s">&quot;,     &quot;</span>Nombre&quot; },
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6"></a><a href="#__codelineno-22-6"><span class="linenos" data-linenos=" 6 "></span></a>      &quot;price<span class="s">&quot;       =&gt; { &quot;</span>required|numeric|min:0|round:2<span class="s">&quot;,   &quot;</span>Precio&quot; },
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7"></a><a href="#__codelineno-22-7"><span class="linenos" data-linenos=" 7 "></span></a>      &quot;stock<span class="s">&quot;       =&gt; { &quot;</span>required|integer|min:0<span class="s">&quot;,           &quot;</span>Stock&quot; },
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8"></a><a href="#__codelineno-22-8"><span class="linenos" data-linenos=" 8 "></span></a>      &quot;category_id<span class="s">&quot; =&gt; { &quot;</span>required|integer|positive<span class="s">&quot;,        &quot;</span>Categoria&quot; },
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9"></a><a href="#__codelineno-22-9"><span class="linenos" data-linenos=" 9 "></span></a>      &quot;active<span class="s">&quot;      =&gt; { &quot;</span>boolean<span class="s">&quot;,                          &quot;</span>Activo&quot; }
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10"></a><a href="#__codelineno-22-10"><span class="linenos" data-linenos="10 "></span></a>   } )
+</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11"></a><a href="#__codelineno-22-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="kr">IF</span> oVal == NIL ; RETURN NIL ; ENDIF
+</span><span id="__span-22-12"><a id="__codelineno-22-12" name="__codelineno-22-12"></a><a href="#__codelineno-22-12"><span class="linenos" data-linenos="12 "></span></a>
+</span><span id="__span-22-13"><a id="__codelineno-22-13" name="__codelineno-22-13"></a><a href="#__codelineno-22-13"><span class="linenos" data-linenos="13 "></span></a>   <span class="nv">hProd</span> := oVal:Validated( { <span class="s">&quot;name&quot;</span>, <span class="s">&quot;price&quot;</span>, <span class="s">&quot;stock&quot;</span>, <span class="s">&quot;category_id&quot;</span>, <span class="s">&quot;active&quot;</span> } )
+</span><span id="__span-22-14"><a id="__codelineno-22-14" name="__codelineno-22-14"></a><a href="#__codelineno-22-14"><span class="linenos" data-linenos="14 "></span></a>   // ... insertar hProd en BD ...
+</span><span id="__span-22-15"><a id="__codelineno-22-15" name="__codelineno-22-15"></a><a href="#__codelineno-22-15"><span class="linenos" data-linenos="15 "></span></a>
+</span><span id="__span-22-16"><a id="__codelineno-22-16" name="__codelineno-22-16"></a><a href="#__codelineno-22-16"><span class="linenos" data-linenos="16 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;id&quot;</span> =&gt; nNewId }, 201 )
+</span><span id="__span-22-17"><a id="__codelineno-22-17" name="__codelineno-22-17"></a><a href="#__codelineno-22-17"><span class="linenos" data-linenos="17 "></span></a><span class="kr">RETURN</span> NIL
+</span></code></pre></div>
+<h3 id="formulario-html-con-re-llenado">Formulario HTML con re-llenado<a class="headerlink" href="#formulario-html-con-re-llenado" title="Permanent link">&para;</a></h3>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1"></a><a href="#__codelineno-23-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> _RegisterPost()
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2"></a><a href="#__codelineno-23-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oVal
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3"></a><a href="#__codelineno-23-3"><span class="linenos" data-linenos=" 3 "></span></a>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4"></a><a href="#__codelineno-23-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">oVal</span> := UValidatePost( {
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5"></a><a href="#__codelineno-23-5"><span class="linenos" data-linenos=" 5 "></span></a>      &quot;username<span class="s">&quot; =&gt; &quot;</span>required|string|min:3|max:50|trim|lower|resume&quot;,
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6"></a><a href="#__codelineno-23-6"><span class="linenos" data-linenos=" 6 "></span></a>      &quot;email<span class="s">&quot;    =&gt; &quot;</span>required|string|email|trim|lower|resume&quot;,
+</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7"></a><a href="#__codelineno-23-7"><span class="linenos" data-linenos=" 7 "></span></a>      &quot;password<span class="s">&quot; =&gt; &quot;</span>required|string|min:8|confirmed&quot;
+</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8"></a><a href="#__codelineno-23-8"><span class="linenos" data-linenos=" 8 "></span></a>   } )
+</span><span id="__span-23-9"><a id="__codelineno-23-9" name="__codelineno-23-9"></a><a href="#__codelineno-23-9"><span class="linenos" data-linenos=" 9 "></span></a>
+</span><span id="__span-23-10"><a id="__codelineno-23-10" name="__codelineno-23-10"></a><a href="#__codelineno-23-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="kr">IF</span> ! oVal:Make()
+</span><span id="__span-23-11"><a id="__codelineno-23-11" name="__codelineno-23-11"></a><a href="#__codelineno-23-11"><span class="linenos" data-linenos="11 "></span></a>      // guardar flash con errores y datos del <span class="nc">form</span>ulario
+</span><span id="__span-23-12"><a id="__codelineno-23-12" name="__codelineno-23-12"></a><a href="#__codelineno-23-12"><span class="linenos" data-linenos="12 "></span></a>      <span class="nv">LOCAL</span> oFlash := UFlash( <span class="s">&quot;register&quot;</span> )
+</span><span id="__span-23-13"><a id="__codelineno-23-13" name="__codelineno-23-13"></a><a href="#__codelineno-23-13"><span class="linenos" data-linenos="13 "></span></a>      <span class="nv">oFlash</span>:<span class="nf">Set</span>( <span class="s">&quot;errors&quot;</span>,  oVal:GetErrors() )
+</span><span id="__span-23-14"><a id="__codelineno-23-14" name="__codelineno-23-14"></a><a href="#__codelineno-23-14"><span class="linenos" data-linenos="14 "></span></a>      <span class="nv">oFlash</span>:<span class="nf">Set</span>( <span class="s">&quot;data&quot;</span>,    oVal:Resume() )
+</span><span id="__span-23-15"><a id="__codelineno-23-15" name="__codelineno-23-15"></a><a href="#__codelineno-23-15"><span class="linenos" data-linenos="15 "></span></a>      <span class="nv">oFlash</span>:Save()
+</span><span id="__span-23-16"><a id="__codelineno-23-16" name="__codelineno-23-16"></a><a href="#__codelineno-23-16"><span class="linenos" data-linenos="16 "></span></a>      <span class="nv">URedirect</span>( <span class="s">&quot;/register&quot;</span> )
+</span><span id="__span-23-17"><a id="__codelineno-23-17" name="__codelineno-23-17"></a><a href="#__codelineno-23-17"><span class="linenos" data-linenos="17 "></span></a>      <span class="kr">RETURN</span> NIL
+</span><span id="__span-23-18"><a id="__codelineno-23-18" name="__codelineno-23-18"></a><a href="#__codelineno-23-18"><span class="linenos" data-linenos="18 "></span></a>   <span class="kr">ENDIF</span>
+</span><span id="__span-23-19"><a id="__codelineno-23-19" name="__codelineno-23-19"></a><a href="#__codelineno-23-19"><span class="linenos" data-linenos="19 "></span></a>
+</span><span id="__span-23-20"><a id="__codelineno-23-20" name="__codelineno-23-20"></a><a href="#__codelineno-23-20"><span class="linenos" data-linenos="20 "></span></a>   // ... crear usuario ...
+</span><span id="__span-23-21"><a id="__codelineno-23-21" name="__codelineno-23-21"></a><a href="#__codelineno-23-21"><span class="linenos" data-linenos="21 "></span></a>   <span class="nv">URedirect</span>( <span class="s">&quot;/dashboard&quot;</span> )
+</span><span id="__span-23-22"><a id="__codelineno-23-22" name="__codelineno-23-22"></a><a href="#__codelineno-23-22"><span class="linenos" data-linenos="22 "></span></a><span class="kr">RETURN</span> NIL
+</span></code></pre></div>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1"></a><a href="#__codelineno-24-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> _RegisterGet()
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2"></a><a href="#__codelineno-24-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oFlash  := UFlash( <span class="s">&quot;register&quot;</span> )
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3"></a><a href="#__codelineno-24-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="nv">LOCAL</span> hErrors := oFlash:Get( <span class="s">&quot;errors&quot;</span>, {=&gt;} )
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4"></a><a href="#__codelineno-24-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">LOCAL</span> hData   := oFlash:Get( <span class="s">&quot;data&quot;</span>,   {=&gt;} )
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5"></a><a href="#__codelineno-24-5"><span class="linenos" data-linenos=" 5 "></span></a>   <span class="kr">USe</span>ndView( <span class="s">&quot;auth/register.view.html&quot;</span>, {
+</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6"></a><a href="#__codelineno-24-6"><span class="linenos" data-linenos=" 6 "></span></a>      &quot;hErrors&quot;   =&gt; hErrors,
+</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7"></a><a href="#__codelineno-24-7"><span class="linenos" data-linenos=" 7 "></span></a>      &quot;cUsername<span class="s">&quot; =&gt; hb_HGetDef( hData, &quot;</span>username<span class="s">&quot;, &quot;</span>&quot; ),
+</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8"></a><a href="#__codelineno-24-8"><span class="linenos" data-linenos=" 8 "></span></a>      &quot;cEmail<span class="s">&quot;    =&gt; hb_HGetDef( hData, &quot;</span>email<span class="s">&quot;,    &quot;</span>&quot; )
+</span><span id="__span-24-9"><a id="__codelineno-24-9" name="__codelineno-24-9"></a><a href="#__codelineno-24-9"><span class="linenos" data-linenos=" 9 "></span></a>   } )
+</span><span id="__span-24-10"><a id="__codelineno-24-10" name="__codelineno-24-10"></a><a href="#__codelineno-24-10"><span class="linenos" data-linenos="10 "></span></a><span class="kr">RETURN</span> NIL
+</span></code></pre></div>
+<h3 id="validar-query-string-para-busqueda-paginada">Validar query string para busqueda paginada<a class="headerlink" href="#validar-query-string-para-busqueda-paginada" title="Permanent link">&para;</a></h3>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1"></a><a href="#__codelineno-25-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> _ProductList()
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2"></a><a href="#__codelineno-25-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oVal, n<span class="nc">Page</span>, nLimit, cQ
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3"></a><a href="#__codelineno-25-3"><span class="linenos" data-linenos=" 3 "></span></a>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4"></a><a href="#__codelineno-25-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">oVal</span> := UValidateGet( {
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5"></a><a href="#__codelineno-25-5"><span class="linenos" data-linenos=" 5 "></span></a>      &quot;<span class="nc">page</span><span class="s">&quot;  =&gt; { &quot;</span>optional|integer|min:1<span class="s">&quot;,    &quot;</span>Pagina&quot;,  1 },
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6"></a><a href="#__codelineno-25-6"><span class="linenos" data-linenos=" 6 "></span></a>      &quot;limit<span class="s">&quot; =&gt; { &quot;</span>optional|integer|between:1,100<span class="s">&quot;, &quot;</span>Limite&quot;, 20 },
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7"></a><a href="#__codelineno-25-7"><span class="linenos" data-linenos=" 7 "></span></a>      &quot;q<span class="s">&quot;     =&gt; { &quot;</span>optional|string|max:200|trim<span class="s">&quot;, &quot;</span>Busqueda<span class="s">&quot;, &quot;</span>&quot; }
+</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8"></a><a href="#__codelineno-25-8"><span class="linenos" data-linenos=" 8 "></span></a>   } )
+</span><span id="__span-25-9"><a id="__codelineno-25-9" name="__codelineno-25-9"></a><a href="#__codelineno-25-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="nv">oVal</span>:Make()   // nunca falla (todos opcionales con defaults)
+</span><span id="__span-25-10"><a id="__codelineno-25-10" name="__codelineno-25-10"></a><a href="#__codelineno-25-10"><span class="linenos" data-linenos="10 "></span></a>
+</span><span id="__span-25-11"><a id="__codelineno-25-11" name="__codelineno-25-11"></a><a href="#__codelineno-25-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="nv">nPage</span>  := oVal:Get( <span class="s">&quot;page&quot;</span> )
+</span><span id="__span-25-12"><a id="__codelineno-25-12" name="__codelineno-25-12"></a><a href="#__codelineno-25-12"><span class="linenos" data-linenos="12 "></span></a>   <span class="nv">nLimit</span> := oVal:Get( <span class="s">&quot;limit&quot;</span> )
+</span><span id="__span-25-13"><a id="__codelineno-25-13" name="__codelineno-25-13"></a><a href="#__codelineno-25-13"><span class="linenos" data-linenos="13 "></span></a>   <span class="nv">cQ</span>     := oVal:Get( <span class="s">&quot;q&quot;</span> )
+</span><span id="__span-25-14"><a id="__codelineno-25-14" name="__codelineno-25-14"></a><a href="#__codelineno-25-14"><span class="linenos" data-linenos="14 "></span></a>
+</span><span id="__span-25-15"><a id="__codelineno-25-15" name="__codelineno-25-15"></a><a href="#__codelineno-25-15"><span class="linenos" data-linenos="15 "></span></a>   // ... consultar BD ...
+</span><span id="__span-25-16"><a id="__codelineno-25-16" name="__codelineno-25-16"></a><a href="#__codelineno-25-16"><span class="linenos" data-linenos="16 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;page&quot;</span> =&gt; n<span class="nc">Page</span>, <span class="s">&quot;limit&quot;</span> =&gt; nLimit, <span class="s">&quot;results&quot;</span> =&gt; aResults } )
+</span><span id="__span-25-17"><a id="__codelineno-25-17" name="__codelineno-25-17"></a><a href="#__codelineno-25-17"><span class="linenos" data-linenos="17 "></span></a><span class="kr">RETURN</span> NIL
+</span></code></pre></div>
+<h3 id="validacion-con-regla-personalizada-contra-bd">Validacion con regla personalizada contra BD<a class="headerlink" href="#validacion-con-regla-personalizada-contra-bd" title="Permanent link">&para;</a></h3>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1"></a><a href="#__codelineno-26-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> _ChangeEmail()
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2"></a><a href="#__codelineno-26-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oVal
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3"></a><a href="#__codelineno-26-3"><span class="linenos" data-linenos=" 3 "></span></a>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4"></a><a href="#__codelineno-26-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">oVal</span> := UValidateOrFail( {
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5"></a><a href="#__codelineno-26-5"><span class="linenos" data-linenos=" 5 "></span></a>      &quot;email<span class="s">&quot; =&gt; { &quot;</span>required|string|email|trim|lower&quot;,
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6"></a><a href="#__codelineno-26-6"><span class="linenos" data-linenos=" 6 "></span></a>                   &quot;Email&quot;,
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7"></a><a href="#__codelineno-26-7"><span class="linenos" data-linenos=" 7 "></span></a>                   &quot;&quot;,
+</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8"></a><a href="#__codelineno-26-8"><span class="linenos" data-linenos=" 8 "></span></a>                   {|v| <span class="nf">iif</span>( _EmailTaken(v), <span class="s">&quot;El email ya esta registrado&quot;</span>, <span class="ow">.T.</span> ) }
+</span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9"></a><a href="#__codelineno-26-9"><span class="linenos" data-linenos=" 9 "></span></a>                 }
+</span><span id="__span-26-10"><a id="__codelineno-26-10" name="__codelineno-26-10"></a><a href="#__codelineno-26-10"><span class="linenos" data-linenos="10 "></span></a>   } )
+</span><span id="__span-26-11"><a id="__codelineno-26-11" name="__codelineno-26-11"></a><a href="#__codelineno-26-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="kr">IF</span> oVal == NIL ; RETURN NIL ; ENDIF
+</span><span id="__span-26-12"><a id="__codelineno-26-12" name="__codelineno-26-12"></a><a href="#__codelineno-26-12"><span class="linenos" data-linenos="12 "></span></a>
+</span><span id="__span-26-13"><a id="__codelineno-26-13" name="__codelineno-26-13"></a><a href="#__codelineno-26-13"><span class="linenos" data-linenos="13 "></span></a>   <span class="nv">cEmail</span> := oVal:Get( <span class="s">&quot;email&quot;</span> )
+</span><span id="__span-26-14"><a id="__codelineno-26-14" name="__codelineno-26-14"></a><a href="#__codelineno-26-14"><span class="linenos" data-linenos="14 "></span></a>   // ... actualizar email ...
+</span><span id="__span-26-15"><a id="__codelineno-26-15" name="__codelineno-26-15"></a><a href="#__codelineno-26-15"><span class="linenos" data-linenos="15 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;ok&quot;</span> =&gt; <span class="ow">.T.</span> } )
+</span><span id="__span-26-16"><a id="__codelineno-26-16" name="__codelineno-26-16"></a><a href="#__codelineno-26-16"><span class="linenos" data-linenos="16 "></span></a><span class="kr">RETURN</span> NIL
+</span><span id="__span-26-17"><a id="__codelineno-26-17" name="__codelineno-26-17"></a><a href="#__codelineno-26-17"><span class="linenos" data-linenos="17 "></span></a>
+</span><span id="__span-26-18"><a id="__codelineno-26-18" name="__codelineno-26-18"></a><a href="#__codelineno-26-18"><span class="linenos" data-linenos="18 "></span></a><span class="nv">STATIC</span> FUNCTION _EmailTaken( cEmail )
+</span><span id="__span-26-19"><a id="__codelineno-26-19" name="__codelineno-26-19"></a><a href="#__codelineno-26-19"><span class="linenos" data-linenos="19 "></span></a>   // consultar BD y retornar <span class="ow">.T.</span> si el email ya existe
+</span><span id="__span-26-20"><a id="__codelineno-26-20" name="__codelineno-26-20"></a><a href="#__codelineno-26-20"><span class="linenos" data-linenos="20 "></span></a><span class="kr">RETURN</span> <span class="ow">.F.</span>
+</span></code></pre></div>
+<hr />
+<h2 id="14-referencia-rapida-de-reglas">14. Referencia rapida de reglas<a class="headerlink" href="#14-referencia-rapida-de-reglas" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1"></a><a href="#__codelineno-27-1"><span class="linenos" data-linenos=" 1 "></span></a>-- Presencia --
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2"></a><a href="#__codelineno-27-2"><span class="linenos" data-linenos=" 2 "></span></a>required       optional
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3"></a><a href="#__codelineno-27-3"><span class="linenos" data-linenos=" 3 "></span></a>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4"></a><a href="#__codelineno-27-4"><span class="linenos" data-linenos=" 4 "></span></a>-- Tipos / cast --
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5"></a><a href="#__codelineno-27-5"><span class="linenos" data-linenos=" 5 "></span></a>string         integer        numeric/decimal
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6"></a><a href="#__codelineno-27-6"><span class="linenos" data-linenos=" 6 "></span></a>boolean/bool   date           positive
+</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7"></a><a href="#__codelineno-27-7"><span class="linenos" data-linenos=" 7 "></span></a>
+</span><span id="__span-27-8"><a id="__codelineno-27-8" name="__codelineno-27-8"></a><a href="#__codelineno-27-8"><span class="linenos" data-linenos=" 8 "></span></a>-- Rango --
+</span><span id="__span-27-9"><a id="__codelineno-27-9" name="__codelineno-27-9"></a><a href="#__codelineno-27-9"><span class="linenos" data-linenos=" 9 "></span></a>min:N          max:N
+</span><span id="__span-27-10"><a id="__codelineno-27-10" name="__codelineno-27-10"></a><a href="#__codelineno-27-10"><span class="linenos" data-linenos="10 "></span></a>minlen:N       maxlen:N
+</span><span id="__span-27-11"><a id="__codelineno-27-11" name="__codelineno-27-11"></a><a href="#__codelineno-27-11"><span class="linenos" data-linenos="11 "></span></a>between:N,M
+</span><span id="__span-27-12"><a id="__codelineno-27-12" name="__codelineno-27-12"></a><a href="#__codelineno-27-12"><span class="linenos" data-linenos="12 "></span></a>
+</span><span id="__span-27-13"><a id="__codelineno-27-13" name="__codelineno-27-13"></a><a href="#__codelineno-27-13"><span class="linenos" data-linenos="13 "></span></a>-- Formato --
+</span><span id="__span-27-14"><a id="__codelineno-27-14" name="__codelineno-27-14"></a><a href="#__codelineno-27-14"><span class="linenos" data-linenos="14 "></span></a>email          url            ip
+</span><span id="__span-27-15"><a id="__codelineno-27-15" name="__codelineno-27-15"></a><a href="#__codelineno-27-15"><span class="linenos" data-linenos="15 "></span></a>regex:PATRON
+</span><span id="__span-27-16"><a id="__codelineno-27-16" name="__codelineno-27-16"></a><a href="#__codelineno-27-16"><span class="linenos" data-linenos="16 "></span></a>
+</span><span id="__span-27-17"><a id="__codelineno-27-17" name="__codelineno-27-17"></a><a href="#__codelineno-27-17"><span class="linenos" data-linenos="17 "></span></a>-- Listas --
+</span><span id="__span-27-18"><a id="__codelineno-27-18" name="__codelineno-27-18"></a><a href="#__codelineno-27-18"><span class="linenos" data-linenos="18 "></span></a>in:a,b,c       notin:a,b,c
+</span><span id="__span-27-19"><a id="__codelineno-27-19" name="__codelineno-27-19"></a><a href="#__codelineno-27-19"><span class="linenos" data-linenos="19 "></span></a>
+</span><span id="__span-27-20"><a id="__codelineno-27-20" name="__codelineno-27-20"></a><a href="#__codelineno-27-20"><span class="linenos" data-linenos="20 "></span></a>-- Fechas --
+</span><span id="__span-27-21"><a id="__codelineno-27-21" name="__codelineno-27-21"></a><a href="#__codelineno-27-21"><span class="linenos" data-linenos="21 "></span></a>mindate:YYYY-MM-DD   maxdate:YYYY-MM-DD
+</span><span id="__span-27-22"><a id="__codelineno-27-22" name="__codelineno-27-22"></a><a href="#__codelineno-27-22"><span class="linenos" data-linenos="22 "></span></a>
+</span><span id="__span-27-23"><a id="__codelineno-27-23" name="__codelineno-27-23"></a><a href="#__codelineno-27-23"><span class="linenos" data-linenos="23 "></span></a>-- Cross-field --
+</span><span id="__span-27-24"><a id="__codelineno-27-24" name="__codelineno-27-24"></a><a href="#__codelineno-27-24"><span class="linenos" data-linenos="24 "></span></a>confirmed      (campo_confirmation debe coincidir)
+</span><span id="__span-27-25"><a id="__codelineno-27-25" name="__codelineno-27-25"></a><a href="#__codelineno-27-25"><span class="linenos" data-linenos="25 "></span></a>
+</span><span id="__span-27-26"><a id="__codelineno-27-26" name="__codelineno-27-26"></a><a href="#__codelineno-27-26"><span class="linenos" data-linenos="26 "></span></a>-- Sanitizacion (inline o en hSanitate) --
+</span><span id="__span-27-27"><a id="__codelineno-27-27" name="__codelineno-27-27"></a><a href="#__codelineno-27-27"><span class="linenos" data-linenos="27 "></span></a>trim    ltrim   rtrim   upper   lower
+</span><span id="__span-27-28"><a id="__codelineno-27-28" name="__codelineno-27-28"></a><a href="#__codelineno-27-28"><span class="linenos" data-linenos="28 "></span></a>strip_tags      slug    nl2br   escape
+</span><span id="__span-27-29"><a id="__codelineno-27-29" name="__codelineno-27-29"></a><a href="#__codelineno-27-29"><span class="linenos" data-linenos="29 "></span></a>abs             round:N
+</span><span id="__span-27-30"><a id="__codelineno-27-30" name="__codelineno-27-30"></a><a href="#__codelineno-27-30"><span class="linenos" data-linenos="30 "></span></a>
+</span><span id="__span-27-31"><a id="__codelineno-27-31" name="__codelineno-27-31"></a><a href="#__codelineno-27-31"><span class="linenos" data-linenos="31 "></span></a>-- Marcadores --
+</span><span id="__span-27-32"><a id="__codelineno-27-32" name="__codelineno-27-32"></a><a href="#__codelineno-27-32"><span class="linenos" data-linenos="32 "></span></a>field          escapedfield   resume
+</span></code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  <span class="md-footer-text"><span class="myinfo">HIX</span>  was developed with <a href="https://harbour.github.io/">Harbour</a></span>
+  <span class="md-footer-copy">&copy; 2026 Charly Aubia Floresvi</span>
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.top", "navigation.instant", "navigation.instant.progress", "navigation.tracking", "toc.follow", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../../../javascripts/extra.js"></script>
+      
+    
+  </body>
+</html>

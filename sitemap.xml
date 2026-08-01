@@ -1,0 +1,793 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>Nonecharly.doc/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonecharly.doc/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/charly.doc/"/>
+    </url>
+    <url>
+        <loc>None./</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="None"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/"/>
+    </url>
+    <url>
+        <loc>Noneapi/admin/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneapi/admin/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/api/admin/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/controllers/controllers/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/controllers/controllers/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/controllers/controllers/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/controllers/requests/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/controllers/requests/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/controllers/requests/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/controllers/validator/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/controllers/validator/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/controllers/validator/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/middleware/contexto/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/middleware/contexto/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/middleware/contexto/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/middleware/middleware/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/middleware/middleware/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/middleware/middleware/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/middleware/mw_dessign/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/middleware/mw_dessign/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/middleware/mw_dessign/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/middleware/mw_example/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/middleware/mw_example/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/middleware/mw_example/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/middleware/mw_list/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/middleware/mw_list/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/middleware/mw_list/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/middleware/mw_loader/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/middleware/mw_loader/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/middleware/mw_loader/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/models/udbf/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/models/udbf/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/models/udbf/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/response/cookies/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/response/cookies/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/response/cookies/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/response/encoding-decoding/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/response/encoding-decoding/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/response/encoding-decoding/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/response/flash/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/response/flash/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/response/flash/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/response/headers/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/response/headers/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/response/headers/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/routes/routes/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/routes/routes/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/routes/routes/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/seguridad/autenticacion/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/autenticacion/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/autenticacion/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/seguridad/claves/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/claves/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/claves/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/seguridad/cors/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/cors/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/cors/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/seguridad/csrf/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/csrf/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/csrf/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/seguridad/firewall/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/firewall/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/firewall/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/seguridad/jwt/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/jwt/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/jwt/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/seguridad/ratelimit/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/ratelimit/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/ratelimit/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/seguridad/resources-ids/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/resources-ids/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/resources-ids/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/seguridad/sesiones/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/sesiones/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/sesiones/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/seguridad/ssl/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/ssl/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/ssl/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/views/directives/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/views/directives/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/views/directives/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/views/example/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/views/example/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/views/example/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/views/example1/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/views/example1/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/views/example1/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/views/example2/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/views/example2/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/views/example2/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/views/example3/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/views/example3/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/views/example3/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/views/example4/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/views/example4/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/views/example4/"/>
+    </url>
+    <url>
+        <loc>Nonehixstyle/views/mambo/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/views/mambo/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/views/mambo/"/>
+    </url>
+    <url>
+        <loc>Noneintro/data-driven/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneintro/data-driven/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/intro/data-driven/"/>
+    </url>
+    <url>
+        <loc>Noneintro/hixstyle/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneintro/hixstyle/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/intro/hixstyle/"/>
+    </url>
+    <url>
+        <loc>Noneintro/intro/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneintro/intro/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/intro/intro/"/>
+    </url>
+    <url>
+        <loc>Noneintro/modo-basico/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneintro/modo-basico/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/intro/modo-basico/"/>
+    </url>
+    <url>
+        <loc>Noneprimeros-pasos/compile/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneprimeros-pasos/compile/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/primeros-pasos/compile/"/>
+    </url>
+    <url>
+        <loc>Noneprimeros-pasos/config/hix.json/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneprimeros-pasos/config/hix.json/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/primeros-pasos/config/hix.json/"/>
+    </url>
+    <url>
+        <loc>Noneprogramacion/error-handling/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneprogramacion/error-handling/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/programacion/error-handling/"/>
+    </url>
+    <url>
+        <loc>Noneprogramacion/error_codes/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneprogramacion/error_codes/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/programacion/error_codes/"/>
+    </url>
+    <url>
+        <loc>Noneprogramacion/errorsys/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneprogramacion/errorsys/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/programacion/errorsys/"/>
+    </url>
+    <url>
+        <loc>Noneprogramacion/mapa-helpers/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneprogramacion/mapa-helpers/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/programacion/mapa-helpers/"/>
+    </url>
+    <url>
+        <loc>Noneprogramacion/modo-dev-prod/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneprogramacion/modo-dev-prod/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/programacion/modo-dev-prod/"/>
+    </url>
+    <url>
+        <loc>Nonesistema/apache-proxy/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonesistema/apache-proxy/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/sistema/apache-proxy/"/>
+    </url>
+    <url>
+        <loc>Nonesistema/bootlog/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonesistema/bootlog/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/sistema/bootlog/"/>
+    </url>
+    <url>
+        <loc>Nonesistema/hix-admin/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonesistema/hix-admin/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/sistema/hix-admin/"/>
+    </url>
+    <url>
+        <loc>Nonesistema/loaders/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonesistema/loaders/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/sistema/loaders/"/>
+    </url>
+    <url>
+        <loc>Nonesistema/logger/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonesistema/logger/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/sistema/logger/"/>
+    </url>
+    <url>
+        <loc>Nonesistema/metricas/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonesistema/metricas/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/sistema/metricas/"/>
+    </url>
+    <url>
+        <loc>Nonesistema/traceando/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonesistema/traceando/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/sistema/traceando/"/>
+    </url>
+    <url>
+        <loc>Nonetiempo-real/longpolling/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonetiempo-real/longpolling/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/tiempo-real/longpolling/"/>
+    </url>
+    <url>
+        <loc>Nonetiempo-real/sse/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonetiempo-real/sse/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/tiempo-real/sse/"/>
+    </url>
+    <url>
+        <loc>Nonetiempo-real/ws/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonetiempo-real/ws/"/>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/tiempo-real/ws/"/>
+    </url>
+    <url>
+        <loc>Nonees/charly.doc/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/charly.doc/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonecharly.doc/"/>
+    </url>
+    <url>
+        <loc>Nonees/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="None"/>
+    </url>
+    <url>
+        <loc>Nonees/api/admin/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/api/admin/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneapi/admin/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/controllers/controllers/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/controllers/controllers/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/controllers/controllers/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/controllers/requests/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/controllers/requests/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/controllers/requests/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/controllers/validator/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/controllers/validator/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/controllers/validator/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/middleware/contexto/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/middleware/contexto/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/middleware/contexto/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/middleware/middleware/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/middleware/middleware/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/middleware/middleware/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/middleware/mw_dessign/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/middleware/mw_dessign/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/middleware/mw_dessign/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/middleware/mw_example/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/middleware/mw_example/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/middleware/mw_example/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/middleware/mw_list/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/middleware/mw_list/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/middleware/mw_list/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/middleware/mw_loader/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/middleware/mw_loader/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/middleware/mw_loader/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/models/udbf/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/models/udbf/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/models/udbf/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/response/cookies/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/response/cookies/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/response/cookies/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/response/encoding-decoding/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/response/encoding-decoding/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/response/encoding-decoding/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/response/flash/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/response/flash/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/response/flash/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/response/headers/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/response/headers/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/response/headers/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/routes/routes/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/routes/routes/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/routes/routes/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/seguridad/autenticacion/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/autenticacion/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/autenticacion/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/seguridad/claves/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/claves/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/claves/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/seguridad/cors/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/cors/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/cors/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/seguridad/csrf/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/csrf/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/csrf/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/seguridad/firewall/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/firewall/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/firewall/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/seguridad/jwt/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/jwt/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/jwt/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/seguridad/ratelimit/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/ratelimit/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/ratelimit/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/seguridad/resources-ids/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/resources-ids/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/resources-ids/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/seguridad/sesiones/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/sesiones/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/sesiones/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/seguridad/ssl/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/seguridad/ssl/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/seguridad/ssl/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/views/directives/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/views/directives/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/views/directives/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/views/example/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/views/example/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/views/example/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/views/example1/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/views/example1/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/views/example1/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/views/example2/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/views/example2/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/views/example2/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/views/example3/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/views/example3/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/views/example3/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/views/example4/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/views/example4/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/views/example4/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/views/mambo/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/views/mambo/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonehixstyle/views/mambo/"/>
+    </url>
+    <url>
+        <loc>Nonees/intro/data-driven/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/intro/data-driven/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneintro/data-driven/"/>
+    </url>
+    <url>
+        <loc>Nonees/intro/hixstyle/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/intro/hixstyle/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneintro/hixstyle/"/>
+    </url>
+    <url>
+        <loc>Nonees/intro/intro/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/intro/intro/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneintro/intro/"/>
+    </url>
+    <url>
+        <loc>Nonees/intro/modo-basico/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/intro/modo-basico/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneintro/modo-basico/"/>
+    </url>
+    <url>
+        <loc>Nonees/primeros-pasos/compile/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/primeros-pasos/compile/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneprimeros-pasos/compile/"/>
+    </url>
+    <url>
+        <loc>Nonees/primeros-pasos/config/hix.json/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/primeros-pasos/config/hix.json/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneprimeros-pasos/config/hix.json/"/>
+    </url>
+    <url>
+        <loc>Nonees/programacion/error-handling/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/programacion/error-handling/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneprogramacion/error-handling/"/>
+    </url>
+    <url>
+        <loc>Nonees/programacion/error_codes/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/programacion/error_codes/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneprogramacion/error_codes/"/>
+    </url>
+    <url>
+        <loc>Nonees/programacion/errorsys/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/programacion/errorsys/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneprogramacion/errorsys/"/>
+    </url>
+    <url>
+        <loc>Nonees/programacion/mapa-helpers/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/programacion/mapa-helpers/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneprogramacion/mapa-helpers/"/>
+    </url>
+    <url>
+        <loc>Nonees/programacion/modo-dev-prod/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/programacion/modo-dev-prod/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Noneprogramacion/modo-dev-prod/"/>
+    </url>
+    <url>
+        <loc>Nonees/sistema/apache-proxy/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/sistema/apache-proxy/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonesistema/apache-proxy/"/>
+    </url>
+    <url>
+        <loc>Nonees/sistema/bootlog/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/sistema/bootlog/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonesistema/bootlog/"/>
+    </url>
+    <url>
+        <loc>Nonees/sistema/hix-admin/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/sistema/hix-admin/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonesistema/hix-admin/"/>
+    </url>
+    <url>
+        <loc>Nonees/sistema/loaders/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/sistema/loaders/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonesistema/loaders/"/>
+    </url>
+    <url>
+        <loc>Nonees/sistema/logger/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/sistema/logger/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonesistema/logger/"/>
+    </url>
+    <url>
+        <loc>Nonees/sistema/metricas/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/sistema/metricas/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonesistema/metricas/"/>
+    </url>
+    <url>
+        <loc>Nonees/sistema/traceando/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/sistema/traceando/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonesistema/traceando/"/>
+    </url>
+    <url>
+        <loc>Nonees/tiempo-real/longpolling/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/tiempo-real/longpolling/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonetiempo-real/longpolling/"/>
+    </url>
+    <url>
+        <loc>Nonees/tiempo-real/sse/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/tiempo-real/sse/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonetiempo-real/sse/"/>
+    </url>
+    <url>
+        <loc>Nonees/tiempo-real/ws/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/tiempo-real/ws/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonetiempo-real/ws/"/>
+    </url>
+    <url>
+        <loc>Nonees/hixstyle/response/cabeceras/</loc>
+        <lastmod>2026-08-01</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="es" href="Nonees/hixstyle/response/cabeceras/"/>
+    </url>
+</urlset>
