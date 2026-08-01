@@ -2706,7 +2706,7 @@ a la hora de crear nuestras soluciones.</p>
 <p>Este mini-manual no explica cómo funciona la web; solo intenta explicar brevemente el uso y la 
 configuración del servidor.</p>
 <p><strong>HIX</strong> nos brinda una experiencia en el momento en que arranca.</p>
-<p><img alt="image" src="../../assets/images/manual/standard/img1.png" /></p>
+<p><img alt="image" src="../../../assets/images/manual/standard/img1.png" /></p>
 <p>Una vez arranque el servidor, podemos empezar inmediatamente a añaadir las distintas páginas 
 web que necesitamos.</p>
 <p>Por defecto, HIX crea una carpeta /www que será nuestra carpeta raiz del sistema y que podremos 
@@ -2725,7 +2725,7 @@ cambiar desde el fichero de configuración <code>hix.json</code>.</p>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10"></a><a href="#__codelineno-0-10"><span class="linenos" data-linenos="10 "></span></a><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </span></code></pre></div>
 <p>Si refrescamos nuestro navegador habria de aparecer la siguiente pantalla</p>
-<p><img alt="image" src="../../assets/images/manual/standard/img2.png" /></p>
+<p><img alt="image" src="../../../assets/images/manual/standard/img2.png" /></p>
 <p><strong>HIX</strong> tiene su propio motor de vistas y podremos inyectar código Harbour dentro de las 
 directivas <code>@prg ... @endprg</code></p>
 <div class="language-html highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
@@ -2753,7 +2753,7 @@ directivas <code>@prg ... @endprg</code></p>
 </span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23"></a><a href="#__codelineno-1-23"><span class="linenos" data-linenos="23 "></span></a><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </span></code></pre></div>
 <p>Este código da como resultado</p>
-<p><img alt="image" src="../../assets/images/manual/standard/img3.png" /></p>
+<p><img alt="image" src="../../../assets/images/manual/standard/img3.png" /></p>
 <p>Todas las funcionalidades del motor de vistas las podemos consultar en el apartado 
 <a href="../../hixstyle/views/mambo/">Motor de Vistas</a>.</p>
 <p>Otra de las bondades de HIX es la de poder ejecutar directamente archivos *.prg, por ejemplo 
@@ -2768,7 +2768,7 @@ si creamos <code>www/test.prg</code> </p>
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8"></a><a href="#__codelineno-2-8"><span class="linenos" data-linenos="8 "></span></a><span class="kr">return</span> cHtml 
 </span></code></pre></div>
 <p>Y ejecutamos <code>https//localhost/test.prg</code></p>
-<p><img alt="image" src="../../assets/images/manual/standard/img4.png" /></p>
+<p><img alt="image" src="../../../assets/images/manual/standard/img4.png" /></p>
 <h2 id="formularios">📋 Formularios<a class="headerlink" href="#formularios" title="Permanent link">&para;</a></h2>
 <p>Podemos crear nuestros formularios usando los standares de html por ejemplo: 
 <a href="https://www.w3schools.com/html/tryit.asp?filename=tryhtml_form_submit">https://www.w3schools.com/html/tryit.asp?filename=tryhtml_form_submit</a>.
@@ -2794,7 +2794,7 @@ Guardaremos el fichero como <code>form.html</code>.</p>
 </span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18"></a><a href="#__codelineno-3-18"><span class="linenos" data-linenos="18 "></span></a><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </span></code></pre></div>
 <p>Veriamos el siguiente formulario.</p>
-<p><img alt="image" src="../../assets/images/manual/standard/form.png" /></p>
+<p><img alt="image" src="../../../assets/images/manual/standard/form.png" /></p>
 <p>Siguiendo con el ejemplo crearemos <code>action_page.prg</code> (un fichero de tipo <code>.prg</code>) para recoger 
 los parámetros y, en este caso, mostrar los datos en pantalla.</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">function</span> main()
@@ -2810,7 +2810,7 @@ los parámetros y, en este caso, mostrar los datos en pantalla.</p>
 </span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11"></a><a href="#__codelineno-4-11"><span class="linenos" data-linenos="11 "></span></a><span class="kr">return</span> cHtml 
 </span></code></pre></div>
 <p>Si ejecutamos <code>form.html</code> podemos ver que la acción ejecuta <code>action_page.prg</code>.</p>
-<p><img alt="image" src="../../assets/images/manual/standard/action_page.png" /></p>
+<p><img alt="image" src="../../../assets/images/manual/standard/action_page.png" /></p>
 <p>Quizás lo mas importante aquí es observar como se utiliza la función <code>UGet()</code> para recuperar 
 los parámetros del formulario. Esta funcion forma parte los diferentes <em>Helpers</em> que ayudaran 
 al programador. En <a href="../helpers/mapa-helpers.md">Helpers</a> podeis consultar todas
