@@ -1,4 +1,5 @@
 site_name: HIX Web Server
+site_url: https://carles9000.github.io/hix/
 docs_dir: site-docs
 site_description: Documentación del servidor web HIX para Harbour
 site_author: Charly Nou mil
