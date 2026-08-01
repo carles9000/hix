@@ -14,7 +14,7 @@ configuración del servidor.
 
 **HIX** nos brinda una experiencia en el momento en que arranca.
 
-<img alt="image" src="../../assets/images/manual/standard/img1.png" />
+<img alt="image" src="../../../assets/images/manual/standard/img1.png" />
 
 
 Una vez arranque el servidor, podemos empezar inmediatamente a añaadir las distintas páginas 
@@ -42,7 +42,7 @@ Pondremos el mismo código de [https://www.w3schools.com/html/tryit.asp?filename
 
 Si refrescamos nuestro navegador habria de aparecer la siguiente pantalla
 
-<img alt="image" src="../../assets/images/manual/standard/img2.png" />
+<img alt="image" src="../../../assets/images/manual/standard/img2.png" />
 
 
 **HIX** tiene su propio motor de vistas y podremos inyectar código Harbour dentro de las 
@@ -77,7 +77,7 @@ directivas `@prg ... @endprg`
 
 Este código da como resultado
 
-<img alt="image" src="../../assets/images/manual/standard/img3.png" />
+<img alt="image" src="../../../assets/images/manual/standard/img3.png" />
 
 Todas las funcionalidades del motor de vistas las podemos consultar en el apartado 
 [Motor de Vistas](../hixstyle/views/mambo.md).
@@ -98,7 +98,7 @@ return cHtml
 
 Y ejecutamos `https//localhost/test.prg`
 
-<img alt="image" src="../../assets/images/manual/standard/img4.png" />
+<img alt="image" src="../../../assets/images/manual/standard/img4.png" />
 
 ## 📋 Formularios 
 
@@ -130,7 +130,7 @@ Guardaremos el fichero como `form.html`.
 
 Veriamos el siguiente formulario.
 
-<img alt="image" src="../../assets/images/manual/standard/form.png" />
+<img alt="image" src="../../../assets/images/manual/standard/form.png" />
 
 Siguiendo con el ejemplo crearemos `action_page.prg` (un fichero de tipo `.prg`) para recoger 
 los parámetros y, en este caso, mostrar los datos en pantalla.
@@ -151,7 +151,7 @@ return cHtml
 
 Si ejecutamos `form.html` podemos ver que la acción ejecuta `action_page.prg`.
 
-<img alt="image" src="../../assets/images/manual/standard/action_page.png" />
+<img alt="image" src="../../../assets/images/manual/standard/action_page.png" />
 
 Quizás lo mas importante aquí es observar como se utiliza la función `UGet()` para recuperar 
 los parámetros del formulario. Esta funcion forma parte los diferentes *Helpers* que ayudaran 

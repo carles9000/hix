@@ -49,7 +49,7 @@ tus ficheros y librerias externas para crear tu propio servidor.
 
 La primera vez que arranques el servidor te muestra la configuración del servidor 
 
-<img alt="image" src="../../assets/images/manual/primeros-pasos/start.png" />
+<img alt="image" src="../../../assets/images/manual/primeros-pasos/start.png" />
 
 Compila tu servidor `hix_app.exe` enlazando contra `hix_server.lib`.  
 Usa este proyecto como punto de partida: añade tus rutas, middlewares y librerías adicionales en `src.app/app.prg` y `hix_app.hbp`.
