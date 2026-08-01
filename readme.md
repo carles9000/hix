@@ -1,5 +1,5 @@
 <h1 style="display: flex; align-items: center;">
-  <img src="https://raw.githubusercontent.com/carles9000/hix/refs/heads/main/resources/images/hix.png" height="50" style="margin-right: 10px;">
+  <img src="https://raw.githubusercontent.com/carles9000/hix/refs/heads/main/resources/images/hix.png" height="50" style="margin-right: 10px;">            
   Web Server 
 </h1>
 

@@ -1,0 +1,584 @@
+{
+  "files": {
+    "api/admin.md": {
+      "es_sha": "b202eb0c84841882c538919bc76489cfa32a7681",
+      "translations": {
+        "en": {
+          "sha": "b202eb0c84841882c538919bc76489cfa32a7681",
+          "translated_at": "2026-07-16T15:45:26Z",
+          "translator": "haiku-4.5"
+        }
+      }
+    },
+    "hixstyle/controllers/controllers.md": {
+      "es_sha": "f15e92c106938aedeb4464e5568a49f7fbda9d39",
+      "translations": {
+        "en": {
+          "sha": "f15e92c106938aedeb4464e5568a49f7fbda9d39",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/controllers/requests.md": {
+      "es_sha": "0b881838ef0cd3e6b21bca8a32823b081913a9b3",
+      "translations": {
+        "en": {
+          "sha": "0b881838ef0cd3e6b21bca8a32823b081913a9b3",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/controllers/validator.md": {
+      "es_sha": "7f7a7487e07a3f638db0170273ab116b1f8f45b6",
+      "translations": {
+        "en": {
+          "sha": "7f7a7487e07a3f638db0170273ab116b1f8f45b6",
+          "translated_at": "2026-07-31T06:57:19Z",
+          "translator": "claude-sonnet-4-6"
+        }
+      }
+    },
+    "hixstyle/middleware/contexto.md": {
+      "es_sha": "77916424670d0899ba3d1a951e1aaa48b48b147b",
+      "translations": {
+        "en": {
+          "sha": "77916424670d0899ba3d1a951e1aaa48b48b147b",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/middleware/middleware.md": {
+      "es_sha": "fedf1d81ffd43ba1c5d51d44314c8206acc34d54",
+      "translations": {
+        "en": {
+          "sha": "fedf1d81ffd43ba1c5d51d44314c8206acc34d54",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/middleware/mw_dessign.md": {
+      "es_sha": "3251c9dab4b017f2d27ea9ee377d5bc3dd8d452a",
+      "translations": {
+        "en": {
+          "sha": "3251c9dab4b017f2d27ea9ee377d5bc3dd8d452a",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/middleware/mw_example.md": {
+      "es_sha": "3d8efcc9bfbbb2c05fd63d0f1d15559a5d46693b",
+      "translations": {
+        "en": {
+          "sha": "3d8efcc9bfbbb2c05fd63d0f1d15559a5d46693b",
+          "translated_at": "2026-07-16T15:45:26Z",
+          "translator": "haiku-4.5"
+        }
+      }
+    },
+    "hixstyle/middleware/mw_list.md": {
+      "es_sha": "24cf2d8281b22fa82d263b50ca245e72bc12f132",
+      "translations": {
+        "en": {
+          "sha": "24cf2d8281b22fa82d263b50ca245e72bc12f132",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/middleware/mw_loader.md": {
+      "es_sha": "b015aa7df809716697cba00d6718a55d08939641",
+      "translations": {
+        "en": {
+          "sha": "b015aa7df809716697cba00d6718a55d08939641",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/models/udbf.md": {
+      "es_sha": "ff3ca912ee1b8f76fde709ca671a7d42048510f5",
+      "translations": {
+        "en": {
+          "sha": "ff3ca912ee1b8f76fde709ca671a7d42048510f5",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/response/cabeceras.md": {
+      "es_sha": "27882d3b7ddc2d166c5460baabeeab24981c5d16",
+      "translations": {
+        "en": {
+          "path": "hixstyle/response/headers.md",
+          "sha": "27882d3b7ddc2d166c5460baabeeab24981c5d16",
+          "translated_at": "2026-07-16T11:56:27Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/response/cookies.md": {
+      "es_sha": "8585a417a93458b33197d3ce2b72d75b5aca8b15",
+      "translations": {
+        "en": {
+          "sha": "8585a417a93458b33197d3ce2b72d75b5aca8b15",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/response/encoding-decoding.md": {
+      "es_sha": "bab35a01503826e731f59059d18428de1d086f48",
+      "translations": {
+        "en": {
+          "sha": "bab35a01503826e731f59059d18428de1d086f48",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/response/flash.md": {
+      "es_sha": "63b56564cba378287aa4c236e64b1c1c26f8eab9",
+      "translations": {
+        "en": {
+          "sha": "63b56564cba378287aa4c236e64b1c1c26f8eab9",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/response/plantillas.md": {
+      "es_sha": "3469a5aa9e9e80ca0022e3db338c6b51219cc3aa",
+      "translations": {
+        "en": {}
+      }
+    },
+    "hixstyle/routes/routes.md": {
+      "es_sha": "c18585a6ea50f9f5f4dbae19b636d20f5af8dab3",
+      "translations": {
+        "en": {
+          "sha": "c18585a6ea50f9f5f4dbae19b636d20f5af8dab3",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/seguridad/autenticacion.md": {
+      "es_sha": "28b9f324116bbec5ae751019b5ca8ab71120aa82",
+      "translations": {
+        "en": {
+          "sha": "28b9f324116bbec5ae751019b5ca8ab71120aa82",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/seguridad/claves.md": {
+      "es_sha": "f235a14b7be91d602f31790f327f9d18aa144b99",
+      "translations": {
+        "en": {
+          "sha": "f235a14b7be91d602f31790f327f9d18aa144b99",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/seguridad/cors.md": {
+      "es_sha": "484591c60ab511395beffe2a7b791e2eb2c0b117",
+      "translations": {
+        "en": {
+          "sha": "484591c60ab511395beffe2a7b791e2eb2c0b117",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/seguridad/csrf.md": {
+      "es_sha": "0b0cf1fac867b1afdc169f712dc079bd4c556697",
+      "translations": {
+        "en": {
+          "sha": "0b0cf1fac867b1afdc169f712dc079bd4c556697",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/seguridad/firewall.md": {
+      "es_sha": "14cddb7aff7d8eeedc62de76d0542a2de9e573b5",
+      "translations": {
+        "en": {
+          "sha": "14cddb7aff7d8eeedc62de76d0542a2de9e573b5",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/seguridad/jwt.md": {
+      "es_sha": "9c20d139c228aae4e5ec3e08216875b89b477e79",
+      "translations": {
+        "en": {
+          "sha": "9c20d139c228aae4e5ec3e08216875b89b477e79",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/seguridad/ratelimit.md": {
+      "es_sha": "802dd2351be9564d64813e39361a89754a4ca940",
+      "translations": {
+        "en": {
+          "sha": "802dd2351be9564d64813e39361a89754a4ca940",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/seguridad/resources-ids.md": {
+      "es_sha": "9560cf2ee3408133d8eebf6d40dbf5c1b11a291f",
+      "translations": {
+        "en": {
+          "sha": "9560cf2ee3408133d8eebf6d40dbf5c1b11a291f",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/seguridad/sesiones.md": {
+      "es_sha": "dd3449cc0f82b11bf7704c3fe5148187e9fb7cee",
+      "translations": {
+        "en": {
+          "sha": "dd3449cc0f82b11bf7704c3fe5148187e9fb7cee",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/seguridad/ssl.md": {
+      "es_sha": "96b6b9661258ebcae2e2d5dd8da4aa1bc678869d",
+      "translations": {
+        "en": {
+          "sha": "96b6b9661258ebcae2e2d5dd8da4aa1bc678869d",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/views/directives.md": {
+      "es_sha": "7b3df63063bfef0af69cac1c199c1c3ef21782f2",
+      "translations": {
+        "en": {
+          "sha": "7b3df63063bfef0af69cac1c199c1c3ef21782f2",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/views/example.md": {
+      "es_sha": "c695d8c9e926642114b59dbb14f6a4909e83a4d2",
+      "translations": {
+        "en": {
+          "sha": "c695d8c9e926642114b59dbb14f6a4909e83a4d2",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/views/example1.md": {
+      "es_sha": "58954d699431c32c303f76eaee52550669640ed5",
+      "translations": {
+        "en": {
+          "sha": "58954d699431c32c303f76eaee52550669640ed5",
+          "translated_at": "2026-07-16T12:11:36Z",
+          "translator": "haiku-4.5"
+        }
+      }
+    },
+    "hixstyle/views/example2.md": {
+      "es_sha": "cd55d95cbaf739e11f8291a1f4a7231310adbb80",
+      "translations": {
+        "en": {
+          "sha": "cd55d95cbaf739e11f8291a1f4a7231310adbb80",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/views/example3.md": {
+      "es_sha": "48108823aa5b437ccdff2318f23a64f09f49f51c",
+      "translations": {
+        "en": {
+          "sha": "48108823aa5b437ccdff2318f23a64f09f49f51c",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/views/example4.md": {
+      "es_sha": "bba808ffa0db402b09c48491f12731ee7d059466",
+      "translations": {
+        "en": {
+          "sha": "bba808ffa0db402b09c48491f12731ee7d059466",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "hixstyle/views/mambo.md": {
+      "es_sha": "ed62450420f907306ec3de9c87a19c5f1e55afaf",
+      "translations": {
+        "en": {
+          "sha": "ed62450420f907306ec3de9c87a19c5f1e55afaf",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "index.md": {
+      "es_sha": "ac2c5a7e57b4bdcf06bed0ce5d130621a3b8b949",
+      "translations": {
+        "en": {
+          "sha": "ac2c5a7e57b4bdcf06bed0ce5d130621a3b8b949",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "intro/data-driven.md": {
+      "es_sha": "65f943b870f05dda46f23877e7f6aafa2ed6d49d",
+      "translations": {
+        "en": {
+          "sha": "65f943b870f05dda46f23877e7f6aafa2ed6d49d",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "intro/data-driven_old.md": {
+      "es_sha": "d9e4844de650f0d50099d27ad86d926245df785c",
+      "translations": {
+        "en": {}
+      }
+    },
+    "intro/hixstyle.md": {
+      "es_sha": "b3f8fc42110a0bdf0671275abd26d3fc2b78d39a",
+      "translations": {
+        "en": {
+          "sha": "b3f8fc42110a0bdf0671275abd26d3fc2b78d39a",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "intro/intro.md": {
+      "es_sha": "18890be34b74c0d0ffc9e54bb2c3e8931e77c44d",
+      "translations": {
+        "en": {
+          "sha": "18890be34b74c0d0ffc9e54bb2c3e8931e77c44d",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "intro/modo-basico.md": {
+      "es_sha": "af37caf4e48058347f18fc5e5b8ca3ce139623a6",
+      "translations": {
+        "en": {
+          "sha": "af37caf4e48058347f18fc5e5b8ca3ce139623a6",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "primeros-pasos/compile.md": {
+      "es_sha": "c5a12e7fb918f2f9dfab4430ef7cedf8021ed64e",
+      "translations": {
+        "en": {
+          "sha": "c5a12e7fb918f2f9dfab4430ef7cedf8021ed64e",
+          "translated_at": "2026-07-31T11:42:16Z",
+          "translator": "haiku-4.5"
+        }
+      }
+    },
+    "primeros-pasos/config/hix.json.md": {
+      "es_sha": "ea83919fd853f47acae49974caa70eb6ba4e911e",
+      "translations": {
+        "en": {
+          "sha": "ea83919fd853f47acae49974caa70eb6ba4e911e",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "primeros-pasos/iniciar-servidor.md": {
+      "es_sha": "318b11a854bf274bf3c6fe5daafc6d6e0633f06e",
+      "translations": {
+        "en": {}
+      }
+    },
+    "programacion/error-handling.md": {
+      "es_sha": "5063adb32085fadf6318783af2f1aab9d4ee669d",
+      "translations": {
+        "en": {
+          "sha": "5063adb32085fadf6318783af2f1aab9d4ee669d",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "programacion/error_codes.md": {
+      "es_sha": "ad9531ecdd0f9e40a92ffc9c5ba548a4edd4d18d",
+      "translations": {
+        "en": {
+          "sha": "ad9531ecdd0f9e40a92ffc9c5ba548a4edd4d18d",
+          "translated_at": "2026-07-16T15:45:26Z",
+          "translator": "haiku-4.5"
+        }
+      }
+    },
+    "programacion/errorsys.md": {
+      "es_sha": "8233a466a4d1d524a440e236ade938b6b8ce318d",
+      "translations": {
+        "en": {
+          "sha": "8233a466a4d1d524a440e236ade938b6b8ce318d",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "programacion/mapa-helpers.md": {
+      "es_sha": "8e25af0ccc63469aee42371e963bfdae44674e75",
+      "translations": {
+        "en": {
+          "sha": "8e25af0ccc63469aee42371e963bfdae44674e75",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "programacion/modo-dev-prod.md": {
+      "es_sha": "61b89d2c9dbd69e4f96b666fb21e4976fc11baca",
+      "translations": {
+        "en": {
+          "sha": "61b89d2c9dbd69e4f96b666fb21e4976fc11baca",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "sistema/apache-proxy.md": {
+      "es_sha": "f3dcd16111d7b9d0a5e172ab5f86e2f69b98b5d8",
+      "translations": {
+        "en": {
+          "sha": "f3dcd16111d7b9d0a5e172ab5f86e2f69b98b5d8",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "sistema/bootlog.md": {
+      "es_sha": "8f63a540a507ca81fd23eed6e6e94f3a81b3484e",
+      "translations": {
+        "en": {
+          "sha": "8f63a540a507ca81fd23eed6e6e94f3a81b3484e",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "sistema/errores.md": {
+      "es_sha": "325a735ac60c14378de9f9325719a3b8a1ab3dc8",
+      "translations": {
+        "en": {}
+      }
+    },
+    "sistema/hix-admin.md": {
+      "es_sha": "6c7713b1145c28426fb2acd8bdd6258dd0109b5b",
+      "translations": {
+        "en": {
+          "sha": "6c7713b1145c28426fb2acd8bdd6258dd0109b5b",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "sistema/loaders.md": {
+      "es_sha": "6d5e3f05ec7e1a3570380b49dab62c6e1c0c7af3",
+      "translations": {
+        "en": {
+          "sha": "6d5e3f05ec7e1a3570380b49dab62c6e1c0c7af3",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "sistema/logger.md": {
+      "es_sha": "3f98d6d293118a9fe47bc02c771050d8b88f20dd",
+      "translations": {
+        "en": {
+          "sha": "3f98d6d293118a9fe47bc02c771050d8b88f20dd",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "sistema/metricas.md": {
+      "es_sha": "8d1d8f94cacaddd8122a1e933be3dfca97f54e67",
+      "translations": {
+        "en": {
+          "sha": "8d1d8f94cacaddd8122a1e933be3dfca97f54e67",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "sistema/traceando.md": {
+      "es_sha": "d6749318bfd876929f9ce9201a2eb22853f25877",
+      "translations": {
+        "en": {
+          "sha": "d6749318bfd876929f9ce9201a2eb22853f25877",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "tiempo-real/longpolling.md": {
+      "es_sha": "6477c33e96dcb2f373d3d260abc185e7ea0c363c",
+      "translations": {
+        "en": {
+          "sha": "6477c33e96dcb2f373d3d260abc185e7ea0c363c",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "tiempo-real/sse.md": {
+      "es_sha": "5b1f0789cbf053552e431198a87e74603c40c9af",
+      "translations": {
+        "en": {
+          "sha": "5b1f0789cbf053552e431198a87e74603c40c9af",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    },
+    "tiempo-real/ws.md": {
+      "es_sha": "37c53ff17751529b81669fae5cebbcd378b5796e",
+      "translations": {
+        "en": {
+          "sha": "37c53ff17751529b81669fae5cebbcd378b5796e",
+          "translated_at": "2026-07-16T11:55:29Z",
+          "translator": "bootstrap"
+        }
+      }
+    }
+  },
+  "pivot": "es",
+  "targets": [
+    "en"
+  ],
+  "version": 1
+}

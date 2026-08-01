@@ -1,0 +1,230 @@
+site_name: HIX Web Server
+docs_dir: site-docs
+site_description: Documentación del servidor web HIX para Harbour
+site_author: Charly Nou mil
+
+
+theme:
+  name: material
+  custom_dir: site-docs/overrides
+  language: en
+  font: false
+  logo: assets/hix_white.png
+  favicon: assets/hix.ico
+  palette:
+    - scheme: default
+      primary: custom        # Color principal (header, sidebar activo)
+      accent: custom           # Color de énfasis (links hover, botones)		
+      toggle:
+        #icon: material/weather-sunny 
+        icon: material/brightness-7
+        name: Modo oscuro
+    - scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        #icon: material/weather-night
+        icon: material/brightness-4
+        name: Modo claro
+  features:
+    # --- SIDEBAR ---
+    #- navigation.sections        # Muestra secciones como grupos colapsables
+    #- navigation.expand          # Expande todos los items por defecto
+    #- navigation.indexes         # Permite que una sección tenga su propia página index
+    - navigation.top             # Botón "volver arriba"
+    # --- COMPORTAMIENTO ---
+    - navigation.instant           # Navegación SPA sin recarga de página
+    - navigation.instant.progress  # Barra de progreso en carga lenta
+    - navigation.tracking          # Actualiza la URL con el anchor activo
+
+    # --- TABLA DE CONTENIDOS ---
+    - toc.follow                 # El TOC derecho sigue el scroll
+    #- toc.integrate              # Integra el TOC dentro del sidebar izquierdo
+
+    # --- BÚSQUEDA ---
+    - search.highlight
+    - search.suggest
+
+    # --- CÓDIGO ---
+    - content.code.copy
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/extra.js
+
+plugins:
+  - search:
+      lang: es
+  - i18n:
+      docs_structure: folder        # carpetas /es /en /ca ...
+      fallback_to_default: true     # si falta traducción, usa el idioma por defecto
+      reconfigure_material: true    # activa el selector de idioma en el header
+      reconfigure_search: true      # búsqueda separada por idioma
+      languages:
+        - locale: es
+          name: Español
+          default: false             # idioma principal
+          build: true
+          site_name: "Web Server"
+          nav:
+            - Inicio: es/index.md
+            - Introducción:
+                - Bienvenido a HIX: es/intro/intro.md
+                - Modo Básico: es/intro/modo-basico.md
+                - Modo HIX Style: es/intro/hixstyle.md
+                - Hoja de ruta: es/intro/data-driven.md
+            - Primeros pasos:
+                - Compila proyecto: es/primeros-pasos/compile.md               
+                - Configuración hix.json: es/primeros-pasos/config/hix.json.md            
+            - Programacion:
+                - Helpers: es/programacion/mapa-helpers.md
+                - Modo Dev / Modo Prod: es/programacion/modo-dev-prod.md
+                - Errorsys: es/programacion/errorsys.md
+                - Error Handling: es/programacion/error-handling.md
+                - Error Code: es/programacion/error_codes.md
+            - HIX Style:
+                - Rutas: es/hixstyle/routes/routes.md
+                - Middleware:
+                    - Introducción: es/hixstyle/middleware/middleware.md
+                    - Contexto: es/hixstyle/middleware/contexto.md
+                    - Diseño: es/hixstyle/middleware/mw_dessign.md
+                    - Catálogo: es/hixstyle/middleware/mw_list.md
+                    - Loader: es/hixstyle/middleware/mw_loader.md
+                    - Ejemplo: es/hixstyle/middleware/mw_example.md
+                - Controllers:
+                    - Controllers: es/hixstyle/controllers/controllers.md
+                    - Requests: es/hixstyle/controllers/requests.md
+                    - Validator: es/hixstyle/controllers/validator.md
+                - Models:
+                    - UDbf: es/hixstyle/models/udbf.md
+                - Response:
+                    - Encoding/Decoding: es/hixstyle/response/encoding-decoding.md
+                    - Cookies: es/hixstyle/response/cookies.md
+                    - Cabeceras: es/hixstyle/response/cabeceras.md                   
+                    - Flash: es/hixstyle/response/flash.md                    
+                - Motor de vistas:
+                    - Mambo: es/hixstyle/views/mambo.md
+                    - Directivas: es/hixstyle/views/directives.md
+                    - Ejemplos: 
+                      - Introducción: es/hixstyle/views/example.md
+                      - Ejemplo 1: es/hixstyle/views/example1.md
+                      - Ejemplo 2: es/hixstyle/views/example2.md
+                      - Ejemplo 3: es/hixstyle/views/example3.md
+                      - Ejemplo 4: es/hixstyle/views/example4.md
+                - Seguridad:
+                    - Claves y secretos: es/hixstyle/seguridad/claves.md
+                    - CORS: es/hixstyle/seguridad/cors.md
+                    - Firewall: es/hixstyle/seguridad/firewall.md
+                    - Ratelimit: es/hixstyle/seguridad/ratelimit.md
+                    - Sesiones: es/hixstyle/seguridad/sesiones.md
+                    - Autenticacion: es/hixstyle/seguridad/autenticacion.md
+                    - JWT: es/hixstyle/seguridad/jwt.md
+                    - CSRF: es/hixstyle/seguridad/csrf.md
+                    - Resources IDs: es/hixstyle/seguridad/resources-ids.md
+                    - SSL: es/hixstyle/seguridad/ssl.md
+                - Loaders y hooks: es/sistema/loaders.md
+            - Tiempo Real:
+                - SSE: es/tiempo-real/sse.md
+                - WS: es/tiempo-real/ws.md
+                - LongPolling: es/tiempo-real/longpolling.md            
+            - API:
+                - Admin: es/api/admin.md
+            - Sistema:
+                - Traceando: es/sistema/traceando.md
+                - Logger: es/sistema/logger.md
+                - Boot Log: es/sistema/bootlog.md
+                - Métricas: es/sistema/metricas.md
+                - HIX Admin: es/sistema/hix-admin.md
+                - Apache proxy: es/sistema/apache-proxy.md
+        - locale: en
+          name: English
+          default: true
+          build: true
+          site_name: "Web Server"
+          nav:
+            - Home: en/index.md
+            - Introduction:
+                - Welcome to HIX: en/intro/intro.md
+                - Basic Mode: en/intro/modo-basico.md
+                - HixStyle Mode: en/intro/hixstyle.md
+                - Roadmap: en/intro/data-driven.md
+            - Getting Started:
+                - Compile Project: en/primeros-pasos/compile.md
+                - hix.json Configuration: en/primeros-pasos/config/hix.json.md
+            - Programming:
+                - Helpers: en/programacion/mapa-helpers.md
+                - Dev Mode / Prod Mode: en/programacion/modo-dev-prod.md
+                - Errorsys: en/programacion/errorsys.md
+                - Error Handling: en/programacion/error-handling.md
+                - Error Code: en/programacion/error_codes.md
+            - HIX Style:
+                - Routes: en/hixstyle/routes/routes.md
+                - Middleware:
+                    - Introduction: en/hixstyle/middleware/middleware.md
+                    - Context: en/hixstyle/middleware/contexto.md
+                    - Design: en/hixstyle/middleware/mw_dessign.md
+                    - Catalog: en/hixstyle/middleware/mw_list.md
+                    - Loader: en/hixstyle/middleware/mw_loader.md
+                    - Example: en/hixstyle/middleware/mw_example.md
+                - Controllers:
+                    - Controllers: en/hixstyle/controllers/controllers.md
+                    - Requests: en/hixstyle/controllers/requests.md
+                    - Validator: en/hixstyle/controllers/validator.md
+                - Models:
+                    - UDbf: en/hixstyle/models/udbf.md
+                - Response:
+                    - Encoding/Decoding: en/hixstyle/response/encoding-decoding.md
+                    - Cookies: en/hixstyle/response/cookies.md
+                    - Headers: en/hixstyle/response/headers.md
+                    - Flash: en/hixstyle/response/flash.md
+                - View Engine:
+                    - Mambo: en/hixstyle/views/mambo.md
+                    - Directives: en/hixstyle/views/directives.md
+                    - Examples:
+                      - Introduction: en/hixstyle/views/example.md
+                      - Example 1: en/hixstyle/views/example1.md
+                      - Example 2: en/hixstyle/views/example2.md
+                      - Example 3: en/hixstyle/views/example3.md
+                      - Example 4: en/hixstyle/views/example4.md
+                - Security:
+                    - Keys and Secrets: en/hixstyle/seguridad/claves.md
+                    - CORS: en/hixstyle/seguridad/cors.md
+                    - Firewall: en/hixstyle/seguridad/firewall.md
+                    - Ratelimit: en/hixstyle/seguridad/ratelimit.md
+                    - Sessions: en/hixstyle/seguridad/sesiones.md
+                    - Authentication: en/hixstyle/seguridad/autenticacion.md
+                    - JWT: en/hixstyle/seguridad/jwt.md
+                    - CSRF: en/hixstyle/seguridad/csrf.md
+                    - Resources IDs: en/hixstyle/seguridad/resources-ids.md
+                    - SSL: en/hixstyle/seguridad/ssl.md
+                - Loaders and hooks: en/sistema/loaders.md
+            - Real Time:
+                - SSE: en/tiempo-real/sse.md
+                - WS: en/tiempo-real/ws.md
+                - LongPolling: en/tiempo-real/longpolling.md
+            - API:
+                - Admin: en/api/admin.md
+            - System:
+                - Tracing: en/sistema/traceando.md
+                - Logger: en/sistema/logger.md
+                - Boot Log: en/sistema/bootlog.md
+                - Metrics: en/sistema/metricas.md
+                - HIX Admin: en/sistema/hix-admin.md
+                - Apache proxy: en/sistema/apache-proxy.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+      linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      linenums_style: pymdownx-inline
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true

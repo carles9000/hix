@@ -1,0 +1,55 @@
+# ⚙️ Compilar proyecto HIX
+
+### Libreria HIX_Server.lib 
+
+**HIX** es una libreria basda en **Harbour** y en esta versión utilizamos 
+el compilador **Visual Studio** (MSVC64). 
+
+**Harbour** lo podeis descargar desde su repositorio oficial 
+[https://harbour.github.io/doc/](https://harbour.github.io/doc/)
+
+**Visual Studio** se puede descargar de 
+[https://visualstudio.microsoft.com/es/vs/community/](https://visualstudio.microsoft.com/es/vs/community/)
+
+
+Para poder compilar la libreria podemos usar el script `go_lib_msvc.bat`. Revise antes 
+debe los paths hacia su instalación de Harbour. 
+
+
+Este script genera `hix_server.lib` y `hix_server.hbx` (tabla de símbolos exportados).  
+
+
+### Aplicación ejemplo 
+
+Si desea no usar el servidor ya construido, puede crearse el suyo propio.
+En el fichero `/src.app/app.prg` hay un ejemplo hiperbásico de como crear tu servidor 
+**HIX**. 
+
+```clipper 
+// Force to link all functions ---------------------
+   #define __HBEXTERN__HIX_SERVER__REQUEST
+   #include "../hix_server.hbx"
+
+   #define __HBEXTERN__HARBOUR__REQUEST
+   #include "harbour.hbx"
+// ------------------------------------------------
+
+FUNCTION Main()
+
+   LOCAL oServer := THixServer():New()
+
+   oServer:Start()
+   
+RETURN NIL
+```
+
+Para poderlo compilar y enlazar se proviene del bat de soporte `go_app_msvc.bat` y 
+que se apoya en `hix_app.hbp` que te puede servir de base para ir incorporando 
+tus ficheros y librerias externas para crear tu propio servidor.
+
+La primera vez que arranques el servidor te muestra la configuración del servidor 
+
+<img alt="image" src="../../assets/images/manual/primeros-pasos/start.png" />
+
+Compila tu servidor `hix_app.exe` enlazando contra `hix_server.lib`.  
+Usa este proyecto como punto de partida: añade tus rutas, middlewares y librerías adicionales en `src.app/app.prg` y `hix_app.hbp`.
