@@ -384,22 +384,22 @@
       }
     },
     "intro/modo-basico.md": {
-      "es_sha": "af37caf4e48058347f18fc5e5b8ca3ce139623a6",
+      "es_sha": "e005169496ad77ac3944d4c690b56a75ad33ebb9",
       "translations": {
         "en": {
-          "sha": "af37caf4e48058347f18fc5e5b8ca3ce139623a6",
-          "translated_at": "2026-07-16T11:55:29Z",
-          "translator": "bootstrap"
+          "sha": "e005169496ad77ac3944d4c690b56a75ad33ebb9",
+          "translated_at": "2026-08-01T09:27:07Z",
+          "translator": "manual"
         }
       }
     },
     "primeros-pasos/compile.md": {
-      "es_sha": "c5a12e7fb918f2f9dfab4430ef7cedf8021ed64e",
+      "es_sha": "9b5c0f7061430f30832ce4811235bbd3abfccdcb",
       "translations": {
         "en": {
-          "sha": "c5a12e7fb918f2f9dfab4430ef7cedf8021ed64e",
-          "translated_at": "2026-07-31T11:42:16Z",
-          "translator": "haiku-4.5"
+          "sha": "9b5c0f7061430f30832ce4811235bbd3abfccdcb",
+          "translated_at": "2026-08-01T09:27:07Z",
+          "translator": "manual"
         }
       }
     },
