@@ -46,4 +46,4 @@ The time is now {{ time() }}
 
 ### Result
 
-![image](../../../assets/images/manual/mambo/img2.jpg)
+![image](../../../../assets/images/manual/mambo/img2.jpg)

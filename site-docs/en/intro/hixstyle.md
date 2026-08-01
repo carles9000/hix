@@ -123,7 +123,7 @@ HTML page for a human or JSON for a mobile app.
 
 ## 🎨 The view engine (Mambo)
 
-**HixStyle** pushes you to use the [view engine](../hixstyle/response/motor-vistas.md)
+**HixStyle** pushes you to use the [view engine](../hixstyle/views/mambo.md)
 of HIX to render HTML - not to concatenate strings inside the controller.
 Our view engine that we call Mambo (it gives us great rhythm) offers us
 some advantages (detailed in its dedicated chapter):
@@ -140,7 +140,7 @@ some advantages (detailed in its dedicated chapter):
   and sends it in the form of arguments to the view.
 - **Automatic escaping**: protection against XSS without thinking about it.
 
-> 📚 The [view engine](../hixstyle/response/motor-vistas.md) has its
+> 📚 The [view engine](../hixstyle/views/mambo.md) has its
 > own chapter. Here you just need to know that **it exists** and that in
 > HixStyle it is the recommended way to return HTML.
 

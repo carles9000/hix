@@ -155,7 +155,7 @@ If we execute `form.html`, we can see that the action executes `action_page.prg`
 
 Perhaps the most important thing here is to observe how the `UGet()` function is used to retrieve 
 the form parameters. This function is part of the different *Helpers* that will help the 
-programmer. In [Helpers](../helpers/mapa-helpers.md) you can consult all
+programmer. In [Helpers](../programacion/mapa-helpers.md) you can consult all
 available functions.
 
 
@@ -165,5 +165,5 @@ available functions.
 consult these sections that will add power to your system.
 
 - The [view engine](../hixstyle/views/mambo.md) will give you all the power to create logical pages.
-- Don't forget to consult the [helpers](../helpers/mapa-helpers.md) section.
+- Don't forget to consult the [helpers](../programacion/mapa-helpers.md) section.
 - Add professional techniques like [routes](../hixstyle/routes/routes.md) to your pages.

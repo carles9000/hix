@@ -155,7 +155,7 @@ Si ejecutamos `form.html` podemos ver que la acción ejecuta `action_page.prg`.
 
 Quizás lo mas importante aquí es observar como se utiliza la función `UGet()` para recuperar 
 los parámetros del formulario. Esta funcion forma parte los diferentes *Helpers* que ayudaran 
-al programador. En [Helpers](../helpers/mapa-helpers.md) podeis consultar todas
+al programador. En [Helpers](../programacion/mapa-helpers.md) podeis consultar todas
 las funciones disponibles.
 
 
@@ -165,5 +165,5 @@ las funciones disponibles.
 vuestra web. No olvides consultar estos apartados que sumarán potencia a tu sistema.
 
 - El [motor de vistas](../hixstyle/views/mambo.md) te dara toda la potencia para crear páginas lógicas.
-- No olvides consultar el apartado de los [helpers](../helpers/mapa-helpers.md).
+- No olvides consultar el apartado de los [helpers](../programacion/mapa-helpers.md).
 - Añade técnicas profesionales como [rutas](../hixstyle/routes/routes.md) a tus páginas.

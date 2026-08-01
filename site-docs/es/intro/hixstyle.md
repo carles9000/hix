@@ -125,7 +125,7 @@ HTML para un humano como si es un JSON para una app móvil.
 
 ## 🎨 El motor de vistas (Mambo)
 
-**HixStyle** te empuja a usar el [motor de vistas](../hixstyle/response/motor-vistas.md)
+**HixStyle** te empuja a usar el [motor de vistas](../hixstyle/views/mambo.md)
 de HIX para renderizar HTML - no a concatenar strings dentro del controlador. 
 Nuestro motor de vistas al que llamaremos Mambo (nos dara mucho ritmo) nos ofrecerá 
 unas ventajas (que se detallan en su capítulo dedicado):
@@ -142,7 +142,7 @@ unas ventajas (que se detallan en su capítulo dedicado):
   y los enviará ne forma de argumentos a la view.
 - **Escape automático**: protección contra XSS sin pensar en ello.
 
-> 📚 El [motor de vistas](../hixstyle/response/motor-vistas.md) tiene su
+> 📚 El [motor de vistas](../hixstyle/views/mambo.md) tiene su
 > propio capítulo. Aquí solo te interesa saber que **existe** y que en
 > HixStyle es la vía recomendada para devolver HTML.
 

@@ -112,4 +112,4 @@ return cUrl
 
 ### Result
 
-![image](../../../assets/images/manual/mambo/img4.jpg)
+![image](../../../../assets/images/manual/mambo/img4.jpg)

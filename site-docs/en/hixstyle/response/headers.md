@@ -168,7 +168,7 @@ oSrv:Use( "MyAppSecurityHeaders" )
 ### CORS
 
 The `Access-Control-*` headers are managed by the
-[`HIX_MwCors`](../seguridad/coors.md) middleware. Don't set them manually:
+[`HIX_MwCors`](../seguridad/cors.md) middleware. Don't set them manually:
 
 ```clipper
 oSrv:Use( "HIX_MwCors" )    // injects Allow-Origin / Allow-Methods / etc.

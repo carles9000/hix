@@ -80,11 +80,11 @@ If you configure [errorsys](errorsys.md) with your own template, prod mode uses 
 
 ### DEV 
 
-![image](../../../assets/images/manual/errors/dev.png)
+![image](../../assets/images/manual/errors/dev.png)
 
 ### PROD
 
-![image](../../../assets/images/manual/errors/prod.png)
+![image](../../assets/images/manual/errors/prod.png)
 
 
 ---

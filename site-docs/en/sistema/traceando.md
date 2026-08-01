@@ -21,7 +21,7 @@ function main()
 retu nil 
 ```
 
-![image](../../../assets/images/manual/sistema/_d.jpg)
+![image](../../assets/images/manual/sistema/_d.jpg)
 
 
 The `_w()` function is the same as `_d()` but converts the result to
@@ -37,7 +37,7 @@ function main()
 retu nil 
 ```
 
-![image](../../../assets/images/manual/sistema/_w.jpg)
+![image](../../assets/images/manual/sistema/_w.jpg)
 
 ---
 

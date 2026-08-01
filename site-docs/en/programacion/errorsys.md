@@ -122,7 +122,7 @@ In summary:
 
 If a standard 404 occurs without this error defined, a basic internal screen is shown:
 
-![image](../../../assets/images/manual/errors/404_std.png)
+![image](../../assets/images/manual/errors/404_std.png)
 
 But if we define `/errors/error_404.html` with something like this:
 
@@ -223,7 +223,7 @@ But if we define `/errors/error_404.html` with something like this:
 
 When the 404 error occurs, we would see this:
 
-![image](../../../assets/images/manual/errors/404_dsg.png)
+![image](../../assets/images/manual/errors/404_dsg.png)
 
 
 ---
