@@ -32,6 +32,7 @@ https://github.com/carles9000/hix.legacy
 
 ---
 
+
 ## 📘 Documentation
 
 Full documentation is available at: https://carles9000.github.io/hix/ 
