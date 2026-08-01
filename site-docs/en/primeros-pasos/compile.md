@@ -44,7 +44,7 @@ To compile and link it, you rely on the support script `go_app_msvc.bat` and `hi
 
 The first time you start the server it displays the server configuration.
 
-<img alt="image" src="../../../assets/images/manual/primeros-pasos/start.png" />
+<img alt="image" src="../../assets/images/manual/primeros-pasos/start.png" />
 
 Compile your server `hix_app.exe` by linking against `hix_server.lib`.
 Use this project as a starting point: add your routes, middlewares, and additional libraries in `src.app/app.prg` and `hix_app.hbp`.
