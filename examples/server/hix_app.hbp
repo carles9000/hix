@@ -15,13 +15,16 @@
 -ohix_app
 
 # Main Test 
-src.app/app.prg
+src/app.prg
 
 # Resources file
 hix_app.res
 
 # Libs
 -lhix_server
+
+../../hix_server.hbx
+c:\harbour\include\harbour.hbx
 
 # OpensSSL
 -lhbssl

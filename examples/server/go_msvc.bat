@@ -10,11 +10,11 @@ if not exist "hix_app.res" (
 )
 
 
-
+set hix=c:\hix.project\hix.pro
 set hbdir=c:\harbour
-set include=%include%;%hbdir%\include
-set lib=%lib%;%hbdir%\lib
-set path=%path%;path c:\windows\system32;c:\windows;%hbdir%;%hbdir%\bin
+set include=%include%;%hbdir%\include;%hix%\src\include
+set lib=%lib%;%hbdir%\lib;%hix%
+set path=%path%;c:\windows\system32;c:\windows;%hbdir%;%hbdir%\bin;%hix%
 
 rem set DEBUG_FLAG=-b -DDEBUG
 

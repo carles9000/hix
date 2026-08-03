@@ -1,0 +1,462 @@
+<!-- -----------------------------------------------------------
+  File ......: index.html
+  Author.....: Claude Code
+  Supersing..: Carles Aubia Floresvi (Charly 9000)
+  Created....: 2026-08-03
+  Modified...: 2026-08-03
+  Version....: 1.0.0
+  Description: Fenix.WS.Function REST API — interactive test suite.
+               Runs 24 sequential tests against http://localhost:8084
+               covering public endpoints, auth (JWT + refresh token
+               rotation), CRUD operations and rate-limit behaviour.
+               Same API contract as Fenix.WS.Class but controllers
+               are implemented as standalone Harbour functions.
+  Usage      : Open in a browser while the example server is running.
+               Click "Run All" or trigger individual tests.
+------------------------------------------------------------ -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Fenix.WS.Function — Test Suite</title>
+<style>
+
+  /* --- Layout --- */
+  body {
+    font-family: monospace;
+    max-width: 980px;
+    margin: 30px auto;
+    color: #222;
+  }
+  h1  { color: #1a1a1a; margin-bottom: 2px; }
+  p.sub { color: #555; margin-top: 0; }
+
+  /* --- Offline / checking banners --- */
+  #checking { display: block; margin-top: 60px; text-align: center; color: #555; font-size: 1.1em; }
+  #offline  { display: none;  margin-top: 60px; text-align: center; color: #b71c1c; font-size: 1.15em; }
+
+  /* --- Table --- */
+  table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+  th    { background: #1a237e; color: #fff; padding: 8px 12px; text-align: left; }
+  td    { border: 1px solid #ccc; padding: 6px 10px; vertical-align: middle; }
+  tr:nth-child(even) td { background: #f4f8ff; }
+  tr.grp td {
+    background: #e8eaf6;
+    font-weight: bold;
+    color: #1a237e;
+    padding: 5px 10px;
+    font-size: .9em;
+    letter-spacing: .04em;
+  }
+
+  /* --- HTTP method badges --- */
+  .m {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 3px;
+    color: #fff;
+    font-weight: bold;
+    font-size: .82em;
+    min-width: 52px;
+    text-align: center;
+  }
+  .get    { background: #2e7d32; }
+  .post   { background: #1565c0; }
+  .put    { background: #e65100; }
+  .delete { background: #b71c1c; }
+
+  /* --- Status code colours --- */
+  .e200 { color: #2e7d32; font-weight: bold; }
+  .e201 { color: #0d47a1; font-weight: bold; }
+  .e4xx { color: #e65100; font-weight: bold; }
+
+  /* --- Run buttons --- */
+  .tb  { cursor: pointer; padding: 3px 14px; border: 1px solid #aaa; border-radius: 3px; background: #f5f5f5; font-size: .85em; }
+  .tok { background: #e8f5e9; border-color: #4caf50; color: #2e7d32; font-weight: bold; cursor: pointer; }
+  .tko { background: #ffebee; border-color: #ef5350; color: #c62828; font-weight: bold; cursor: pointer; }
+
+  /* --- Toolbar buttons --- */
+  .run-all {
+    padding: 8px 20px;
+    background: #1a237e;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: .95em;
+  }
+  .run-all:hover { background: #0d1257; }
+  .reset {
+    padding: 8px 20px;
+    background: #fff;
+    color: #555;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: .95em;
+    margin-left: 8px;
+  }
+  #summary { display: inline-block; margin-left: 16px; vertical-align: middle; font-size: .95em; }
+  .sok { color: #2e7d32; }
+  .sko { color: #c62828; }
+  .stm { color: #555;    }
+
+  /* --- Response popup --- */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.55);
+    z-index: 100;
+  }
+  .popup {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    background: #fff;
+    border-radius: 6px;
+    padding: 28px 32px;
+    max-width: 720px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 101;
+    box-shadow: 0 8px 32px rgba(0,0,0,.3);
+  }
+  .popup h2  { margin-top: 0; color: #1a237e; }
+  .popup pre { background: #f5f5f5; border: 1px solid #ccc; padding: 12px; overflow-x: auto; font-size: .82em; white-space: pre-wrap; }
+  .close       { float: right; font-size: 1.4em; cursor: pointer; color: #888; margin-top: -8px; margin-right: -8px; }
+  .close:hover { color: #333; }
+
+</style>
+</head>
+<body>
+
+  <!-- Startup check banner -->
+  <div id="checking">
+    <span id="checking-dot">&#9679;</span> Checking server at <b>localhost:8084</b>&hellip;
+  </div>
+
+  <!-- Server offline banner -->
+  <div id="offline">
+    &#9888; API server not available at <b>localhost:8084</b>.<br>
+    <span style="color:#555;font-size:.9em">Start the server and reload this page.</span>
+  </div>
+
+  <!-- Main UI -->
+  <div id="ui" style="display:none">
+
+    <h1>Fenix.WS.Function &mdash; Test Suite</h1>
+    <p class="sub">Targeting <b>http://localhost:8084</b> &mdash; Run All executes all tests in sequence.</p>
+    <p class="sub" style="font-size:.82em;color:#1a237e;background:#e8eaf6;border-left:3px solid #1a237e;padding:6px 10px;margin:6px 0">
+      <b>Rate limit:</b> the middleware is configured at <b>300&nbsp;req/min</b>
+      (each full run consumes ~50&nbsp;requests &mdash; one OPTIONS preflight&nbsp;+&nbsp;one actual call per test).
+      This allows up to <b>~6 consecutive runs</b> within the same 60&nbsp;s window without hitting 429.
+      If an unexpected 429 appears, wait a moment and run again.
+    </p>
+
+    <button class="run-all" onclick="runAll()">&#9654;&#9654; Run All</button>
+    <button class="reset"   onclick="resetAll()">&#8635; Reset</button>
+    <span id="summary"></span>
+
+    <table>
+      <tr>
+        <th>#</th><th>Test</th><th>Method</th><th>URL</th><th>Expect</th><th>Run</th>
+      </tr>
+
+      <!-- Public -->
+      <tr class="grp"><td colspan="6">Public</td></tr>
+      <tr><td>01</td><td>Health check</td>                    <td><span class="m get">GET</span></td>    <td><small>/health</small></td>       <td><span class="e200">200</span></td><td><button class="tb" data-id="01" onclick="runTest('01',this)">&#9654;</button></td></tr>
+      <tr><td>02</td><td>Server time</td>                     <td><span class="m get">GET</span></td>    <td><small>/time</small></td>         <td><span class="e200">200</span></td><td><button class="tb" data-id="02" onclick="runTest('02',this)">&#9654;</button></td></tr>
+
+      <!-- Auth -->
+      <tr class="grp"><td colspan="6">Auth</td></tr>
+      <tr><td>03</td><td>Login admin (stores token)</td>      <td><span class="m post">POST</span></td>  <td><small>/login</small></td>        <td><span class="e200">200</span></td><td><button class="tb" data-id="03" onclick="runTest('03',this)">&#9654;</button></td></tr>
+      <tr><td>04</td><td>Login demo (stores token)</td>       <td><span class="m post">POST</span></td>  <td><small>/login</small></td>        <td><span class="e200">200</span></td><td><button class="tb" data-id="04" onclick="runTest('04',this)">&#9654;</button></td></tr>
+      <tr><td>05</td><td>Login bad password</td>              <td><span class="m post">POST</span></td>  <td><small>/login</small></td>        <td><span class="e4xx">401</span></td><td><button class="tb" data-id="05" onclick="runTest('05',this)">&#9654;</button></td></tr>
+
+      <!-- Me -->
+      <tr class="grp"><td colspan="6">Me</td></tr>
+      <tr><td>06</td><td>GET /me (admin scope ok)</td>        <td><span class="m get">GET</span></td>    <td><small>/me</small></td>           <td><span class="e200">200</span></td><td><button class="tb" data-id="06" onclick="runTest('06',this)">&#9654;</button></td></tr>
+      <tr><td>07</td><td>GET /me (guest, no me:read scope)</td><td><span class="m get">GET</span></td>   <td><small>/me</small></td>           <td><span class="e4xx">403</span></td><td><button class="tb" data-id="07" onclick="runTest('07',this)">&#9654;</button></td></tr>
+      <tr><td>08</td><td>GET /me (no auth)</td>               <td><span class="m get">GET</span></td>    <td><small>/me</small></td>           <td><span class="e4xx">401</span></td><td><button class="tb" data-id="08" onclick="runTest('08',this)">&#9654;</button></td></tr>
+
+      <!-- Customers Read -->
+      <tr class="grp"><td colspan="6">Customers Read</td></tr>
+      <tr><td>09</td><td>GET /customers (admin)</td>          <td><span class="m get">GET</span></td>    <td><small>/customers</small></td>    <td><span class="e200">200</span></td><td><button class="tb" data-id="09" onclick="runTest('09',this)">&#9654;</button></td></tr>
+      <tr><td>10</td><td>GET /customers?q=a</td>              <td><span class="m get">GET</span></td>    <td><small>/customers?q=a</small></td><td><span class="e200">200</span></td><td><button class="tb" data-id="10" onclick="runTest('10',this)">&#9654;</button></td></tr>
+      <tr><td>11</td><td>GET /customers (demo)</td>           <td><span class="m get">GET</span></td>    <td><small>/customers</small></td>    <td><span class="e200">200</span></td><td><button class="tb" data-id="11" onclick="runTest('11',this)">&#9654;</button></td></tr>
+      <tr><td>12</td><td>GET /customers (no auth)</td>        <td><span class="m get">GET</span></td>    <td><small>/customers</small></td>    <td><span class="e4xx">401</span></td><td><button class="tb" data-id="12" onclick="runTest('12',this)">&#9654;</button></td></tr>
+      <tr><td>13</td><td>GET /customer/1</td>                 <td><span class="m get">GET</span></td>    <td><small>/customer/1</small></td>   <td><span class="e200">200</span></td><td><button class="tb" data-id="13" onclick="runTest('13',this)">&#9654;</button></td></tr>
+      <tr><td>14</td><td>GET /customer/999999</td>            <td><span class="m get">GET</span></td>    <td><small>/customer/999999</small></td><td><span class="e4xx">404</span></td><td><button class="tb" data-id="14" onclick="runTest('14',this)">&#9654;</button></td></tr>
+
+      <!-- Customers Write -->
+      <tr class="grp"><td colspan="6">Customers Write</td></tr>
+      <tr><td>15</td><td>POST /customer (creates, stores ID)</td><td><span class="m post">POST</span></td>  <td><small>/customer</small></td>    <td><span class="e201">201</span></td><td><button class="tb" data-id="15" onclick="runTest('15',this)">&#9654;</button></td></tr>
+      <tr><td>16</td><td>POST /customer (validation fails)</td>  <td><span class="m post">POST</span></td>  <td><small>/customer</small></td>    <td><span class="e4xx">422</span></td><td><button class="tb" data-id="16" onclick="runTest('16',this)">&#9654;</button></td></tr>
+      <tr><td>17</td><td>POST /customer (demo, no scope)</td>    <td><span class="m post">POST</span></td>  <td><small>/customer</small></td>    <td><span class="e4xx">403</span></td><td><button class="tb" data-id="17" onclick="runTest('17',this)">&#9654;</button></td></tr>
+      <tr><td>18</td><td>PUT /customer/:id (update)</td>         <td><span class="m put">PUT</span></td>    <td><small>/customer/:id</small></td><td><span class="e200">200</span></td><td><button class="tb" data-id="18" onclick="runTest('18',this)">&#9654;</button></td></tr>
+      <tr><td>19</td><td>PUT /customer/999999 (not found)</td>   <td><span class="m put">PUT</span></td>    <td><small>/customer/999999</small></td><td><span class="e4xx">404</span></td><td><button class="tb" data-id="19" onclick="runTest('19',this)">&#9654;</button></td></tr>
+      <tr><td>20</td><td>DELETE /customer/:id (deleted)</td>     <td><span class="m delete">DELETE</span></td><td><small>/customer/:id</small></td><td><span class="e200">200</span></td><td><button class="tb" data-id="20" onclick="runTest('20',this)">&#9654;</button></td></tr>
+      <tr><td>21</td><td>DELETE /customer/:id (recalled)</td>    <td><span class="m delete">DELETE</span></td><td><small>/customer/:id</small></td><td><span class="e200">200</span></td><td><button class="tb" data-id="21" onclick="runTest('21',this)">&#9654;</button></td></tr>
+      <tr><td>22</td><td>DELETE /customer/999999 (not found)</td><td><span class="m delete">DELETE</span></td><td><small>/customer/999999</small></td><td><span class="e4xx">404</span></td><td><button class="tb" data-id="22" onclick="runTest('22',this)">&#9654;</button></td></tr>
+
+      <!-- Token / Logout -->
+      <tr class="grp"><td colspan="6">Token / Logout</td></tr>
+      <tr><td>23</td><td>POST /refresh (rotates token)</td>   <td><span class="m post">POST</span></td>  <td><small>/refresh</small></td>      <td><span class="e200">200</span></td><td><button class="tb" data-id="23" onclick="runTest('23',this)">&#9654;</button></td></tr>
+      <tr><td>24</td><td>POST /logout (revokes)</td>          <td><span class="m post">POST</span></td>  <td><small>/logout</small></td>       <td><span class="e200">200</span></td><td><button class="tb" data-id="24" onclick="runTest('24',this)">&#9654;</button></td></tr>
+
+    </table>
+  </div>
+
+  <!-- Response popup -->
+  <div class="overlay" id="ov" onclick="hide()"></div>
+  <div class="popup" id="res" style="display:none">
+    <span class="close" onclick="hide()">&#x2715;</span>
+    <h2>Server response</h2>
+    <pre id="res-body" style="max-height:420px;overflow-y:auto"></pre>
+  </div>
+
+<script>
+
+  const API = 'http://localhost:8084';
+
+  let adminToken  = '';
+  let adminRefresh = '';
+  let demoToken   = '';
+  let guestToken  = '';
+  let newCustId   = 0;
+
+  // ── Connectivity check ──────────────────────────────────────
+  async function ping() {
+    try {
+      const ac = new AbortController();
+      setTimeout(() => ac.abort(), 3000);
+      const r = await fetch(API + '/health', { signal: ac.signal });
+      return r.ok || r.status > 0;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // ── Generic request helper ───────────────────────────────────
+  async function req(url, method, body, token) {
+    const h = { 'Content-Type': 'application/json' };
+    if (token) h['Authorization'] = 'Bearer ' + token;
+    try {
+      const r = await fetch(API + url, {
+        method:  method || 'GET',
+        headers: h,
+        body:    body ? JSON.stringify(body) : undefined
+      });
+      let json = null;
+      try { json = await r.json(); } catch (_) {}
+      return { status: r.status, json };
+    } catch (_) {
+      return { status: 0, json: null };
+    }
+  }
+
+  // ── Token getters (cached per run) ───────────────────────────
+  async function getAdminToken() {
+    if (adminToken) return adminToken;
+    const d = await req('/login', 'POST', { username: 'admin', password: 'admin123' });
+    if (d.status === 200 && d.json?.data) {
+      adminToken   = d.json.data.access_token;
+      adminRefresh = d.json.data.refresh_token;
+    }
+    return adminToken;
+  }
+
+  async function getDemoToken() {
+    if (demoToken) return demoToken;
+    const d = await req('/login', 'POST', { username: 'demo', password: 'demo123' });
+    if (d.status === 200 && d.json?.data) demoToken = d.json.data.access_token;
+    return demoToken;
+  }
+
+  async function getGuestToken() {
+    if (guestToken) return guestToken;
+    const d = await req('/login', 'POST', { username: 'guest', password: 'guest123' });
+    if (d.status === 200 && d.json?.data) guestToken = d.json.data.access_token;
+    return guestToken;
+  }
+
+  // ── Test definitions ─────────────────────────────────────────
+  const TESTS = {
+
+    '01': async () => req('/health', 'GET'),
+    '02': async () => req('/time',   'GET'),
+
+    '03': async () => {
+      const d = await req('/login', 'POST', { username: 'admin', password: 'admin123' });
+      if (d.status === 200 && d.json?.data) {
+        adminToken   = d.json.data.access_token;
+        adminRefresh = d.json.data.refresh_token;
+      }
+      return { status: d.status, json: d.json, ok: d.status === 200 && !!adminToken };
+    },
+
+    '04': async () => {
+      const d = await req('/login', 'POST', { username: 'demo', password: 'demo123' });
+      if (d.status === 200 && d.json?.data) demoToken = d.json.data.access_token;
+      return { status: d.status, json: d.json, ok: d.status === 200 && !!demoToken };
+    },
+
+    '05': async () => req('/login', 'POST', { username: 'admin', password: 'WRONG' }),
+
+    '06': async () => req('/me', 'GET', null, await getAdminToken()),
+    '07': async () => req('/me', 'GET', null, await getGuestToken()),
+    '08': async () => req('/me', 'GET'),
+
+    '09': async () => {
+      const d = await req('/customers', 'GET', null, await getAdminToken());
+      return { status: d.status, json: d.json, ok: d.status === 200 && Array.isArray(d.json?.data?.items) };
+    },
+
+    '10': async () => req('/customers?q=a', 'GET', null, await getAdminToken()),
+    '11': async () => req('/customers',     'GET', null, await getDemoToken()),
+    '12': async () => req('/customers',     'GET'),
+    '13': async () => req('/customer/1',      'GET', null, await getAdminToken()),
+    '14': async () => req('/customer/999999', 'GET', null, await getAdminToken()),
+
+    '15': async () => {
+      const body = {
+        first: 'webtest', last: 'runner', street: '1 test lane',
+        city: 'testcity', state: 'CA', zip: '90001',
+        hiredate: '2000-01-15', married: false, age: 30, notes: 'web test'
+      };
+      const d = await req('/customer', 'POST', body, await getAdminToken());
+      if (d.status === 201 && d.json?.data?.recno) newCustId = d.json.data.recno;
+      return { status: d.status, json: d.json, ok: d.status === 201 && newCustId > 0 };
+    },
+
+    '16': async () => req('/customer', 'POST', { first: '' }, await getAdminToken()),
+
+    '17': async () => req('/customer', 'POST',
+      { first: 'x', last: 'y', street: 's', city: 'c', state: 'CA', zip: '00000', hiredate: '2000-01-01', age: 20 },
+      await getDemoToken()),
+
+    '18': async () => req('/customer/' + newCustId, 'PUT', {
+      first: 'updated', last: 'webtest', street: '2 updated rd',
+      city: 'newcity', state: 'NY', zip: '10001',
+      hiredate: '2000-01-15', married: true, age: 31, notes: 'updated'
+    }, await getAdminToken()),
+
+    '19': async () => req('/customer/999999', 'PUT',
+      { first: 'x', last: 'y', street: 's', city: 'c', state: 'CA', zip: '00000', hiredate: '2000-01-01', married: false, age: 20, notes: '' },
+      await getAdminToken()),
+
+    '20': async () => {
+      const d = await req('/customer/' + newCustId, 'DELETE', null, await getAdminToken());
+      return { status: d.status, json: d.json, ok: d.status === 200 && d.json?.data?.action === 'deleted' };
+    },
+
+    '21': async () => {
+      const d = await req('/customer/' + newCustId, 'DELETE', null, await getAdminToken());
+      return { status: d.status, json: d.json, ok: d.status === 200 && d.json?.data?.action === 'recalled' };
+    },
+
+    '22': async () => req('/customer/999999', 'DELETE', null, await getAdminToken()),
+
+    '23': async () => {
+      const d = await req('/refresh', 'POST', { refresh_token: adminRefresh });
+      if (d.status === 200 && d.json?.data) {
+        adminToken   = d.json.data.access_token;
+        adminRefresh = d.json.data.refresh_token;
+      }
+      return d;
+    },
+
+    '24': async () => {
+      const h = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken };
+      try {
+        const r    = await fetch(API + '/logout', { method: 'POST', headers: h, body: JSON.stringify({ refresh_token: adminRefresh }) });
+        const json = await r.json();
+        if (r.ok) { adminToken = ''; adminRefresh = ''; }
+        return { status: r.status, json, ok: r.status === 200 && json?.data?.revoked === true };
+      } catch (_) {
+        return { status: 0, json: null };
+      }
+    }
+
+  };
+
+  // ── Expected status codes ────────────────────────────────────
+  const EXPECT = {
+    '01': 200, '02': 200, '03': 200, '04': 200, '05': 401,
+    '06': 200, '07': 403, '08': 401, '09': 200, '10': 200,
+    '11': 200, '12': 401, '13': 200, '14': 404, '15': 201,
+    '16': 422, '17': 403, '18': 200, '19': 404, '20': 200,
+    '21': 200, '22': 404, '23': 200, '24': 200
+  };
+
+  // ── Run a single test ────────────────────────────────────────
+  async function runTest(id, btn) {
+    btn.disabled    = true;
+    btn.textContent = '...';
+    const d      = await TESTS[id]();
+    const ok     = ('ok' in d) ? d.ok : (d.status === EXPECT[id]);
+    btn.disabled    = false;
+    btn.textContent = (ok ? '\u2713 ' : '\u2717 ') + d.status;
+    btn.className   = ok ? 'tb tok' : 'tb tko';
+    btn.onclick     = () => showResult({ ok, http: d.status, response: d.json });
+    return ok;
+  }
+
+  // ── Popup helpers ────────────────────────────────────────────
+  function showResult(d) {
+    document.getElementById('res-body').textContent = JSON.stringify(d, null, 2);
+    document.getElementById('res').style.display    = 'block';
+    document.getElementById('ov').style.display     = 'block';
+  }
+
+  function hide() {
+    document.getElementById('res').style.display = 'none';
+    document.getElementById('ov').style.display  = 'none';
+  }
+
+  // ── Reset all buttons and state ──────────────────────────────
+  function resetAll() {
+    adminToken = ''; adminRefresh = ''; demoToken = ''; guestToken = ''; newCustId = 0;
+    document.querySelectorAll('button.tb').forEach(btn => {
+      btn.disabled    = false;
+      btn.textContent = '\u25b6';
+      btn.className   = 'tb';
+      btn.onclick     = () => runTest(btn.dataset.id, btn);
+    });
+    document.getElementById('summary').innerHTML = '';
+  }
+
+  // ── Run all tests in sequence ────────────────────────────────
+  async function runAll() {
+    resetAll();
+    const t0   = performance.now();
+    let ok = 0, ko = 0;
+    for (const btn of document.querySelectorAll('button.tb')) {
+      const r = await runTest(btn.dataset.id, btn);
+      if (r) ok++; else ko++;
+    }
+    const ms = Math.round(performance.now() - t0);
+    document.getElementById('summary').innerHTML =
+      '<b class="sok">\u2713 ' + ok + ' ok<\/b>&nbsp;&nbsp;' +
+      '<b class="sko">\u2717 ' + ko + ' ko<\/b>&nbsp;&nbsp;' +
+      '<span class="stm">\u23f1 ' + ms + ' ms<\/span>';
+  }
+
+  // ── Boot: ping server then show UI or offline banner ─────────
+  (async () => {
+    const dots  = ['&#9679;', '&#9675;', '&#9679;', '&#9675;'];
+    let di      = 0;
+    const timer = setInterval(() => {
+      document.getElementById('checking-dot').innerHTML = dots[di++ % dots.length];
+    }, 350);
+    const up = await ping();
+    clearInterval(timer);
+    document.getElementById('checking').style.display = 'none';
+    document.getElementById(up ? 'ui' : 'offline').style.display = 'block';
+  })();
+
+</script>
+</body>
+</html>

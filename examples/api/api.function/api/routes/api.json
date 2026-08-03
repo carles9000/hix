@@ -1,0 +1,16 @@
+[
+  { "name": "health",          "url": "/health",                "action": "controllers/health.prg",           "method": "GET",    "middleware": "MyWsGuardPublic" },
+  { "name": "time",            "url": "/time",                  "action": "controllers/time.prg",             "method": "GET",    "middleware": "MyWsGuardPublic" },
+
+  { "name": "auth.login",      "url": "/login",                 "action": "controllers/auth/login.prg",       "method": "POST",   "middleware": "MyWsGuardPublic" },
+  { "name": "auth.refresh",    "url": "/refresh",               "action": "controllers/auth/refresh.prg",     "method": "POST",   "middleware": "MyWsGuardPublic" },
+  { "name": "auth.logout",     "url": "/logout",                "action": "controllers/auth/logout.prg",      "method": "POST",   "middleware": "MyWsGuardAuth"   },
+
+  { "name": "me.read",         "url": "/me",                    "action": "controllers/me.prg",               "method": "GET",    "middleware": "MyWsGuardScope",  "scope": "me:read" },
+
+  { "name": "customer.list",   "url": "/customers",             "action": "controllers/customer/list.prg",    "method": "GET",    "middleware": "MyWsGuardScope",  "scope": "customers:read"   },
+  { "name": "customer.get",    "url": "/customer/:id([0-9]+)",  "action": "controllers/customer/get.prg",     "method": "GET",    "middleware": "MyWsGuardScope",  "scope": "customers:read"   },
+  { "name": "customer.store",  "url": "/customer",              "action": "controllers/customer/store.prg",   "method": "POST",   "middleware": "MyWsGuardScope",  "scope": "customers:write"  },
+  { "name": "customer.update", "url": "/customer/:id([0-9]+)",  "action": "controllers/customer/update.prg",  "method": "PUT",    "middleware": "MyWsGuardScope",  "scope": "customers:write"  },
+  { "name": "customer.delete", "url": "/customer/:id([0-9]+)",  "action": "controllers/customer/delete.prg",  "method": "DELETE", "middleware": "MyWsGuardScope",  "scope": "customers:delete" }
+]

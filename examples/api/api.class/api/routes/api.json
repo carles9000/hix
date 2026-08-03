@@ -1,0 +1,16 @@
+[
+  { "name": "health",          "url": "/health",                  "action": "controllers/index@health.prg",   "method": "GET",    "middleware": "MyWsGuardPublic"                        },
+  { "name": "time",            "url": "/time",                    "action": "controllers/index@time.prg",     "method": "GET",    "middleware": "MyWsGuardPublic"                        },
+
+  { "name": "auth.login",      "url": "/login",                   "action": "controllers/login@auth.prg",     "method": "POST",   "middleware": "MyWsGuardPublic"                        },
+  { "name": "auth.refresh",    "url": "/refresh",                 "action": "controllers/refresh@auth.prg",   "method": "POST",   "middleware": "MyWsGuardPublic"                        },
+  { "name": "auth.logout",     "url": "/logout",                  "action": "controllers/logout@auth.prg",    "method": "POST",   "middleware": "MyWsGuardAuth"                          },
+
+  { "name": "me.read",         "url": "/me",                      "action": "controllers/read@me.prg",        "method": "GET",    "middleware": "MyWsGuardScope", "scope": "me:read"     },
+
+  { "name": "customer.list",   "url": "/customers",               "action": "controllers/list@customer.prg",  "method": "GET",    "middleware": "MyWsGuardScope", "scope": "customers:read"   },
+  { "name": "customer.get",    "url": "/customer/:id([0-9]+)",    "action": "controllers/get@customer.prg",   "method": "GET",    "middleware": "MyWsGuardScope", "scope": "customers:read"   },
+  { "name": "customer.store",  "url": "/customer",                "action": "controllers/store@customer.prg", "method": "POST",   "middleware": "MyWsGuardScope", "scope": "customers:write"  },
+  { "name": "customer.update", "url": "/customer/:id([0-9]+)",    "action": "controllers/update@customer.prg","method": "PUT",    "middleware": "MyWsGuardScope", "scope": "customers:write"  },
+  { "name": "customer.delete", "url": "/customer/:id([0-9]+)",    "action": "controllers/delete@customer.prg","method": "DELETE", "middleware": "MyWsGuardScope", "scope": "customers:delete" }
+]
