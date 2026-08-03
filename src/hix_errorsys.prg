@@ -439,8 +439,8 @@ STATIC FUNCTION _HixErrHead( cTitle )
  <html>
    <head>
      <meta charset='UTF-8'>
-     <title><$ UHtmlEncode( cTitle ) $></title>
-     <link rel='icon' href='https://raw.githubusercontent.com/carles9000/hix/main/resources/images/hix.ico' type='image/x-icon'>
+     <title><$ UHtmlEncode( cTitle ) $></title>     
+     <link rel='icon' href='https://raw.githubusercontent.com/carles9000/hix/refs/heads/main/resources/images/hix.ico' type='image/x-icon'>
      <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css' rel='stylesheet'>
      <style>
        body { padding: 10px; }
@@ -448,7 +448,7 @@ STATIC FUNCTION _HixErrHead( cTitle )
        tbody { font-family: Consolas, monospace; }
        .col { text-align: right; font-weight: bold; }
        .contenedor { display: flex; align-items: center; gap: 20px; }
-       .contenedor img { height: 40px; width: auto; }
+       .contenedor img { height: 50px; width: auto; }
        .title { font-size: 40px; font-weight: bold; font-family: system-ui; }
        .line_error { border: 1px solid red; padding: 0; font-weight: bold; }
      </style>
@@ -465,7 +465,7 @@ STATIC FUNCTION _HixErrLogo( cSubtitle )
    
    BLOCK TO cHtml RAW PARAMS cSubTitle 
 <div class='contenedor'>
-   <img src='https://raw.githubusercontent.com/carles9000/hix/main/resources/images/hix.png' alt='Logo HIX'>
+   <img src='https://raw.githubusercontent.com/carles9000/hix/refs/heads/main/resources/images/logo240.png' alt='Logo HIX'>
    <span class='title'><$ UHtmlEncode( cSubtitle ) $></span>
    </div><hr>
    ENDTEXT 

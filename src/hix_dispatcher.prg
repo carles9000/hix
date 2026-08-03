@@ -300,7 +300,7 @@ METHOD Dispatch( oReq ) CLASS THixDispatcher
 
       IF cPath == "/"
 
-         oReq:Respond( _HixHelloPage(), 200, "html" )
+         oReq:Respond( HIX_HelloPage(), 200, "html" )
          
       ELSE
       
@@ -1159,7 +1159,7 @@ STATIC FUNCTION _HixStreamFile( oReq, cPath )
 
 RETURN NIL
 
-STATIC FUNCTION _HixHelloPage()
+FUNCTION HIX_HelloPage()
 
    LOCAL cHtml := ''
    LOCAL cVersion :=  HIX_Version()
@@ -1170,7 +1170,7 @@ STATIC FUNCTION _HixHelloPage()
 <head>
    <meta charset='utf-8'>
    <title>HIX</title>  
-   <link rel='shortcut icon' type='image/png' href='https://raw.githubusercontent.com/carles9000/hix/main/resources/images/hix.ico' />
+   <link rel='shortcut icon' type='image/png' href='https://raw.githubusercontent.com/carles9000/hix/refs/heads/main/resources/images/hix.ico' />
    <link href="https://fonts.googleapis.com/css2?family=BBH+Sans+Bartle&family=Saira+Stencil+One&display=swap" rel="stylesheet">  
     
 
@@ -1184,7 +1184,7 @@ STATIC FUNCTION _HixHelloPage()
    <meta property="og:site_name" content="HIX">
    <meta property="og:title" content="HIX">
    <meta property="og:description" content="Code in xBase, deploy on the web">
-   <meta property="og:image" content="https://raw.githubusercontent.com/carles9000/hix/main/resources/images/hix.png">    
+   <meta property="og:image" content="https://raw.githubusercontent.com/carles9000/hix/refs/heads/main/resources/images/logo240.png">    
   
    <style>
        html, body {
@@ -1216,6 +1216,11 @@ STATIC FUNCTION _HixHelloPage()
          background-size: cover;
          background-repeat: no-repeat;
        }
+       
+       .logo img {
+         width:100px;
+       }
+       
        .text {
          font-size: 4.2em;
          color: #333;	  
@@ -1233,8 +1238,8 @@ STATIC FUNCTION _HixHelloPage()
   <div class="container">
     <div class="content">
       <div class="row">
-        <div class="logo">
-           <img src='https://raw.githubusercontent.com/carles9000/hix/main/resources/images/logo.png' alt='Logo HIX'>                
+        <div class="logo">           
+           <img src='https://raw.githubusercontent.com/carles9000/hix/refs/heads/main/resources/images/logo240.png' alt='Logo HIX'>                
         </div>
         <div class="text">HIX <span>2.0</span></div>
       </div>

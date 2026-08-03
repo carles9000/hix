@@ -578,7 +578,12 @@ FUNCTION HIX_RouteDispatch( oReq )
 
    ELSE
 
-      IF hb_HHasKey( s_hHandlers, "404" )
+      IF oReq:cPath == "/"
+
+         HIX_SetRequest( oReq )
+         oReq:Respond( HIX_HelloPage(), 200, "html" )
+
+      ELSEIF hb_HHasKey( s_hHandlers, "404" )
 
          HIX_SetRequest( oReq )
          HIX_SetContext( NIL )

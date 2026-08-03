@@ -185,9 +185,10 @@ RETURN snLines
 
 FUNCTION HIX_CompileFile( cPath )
 
-   LOCAL oHrb, oError, cCode
-   LOCAL cOs     := OS()
-   LOCAL cHBHeader    := ''
+   LOCAL oHrb, oError, cCode, aArgs
+   LOCAL cOs      := OS()
+   LOCAL cHBHeader := ''
+   LOCAL cHBInclude, cUserFlags
 
    l( "CompileFile: " + cPath )
 
@@ -202,10 +203,21 @@ FUNCTION HIX_CompileFile( cPath )
 
    DO CASE
 
-      CASE "Windows" $ cOs   ; cHBHeader := "c:\harbour\include"
-      CASE "Linux" $ cOs    ; cHBHeader := "~/harbour/include"
+      CASE "Windows" $ cOs ; cHBHeader := "c:\harbour\include"
+      CASE "Linux" $ cOs   ; cHBHeader := "~/harbour/include"
 
    ENDCASE
+
+   cHBInclude := hb_GetEnv( "HB_INCLUDE" )
+   cUserFlags := hb_GetEnv( "HB_USER_PRGFLAGS" )
+
+   // Build arg list filtering empty strings — hb_CompileFromBuf treats ""
+   // as an empty filename and throws "Invalid filename ''"
+   aArgs := { _HixPreamble() + cCode, .T., "-n", "-q2" }
+   IF ! Empty( cHBHeader )  ; AAdd( aArgs, "-I" + cHBHeader ) ; ENDIF
+   AAdd( aArgs, "-I" + HIX_GetRootAbsolute() )
+   IF ! Empty( cHBInclude ) ; AAdd( aArgs, "-I" + cHBInclude ) ; ENDIF
+   IF ! Empty( cUserFlags ) ; AAdd( aArgs, cUserFlags ) ; ENDIF
 
    TRY
 
@@ -213,8 +225,8 @@ FUNCTION HIX_CompileFile( cPath )
       // HIX_PreambleLines(). Harbour ignora las directivas #line de
       // entrada (ppcore.c:5407), por lo que la compensacion se hace en
       // runtime desde HIX_Trace_Out via HIX_LoaderIsUserFunc().
-      oHrb := hb_CompileFromBuf( _HixPreamble() + cCode, .T., "-n", "-q2", "-I" + cHBheader, ;
-         "-I" + HIX_GetRootAbsolute(), "-I" + hb_GetEnv( "HB_INCLUDE" ), hb_GetEnv( "HB_USER_PRGFLAGS" ) )
+      oHrb := hb_ExecFromArray( "hb_CompileFromBuf", aArgs )
+
    CATCH oError
       oError:filename := cPath
 
