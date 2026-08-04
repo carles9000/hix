@@ -32,14 +32,14 @@ FUNCTION Main()
 RETURN NIL
 ```
 
-To compile and link it, you rely on the support script `go_msvc.bat` and `hix_app.hbp` which can serve as a starting point for incorporating your files and external libraries to create your own server.
+To compile and link it, you rely on the support script `go_msvc.bat` and `hix.hbp` which can serve as a starting point for incorporating your files and external libraries to create your own server.
 
 The first time you start the server it displays the server configuration.
 
 <img alt="image" src="../../assets/images/manual/primeros-pasos/start.png" />
 
-Compile your server `hix_app.exe` by linking against `hix_server.lib`.
-Use this project as a starting point: add your routes, middlewares, and additional libraries in `src.app/app.prg` and `hix_app.hbp`.
+Compile your server `hix.exe` by linking against `hix_server.lib`.
+Use this project as a starting point: add your routes, middlewares, and additional libraries in `examples/server/src/app.prg` and `hix.hbp`.
 
 Remember that in all your projects you must copy the DLLs from the `/dll` folder
 into the directory where you have your server.

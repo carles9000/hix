@@ -36,15 +36,16 @@ RETURN NIL
 ```
 
 Para poderlo compilar y enlazar se proviene del bat de soporte `go_msvc.bat` y 
-que se apoya en `hix_app.hbp` que te puede servir de base para ir incorporando 
+que se apoya en `hix.hbp` que te puede servir de base para ir incorporando 
 tus ficheros y librerias externas para crear tu propio servidor.
 
 La primera vez que arranques el servidor te muestra la configuración del servidor 
 
 <img alt="image" src="../../../assets/images/manual/primeros-pasos/start.png" />
 
-Compila tu servidor `hix_app.exe` enlazando contra `hix_server.lib`.  
-Usa este proyecto como punto de partida: añade tus rutas, middlewares y librerías adicionales en `src.app/app.prg` y `hix_app.hbp`.
+Compila tu servidor `hix.exe` enlazando contra `hix_server.lib`.  
+Usa este proyecto como punto de partida: añade tus rutas, middlewares y librerías adicionales 
+en `examples/server/src/app.prg` y `hix.hbp`.
 
-Recuerda que en todos los proyectos que realizes has de copiar las dell de la carpeta /dll 
+Recuerda que en todos los proyectos que realizes has de copiar las dll de la carpeta /dll 
 en el directorio donde tengas el server. 
