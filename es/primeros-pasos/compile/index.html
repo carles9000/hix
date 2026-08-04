@@ -2708,31 +2708,25 @@ debe los paths hacia su instalación de Harbour. </p>
 <p>Este script genera <code>hix_server.lib</code> y <code>hix_server.hbx</code> (tabla de símbolos exportados).  </p>
 <h3 id="aplicacion-ejemplo">Aplicación ejemplo<a class="headerlink" href="#aplicacion-ejemplo" title="Permanent link">&para;</a></h3>
 <p>Si desea no usar el servidor ya construido, puede crearse el suyo propio.
-En el fichero <code>/src.app/app.prg</code> hay un ejemplo hiperbásico de como crear tu servidor 
+En el fichero <code>/examples/server/app.prg</code> hay un ejemplo hiperbásico de como crear tu servidor 
 <strong>HIX</strong>. </p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos=" 1 "></span></a>// Force to link all functions ---------------------
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="cp">#define</span> __HBEXTERN__HIX_<span class="nc">SERVER</span>__REQUEST
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="cp">#include</span> <span class="s">&quot;../hix_server.hbx&quot;</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos=" 4 "></span></a>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a>   <span class="cp">#define</span> __HBEXTERN__HARBOUR__REQUEST
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos=" 6 "></span></a>   <span class="cp">#include</span> <span class="s">&quot;harbour.hbx&quot;</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos=" 7 "></span></a>// ------------------------------------------------
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos=" 8 "></span></a>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9"></a><a href="#__codelineno-0-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="kr">FUNCTION</span> Main()
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10"></a><a href="#__codelineno-0-10"><span class="linenos" data-linenos="10 "></span></a>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11"></a><a href="#__codelineno-0-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="nv">LOCAL</span> o<span class="nc">Server</span> := THix<span class="nc">Server</span>():New()
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12"></a><a href="#__codelineno-0-12"><span class="linenos" data-linenos="12 "></span></a>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13"></a><a href="#__codelineno-0-13"><span class="linenos" data-linenos="13 "></span></a>   <span class="nv">oServer</span>:Start()
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14"></a><a href="#__codelineno-0-14"><span class="linenos" data-linenos="14 "></span></a>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15"></a><a href="#__codelineno-0-15"><span class="linenos" data-linenos="15 "></span></a><span class="kr">RETURN</span> NIL
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">FUNCTION</span> Main()
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos="2 "></span></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="nv">LOCAL</span> o<span class="nc">Server</span> := THix<span class="nc">Server</span>():New()   
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos="4 "></span></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos="5 "></span></a>   o<span class="nc">Server</span>:Start()
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos="6 "></span></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos="7 "></span></a><span class="kr">RETURN</span> NIL
 </span></code></pre></div>
-<p>Para poderlo compilar y enlazar se proviene del bat de soporte <code>go_app_msvc.bat</code> y 
+<p>Para poderlo compilar y enlazar se proviene del bat de soporte <code>go_msvc.bat</code> y 
 que se apoya en <code>hix_app.hbp</code> que te puede servir de base para ir incorporando 
 tus ficheros y librerias externas para crear tu propio servidor.</p>
 <p>La primera vez que arranques el servidor te muestra la configuración del servidor </p>
 <p><img alt="image" src="../../../assets/images/manual/primeros-pasos/start.png" /></p>
 <p>Compila tu servidor <code>hix_app.exe</code> enlazando contra <code>hix_server.lib</code>.<br />
 Usa este proyecto como punto de partida: añade tus rutas, middlewares y librerías adicionales en <code>src.app/app.prg</code> y <code>hix_app.hbp</code>.</p>
+<p>Recuerda que en todos los proyectos que realizes has de copiar las dell de la carpeta /dll 
+en el directorio donde tengas el server. </p>
 
 
 

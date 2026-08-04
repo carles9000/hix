@@ -111,13 +111,13 @@
       }
     },
     "hixstyle/response/cabeceras.md": {
-      "es_sha": "27882d3b7ddc2d166c5460baabeeab24981c5d16",
+      "es_sha": "b803a4ef6887ab010667d62bc7759f879e8fe02a",
       "translations": {
         "en": {
           "path": "hixstyle/response/headers.md",
-          "sha": "27882d3b7ddc2d166c5460baabeeab24981c5d16",
-          "translated_at": "2026-07-16T11:56:27Z",
-          "translator": "bootstrap"
+          "sha": "b803a4ef6887ab010667d62bc7759f879e8fe02a",
+          "translated_at": "2026-08-03T17:59:33Z",
+          "translator": "haiku-4.5"
         }
       }
     },
@@ -292,7 +292,7 @@
       "translations": {
         "en": {
           "sha": "58954d699431c32c303f76eaee52550669640ed5",
-          "translated_at": "2026-07-16T12:11:36Z",
+          "translated_at": "2026-08-03T18:07:31Z",
           "translator": "haiku-4.5"
         }
       }
@@ -302,8 +302,8 @@
       "translations": {
         "en": {
           "sha": "cd55d95cbaf739e11f8291a1f4a7231310adbb80",
-          "translated_at": "2026-07-16T11:55:29Z",
-          "translator": "bootstrap"
+          "translated_at": "2026-08-03T18:07:31Z",
+          "translator": "haiku-4.5"
         }
       }
     },
@@ -312,8 +312,8 @@
       "translations": {
         "en": {
           "sha": "48108823aa5b437ccdff2318f23a64f09f49f51c",
-          "translated_at": "2026-07-16T11:55:29Z",
-          "translator": "bootstrap"
+          "translated_at": "2026-08-03T18:07:31Z",
+          "translator": "haiku-4.5"
         }
       }
     },
@@ -322,8 +322,8 @@
       "translations": {
         "en": {
           "sha": "bba808ffa0db402b09c48491f12731ee7d059466",
-          "translated_at": "2026-07-16T11:55:29Z",
-          "translator": "bootstrap"
+          "translated_at": "2026-08-03T18:07:31Z",
+          "translator": "haiku-4.5"
         }
       }
     },
@@ -332,8 +332,8 @@
       "translations": {
         "en": {
           "sha": "ed62450420f907306ec3de9c87a19c5f1e55afaf",
-          "translated_at": "2026-07-16T11:55:29Z",
-          "translator": "bootstrap"
+          "translated_at": "2026-08-03T18:07:32Z",
+          "translator": "haiku-4.5"
         }
       }
     },
@@ -364,12 +364,12 @@
       }
     },
     "intro/hixstyle.md": {
-      "es_sha": "b3f8fc42110a0bdf0671275abd26d3fc2b78d39a",
+      "es_sha": "38e9f0698d685026a8f104e29e69be17b405ce4a",
       "translations": {
         "en": {
-          "sha": "b3f8fc42110a0bdf0671275abd26d3fc2b78d39a",
-          "translated_at": "2026-07-16T11:55:29Z",
-          "translator": "bootstrap"
+          "sha": "38e9f0698d685026a8f104e29e69be17b405ce4a",
+          "translated_at": "2026-08-03T17:59:34Z",
+          "translator": "haiku-4.5"
         }
       }
     },
@@ -384,22 +384,22 @@
       }
     },
     "intro/modo-basico.md": {
-      "es_sha": "e005169496ad77ac3944d4c690b56a75ad33ebb9",
+      "es_sha": "7ad0e0db9be16d114aa2fd95ad416db6d417d7eb",
       "translations": {
         "en": {
-          "sha": "e005169496ad77ac3944d4c690b56a75ad33ebb9",
-          "translated_at": "2026-08-01T09:27:07Z",
-          "translator": "manual"
+          "sha": "7ad0e0db9be16d114aa2fd95ad416db6d417d7eb",
+          "translated_at": "2026-08-03T17:59:34Z",
+          "translator": "haiku-4.5"
         }
       }
     },
     "primeros-pasos/compile.md": {
-      "es_sha": "9b5c0f7061430f30832ce4811235bbd3abfccdcb",
+      "es_sha": "2f3acf6b2c9c57f353d1fbe8de6db3971e490313",
       "translations": {
         "en": {
-          "sha": "9b5c0f7061430f30832ce4811235bbd3abfccdcb",
-          "translated_at": "2026-08-01T09:27:07Z",
-          "translator": "manual"
+          "sha": "2f3acf6b2c9c57f353d1fbe8de6db3971e490313",
+          "translated_at": "2026-08-03T17:59:35Z",
+          "translator": "haiku-4.5"
         }
       }
     },
