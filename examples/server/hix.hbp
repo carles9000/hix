@@ -12,13 +12,13 @@
 -workdir=.hbmk/${hb_compiler}/app
 
 -hbexe
--ohix_app
+-ohix
 
 # Main Test 
 src/app.prg
 
 # Resources file
-hix_app.res
+hix.res
 
 # Libs
 -lhix_server
