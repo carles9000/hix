@@ -2719,13 +2719,14 @@ En el fichero <code>/examples/server/app.prg</code> hay un ejemplo hiperbásico 
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos="7 "></span></a><span class="kr">RETURN</span> NIL
 </span></code></pre></div>
 <p>Para poderlo compilar y enlazar se proviene del bat de soporte <code>go_msvc.bat</code> y 
-que se apoya en <code>hix_app.hbp</code> que te puede servir de base para ir incorporando 
+que se apoya en <code>hix.hbp</code> que te puede servir de base para ir incorporando 
 tus ficheros y librerias externas para crear tu propio servidor.</p>
 <p>La primera vez que arranques el servidor te muestra la configuración del servidor </p>
 <p><img alt="image" src="../../../assets/images/manual/primeros-pasos/start.png" /></p>
-<p>Compila tu servidor <code>hix_app.exe</code> enlazando contra <code>hix_server.lib</code>.<br />
-Usa este proyecto como punto de partida: añade tus rutas, middlewares y librerías adicionales en <code>src.app/app.prg</code> y <code>hix_app.hbp</code>.</p>
-<p>Recuerda que en todos los proyectos que realizes has de copiar las dell de la carpeta /dll 
+<p>Compila tu servidor <code>hix.exe</code> enlazando contra <code>hix_server.lib</code>.<br />
+Usa este proyecto como punto de partida: añade tus rutas, middlewares y librerías adicionales 
+en <code>examples/server/src/app.prg</code> y <code>hix.hbp</code>.</p>
+<p>Recuerda que en todos los proyectos que realizes has de copiar las dll de la carpeta /dll 
 en el directorio donde tengas el server. </p>
 
 

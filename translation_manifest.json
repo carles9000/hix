@@ -394,11 +394,11 @@
       }
     },
     "primeros-pasos/compile.md": {
-      "es_sha": "2f3acf6b2c9c57f353d1fbe8de6db3971e490313",
+      "es_sha": "00fce1121ee8bd9cc21a31299decff8f6124dc02",
       "translations": {
         "en": {
-          "sha": "2f3acf6b2c9c57f353d1fbe8de6db3971e490313",
-          "translated_at": "2026-08-03T17:59:35Z",
+          "sha": "00fce1121ee8bd9cc21a31299decff8f6124dc02",
+          "translated_at": "2026-08-04T09:35:53Z",
           "translator": "haiku-4.5"
         }
       }

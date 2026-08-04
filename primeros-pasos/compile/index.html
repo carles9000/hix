@@ -2715,11 +2715,11 @@ The file <code>/examples/server/app.prg</code> contains a very basic example of 
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos="6 "></span></a>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos="7 "></span></a><span class="kr">RETURN</span> NIL
 </span></code></pre></div>
-<p>To compile and link it, you rely on the support script <code>go_msvc.bat</code> and <code>hix_app.hbp</code> which can serve as a starting point for incorporating your files and external libraries to create your own server.</p>
+<p>To compile and link it, you rely on the support script <code>go_msvc.bat</code> and <code>hix.hbp</code> which can serve as a starting point for incorporating your files and external libraries to create your own server.</p>
 <p>The first time you start the server it displays the server configuration.</p>
 <p><img alt="image" src="../../assets/images/manual/primeros-pasos/start.png" /></p>
-<p>Compile your server <code>hix_app.exe</code> by linking against <code>hix_server.lib</code>.
-Use this project as a starting point: add your routes, middlewares, and additional libraries in <code>src.app/app.prg</code> and <code>hix_app.hbp</code>.</p>
+<p>Compile your server <code>hix.exe</code> by linking against <code>hix_server.lib</code>.
+Use this project as a starting point: add your routes, middlewares, and additional libraries in <code>examples/server/src/app.prg</code> and <code>hix.hbp</code>.</p>
 <p>Remember that in all your projects you must copy the DLLs from the <code>/dll</code> folder
 into the directory where you have your server.</p>
 
