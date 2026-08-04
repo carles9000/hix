@@ -151,7 +151,7 @@ el controlador y si no se encian, los inicializa -> fácil.
 Despues podemos ver un simple uso de una directiva, en este caso @foreach ... @endforeach 
 y como con {{ ... }} usamos las variables 
 
-![image](../../../../assets/images/manual/mambo/img1.png)
+![image](../../../assets/images/manual/mambo/img1.png)
 
 
 ## Caché de vistas 

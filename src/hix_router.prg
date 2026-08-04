@@ -578,12 +578,7 @@ FUNCTION HIX_RouteDispatch( oReq )
 
    ELSE
 
-      IF oReq:cPath == "/"
-
-         HIX_SetRequest( oReq )
-         oReq:Respond( HIX_HelloPage(), 200, "html" )
-
-      ELSEIF hb_HHasKey( s_hHandlers, "404" )
+      IF hb_HHasKey( s_hHandlers, "404" )
 
          HIX_SetRequest( oReq )
          HIX_SetContext( NIL )
@@ -592,6 +587,12 @@ FUNCTION HIX_RouteDispatch( oReq )
             oReq:Respond( oReq:cEchoBuffer, oReq:nResponseStatus, oReq:cResponseMime )
             HIX_EchoClear()
          ENDIF
+
+      ELSEIF oReq:cPath == "/"
+
+         HIX_SetRequest( oReq )
+         oReq:Respond( HIX_HelloPage(), 200, "html" )
+
       ELSE
          oReq:lKeepAlive := .F.
          HIX_HttpError( oReq, 404 )

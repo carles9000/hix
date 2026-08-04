@@ -70,4 +70,4 @@ return UView( 'example2.html', aData )
 
 ### Result
 
-![image](../../../../assets/images/manual/mambo/img3.jpg)
+![image](../../../assets/images/manual/mambo/img3.jpg)

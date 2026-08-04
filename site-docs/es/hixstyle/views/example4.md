@@ -182,4 +182,4 @@ return UView( 'example4.html', aData, hUrls )
 
 ### Result 
 
-![image](../../../../assets/images/manual/mambo/img5.jpg)
+![image](../../../assets/images/manual/mambo/img5.jpg)
