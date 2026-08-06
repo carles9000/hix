@@ -1,0 +1,73 @@
+@args cName = '', hUser = {=>}, cRoles = ''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	@view 'common/header.html' 
+   
+   <link href='/public/css/main.css' rel='stylesheet'>
+   
+</head>
+
+<body>
+
+	<!-- Navbar -->	
+	
+	@view 'common/navbar.html'
+
+
+	<!-- Offcanvas Sidebar -->	
+	
+	@view 'common/sidebar.html'
+  
+   <div class='contenedor'>
+     <img src='/public/images/logo.png'/>     
+     <span class='title'>Welcome, {{ cName }} ! </span>
+   </div><hr>   
+  
+   <main class="container-fluid mycontainer">   
+      
+      <table class="table table-striped">
+          <tr>
+            <th>Field</th>
+            <th>Value</th>
+          </tr>
+          
+          <tr>
+            <td>ID</td><td>{{ hb_HGetDef( hUser, 'id', '?' ) }}</td>
+          </tr>
+          
+          <tr>
+            <td>Name</td><td>{{ cName }}</td>
+          </tr>
+          
+          <tr>
+            <td>Roles</td><td>{{ cRoles }}</td>
+          </tr>                       
+          
+      </table>      
+   
+      <br><strong>Authorization roles for user: {{ UAuthUser('name','?') }}</strong>
+    
+      <br>UHasRole('customers'):          {{ if( UHasRole( 'customers'           ), 'Yes', 'No' ) }}
+      <br>UHasRole('customers', 'show'):  {{ if( UHasRole( 'customers', 'show'   ), 'Yes', 'No' ) }}
+      <br>UHasRole('customers', 'edit'):  {{ if( UHasRole( 'customers', 'edit'   ), 'Yes', 'No' ) }}
+      <br>UHasRole('customers', 'create'):{{ if( UHasRole( 'customers', 'create' ), 'Yes', 'No' ) }}
+      <br>UHasRole('customers', 'delete'):{{ if( UHasRole( 'customers', 'delete' ), 'Yes', 'No' ) }}
+      <br>UHasRole('customers', 'xxx'):   {{ if( UHasRole( 'customers', 'xxx'    ), 'Yes', 'No' ) }}
+      
+      <br>UHasRole('sales'):              {{ if( UHasRole( 'sales'               ), 'Yes', 'No' ) }}
+      <br>UHasRole('purchases'):          {{ if( UHasRole( 'purchases'           ), 'Yes', 'No' ) }}
+      
+      <br>UHasRole('dummy'):              {{ if( UHasRole( 'dummy'               ), 'Yes', 'No' ) }}
+
+
+{{ _d( 'Epppp' ) }}
+{{ _d( UGetRoles() ) }}
+
+   </main>   
+
+	
+</body>
+
+</html>   

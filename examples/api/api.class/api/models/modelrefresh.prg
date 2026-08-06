@@ -1,11 +1,11 @@
 /*-----------------------------------------------------------
-  File ......: modeltoken.prg
+  File ......: modelrefresh.prg
   Author.....: Charly 9000
   Created....: 2026-07-23
-  Modified...: 2026-07-24
+  Modified...: 2026-07-23
   Version....: 2.0.0
   Description: Refresh token store -- backed by HIX_DataPool
-               ("token" pool). No STATIC variables; no HRB
+               ("refresh" pool). No STATIC variables; no HRB
                isolation concerns. Safe to #include from any
                controller.
 
@@ -16,66 +16,66 @@
                the caller must respond 401 and force re-login.
 
                Cleanup: expired entries are pruned on every
-               ModelTokenIssue call (no background worker).
+               ModelRefreshIssue call (no background worker).
 
-               TTL: UMwConfig( "token", "ttl_days", 1 )
-  Usage      : ModelTokenInit()   -- call once at startup
-               hIssued  := ModelTokenIssue( cUserId, cIp )
-               hRotated := ModelTokenRotate( cToken, cIp )
-               ModelTokenRevoke( cToken )
+               TTL: UMwConfig( "refresh", "ttl_days", 1 )
+  Usage      : ModelRefreshInit()   -- call once at startup
+               hIssued  := ModelRefreshIssue( cUserId, cIp )
+               hRotated := ModelRefreshRotate( cToken, cIp )
+               ModelRefreshRevoke( cToken )
  -----------------------------------------------------------*/
 
-#define POOL_TOKEN "token"
+#define POOL_REFRESH "refresh"
 
 
 // ============================================================
-// ModelTokenInit -- create the pool at startup (single thread).
+// ModelRefreshInit -- create the pool at startup (single thread).
 // Call from UserInit() before any worker starts.
 // ============================================================
-FUNCTION ModelTokenInit()
-   HIX_PoolCreate( POOL_TOKEN )
+FUNCTION ModelRefreshInit()
+   HIX_PoolCreate( POOL_REFRESH )
 RETURN NIL
 
 
 // ============================================================
-// ModelTokenIssue -- mint a new refresh token.
+// ModelRefreshIssue -- mint a new refresh token.
 // Returns { token, exp } -- the only moment the plaintext is
 // visible; the caller must return it to the client.
 // ============================================================
-FUNCTION ModelTokenIssue( cUserId, cIp, cRotatedFrom )
+FUNCTION ModelRefreshIssue( cUserId, cIp, cRotatedFrom )
 
    LOCAL cToken, nExp, nTtlDays
 
    hb_default( @cIp,          "" )
    hb_default( @cRotatedFrom, "" )
 
-   nTtlDays := UMwConfig( "token", "ttl_days", 1 )
+   nTtlDays := UMwConfig( "refresh", "ttl_days", 1 )
    IF ! HB_ISNUMERIC( nTtlDays ) .OR. nTtlDays <= 0
       nTtlDays := 1
    ENDIF
    nExp   := Int( hb_TToSec( hb_DateTime() ) ) + ( nTtlDays * 86400 )
-   cToken := _TokenRandomToken()
+   cToken := _RefreshRandomToken()
 
-   HIX_PoolLock( POOL_TOKEN )
-   _TokenPurge()
-   HIX_PoolSetRaw( POOL_TOKEN, cToken, { ;
+   HIX_PoolLock( POOL_REFRESH )
+   _RefreshPurge()
+   HIX_PoolSetRaw( POOL_REFRESH, cToken, { ;
       "user_id"  => cUserId,      ;
       "exp"      => nExp,         ;
       "revoked"  => .F.,          ;
       "rot_from" => cRotatedFrom  ;
    } )
-   HIX_PoolUnlock( POOL_TOKEN )
+   HIX_PoolUnlock( POOL_REFRESH )
 
 RETURN { "token" => cToken, "exp" => nExp }
 
 
 // ============================================================
-// ModelTokenRotate -- validate + revoke old, issue new.
+// ModelRefreshRotate -- validate + revoke old, issue new.
 // Returns { user_id, token, exp } or NIL on any failure.
 // On reuse of a revoked token the whole forward chain is
 // revoked -- caller must respond 401 and force re-login.
 // ============================================================
-FUNCTION ModelTokenRotate( cToken, cIp )
+FUNCTION ModelRefreshRotate( cToken, cIp )
 
    LOCAL hEntry, cUserId, hIssued, nNow
 
@@ -87,44 +87,44 @@ FUNCTION ModelTokenRotate( cToken, cIp )
 
    nNow := Int( hb_TToSec( hb_DateTime() ) )
 
-   HIX_PoolLock( POOL_TOKEN )
+   HIX_PoolLock( POOL_REFRESH )
 
-   IF ! HIX_PoolHasRaw( POOL_TOKEN, cToken )
-      HIX_PoolUnlock( POOL_TOKEN )
+   IF ! HIX_PoolHasRaw( POOL_REFRESH, cToken )
+      HIX_PoolUnlock( POOL_REFRESH )
       RETURN NIL
    ENDIF
 
-   hEntry := HIX_PoolGetRaw( POOL_TOKEN, cToken, NIL )
+   hEntry := HIX_PoolGetRaw( POOL_REFRESH, cToken, NIL )
 
    IF hEntry[ "revoked" ]
-      _TokenRevokeChain( cToken )
-      HIX_PoolUnlock( POOL_TOKEN )
+      _RefreshRevokeChain( cToken )
+      HIX_PoolUnlock( POOL_REFRESH )
       RETURN NIL
    ENDIF
 
    IF hEntry[ "exp" ] < nNow
-      HIX_PoolDelRaw( POOL_TOKEN, cToken )
-      HIX_PoolUnlock( POOL_TOKEN )
+      HIX_PoolDelRaw( POOL_REFRESH, cToken )
+      HIX_PoolUnlock( POOL_REFRESH )
       RETURN NIL
    ENDIF
 
    cUserId             := hEntry[ "user_id" ]
    hEntry[ "revoked" ] := .T.
-   HIX_PoolSetRaw( POOL_TOKEN, cToken, hEntry )
+   HIX_PoolSetRaw( POOL_REFRESH, cToken, hEntry )
 
-   HIX_PoolUnlock( POOL_TOKEN )
+   HIX_PoolUnlock( POOL_REFRESH )
 
-   hIssued              := ModelTokenIssue( cUserId, cIp, cToken )
+   hIssued              := ModelRefreshIssue( cUserId, cIp, cToken )
    hIssued[ "user_id" ] := cUserId
 
 RETURN hIssued
 
 
 // ============================================================
-// ModelTokenRevoke -- mark a token as revoked (logout).
+// ModelRefreshRevoke -- mark a token as revoked (logout).
 // Silent success if token not found.
 // ============================================================
-FUNCTION ModelTokenRevoke( cToken )
+FUNCTION ModelRefreshRevoke( cToken )
 
    LOCAL hEntry
 
@@ -132,50 +132,50 @@ FUNCTION ModelTokenRevoke( cToken )
       RETURN .F.
    ENDIF
 
-   HIX_PoolLock( POOL_TOKEN )
+   HIX_PoolLock( POOL_REFRESH )
 
-   IF HIX_PoolHasRaw( POOL_TOKEN, cToken )
-      hEntry              := HIX_PoolGetRaw( POOL_TOKEN, cToken, NIL )
+   IF HIX_PoolHasRaw( POOL_REFRESH, cToken )
+      hEntry              := HIX_PoolGetRaw( POOL_REFRESH, cToken, NIL )
       hEntry[ "revoked" ] := .T.
-      HIX_PoolSetRaw( POOL_TOKEN, cToken, hEntry )
+      HIX_PoolSetRaw( POOL_REFRESH, cToken, hEntry )
    ENDIF
 
-   HIX_PoolUnlock( POOL_TOKEN )
+   HIX_PoolUnlock( POOL_REFRESH )
 
 RETURN .T.
 
 
 // ---- private helpers (called under pool lock) ----
 
-STATIC PROCEDURE _TokenPurge()
+STATIC PROCEDURE _RefreshPurge()
 
    LOCAL aKeys, nNow, i, hEntry
 
    nNow  := Int( hb_TToSec( hb_DateTime() ) )
-   aKeys := HIX_PoolKeysRaw( POOL_TOKEN )
+   aKeys := HIX_PoolKeysRaw( POOL_REFRESH )
 
    FOR i := 1 TO Len( aKeys )
-      hEntry := HIX_PoolGetRaw( POOL_TOKEN, aKeys[ i ], NIL )
+      hEntry := HIX_PoolGetRaw( POOL_REFRESH, aKeys[ i ], NIL )
       IF HB_ISHASH( hEntry ) .AND. hEntry[ "exp" ] < nNow
-         HIX_PoolDelRaw( POOL_TOKEN, aKeys[ i ] )
+         HIX_PoolDelRaw( POOL_REFRESH, aKeys[ i ] )
       ENDIF
    NEXT
 
 RETURN
 
 
-STATIC PROCEDURE _TokenRevokeChain( cRoot )
+STATIC PROCEDURE _RefreshRevokeChain( cRoot )
 
    LOCAL aKeys, i, hEntry
 
-   aKeys := HIX_PoolKeysRaw( POOL_TOKEN )
+   aKeys := HIX_PoolKeysRaw( POOL_REFRESH )
 
    FOR i := 1 TO Len( aKeys )
-      hEntry := HIX_PoolGetRaw( POOL_TOKEN, aKeys[ i ], NIL )
+      hEntry := HIX_PoolGetRaw( POOL_REFRESH, aKeys[ i ], NIL )
       IF HB_ISHASH( hEntry )
          IF aKeys[ i ] == cRoot .OR. hEntry[ "rot_from" ] == cRoot
             hEntry[ "revoked" ]    := .T.
-            HIX_PoolSetRaw( POOL_TOKEN, aKeys[ i ], hEntry )
+            HIX_PoolSetRaw( POOL_REFRESH, aKeys[ i ], hEntry )
          ENDIF
       ENDIF
    NEXT
@@ -183,7 +183,7 @@ STATIC PROCEDURE _TokenRevokeChain( cRoot )
 RETURN
 
 
-STATIC FUNCTION _TokenRandomToken()
+STATIC FUNCTION _RefreshRandomToken()
 
    LOCAL cChars := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
    LOCAL cToken := ""

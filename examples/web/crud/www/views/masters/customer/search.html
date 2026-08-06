@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	@view 'common/header.html' 
+
+</head>
+
+<style>
+
+
+   a { color: black; }
+   
+	main {
+		margin-top: 70px;
+	}	
+
+	.centered-content {
+		display: grid;
+		place-items: center; /* Centra horizontal y verticalmente */
+	}	
+	
+	#card-custom {
+		max-width: 450px;
+		width: 100%;
+		border-radius: 15px;
+		box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+	}
+   
+   .card-header {
+      border-bottom: 1px solid black;
+      background-color: #c4c4c4;
+      color: black;
+   }
+   
+   .card {
+      box-shadow: 5px 5px 5px gray !important;   
+   } 
+
+   .mybox {
+      box-shadow: 5px 5px 5px gray;
+      background-color: #dedede;      
+   }
+
+   .w-100px {
+       width: 200px !important;
+   }
+
+   .card-search {
+   
+      max-width:400px;
+   
+   }
+
+   
+	
+</style>
+
+<body>
+
+	<!-- Navbar -->	
+	
+	@view 'common/navbar.html'
+
+
+	<!-- Offcanvas Sidebar -->	
+	
+	@view 'common/sidebar.html', 'customer'
+
+
+   <main class="container-fluid">
+		<!-- Breadcrumb... -->
+	
+		<div class="row w-100 mt-5">
+			<nav  aria-label="breadcrumb">
+			  <ol class="breadcrumb fs-5">
+				<li class="breadcrumb-item"><a href="/main"><i class="bi bi-house-door-fill"></i></a></li>
+				<li class="breadcrumb-item"><a href="/customer/search">Customers</a></li>				
+			  </ol>
+			</nav>	
+		</div>	
+      
+      <div class="row justify-content-center">
+           <div class="col-auto">
+               
+               <div class="card card_search" >
+               
+                  <div class="card-header">
+                     <h4 class="m-0 fw-bold ">
+                        <i class="bi bi-person"></i>&nbsp;Customer				            
+                     </h4>               
+                  </div>               
+                  
+                  <div class="card-body">
+                     <form id="codigoForm" action="/customer" method="GET">                   
+                        <div class="mb-4">
+                           <label for="inputCodigo" class="form-label text-muted">Id. Code</label>
+                           <input type="text" 
+                                 class="form-control form-control-lg text-center" 
+                                 id="customer" 
+                                 placeholder="Ej: 123" 
+                                 pattern="\d{1,5}" 
+                                 maxlength="5" 
+                                 oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
+                                 title="Code, max 5 dígits" 
+                                 required>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                           <button type="submit" class="btn btn-outline-secondary btn-lg">
+                              <i class="bi bi-search"></i> Search
+                           </button>
+                        </div>
+                     </form>                                          
+                   </div>
+                   
+                   
+                  @if UHasRole( 'customers', 'create' )                     
+                     
+                     <div class="card-footer">
+
+                       <a href="{{ URoute( 'customer.create') }}"  class="d-flex justify-content-end small">
+                         Create customer
+                       </a>                                                        
+                        
+                     </div>                     
+                     
+                  @endif
+                  
+               </div>
+           </div>
+       </div>
+   </main>   
+	
+	
+	
+	<script>
+		document.getElementById('codigoForm').addEventListener('submit', function(e) {
+		
+			e.preventDefault();
+			
+			const id = document.getElementById('customer').value;
+
+			if (id) {
+				this.action = '/customer/' + id ;          
+				this.submit(); 
+			}
+		});
+	</script>	
+	
+</body>
+
+</html>

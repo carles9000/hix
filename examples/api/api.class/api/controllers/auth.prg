@@ -72,7 +72,7 @@ METHOD Login() CLASS AuthController
    nExp    := UMwConfig( "jwt", "exp", 900 )
    cAccess := HIX_JwtEncode( hAuth, HIX_KeyGet( "jwt" ), nExp )
 
-   hIssued := ModelTokenIssue( hAuth[ "sub" ], UIP() )
+   hIssued := ModelRefreshIssue( hAuth[ "sub" ], UIP() )
 
    USendApi( { ;
       "access_token"  => cAccess, ;
@@ -103,7 +103,7 @@ METHOD Refresh() CLASS AuthController
       RETURN NIL
    ENDIF
 
-   hRotated := ModelTokenRotate( oVal:Get( "refresh_token" ), UIP() )
+   hRotated := ModelRefreshRotate( oVal:Get( "refresh_token" ), UIP() )
 
    IF hRotated == NIL
       USendApiError( "AUTH_REFRESH_INVALID", ;
@@ -156,7 +156,7 @@ METHOD Logout() CLASS AuthController
       RETURN NIL
    ENDIF
 
-   ModelTokenRevoke( oVal:Get( "refresh_token" ) )
+   ModelRefreshRevoke( oVal:Get( "refresh_token" ) )
 
    hUser := UWho()
 
@@ -170,4 +170,4 @@ RETURN NIL
 
 
 #include '/models/modeluser.prg'
-#include '/models/modeltoken.prg'
+#include '/models/modelrefresh.prg'

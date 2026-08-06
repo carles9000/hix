@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	@view 'common/header.html'     
+ 
+   @css 'crud.css'   
+   
+</head>
+
+<body>
+
+	<!-- Navbar -->	
+	
+	@view 'common/navbar.html'
+
+
+	<!-- Offcanvas Sidebar -->	
+	
+	@view 'common/sidebar.html', 'module_c' 
+   
+   <main class="container-fluid" >  
+   
+      @view 'masters/example.html', 'Module C', 'Example show module', '<i class="bi bi-globe2"></i>'
+
+   </main>   
+	
+</body>
+
+</html>     
+   
+   

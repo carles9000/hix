@@ -1,0 +1,49 @@
+-n
+-w1
+-es2
+-inc
+-head=full
+-mt
+-ic:\hix.project\hix.pro\src\include
+-workdir=.hbmk/${hb_compiler}
+
+-hbexe
+-oapp
+
+# Main
+src/app.prg
+src/appconfig.prg
+src/appmiddleware.prg
+
+
+# Resources file
+app.res
+
+
+# Libs
+-lhix_server
+
+${hix}\hix_server.hbx
+c:\harbour\include\harbour.hbx
+
+# OpensSSL
+-lhbssl
+-lhbssls
+-llibcrypto-3-x64
+-llibssl-3-x64 
+
+
+# Curl
+hbcurl.hbc
+
+# PDF
+hbhpdf.hbc
+
+# WAPI_OutputDebugString()
+-lhbwin
+-lxhb
+-lhbct
+
+-ldflag=/NODEFAULTLIB:libucrt
+-ldflag=/NODEFAULTLIB:msvcrt
+-lucrt

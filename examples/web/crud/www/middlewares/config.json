@@ -1,0 +1,30 @@
+{
+  "load": [
+    "myappauth.prg",
+    "myappauthrole.prg",
+    "myappauthedit.prg",
+    "myapplogin.prg"
+  ],
+  "setup": {
+    "auth": {
+      "session_user_key": "_auth_user",
+      "roles_key":        "roles",
+      "redirect_login":   "/login",
+      "redirect_accept":  "/main"
+    },
+    "session": {
+      "cookie":   "FENIXSID",
+      "ttl":      3600,
+      "max":      100,
+      "storage":  "memory"
+    },
+    "csrf": {
+      "redirect": "/login",
+      "ttl":      3600
+    },
+    "ratelimit": {
+      "ip_per_min": 300,
+      "window_s":   60
+    }
+  }
+}

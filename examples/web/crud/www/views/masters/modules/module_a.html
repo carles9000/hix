@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+
+	@view 'common/header.html'     
+ 
+   @css 'crud.css'   
+   @js 'hi.js'     
+   
+</head>
+
+<body>
+
+	<!-- Navbar -->	
+	
+	@view 'common/navbar.html'
+
+
+	<!-- Offcanvas Sidebar -->	
+	
+	@view 'common/sidebar.html', 'module_a' 
+   
+   <main class="container-fluid" >  
+   
+      @view 'masters/example.html', 'Module A', 'Example show module', '<i class="bi bi-globe2"></i>'
+
+   </main>   
+
+   <script>
+      hi()
+   </script>
+	
+</body>
+
+</html>     
+   
+   

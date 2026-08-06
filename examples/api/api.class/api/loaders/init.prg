@@ -12,21 +12,35 @@
  -----------------------------------------------------------*/
 
 
-FUNCTION UserInit()
+FUNCTION UserInit()   
 
-   _d( 'Ep!!!' )
-   _d(  HIX_BootLog() )
+   _t( 'My init process...' )   
+   _t( HIX_BootLog() )           // Check DbgView
 
-   ModelTokenInit()
+    
+   // ModelRefreshInit -- create the token pool at startup (single thread).
 
+      ModelRefreshInit()
+   
+   /*
+      We are creating a web service and basing the responses on JSON.
+      With this configuration, we force the server to send a JSON response 
+      instead of an HTML error if it should respond with a 404 or 405 error.
+
+      In the case of a 404 error, if the main path is '/', we will simply 
+      display an "OK" message in JSON.         
+   */      
+   
    HIX_RouteSetHandler( "405", {| oReq, cAllowed | ;
       USendJson( { "error" => "method_not_allowed", "allow" => cAllowed }, 405 ) } )
-
+   
    HIX_RouteSetHandler( "404", {| oReq | ;
-      USendJson( { "error" => "not_found", "path" => oReq:cPath }, 404 ) } )
+      iif( oReq:cPath == "/", ;
+           USendJson( { "name" => 'HIX ' + HIX_Version(), "status" => "ok", "now" => dtoc(date()) + ' ' + time() }, 200 ), ;
+           USendJson( { "error" => "not_found", "path" => oReq:cPath }, 404 ) ) }  )
 
 RETURN NIL
 
 
 #include '/models/modeluser.prg'
-#include '/models/modeltoken.prg'
+#include '/models/modelrefresh.prg'

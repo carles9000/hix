@@ -15,7 +15,7 @@ if not exist "app.res" (
 )
 
 
-@echo Compiling Fenix.WS.Function !
+@echo Compiling Webservice !
 hbmk2 app.hbp -comp=msvc64
 
 if errorlevel 1 goto error

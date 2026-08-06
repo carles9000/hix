@@ -1,0 +1,36 @@
+a { color: black; }
+
+main {
+	margin-top: 70px;
+}	
+
+.centered-content {
+	display: grid;
+	place-items: center; /* Centra horizontal y verticalmente */
+}	
+
+#card-custom {
+	max-width: 450px;
+	width: 100%;
+	border-radius: 15px;
+	box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.card-header {
+   border-bottom: 1px solid black;
+   background-color: #c4c4c4;
+   color: black;
+}
+
+.card {
+   box-shadow: 5px 5px 5px gray !important;   
+} 
+
+.mybox {
+   box-shadow: 5px 5px 5px gray;
+   background-color: #dedede;      
+}
+
+.w-100px {
+    width: 200px !important;
+}	

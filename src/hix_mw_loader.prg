@@ -240,7 +240,7 @@ RETURN NIL
 // ============================================================
 STATIC FUNCTION _MwApplyCsrf( hSetup )
 
-   LOCAL hCsrf, cRedirect
+   LOCAL hCsrf, cRedirect, nTtl
 
    hCsrf := _MwHGet( hSetup, "csrf", NIL )
 
@@ -251,8 +251,10 @@ STATIC FUNCTION _MwApplyCsrf( hSetup )
    ENDIF
 
    cRedirect := _MwHGet( hCsrf, "redirect", "" )
-   HIX_MwCsrfSetup( cRedirect )
-   HIX_BootLogAdd( "middlewares", "config", .T., "csrf: redirect=" + cRedirect )
+   nTtl      := _MwHGet( hCsrf, "ttl",       0 )
+   HIX_MwCsrfSetup( cRedirect, NIL, NIL, NIL, nTtl )
+   HIX_BootLogAdd( "middlewares", "config", .T., ;
+      "csrf: redirect=" + cRedirect + " ttl=" + hb_NToS( nTtl ) )
 
 RETURN NIL
 

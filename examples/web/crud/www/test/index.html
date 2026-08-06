@@ -1,0 +1,445 @@
+<!-- -----------------------------------------------------------
+  File ......: index.html
+  Author.....: Claude Code
+  Supervisor.: Carles Aubia Floresvi (Charly 9000)
+  Created....: 2026-08-05
+  Modified...: 2026-08-05
+  Version....: 1.0.0
+  Description: CRUD Web App — interactive test suite.
+               Runs sequential tests against the CRUD server
+               covering public pages, session-based auth (login
+               + CSRF), role-scoped access and logout.
+  Usage      : IMPORTANT — must be served from the same origin
+               as the CRUD app so session cookies and CSRF work.
+               The simplest way is to copy this folder to
+                 www/public/test/
+               and open http://localhost/public/test/index.html
+               in a browser while the CRUD server is running.
+               (Opening this file via file:// will fail: browsers
+               block cross-origin cookies and CORS is not enabled
+               on the CRUD app.)
+------------------------------------------------------------ -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>CRUD Web App — Test Suite</title>
+<style>
+
+  /* --- Layout --- */
+  body {
+    font-family: monospace;
+    max-width: 980px;
+    margin: 30px auto;
+    color: #222;
+  }
+  h1  { color: #1a1a1a; margin-bottom: 2px; }
+  p.sub { color: #555; margin-top: 0; }
+
+  /* --- Offline / checking banners --- */
+  #checking { display: block; margin-top: 60px; text-align: center; color: #555; font-size: 1.1em; }
+  #offline  { display: none;  margin-top: 60px; text-align: center; color: #b71c1c; font-size: 1.15em; }
+
+  /* --- Table --- */
+  table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+  th    { background: #1a237e; color: #fff; padding: 8px 12px; text-align: left; }
+  td    { border: 1px solid #ccc; padding: 6px 10px; vertical-align: middle; }
+  tr:nth-child(even) td { background: #f4f8ff; }
+  tr.grp td {
+    background: #e8eaf6;
+    font-weight: bold;
+    color: #1a237e;
+    padding: 5px 10px;
+    font-size: .9em;
+    letter-spacing: .04em;
+  }
+
+  /* --- HTTP method badges --- */
+  .m {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 3px;
+    color: #fff;
+    font-weight: bold;
+    font-size: .82em;
+    min-width: 52px;
+    text-align: center;
+  }
+  .get    { background: #2e7d32; }
+  .post   { background: #1565c0; }
+
+  /* --- Status code colours --- */
+  .e200 { color: #2e7d32; font-weight: bold; }
+  .e302 { color: #6a1b9a; font-weight: bold; }
+  .e4xx { color: #e65100; font-weight: bold; }
+
+  /* --- Run buttons --- */
+  .tb  { cursor: pointer; padding: 3px 14px; border: 1px solid #aaa; border-radius: 3px; background: #f5f5f5; font-size: .85em; }
+  .tok { background: #e8f5e9; border-color: #4caf50; color: #2e7d32; font-weight: bold; cursor: pointer; }
+  .tko { background: #ffebee; border-color: #ef5350; color: #c62828; font-weight: bold; cursor: pointer; }
+
+  /* --- Toolbar buttons --- */
+  .run-all {
+    padding: 8px 20px;
+    background: #1a237e;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: .95em;
+  }
+  .run-all:hover { background: #0d1257; }
+  .reset {
+    padding: 8px 20px;
+    background: #fff;
+    color: #555;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: .95em;
+    margin-left: 8px;
+  }
+  #summary { display: inline-block; margin-left: 16px; vertical-align: middle; font-size: .95em; }
+  .sok { color: #2e7d32; }
+  .sko { color: #c62828; }
+  .stm { color: #555;    }
+
+  /* --- Response popup --- */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.55);
+    z-index: 100;
+  }
+  .popup {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    background: #fff;
+    border-radius: 6px;
+    padding: 28px 32px;
+    max-width: 720px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 101;
+    box-shadow: 0 8px 32px rgba(0,0,0,.3);
+  }
+  .popup h2  { margin-top: 0; color: #1a237e; }
+  .popup pre { background: #f5f5f5; border: 1px solid #ccc; padding: 12px; overflow-x: auto; font-size: .82em; white-space: pre-wrap; }
+  .close       { float: right; font-size: 1.4em; cursor: pointer; color: #888; margin-top: -8px; margin-right: -8px; }
+  .close:hover { color: #333; }
+
+</style>
+</head>
+<body>
+
+  <!-- Startup check banner -->
+  <div id="checking">
+    <span id="checking-dot">&#9679;</span> Checking server at <b id="target">…</b>&hellip;
+  </div>
+
+  <!-- Server offline banner -->
+  <div id="offline">
+    &#9888; CRUD server not reachable at <b id="target-off">…</b>.<br>
+    <span style="color:#555;font-size:.9em">
+      Start the server (<code>go.bat</code> in <code>examples/web/crud/</code>) and reload this page.<br>
+      Remember: this page must be served from the same origin as the CRUD app
+      (copy to <code>www/public/test/</code> and open <code>http://localhost/public/test/index.html</code>).
+    </span>
+  </div>
+
+  <!-- Main UI -->
+  <div id="ui" style="display:none">
+
+    <h1>CRUD Web App &mdash; Test Suite</h1>
+    <p class="sub">Targeting <b id="api-label">…</b> &mdash; Run All executes all tests in sequence.</p>
+    <p class="sub" style="font-size:.82em;color:#1a237e;background:#e8eaf6;border-left:3px solid #1a237e;padding:6px 10px;margin:6px 0">
+      <b>Session &amp; CSRF:</b> tests use <code>credentials:'include'</code> so session cookies (<code>FENIXSID</code>) flow.
+      The auth flow reads the CSRF token from <code>GET /login</code> before submitting <code>POST /auth</code>.
+      A single "Reset" clears local state and destroys the server session via <code>GET /logout</code>.
+    </p>
+
+    <button class="run-all" onclick="runAll()">&#9654;&#9654; Run All</button>
+    <button class="reset"   onclick="resetAll()">&#8635; Reset</button>
+    <span id="summary"></span>
+
+    <table>
+      <tr>
+        <th>#</th><th>Test</th><th>Method</th><th>URL</th><th>Expect</th><th>Run</th>
+      </tr>
+
+      <!-- Public -->
+      <tr class="grp"><td colspan="6">Public (no session)</td></tr>
+      <tr><td>01</td><td>Index page</td>                              <td><span class="m get">GET</span></td> <td><small>/</small></td>                <td><span class="e200">200</span></td><td><button class="tb" data-id="01" onclick="runTest('01',this)">&#9654;</button></td></tr>
+      <tr><td>02</td><td>Login form (returns HTML + CSRF)</td>        <td><span class="m get">GET</span></td> <td><small>/login</small></td>           <td><span class="e200">200</span></td><td><button class="tb" data-id="02" onclick="runTest('02',this)">&#9654;</button></td></tr>
+
+      <!-- Protected — no session → redirect to /login -->
+      <tr class="grp"><td colspan="6">Protected without session (expect 302 → /login)</td></tr>
+      <tr><td>03</td><td>/main (no session)</td>                      <td><span class="m get">GET</span></td> <td><small>/main</small></td>            <td><span class="e302">302</span></td><td><button class="tb" data-id="03" onclick="runTest('03',this)">&#9654;</button></td></tr>
+      <tr><td>04</td><td>/module_a (no session)</td>                  <td><span class="m get">GET</span></td> <td><small>/module_a</small></td>        <td><span class="e302">302</span></td><td><button class="tb" data-id="04" onclick="runTest('04',this)">&#9654;</button></td></tr>
+      <tr><td>05</td><td>/customer/search (no session)</td>           <td><span class="m get">GET</span></td> <td><small>/customer/search</small></td> <td><span class="e302">302</span></td><td><button class="tb" data-id="05" onclick="runTest('05',this)">&#9654;</button></td></tr>
+      <tr><td>06</td><td>/customer/1 (no session)</td>                <td><span class="m get">GET</span></td> <td><small>/customer/1</small></td>      <td><span class="e302">302</span></td><td><button class="tb" data-id="06" onclick="runTest('06',this)">&#9654;</button></td></tr>
+
+      <!-- Auth as demo (full admin) -->
+      <tr class="grp"><td colspan="6">Auth as demo (admin — all customers ops)</td></tr>
+      <tr><td>07</td><td>POST /auth WITHOUT csrf (fail)</td>          <td><span class="m post">POST</span></td><td><small>/auth</small></td>           <td><span class="e302">302</span></td><td><button class="tb" data-id="07" onclick="runTest('07',this)">&#9654;</button></td></tr>
+      <tr><td>08</td><td>Fetch CSRF + POST /auth demo/1234</td>       <td><span class="m post">POST</span></td><td><small>/auth</small></td>           <td><span class="e302">302</span></td><td><button class="tb" data-id="08" onclick="runTest('08',this)">&#9654;</button></td></tr>
+      <tr><td>09</td><td>GET /main (with session)</td>                <td><span class="m get">GET</span></td> <td><small>/main</small></td>            <td><span class="e200">200</span></td><td><button class="tb" data-id="09" onclick="runTest('09',this)">&#9654;</button></td></tr>
+      <tr><td>10</td><td>GET /module_a (with session)</td>            <td><span class="m get">GET</span></td> <td><small>/module_a</small></td>        <td><span class="e200">200</span></td><td><button class="tb" data-id="10" onclick="runTest('10',this)">&#9654;</button></td></tr>
+      <tr><td>11</td><td>GET /module_b (with session)</td>            <td><span class="m get">GET</span></td> <td><small>/module_b</small></td>        <td><span class="e200">200</span></td><td><button class="tb" data-id="11" onclick="runTest('11',this)">&#9654;</button></td></tr>
+      <tr><td>12</td><td>GET /customer/search (demo: search ok)</td>  <td><span class="m get">GET</span></td> <td><small>/customer/search</small></td> <td><span class="e200">200</span></td><td><button class="tb" data-id="12" onclick="runTest('12',this)">&#9654;</button></td></tr>
+      <tr><td>13</td><td>GET /customer/create (demo: create ok)</td>  <td><span class="m get">GET</span></td> <td><small>/customer/create</small></td> <td><span class="e200">200</span></td><td><button class="tb" data-id="13" onclick="runTest('13',this)">&#9654;</button></td></tr>
+      <tr><td>14</td><td>GET /customer/1 (demo: show ok)</td>         <td><span class="m get">GET</span></td> <td><small>/customer/1</small></td>      <td><span class="e200">200</span></td><td><button class="tb" data-id="14" onclick="runTest('14',this)">&#9654;</button></td></tr>
+      <tr><td>15</td><td>GET /customer/1/edit (demo: edit ok)</td>    <td><span class="m get">GET</span></td> <td><small>/customer/1/edit</small></td> <td><span class="e200">200</span></td><td><button class="tb" data-id="15" onclick="runTest('15',this)">&#9654;</button></td></tr>
+
+      <!-- CSRF-protected write (as demo, still authenticated) -->
+      <tr class="grp"><td colspan="6">CSRF-protected write endpoint (as demo)</td></tr>
+      <tr><td>15b</td><td>POST /customer/store WITHOUT csrf (CsrfCheck fails)</td><td><span class="m post">POST</span></td><td><small>/customer/store</small></td><td><span class="e302">302</span></td><td><button class="tb" data-id="15b" onclick="runTest('15b',this)">&#9654;</button></td></tr>
+
+      <!-- Logout -->
+      <tr class="grp"><td colspan="6">Logout</td></tr>
+      <tr><td>16</td><td>GET /logout (destroys session)</td>          <td><span class="m get">GET</span></td> <td><small>/logout</small></td>          <td><span class="e302">302</span></td><td><button class="tb" data-id="16" onclick="runTest('16',this)">&#9654;</button></td></tr>
+      <tr><td>17</td><td>GET /main after logout (expect 302)</td>     <td><span class="m get">GET</span></td> <td><small>/main</small></td>            <td><span class="e302">302</span></td><td><button class="tb" data-id="17" onclick="runTest('17',this)">&#9654;</button></td></tr>
+
+      <!-- Auth as carles (restricted: customers = search;show only) -->
+      <tr class="grp"><td colspan="6">Auth as carles (restricted — customers: search;show)</td></tr>
+      <tr><td>18</td><td>Fetch CSRF + POST /auth carles/1234</td>     <td><span class="m post">POST</span></td><td><small>/auth</small></td>           <td><span class="e302">302</span></td><td><button class="tb" data-id="18" onclick="runTest('18',this)">&#9654;</button></td></tr>
+      <tr><td>19</td><td>GET /customer/search (carles: search ok)</td><td><span class="m get">GET</span></td> <td><small>/customer/search</small></td> <td><span class="e200">200</span></td><td><button class="tb" data-id="19" onclick="runTest('19',this)">&#9654;</button></td></tr>
+      <tr><td>20</td><td>GET /customer/1 (carles: show ok)</td>       <td><span class="m get">GET</span></td> <td><small>/customer/1</small></td>      <td><span class="e200">200</span></td><td><button class="tb" data-id="20" onclick="runTest('20',this)">&#9654;</button></td></tr>
+      <tr><td>21</td><td>GET /customer/create (carles: no create)</td><td><span class="m get">GET</span></td> <td><small>/customer/create</small></td> <td><span class="e4xx">403</span></td><td><button class="tb" data-id="21" onclick="runTest('21',this)">&#9654;</button></td></tr>
+      <tr><td>22</td><td>GET /customer/1/edit (carles: no edit)</td>  <td><span class="m get">GET</span></td> <td><small>/customer/1/edit</small></td> <td><span class="e4xx">403</span></td><td><button class="tb" data-id="22" onclick="runTest('22',this)">&#9654;</button></td></tr>
+
+      <!-- Role-guarded write endpoint (as carles: HasRole rejects before CsrfCheck) -->
+      <tr><td>23</td><td>POST /customer/store as carles (HasRole rejects)</td><td><span class="m post">POST</span></td><td><small>/customer/store</small></td><td><span class="e4xx">403</span></td><td><button class="tb" data-id="23" onclick="runTest('23',this)">&#9654;</button></td></tr>
+
+      <!-- Final logout -->
+      <tr class="grp"><td colspan="6">Clean-up</td></tr>
+      <tr><td>24</td><td>GET /logout (final)</td>                     <td><span class="m get">GET</span></td> <td><small>/logout</small></td>          <td><span class="e302">302</span></td><td><button class="tb" data-id="24" onclick="runTest('24',this)">&#9654;</button></td></tr>
+
+    </table>
+  </div>
+
+  <!-- Response popup -->
+  <div class="overlay" id="ov" onclick="hide()"></div>
+  <div class="popup" id="res" style="display:none">
+    <span class="close" onclick="hide()">&#x2715;</span>
+    <h2>Server response</h2>
+    <pre id="res-body" style="max-height:420px;overflow-y:auto"></pre>
+  </div>
+
+<script>
+
+  // ── API base ────────────────────────────────────────────────
+  // If the page is served over http(s) we assume same-origin as
+  // the CRUD app; otherwise (file://) fall back to localhost:80.
+  const API = (location.protocol.startsWith('http'))
+              ? location.origin
+              : 'http://localhost';
+
+  document.getElementById('target').textContent     = API;
+  document.getElementById('target-off').textContent = API;
+  document.getElementById('api-label').textContent  = API;
+
+  let csrfToken = '';
+
+  // ── Connectivity check ─────────────────────────────────────
+  async function ping() {
+    try {
+      const ac = new AbortController();
+      setTimeout(() => ac.abort(), 3000);
+      const r = await fetch(API + '/', { signal: ac.signal, credentials: 'include' });
+      return r.ok || r.status > 0;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // ── Generic request helper ──────────────────────────────────
+  // Uses redirect:'manual' so we can detect 302 explicitly. When
+  // the browser cannot expose the real status of an opaque
+  // redirect we synthesize status=302. For setup steps that need
+  // reliable cookie propagation, pass follow=true to follow 302s.
+  async function req(url, method, body, contentType, follow) {
+    const h = {};
+    if (contentType) h['Content-Type'] = contentType;
+    try {
+      const r = await fetch(API + url, {
+        method:      method || 'GET',
+        headers:     h,
+        body:        body,
+        credentials: 'include',
+        cache:       'no-store',
+        redirect:    follow ? 'follow' : 'manual'
+      });
+      if (r.type === 'opaqueredirect') {
+        return { status: 302, body: '(opaque redirect — cannot read body)' };
+      }
+      let text = '';
+      try { text = await r.text(); } catch (_) {}
+      return { status: r.status, body: text };
+    } catch (e) {
+      return { status: 0, body: 'fetch error: ' + e.message };
+    }
+  }
+
+  // ── Extract CSRF token from /login HTML ─────────────────────
+  async function fetchCsrf() {
+    const d = await req('/login', 'GET');
+    if (d.status !== 200) return '';
+    const m = d.body.match(/name=["']_csrf["']\s+value=["']([^"']+)["']/i)
+           || d.body.match(/value=["']([^"']+)["']\s+name=["']_csrf["']/i);
+    csrfToken = m ? m[1] : '';
+    return csrfToken;
+  }
+
+  // ── Form-urlencoded body builder ────────────────────────────
+  function form(fields) {
+    return Object.entries(fields)
+      .map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v))
+      .join('&');
+  }
+
+  // ── Login helper (fetches CSRF + posts credentials) ─────────
+  async function login(user, pass) {
+    const tok = await fetchCsrf();
+    if (!tok) return { status: 0, body: 'CSRF token not found in /login' };
+    return await req('/auth', 'POST',
+      form({ _csrf: tok, username: user, password: pass }),
+      'application/x-www-form-urlencoded');
+  }
+
+  // ── Test definitions ────────────────────────────────────────
+  const TESTS = {
+
+    '01': async () => req('/', 'GET'),
+    '02': async () => req('/login', 'GET'),
+
+    '03': async () => req('/main',             'GET'),
+    '04': async () => req('/module_a',         'GET'),
+    '05': async () => req('/customer/search',  'GET'),
+    '06': async () => req('/customer/1',       'GET'),
+
+    '07': async () => req('/auth', 'POST',
+                          form({ username: 'demo', password: '1234' }),
+                          'application/x-www-form-urlencoded'),
+
+    '08': async () => login('demo', '1234'),
+
+    '09': async () => req('/main',             'GET'),
+    '10': async () => req('/module_a',         'GET'),
+    '11': async () => req('/module_b',         'GET'),
+    '12': async () => req('/customer/search',  'GET'),
+    '13': async () => req('/customer/create',  'GET'),
+    '14': async () => req('/customer/1',       'GET'),
+    '15': async () => req('/customer/1/edit',  'GET'),
+
+    // Demo is authenticated and has customers:create → HasRole passes,
+    // CsrfCheck is the one that must fail (302 to /login).
+    '15b': async () => req('/customer/store', 'POST',
+                           form({ first: 'x', last: 'y' }),
+                           'application/x-www-form-urlencoded'),
+
+    '16': async () => req('/logout', 'GET'),
+    '17': async () => req('/main',   'GET'),
+
+    '18': async () => login('carles', '1234'),
+    '19': async () => req('/customer/search',  'GET'),
+    '20': async () => req('/customer/1',       'GET'),
+    '21': async () => req('/customer/create',  'GET'),
+    '22': async () => req('/customer/1/edit',  'GET'),
+
+    // Carles lacks customers:create → HasRole rejects with 403 before
+    // CsrfCheck runs. Verifies the role guard on write endpoints.
+    '23': async () => req('/customer/store', 'POST',
+                          form({ first: 'x', last: 'y' }),
+                          'application/x-www-form-urlencoded'),
+
+    '24': async () => req('/logout', 'GET')
+
+  };
+
+  // ── Expected status codes ──────────────────────────────────
+  const EXPECT = {
+    '01': 200, '02': 200,
+    '03': 302, '04': 302, '05': 302, '06': 302,
+    '07': 302, '08': 302,
+    '09': 200, '10': 200, '11': 200, '12': 200, '13': 200, '14': 200, '15': 200,
+    '15b': 302,
+    '16': 302, '17': 302,
+    '18': 302, '19': 200, '20': 200, '21': 403, '22': 403,
+    '23': 403,
+    '24': 302
+  };
+
+  // ── Run a single test ──────────────────────────────────────
+  async function runTest(id, btn) {
+    btn.disabled    = true;
+    btn.textContent = '...';
+    const d      = await TESTS[id]();
+    const ok     = d.status === EXPECT[id];
+    btn.disabled    = false;
+    btn.textContent = (ok ? '\u2713 ' : '\u2717 ') + d.status;
+    btn.className   = ok ? 'tb tok' : 'tb tko';
+    btn.onclick     = () => showResult({ ok, http: d.status, expected: EXPECT[id], response: d.body });
+    return ok;
+  }
+
+  // ── Popup helpers ──────────────────────────────────────────
+  function showResult(d) {
+    document.getElementById('res-body').textContent = JSON.stringify(d, null, 2);
+    document.getElementById('res').style.display    = 'block';
+    document.getElementById('ov').style.display     = 'block';
+  }
+
+  function hide() {
+    document.getElementById('res').style.display = 'none';
+    document.getElementById('ov').style.display  = 'none';
+  }
+
+  // ── Reset all buttons + destroy any lingering session ──────
+  async function resetAll() {
+    csrfToken = '';
+    try { await fetch(API + '/logout', { credentials: 'include', redirect: 'manual' }); } catch (_) {}
+    document.querySelectorAll('button.tb').forEach(btn => {
+      btn.disabled    = false;
+      btn.textContent = '\u25b6';
+      btn.className   = 'tb';
+      btn.onclick     = () => runTest(btn.dataset.id, btn);
+    });
+    document.getElementById('summary').innerHTML = '';
+  }
+
+  // ── Run all tests in sequence ──────────────────────────────
+  async function runAll() {
+    await resetAll();
+    const t0   = performance.now();
+    let ok = 0, ko = 0;
+    for (const btn of document.querySelectorAll('button.tb')) {
+      const r = await runTest(btn.dataset.id, btn);
+      if (r) ok++; else ko++;
+    }
+    const ms = Math.round(performance.now() - t0);
+    document.getElementById('summary').innerHTML =
+      '<b class="sok">\u2713 ' + ok + ' ok<\/b>&nbsp;&nbsp;' +
+      '<b class="sko">\u2717 ' + ko + ' ko<\/b>&nbsp;&nbsp;' +
+      '<span class="stm">\u23f1 ' + ms + ' ms<\/span>';
+  }
+
+  // ── Boot: ping server then show UI or offline banner ───────
+  (async () => {
+    const dots  = ['&#9679;', '&#9675;', '&#9679;', '&#9675;'];
+    let di      = 0;
+    const timer = setInterval(() => {
+      document.getElementById('checking-dot').innerHTML = dots[di++ % dots.length];
+    }, 350);
+    const up = await ping();
+    clearInterval(timer);
+    document.getElementById('checking').style.display = 'none';
+    document.getElementById(up ? 'ui' : 'offline').style.display = 'block';
+  })();
+
+</script>
+</body>
+</html>

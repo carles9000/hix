@@ -1,0 +1,36 @@
+ body { 
+   font-family:sans-serif;
+   max-width:600px;
+   margin:60px auto;
+   padding:0 20px
+ }
+ 
+ table { 
+   border-collapse:collapse; 
+   width:100%
+ }
+ 
+ td,th { 
+   border:1px solid #ddd;
+   padding:8px
+ }
+ 
+ th { background:#f4f4f4 }
+ 
+.contenedor { 
+   display: flex; 
+   align-items: center; 
+   gap: 20px; 
+}
+
+.contenedor img { 
+   height: 40px; 
+   width: auto; 
+}
+ 
+.title { font-size: 30px; font-weight: bold; font-family: system-ui; }
+
+.mycontainer {
+   max-width: 500px;
+}
+

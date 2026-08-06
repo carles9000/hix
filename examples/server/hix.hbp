@@ -23,7 +23,7 @@ hix.res
 # Libs
 -lhix_server
 
-../../hix_server.hbx
+${hix}\hix_server.hbx
 c:\harbour\include\harbour.hbx
 
 # OpensSSL

@@ -4,7 +4,7 @@
 -inc
 -head=full
 -mt
--ic:\hix.pro\src\include
+-ic:\hix.project\hix.pro\src\include
 -workdir=.hbmk/${hb_compiler}
 
 -hbexe
@@ -18,9 +18,10 @@ src/apphelpers.prg
 # Resources file
 app.res
 
+# Libs
 -lhix_server
 
-..\..\..\hix_server.hbx
+${hix}\hix_server.hbx
 c:\harbour\include\harbour.hbx
 
 # OpensSSL
