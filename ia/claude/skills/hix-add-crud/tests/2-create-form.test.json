@@ -1,0 +1,12 @@
+{
+  "name": "create form for {{ENTITY_LOWER}} renders",
+  "request": {
+    "method": "GET",
+    "path": "/{{ENTITY_PLURAL_LOWER}}/create"
+  },
+  "expect": {
+    "status": 200,
+    "content_type_contains": "text/html",
+    "body_contains": [ "<form", "name=\"name\"" ]
+  }
+}

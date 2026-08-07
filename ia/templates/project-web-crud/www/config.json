@@ -1,0 +1,26 @@
+{
+  "sets":
+  {
+    "language": "EN",
+    "dateformat": "dd/mm/yy",
+    "decimals": 2,
+    "deleted": false,
+    "epoch": 1900,
+    "exact": false,
+    "exclusive": false,
+    "fixed": false,
+    "softseek": false
+  },
+  "dbf":
+  {
+    "rddname": "DBFCDX"
+  },
+  "keys":
+  {
+    "csrf":     "CHANGE-ME-CSRF",
+    "jwt":      "CHANGE-ME-JWT",
+    "session":  "CHANGE-ME-SESSION",
+    "token":    "CHANGE-ME-TOKEN",
+    "resource": "CHANGE-ME-RESOURCE"
+  }
+}

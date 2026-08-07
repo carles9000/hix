@@ -1,0 +1,10 @@
+{
+  "name": "{{ROUTE_NAME_LOWER}} rejects wrong HTTP method with 405",
+  "request": {
+    "method": "DELETE",
+    "path": "{{ROUTE_URL}}"
+  },
+  "expect": {
+    "status": 405
+  }
+}

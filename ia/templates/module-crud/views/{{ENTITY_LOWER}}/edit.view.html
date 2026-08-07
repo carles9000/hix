@@ -1,0 +1,29 @@
+@args cMode, hRow, hErrors
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ iif(cMode == "create", "New {{ENTITY_LOWER}}", "Edit {{ENTITY}} #" + hb_NToS(hRow['id'])) }}</title>
+  <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body>
+  <h1>{{ iif(cMode == "create", "New {{ENTITY_LOWER}}", "Edit {{ENTITY}} #" + hb_NToS(hRow['id'])) }}</h1>
+
+  <form method="POST" action="{{ iif(cMode == 'create', '/{{ENTITY_PLURAL_LOWER}}/store', '/{{ENTITY_PLURAL_LOWER}}/' + hb_NToS(hRow['id']) + '/update') }}">
+
+    <label>Name
+      <input name="name" value="{{ hRow['name'] }}" required>
+    </label>
+    {{ iif( hb_HHasKey(hErrors, 'name'), '<span class="err">' + hErrors['name'] + '</span>', '' ) }}
+
+    <label>Notes
+      <textarea name="notes">{{ hRow['notes'] }}</textarea>
+    </label>
+    {{ iif( hb_HHasKey(hErrors, 'notes'), '<span class="err">' + hErrors['notes'] + '</span>', '' ) }}
+
+    <button type="submit">Save</button>
+    <a href="/{{ENTITY_PLURAL_LOWER}}">Cancel</a>
+  </form>
+</body>
+</html>

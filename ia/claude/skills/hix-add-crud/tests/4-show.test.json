@@ -1,0 +1,12 @@
+{
+  "name": "show {{ENTITY_LOWER}} id 1 renders stored name",
+  "request": {
+    "method": "GET",
+    "path": "/{{ENTITY_PLURAL_LOWER}}/1"
+  },
+  "expect": {
+    "status": 200,
+    "content_type_contains": "text/html",
+    "body_contains": [ "TestItem" ]
+  }
+}

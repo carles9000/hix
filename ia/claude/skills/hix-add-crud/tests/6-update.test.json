@@ -1,0 +1,12 @@
+{
+  "name": "update {{ENTITY_LOWER}} id 1 redirects",
+  "request": {
+    "method": "POST",
+    "path": "/{{ENTITY_PLURAL_LOWER}}/1/update",
+    "headers": { "Content-Type": "application/x-www-form-urlencoded" },
+    "body": "name=Renamed&notes=updated"
+  },
+  "expect": {
+    "status": 302
+  }
+}

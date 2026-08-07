@@ -1,0 +1,10 @@
+{
+  "name": "delete {{ENTITY_LOWER}} id 1 redirects to list",
+  "request": {
+    "method": "POST",
+    "path": "/{{ENTITY_PLURAL_LOWER}}/1/delete"
+  },
+  "expect": {
+    "status": 302
+  }
+}

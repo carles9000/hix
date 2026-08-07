@@ -1,0 +1,10 @@
+{
+  "name": "root path returns some response",
+  "request": {
+    "method": "GET",
+    "path": "/"
+  },
+  "expect": {
+    "body_matches": "."
+  }
+}

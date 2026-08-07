@@ -1,0 +1,10 @@
+{
+  "name": "unknown path returns 404",
+  "request": {
+    "method": "GET",
+    "path": "/__this_route_should_not_exist__"
+  },
+  "expect": {
+    "status": 404
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "list {{ENTITY_PLURAL_LOWER}} returns 200",
+  "request": {
+    "method": "GET",
+    "path": "/{{ENTITY_PLURAL_LOWER}}"
+  },
+  "expect": {
+    "status": 200,
+    "content_type_contains": "text/html",
+    "body_contains": [ "{{ENTITY_LOWER}}" ]
+  }
+}

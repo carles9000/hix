@@ -1,0 +1,12 @@
+{
+  "name": "HixMw{{MIDDLEWARE_NAME}} denies request without X-Api-Key",
+  "request": {
+    "method": "GET",
+    "path": "{{PROBE_URL}}"
+  },
+  "expect": {
+    "status": 401,
+    "content_type_contains": "json",
+    "body_contains": [ "missing X-Api-Key" ]
+  }
+}

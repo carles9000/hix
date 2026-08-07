@@ -1,0 +1,15 @@
+{
+  "load": [],
+  "setup": {
+    "session": {
+      "cookie":  "{{PROJECT_NAME_LOWER}}_sid",
+      "ttl":     3600,
+      "max":     100,
+      "storage": "memory"
+    },
+    "ratelimit": {
+      "ip_per_min": 300,
+      "window_s":   60
+    }
+  }
+}

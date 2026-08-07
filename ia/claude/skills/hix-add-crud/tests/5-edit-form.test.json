@@ -1,0 +1,12 @@
+{
+  "name": "edit form for {{ENTITY_LOWER}} id 1 pre-fills stored data",
+  "request": {
+    "method": "GET",
+    "path": "/{{ENTITY_PLURAL_LOWER}}/1/edit"
+  },
+  "expect": {
+    "status": 200,
+    "content_type_contains": "text/html",
+    "body_contains": [ "<form", "TestItem" ]
+  }
+}
