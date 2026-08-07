@@ -3,13 +3,38 @@
 Declarative HTTP tests for HIX projects. Every skill that generates code is expected to ship one or more `*.test.json` files that prove the generated code runs against a live server.
 
 - Schema: [SCHEMA.md](./SCHEMA.md)
-- Runner: [`run.ps1`](./run.ps1)
-- Helpers: [`helpers.ps1`](./helpers.ps1)
+- Runners:
+  - [`run-live.ps1`](./run-live.ps1) — **binary-first (canon in v0.2+)**. Runs tests against an already-installed `hix.exe`. No build phase. Used by `/hix-init`, `/hix-add-crud`, `/hix-add-route`, `/hix-add-middleware`.
+  - [`run.ps1`](./run.ps1) — source-first (legacy). Compiles a project via `go.bat build`, launches its `app.exe`, then runs tests. Used only by the `/hix-scaffold-source` flow.
+- Helpers: [`helpers.ps1`](./helpers.ps1) (shared)
 - Meta-tests: [`self-test/`](./self-test/)
 
 ---
 
-## Quick start
+## Quick start (binary-first — canonical)
+
+```powershell
+# 1. Bootstrap an HIX app on top of an existing hix.exe distribution
+#    (via /hix-init or apply-template.ps1 project-www + edit hix.json)
+
+# 2. Drop *.test.json files under <hix_root>\tests\
+#    e.g. C:\hix\tests\health.test.json
+
+# 3. Run
+.\tests\run-live.ps1 -Root C:\hix -Tests C:\hix\tests
+```
+
+`run-live.ps1`:
+
+1. Reads `server.port` from `<root>\hix.json` (regex-based — the file may carry `/* ... */` comments).
+2. Checks if `hix.exe` is already listening on that port. Reuses it, or starts it in the background.
+3. Iterates every `*.test.json` file, sends the HTTP request, compares the response.
+4. If it started `hix.exe` itself, stops it at the end. If it reused a running instance, leaves it alone.
+5. Exit codes identical to `run.ps1` below.
+
+Pass `-Restart` after adding routes, loaders, or editing `hix.json` (config is read once at boot; controllers/views/models hot-reload without restart).
+
+## Quick start (source-first — legacy)
 
 ```powershell
 # 1. Scaffold a project (or use an existing one)
@@ -22,7 +47,7 @@ Declarative HTTP tests for HIX projects. Every skill that generates code is expe
 .\tests\run.ps1 -Project C:/tmp/myapp -Tests C:/tmp/myapp/tests
 ```
 
-The runner:
+`run.ps1`:
 
 1. Runs `go.bat` (or `-BuildScript <name>`).
 2. Picks a free TCP port on the loopback interface.

@@ -25,7 +25,7 @@ Required:
   - Rejects: names with spaces, non-ASCII characters, or starting with a digit.
 
 Optional:
-- `project` — absolute path to the target HIX project. Default: the user's current working directory.
+- `project` — absolute path to the HIX distribution (the folder that contains `hix.exe`). Default: the user's current working directory. Common value: `C:\hix`.
 - `author` — override for `{{AUTHOR}}`. Default: `git config user.name` → `Developer`.
 
 If `entity` is missing, ask the user before proceeding.
@@ -34,10 +34,10 @@ If `entity` is missing, ask the user before proceeding.
 
 1. Resolve `IA_ROOT`. Verify `IA_ROOT/templates/module-crud/` exists.
 2. Resolve `<project>` to an absolute path. Verify it contains:
+   - `hix.exe`
    - `hix.json`
    - `www/` directory
-   - `go.bat`
-   If any is missing, abort with a message pointing to `hix-scaffold`.
+   If any is missing, abort with a message pointing to `/hix-init`.
 3. Check the module does not already exist. If any of the following are present, ask the user before overwriting (they must accept `-Force`):
    - `<project>/www/controllers/<entity_lower>.prg`
    - `<project>/www/models/<entity_lower>.prg`
@@ -94,23 +94,25 @@ Delete the DBF + index if they exist before running the tests:
 
 The template's first-boot loader (`init_<entity_lower>.prg`) will recreate them empty when the server starts.
 
-### 4. Build and run tests
+### 4. Run tests against the live hix.exe
+
+The CRUD adds a new `www/routes/<entity_lower>.json` and a `www/loaders/init_<entity>.prg` — both are read only at HIX boot. Pass `-Restart` so the runner kills and relaunches `hix.exe` before probing.
 
 ```
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
-    "<IA_ROOT>\tests\run.ps1" `
-    -Project "<project>" `
-    -Tests   "<project>\tests"
+    "<IA_ROOT>\tests\run-live.ps1" `
+    -Root  "<project>" `
+    -Tests "<project>\tests" `
+    -Restart
 ```
 
-Exit codes (from `run.ps1`):
+Exit codes (from `run-live.ps1`):
 
 | Code | Meaning                        |
 |------|--------------------------------|
 | 0    | All tests pass                 |
 | >0<2 | N tests failed                 |
 | 2    | Bad input                      |
-| 3    | Build failed                   |
 | 4    | Server never answered          |
 
 Tests execute in filename order (`Get-ChildItem` alphabetical), so `1-list-empty` → `2-create-form` → `3-store` → `4-show` → `5-edit-form` → `6-update` → `7-delete`. This ordering is required — the `show`/`edit`/`update`/`delete` tests all target the id produced by `store`.

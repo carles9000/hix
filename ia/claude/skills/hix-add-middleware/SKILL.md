@@ -24,7 +24,7 @@ Required:
 
 Optional:
 - `probe_url` -- URL for the probe route. Default: `/__mw_probe_<name_lower>`. Must start with `/`.
-- `project` -- absolute path to the target HIX project. Default: cwd.
+- `project` -- absolute path to the HIX distribution (the folder that contains `hix.exe`). Default: cwd. Common value: `C:\hix`.
 - `author` -- override for `{{AUTHOR}}`. Default: `git config user.name` -> `Developer`.
 
 If `name` is missing, ask the user before proceeding.
@@ -32,7 +32,7 @@ If `name` is missing, ask the user before proceeding.
 ## Pre-flight
 
 1. Resolve `IA_ROOT`. Verify `IA_ROOT/templates/module-middleware/` exists.
-2. Resolve `<project>` to an absolute path. Verify it contains `hix.json`, `www/`, `go.bat`. If any is missing, abort with a message pointing to `hix-scaffold`.
+2. Resolve `<project>` to an absolute path. Verify it contains `hix.exe`, `hix.json`, `www/`. If any is missing, abort with a message pointing to `/hix-init`.
 3. Check the module files do not already exist. If any of these are present, ask the user before overwriting (they must accept `-Force`):
    - `<project>/www/middlewares/<name_lower>.prg`
    - `<project>/www/loaders/init_mw_<name_lower>.prg`
@@ -71,13 +71,16 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
 
 This copies 2 files, substituting `{{MIDDLEWARE_NAME}}` and `{{PROBE_URL}}`. The `-Prefix` flag isolates multiple middleware invocations.
 
-### 3. Build and run tests
+### 3. Run tests against the live hix.exe
+
+Adding a new `www/loaders/init_mw_*.prg` and a `www/routes/*.json` requires a restart -- loaders and routes are read at HIX boot.
 
 ```
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
-    "<IA_ROOT>\tests\run.ps1" `
-    -Project "<project>" `
-    -Tests   "<project>\tests"
+    "<IA_ROOT>\tests\run-live.ps1" `
+    -Root  "<project>" `
+    -Tests "<project>\tests" `
+    -Restart
 ```
 
 Tests execute in alphabetical order:

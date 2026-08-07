@@ -27,7 +27,7 @@ Required:
 
 Optional:
 - `method` -- HTTP method: `GET|POST|PUT|DELETE|PATCH`. Default `GET`.
-- `project` -- absolute path to the target HIX project. Default: cwd.
+- `project` -- absolute path to the HIX distribution (the folder that contains `hix.exe`). Default: cwd. Common value: `C:\hix`.
 - `author` -- override for `{{AUTHOR}}`. Default: `git config user.name` -> `Developer`.
 
 If `name` or `url` is missing, ask the user before proceeding.
@@ -35,7 +35,7 @@ If `name` or `url` is missing, ask the user before proceeding.
 ## Pre-flight
 
 1. Resolve `IA_ROOT`. Verify `IA_ROOT/templates/module-route/` exists.
-2. Resolve `<project>` to an absolute path. Verify it contains `hix.json`, `www/`, `go.bat`. If any is missing, abort with a message pointing to `hix-scaffold`.
+2. Resolve `<project>` to an absolute path. Verify it contains `hix.exe`, `hix.json`, `www/`. If any is missing, abort with a message pointing to `/hix-init`.
 3. Check the route files do not already exist. If any of these are present, ask the user before overwriting (they must accept `-Force`):
    - `<project>/www/controllers/<name_lower>.prg`
    - `<project>/www/routes/<name_lower>.json`
@@ -81,13 +81,16 @@ Tests execute in alphabetical order:
 - `route-<name_lower>-1-route-ok.test.json` -- `<method> <url>` returns 200 with `{"ok":true, ...}`.
 - `route-<name_lower>-2-route-wrong-method.test.json` -- `DELETE <url>` returns 405 (proves the route is scoped to `<method>`, not method-agnostic).
 
-### 3. Build and run tests
+### 3. Run tests against the live hix.exe
+
+Adding a new `www/routes/<name_lower>.json` requires a restart -- routes are read at HIX boot.
 
 ```
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
-    "<IA_ROOT>\tests\run.ps1" `
-    -Project "<project>" `
-    -Tests   "<project>\tests"
+    "<IA_ROOT>\tests\run-live.ps1" `
+    -Root  "<project>" `
+    -Tests "<project>\tests" `
+    -Restart
 ```
 
 Exit codes: 0 = all pass. Otherwise report the failing test names + assertion details and stop -- route-generation bugs are template bugs and belong in `templates/module-route/`, not in the user's project.
