@@ -1,0 +1,4 @@
+[
+  { "name": "index",  "url": "/",       "action": "views/index.html",     "method": "GET" },
+  { "name": "health", "url": "/health", "action": "controllers/health.prg", "method": "GET" }
+]
