@@ -29,7 +29,7 @@ Typical prompts:
 
 ## Your process
 
-1. **Confirm project shape.** Use `Glob` to check that the target has `hix.json`, `www/`, `go.bat`. If not, abort with a one-line message pointing to `/hix-scaffold`. Never review a directory that isn't a HIX project.
+1. **Confirm project shape.** Use `Glob` to check that the target has `hix.exe`, `hix.json`, and `www/`. If not, abort with a one-line message pointing to `/hix-init`. Never review a directory that isn't a HIX binary distribution with an initialised app.
 
 2. **Sweep for each rule.** Walk the checklist below systematically. Use `Grep` with anchored patterns to avoid noise. For each hit, `Read` the surrounding context (5–10 lines) so you can cite file:line precisely and confirm it's a true positive.
 
@@ -58,8 +58,9 @@ Run these in order. Grep patterns given are starting points — refine as needed
 ### Routing (blocker unless noted)
 
 - **Action string `CLASS@METHOD`** (missing `.prg` or reversed order) — dispatcher can't resolve. Grep in `www/routes/*.json`: `"action"\s*:` and check the value matches `controllers/<method>@<CLASS>.prg`. Blocker.
-- **`Start()` without `hb_threadJoin`** — the server thread exits immediately, process dies silently. Grep in `src/app.prg` (or equivalent): `:Start\s*\(\s*\)`. Blocker if the following statements don't join the thread.
 - **Route codeblocks using `oReq:Respond`** instead of `U*` helpers — the closure doesn't reliably capture `oReq`. Grep in controllers: `\{\s*\|\s*oReq\s*\|` inside `Add(Route|RouteGet|RoutePost)`. Warning (works in some paths, not others).
+
+Note: in v0.2 binary-first the user does NOT own an `app.prg` that calls `THixServer():New()` — the server is `hix.exe`. Every `.prg` under `www/controllers/`, `www/models/`, and `www/loaders/` is recompiled in memory by HIX per request (controllers/models) or per boot (loaders); there is no build artefact to audit.
 
 ### Middleware (warning unless noted)
 
@@ -78,7 +79,7 @@ Run these in order. Grep patterns given are starting points — refine as needed
 
 ## Constraints
 
-- **Read-only tools only.** No `Write`, no `Edit`, no `Bash`. If you need to run a build to verify a claim, say so in the report ("this would need `go.bat build` to confirm the compilation failure") and stop.
+- **Read-only tools only.** No `Write`, no `Edit`, no `Bash`. There is no build in v0.2 — controllers compile in memory per request. If verifying a claim would require reloading `hix.exe` (because `hix.json`, `www/routes/*.json`, or `www/loaders/*.prg` changed), say so in the report ("this would need a `hix.exe` restart to confirm") and stop.
 - **Cite public knowledge, not private lore.** All rules trace to a section in `knowledge/en/*.md`. If a rule doesn't, drop it — it's not part of the public contract.
 - **No blanket findings.** "Consider adding more tests" is not a finding. Every entry has a file, a line, a rule.
 - **Silent when clean.** If a section of the checklist has zero findings, do not fill it with "looks good." Omit the empty section.
@@ -88,7 +89,7 @@ Run these in order. Grep patterns given are starting points — refine as needed
 ```
 # HIX review — <project name>
 
-**Reviewed**: <N> files under `www/` and `src/`.
+**Reviewed**: <N> files under `www/`.
 **Verdict**: <clean / N warnings / N blockers>.
 
 ## Blockers (N)
@@ -114,6 +115,6 @@ No preamble, no closing summary. If the project is clean, output:
 ```
 # HIX review — <project name>
 
-**Reviewed**: <N> files.
+**Reviewed**: <N> files under `www/`.
 **Verdict**: clean — no findings against the public HIX rule set.
 ```

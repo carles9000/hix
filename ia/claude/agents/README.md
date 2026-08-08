@@ -6,7 +6,7 @@ scripts) and unlike slash commands (which are thin wrappers), agents run in
 their **own context window** with a **restricted tool set** — they behave
 like a focused colleague you brief once and then let work.
 
-## Index (v0.1)
+## Index (v0.2)
 
 | Agent                                | Role                                                             | Tools                          | Writes files? |
 |--------------------------------------|------------------------------------------------------------------|--------------------------------|---------------|

@@ -1,6 +1,6 @@
 ---
 name: hix-architect
-description: Use this agent when the user describes a new HIX web application at a high level and needs a step-by-step implementation plan before writing any code. Trigger phrases include "design a HIX app for...", "I want to build a HIX project that...", "what modules do I need for...", "plan the architecture of a HIX app...". This agent produces a design document (module list, routes, middleware, invocation order) — it does NOT write code, run scaffolders, or edit files. After it delivers the plan, the user drives `/hix-scaffold`, `/hix-add-crud`, `/hix-add-route`, `/hix-add-middleware` to materialize it.
+description: Use this agent when the user describes a new HIX web application at a high level and needs a step-by-step implementation plan before writing any code. Trigger phrases include "design a HIX app for...", "I want to build a HIX project that...", "what modules do I need for...", "plan the architecture of a HIX app...". This agent produces a design document (module list, routes, middleware, invocation order) — it does NOT write code, run scaffolders, or edit files. After it delivers the plan, the user drives `/hix-init`, `/hix-add-crud`, `/hix-add-route`, `/hix-add-middleware` to materialize it.
 tools: Read, Grep, Glob, WebFetch
 ---
 
@@ -39,7 +39,7 @@ The user has just given a one-line-to-one-paragraph description of an app they w
 4. **Choose middlewares.** For each area, list which middlewares apply and in what order. Reference the built-ins by exact name. For anything the built-ins don't cover, propose a **user middleware** by name (`HixMwRequireRole`, `HixMwLogAudit`, etc.) and one-line spec — the user will materialize it later with `/hix-add-middleware`.
 
 5. **Order the invocation.** Produce a numbered list of the exact slash commands the user should run, in order, to build this app from empty:
-   - `/hix-scaffold <ProjectName>`
+   - `/hix-init <ProjectName>`
    - `/hix-add-crud <Entity>` (repeat)
    - `/hix-add-route <Name> <Url> [Method]` (for non-CRUD routes)
    - `/hix-add-middleware <Name>` (for each user middleware)
@@ -89,7 +89,7 @@ Reply with a single markdown document, no preamble, structured as:
 - **User-owned**: `HixMwRequireRole` (checks `USession('role')` matches arg).
 
 ## Invocation order
-1. `/hix-scaffold NotesApp`
+1. `/hix-init NotesApp`
 2. `/hix-add-crud User`
 3. `/hix-add-crud Note`
 4. `/hix-add-crud Tag`

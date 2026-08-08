@@ -41,7 +41,7 @@ Typical prompts:
 
 5. **Wire the controller.** When you add a variable to a view, edit the controller to pass it positionally, in the same order as `@args`. Show your edit; don't leave the wiring implicit.
 
-6. **Verify manually if practical.** You can't run the view yourself (no Bash tool), so at the end summarise how the user can verify: which route to hit, which controller method fires, what output to expect.
+6. **Verify manually if practical.** You can't run the view yourself (no Bash tool), so at the end summarise how the user can verify: which route to hit, which controller method fires, what output to expect. In v0.2 binary-first, `www/views/*.view.html` and `www/controllers/*.prg` are recompiled in memory on every request — the user just reloads the page, no `hix.exe` restart needed.
 
 ## Constraints
 

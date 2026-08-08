@@ -44,8 +44,9 @@ Typical prompts:
    - Never invent new HIX APIs. If the routing pattern you need isn't in `02_routing.md`, say so and propose the closest supported alternative.
 
 4. **Prove it works.** After every non-trivial change:
-   - Run `go.bat build` via Bash.
-   - Run `tests/run.ps1 -Project <cwd> -Tests <cwd>/tests` (or the specific `*.test.json` the user cares about).
+   - There is no build phase in v0.2. `www/controllers/*.prg` recompile in memory per request — no restart needed.
+   - If you touched `www/routes/*.json`, `www/loaders/*.prg`, `www/middlewares/config.json`, or `hix.json`, restart `hix.exe` (those are loaded once at boot).
+   - Run the shipped tests via `/hix-test` (which invokes the `hix-run-tests` skill and drives `run-live.ps1`). Pass `--restart` if you edited any boot-time file above.
    - Report the exit code and the failing assertions verbatim.
 
 5. **Explain precedence when relevant.** If two routes could match, tell the user which wins and why (order in JSON file, specificity of `:var` vs literal, group prefix).
@@ -58,7 +59,7 @@ Typical prompts:
 - **String comparisons** for method/path use `==`, not `!=` (Harbour default `SET EXACT OFF` makes `!=` prefix-sensitive).
 - **Middleware order is left-to-right**: `"middleware": "HIX_MwSession,HixMwRequireRole"` runs session first, then role check. If role check needs session data, the order matters.
 - **hixstyle whitelist**: any unknown path returns **403**, not 404. If the user expects 404, either they need to register a custom 404 handler via `SetRouteHandler`, or their test assertion is wrong.
-- **You may edit files, but not framework files.** Anything under `hix.pro/src/` is off-limits — that's the framework, not the user's project.
+- **You may edit files, but only inside `www/`.** In v0.2 binary-first the HIX framework is not in the user's project — it lives inside `hix.exe`. Everything you touch is under `<root>/www/**` (and, when strictly needed, `<root>/hix.json`). If a problem seems to require framework changes, stop and hand it back to the user as a follow-up for the HIX maintainer.
 
 ## Output format
 
@@ -67,7 +68,7 @@ For each task:
 1. **What I read** — one bullet per file, with why.
 2. **Current model** — 2–4 sentences on how routes/middleware resolve today.
 3. **The change** — the diff (via `Edit` tool calls) with a one-line justification per file.
-4. **Verification** — `go.bat build` result + `tests/run.ps1` output block. If a specific route needs a curl-equivalent proof beyond the shipped tests, add a one-off `.test.json` under `tests/` and run it.
+4. **Verification** — `/hix-test` output block (via `hix-run-tests` skill). Pass `--restart` if you edited `www/routes/*.json`, `www/loaders/*.prg`, `www/middlewares/config.json`, or `hix.json`; otherwise the running `hix.exe` picks up controller edits on the fly. If a specific route needs a curl-equivalent proof beyond the shipped tests, add a one-off `.test.json` under `tests/` and run it.
 5. **Follow-ups** — one bullet list, only if there's something the user should know for the next change (e.g., "this new group inherits `HIX_MwCsrf` — remember to include a CSRF token in POST forms").
 
 Do not summarise what you just did — the diff and the test result speak for themselves.
