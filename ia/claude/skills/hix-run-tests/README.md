@@ -27,8 +27,9 @@ command.
 
 ## When to prefer another skill
 
-- Source-first project (`app.hbp` + `go.bat build` + `app.exe`) →
-  `hix-compile-and-test`.
+- Source-first project (`app.hbp` + `go.bat build` + `app.exe`): user must
+  build their own `.exe` first (the AI System does not manage source-first
+  builds in v0.2); then this same skill drives the tests.
 - Empty `www/` (never initialised) → `hix-init` first.
 - Only adding a CRUD/route/middleware → those skills already invoke
   `run-live.ps1` on their own subset of tests.
@@ -46,5 +47,5 @@ Optional flags: `-TimeoutMs <n>`, `-Restart`, `-KeepRunning`.
 ## Exit contract
 
 Reports success only when `run-live.ps1` exits 0. Any other code produces a
-failure report with the relevant runner output. Same contract as
-`hix-compile-and-test`, minus the build phase (no exit code 3).
+failure report with the relevant runner output. Exit code `3` (build failure)
+is intentionally absent — there is no build phase in binary-first mode.

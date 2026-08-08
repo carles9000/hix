@@ -1,6 +1,6 @@
 ---
 name: hix-run-tests
-description: Run the full HIX declarative test suite against a binary-first HIX distribution. Use when the user asks to "run the tests", "test everything", "verify the app", "check if MyApp works", or after manual edits to a HIX root that ships with hix.exe. Arguments - HIX root path (defaults to cwd) and optional tests path (defaults to <root>/tests). NO build phase - HIX hot-reloads .prg on each request. For source-first projects that compile their own .exe, use hix-compile-and-test instead.
+description: Run the full HIX declarative test suite against a binary-first HIX distribution. Use when the user asks to "run the tests", "test everything", "verify the app", "check if MyApp works", or after manual edits to a HIX root that ships with hix.exe. Arguments - HIX root path (defaults to cwd) and optional tests path (defaults to <root>/tests). NO build phase - HIX hot-reloads .prg on each request. Source-first projects (app.hbp + go.bat) must first build their own .exe by hand; this skill will drive the tests once the .exe is running.
 ---
 
 # hix-run-tests — Run the HIX declarative test suite (binary-first)
@@ -27,7 +27,7 @@ Also use proactively after:
 Do NOT use for:
 - Creating an app → `hix-init`.
 - Adding a CRUD → `hix-add-crud`.
-- Source-first projects with `app.hbp` + `go.bat build` → `hix-compile-and-test`.
+- Source-first projects with `app.hbp` + `go.bat build`: user must build the `.exe` by hand first; then `hix-run-tests` still drives the suite against the running exe.
 - Debugging a single failing test — read the `*.test.json` and the target controller directly.
 
 ## Arguments

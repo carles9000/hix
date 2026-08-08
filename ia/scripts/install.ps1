@@ -140,21 +140,42 @@ Install-Asset -Kind 'skills'   -SourceDir (Join-Path $ClaudeSrc 'skills')   -Hom
 Install-Asset -Kind 'agents'   -SourceDir (Join-Path $ClaudeSrc 'agents')   -HomeDir (Join-Path $UserClaude 'agents')
 Install-Asset -Kind 'commands' -SourceDir (Join-Path $ClaudeSrc 'commands') -HomeDir (Join-Path $UserClaude 'commands')
 
-# --- Wire CLAUDE.md in target project ----------------------------------------
+# --- Render CLAUDE.md (expand {{HIX_ROOT}}) and wire it into the project -----
+#
+# The master claude/CLAUDE.md ships with `{{HIX_ROOT}}` placeholders so the
+# framework install can live anywhere. We resolve the actual HIX root
+# (parent of SourceRoot -- SourceRoot is <hix>/ia/), render the placeholder,
+# and drop the result into ~/.claude/ so Claude Code can import it.
+
+$HixRoot          = Split-Path -Parent $SourceRoot
+$SrcClaudeMd      = Join-Path $ClaudeSrc 'CLAUDE.md'
+$RenderedClaudeMd = Join-Path $UserClaude 'hix-claude-rendered.md'
+
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+
+if (-not (Test-Path $SrcClaudeMd)) {
+    throw "Master CLAUDE.md not found at $SrcClaudeMd"
+}
+
+$rendered = Get-Content -Raw -Encoding UTF8 $SrcClaudeMd
+$rendered = $rendered -replace '\{\{HIX_ROOT\}\}', $HixRoot
+[System.IO.File]::WriteAllText($RenderedClaudeMd, $rendered, $utf8NoBom)
+
+Write-Host ""
+Write-Host "  [CLAUDE.md] RENDERED -> $RenderedClaudeMd" -ForegroundColor Green
+Write-Host "             (HIX_ROOT = $HixRoot)" -ForegroundColor DarkGray
 
 $ProjectClaude = Join-Path $Target 'CLAUDE.md'
-$ImportLine    = "@$(Join-Path $ClaudeSrc 'CLAUDE.md')"
+$ImportLine    = "@$RenderedClaudeMd"
 $Marker        = '# HIX AI System -- auto-imported'
 
 if (Test-Path $ProjectClaude) {
     $existing = Get-Content $ProjectClaude -Raw
     if ($existing -like "*$ImportLine*") {
-        Write-Host ""
         Write-Host "  [CLAUDE.md] Already imports HIX AI -- nothing to do." -ForegroundColor DarkGray
     } else {
         $append = "`r`n`r`n$Marker`r`n$ImportLine`r`n"
         Add-Content -Path $ProjectClaude -Value $append -Encoding UTF8
-        Write-Host ""
         Write-Host "  [CLAUDE.md] APPENDED import to existing file." -ForegroundColor Green
     }
 } else {
@@ -165,7 +186,6 @@ $Marker
 $ImportLine
 "@
     Set-Content -Path $ProjectClaude -Value $header -Encoding UTF8
-    Write-Host ""
     Write-Host "  [CLAUDE.md] CREATED at $ProjectClaude" -ForegroundColor Green
 }
 
@@ -218,7 +238,6 @@ foreach ($rule in $RequiredAllows) {
 $settings.permissions.allow = $existing
 
 $json = $settings | ConvertTo-Json -Depth 20
-$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($SettingsPath, $json, $utf8NoBom)
 
 Write-Host ""

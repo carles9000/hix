@@ -4,15 +4,23 @@ Skills that Claude Code invokes when helping the user work on a HIX project.
 Each skill lives in its own folder and is discovered by Claude via the
 `description` field in the frontmatter of its `SKILL.md`.
 
-## Index (v0.1)
+## Index (v0.2)
+
+Default flow (binary-first — you have `hix.exe` + `www/`):
 
 | Skill                                        | Purpose                                              | Triggers                                                        |
 |----------------------------------------------|------------------------------------------------------|-----------------------------------------------------------------|
-| [`hix-scaffold`](hix-scaffold/)              | Create a new HIX web project                         | "new HIX project", "scaffold a HIX app"                         |
+| [`hix-init`](hix-init/)                      | Bootstrap `www/` on a HIX binary distribution        | "init HIX", "start a HIX app", "prepare www"                    |
 | [`hix-add-crud`](hix-add-crud/)              | Add a full CRUD module to an existing project        | "add a CRUD for X", "generate a Product resource"               |
 | [`hix-add-route`](hix-add-route/)            | Add a single HTTP route (controller + routes JSON)   | "add a route GET /ping", "add an endpoint"                      |
 | [`hix-add-middleware`](hix-add-middleware/)  | Scaffold a user-owned middleware + probe route       | "add a middleware", "auth guard skeleton"                       |
-| [`hix-compile-and-test`](hix-compile-and-test/) | Build and run the test suite for a project        | "run the tests", "compile and test", "verify this project"      |
+| [`hix-run-tests`](hix-run-tests/)            | Run the declarative HTTP test suite (no build)       | "run the tests", "verify the app", "test everything"            |
+
+Legacy (source-first — you compile your own `.exe` against `hix_server.lib`):
+
+| Skill                                                | Purpose                                                  | Triggers                                                    |
+|------------------------------------------------------|----------------------------------------------------------|-------------------------------------------------------------|
+| [`hix-scaffold-source`](hix-scaffold-source/)        | Scaffold a source-first HIX project (`app.hbp` + `go.bat`) | "scaffold source HIX", "project that compiles its own exe"  |
 
 ## Anatomy of a skill
 

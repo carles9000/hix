@@ -4,21 +4,29 @@ Thin wrappers that let the user drive a HIX skill from a single line typed
 into a Claude Code session. Every command in this folder just invokes the
 skill of the same base name -- the real logic lives in `../skills/`.
 
-## Available commands
+## Available commands (v0.2)
+
+Default flow (binary-first):
 
 | Command                | Skill invoked          | Args                              | One-line purpose                                             |
 |------------------------|------------------------|-----------------------------------|--------------------------------------------------------------|
-| `/hix-scaffold`        | `hix-scaffold`         | `<project-name>`                  | Create a new HIX web project from `project-web-crud`.        |
+| `/hix-init`            | `hix-init`             | `<name> [root] [--force] [--restart]` | Bootstrap `www/` on a HIX binary distribution.           |
 | `/hix-add-crud`        | `hix-add-crud`         | `<entity>`                        | Add a full CRUD module (7 routes + 7 tests) to a project.    |
 | `/hix-add-route`       | `hix-add-route`        | `<name> <url> [method]`           | Add a single HTTP route + 2 tests.                           |
 | `/hix-add-middleware`  | `hix-add-middleware`   | `<name> [probe-url]`              | Scaffold a `HixMw<Name>` middleware + probe route + 2 tests. |
-| `/hix-test`            | `hix-compile-and-test` | `[project-path]`                  | Build the project and run all `*.test.json` in `tests/`.     |
+| `/hix-test`            | `hix-run-tests`        | `[root] [--restart] [--keep-running] [--timeout <ms>]` | Run the declarative HTTP suite (no build phase).             |
 | `/hix-review`          | `hix-reviewer` (agent) | `[project-path]`                  | Audit a project against the public HIX/Harbour rule set.     |
+
+Legacy (source-first):
+
+| Command                    | Skill invoked           | Args                              | One-line purpose                                                 |
+|----------------------------|-------------------------|-----------------------------------|------------------------------------------------------------------|
+| `/hix-scaffold-source`     | `hix-scaffold-source`   | `<project-name>`                  | Scaffold a source-first HIX project (`app.hbp` + `go.bat`).      |
 
 ## Examples
 
 ```
-/hix-scaffold MyNotes
+/hix-init MyNotes
 /hix-add-crud Product
 /hix-add-route Ping /ping GET
 /hix-add-middleware RequireApiKey

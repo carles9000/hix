@@ -1,23 +1,30 @@
 ---
-name: hix-scaffold
-description: Scaffold a new HIX web project from the project-web-crud template. Use when the user asks to create a new HIX project, initialise a HIX web app, or says "new HIX project", "scaffold HIX", "start a HIX web app". Arguments expected - project name (required) and optional target directory. Runs the template applier, copies self-tests, and verifies the scaffolded project builds and answers HTTP.
+name: hix-scaffold-source
+description: LEGACY / source-first only. Scaffold a HIX web project that links against hix_server.lib and compiles its own .exe (app.hbp + src/app.prg + go.bat). Use ONLY when the user explicitly asks for a source-first / from-scratch HIX project, or already has Harbour + hbmk2 installed and wants to build their own binary. For the default v0.2 flow (drop hix.exe into a folder + scaffold www/), use hix-init instead. Trigger phrases - "scaffold source HIX project", "new HIX project that compiles its own exe", "hix-scaffold-source MyApp".
 ---
 
-# hix-scaffold — Scaffold a new HIX web project
+# hix-scaffold-source — Scaffold a source-first HIX web project (legacy)
 
 ## When to use
 
-Trigger phrases:
+This is the **legacy / source-first** entry point. It generates a full Harbour project
+that links against `hix_server.lib` and produces its own `.exe` via `hbmk2`. Requires
+Harbour + hbmk2 installed on the developer machine.
 
-- "create a new HIX project called MyNotes"
-- "scaffold a HIX web app named payments"
-- "new HIX project"
-- "start a HIX web-crud project"
+For the default v0.2 flow (binary-first, no compilation), use `hix-init` instead.
+
+Trigger phrases (source-first only):
+
+- "scaffold a source-first HIX project called MyNotes"
+- "new HIX project that compiles its own exe"
+- "hix-scaffold-source payments-api"
 
 Do NOT use for:
+- Binary distributions (`hix.exe` + `www/`) → use `hix-init`.
 - Adding a CRUD module to an existing project → use `hix-add-crud`.
 - Adding a single route or middleware → use `hix-add-route` / `hix-add-middleware`.
-- Just compiling / running tests on an existing project → use `hix-compile-and-test`.
+- Running the test suite → use `hix-run-tests`. For source-first the user runs
+  their own `go.bat build` before invoking `hix-run-tests` (no IA-managed build).
 
 ## Arguments
 
@@ -27,13 +34,13 @@ Required:
 Optional:
 - `target` — parent directory. Default: the user's current working directory. The project is created at `<target>/<name>`.
 - `author` — override for `{{AUTHOR}}` token. Default: `git config user.name` → `Developer`.
-- `hixPath` — override for `{{HIX_PATH}}` token (path to the HIX lib repo). Default: `$env:HIX_PATH` → `c:\HIX.PROJECT\hix.pro`.
+- `hixPath` — override for `{{HIX_PATH}}` token (path to the HIX lib repo containing `hix_server.hbp` / `hix_server.lib`). Default: `$env:HIX_PATH`, then fallback to `C:\hix` (typical binary drop that also ships the lib). If neither exists, the skill aborts and asks.
 
 If `name` is missing, ask the user before proceeding.
 
 ## Pre-flight
 
-1. Resolve `IA_ROOT` — the directory containing this skill's parent tree. Typically `~/.claude/skills/hix-scaffold/../../..` or the install location of the HIX AI System. Use the absolute path stored during install.
+1. Resolve `IA_ROOT` — the directory containing this skill's parent tree. Typically `~/.claude/skills/hix-scaffold-source/../../..` or the install location of the HIX AI System. Use the absolute path stored during install.
 2. Verify `IA_ROOT/templates/project-web-crud/` exists. If not, abort with a clear error pointing to `INSTALL.md`.
 3. Resolve `<target>/<name>` to an absolute path. If it already exists and is non-empty, ask the user whether to overwrite (translates to `-Force` on the applier).
 

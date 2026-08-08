@@ -20,7 +20,7 @@ Invoke the **`hix-run-tests`** skill.
 
 If the arg is empty, use the current working directory. If the path is not a valid HIX binary distribution (missing `hix.exe` or `hix.json`), abort with a message pointing to `/hix-init`.
 
-For source-first projects (containing `app.hbp` + `go.bat` + `app.exe`), redirect the user to the legacy `hix-compile-and-test` skill instead.
+For source-first projects (containing `app.hbp` + `go.bat` + `app.exe`), the user must first build their own `.exe` (e.g. `go.bat build`) — the AI System does not manage source-first builds in v0.2. Once the `.exe` runs and answers on the configured port, `hix-run-tests` still drives the suite.
 
 ## What the skill does
 

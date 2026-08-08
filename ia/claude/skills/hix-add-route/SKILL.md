@@ -16,7 +16,7 @@ Trigger phrases:
 Do NOT use for:
 - Full CRUD -> use `hix-add-crud`.
 - Middleware skeleton -> use `hix-add-middleware`.
-- Creating a new project -> use `hix-scaffold`.
+- Creating a new project -> use `hix-init` (binary-first, default) or `hix-scaffold-source` (source-first legacy).
 
 ## Arguments
 

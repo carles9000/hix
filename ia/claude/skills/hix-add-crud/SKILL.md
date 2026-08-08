@@ -15,7 +15,7 @@ Trigger phrases:
 - "add an Order entity"
 
 Do NOT use for:
-- Creating a new project → use `hix-scaffold`.
+- Creating a new project → use `hix-init` (binary-first, default) or `hix-scaffold-source` (source-first legacy).
 - Adding a single non-CRUD route → use `hix-add-route`.
 
 ## Arguments
@@ -148,4 +148,4 @@ Rerunning `hix-add-crud` with the same entity name should reproduce the same sta
 - Do NOT merge routes into `web.json`. HIX loads every `www/routes/*.json`, so a separate `<entity_lower>.json` is the correct layout.
 - Never invoke `apply-template.ps1` without `-Entity`. It fails loudly, but the error is easier to read if you pass it.
 - The `<entity>` argument casing matters: `Product` stays PascalCase for `{{ENTITY}}`, is lowercased for `{{ENTITY_LOWER}}`, and pluralised-then-lowercased for `{{ENTITY_PLURAL_LOWER}}`. Do not attempt smart pluralisation (only `+s` is applied, matching `apply-template.ps1`).
-- If the user asks to add a CRUD to a project that is not hixstyle-enabled, abort and point them at `hix-scaffold` or the docs — this skill only supports the hixstyle layout.
+- If the user asks to add a CRUD to a project that is not hixstyle-enabled, abort and point them at `hix-init` (default) or `hix-scaffold-source` (legacy) — this skill only supports the hixstyle layout.

@@ -21,7 +21,7 @@ Invoke the **`hix-init`** skill.
 
 Note: this skill does NOT ask about PowerShell / Bash permissions. Those are wired at install time by `install.bat` into `<root>\.claude\settings.local.json`. If you skipped install, expect per-command prompts.
 
-If the path is not a HIX binary distribution (missing `hix.exe` or `hix.json`), abort. For source-first projects that compile their own `.exe`, redirect the user to `/hix-scaffold` (soon `/hix-scaffold-source`).
+If the path is not a HIX binary distribution (missing `hix.exe` or `hix.json`), abort. For source-first projects that compile their own `.exe`, redirect the user to `/hix-scaffold-source`.
 
 ## What the skill does
 

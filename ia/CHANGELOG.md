@@ -13,6 +13,35 @@ _(no changes yet)_
 
 ---
 
+## [0.2.0] — 2026-08-08 — Binary-first
+
+Major reorientation: HIX is now distributed as `hix.exe` + DLLs + empty folder. The AI System scaffolds `www/` on top of that pre-built binary; **no compilation** is required for the default flow. `hix.exe` hot-recompiles `www/controllers|models|views/*.prg` per request. Source-first (build your own `.exe` linked against `hix_server.lib`) is preserved as a legacy opt-in via `/hix-scaffold-source`.
+
+### Added
+
+- **Skill `hix-init`** (default) — bootstraps a hixstyle app inside a folder already containing `hix.exe`. Applies `templates/project-www/`, enables `hixstyle` in `hix.json`, starts `hix.exe` in the background, verifies `/health` returns 200. Zero user prompts on success.
+- **Slash command `/hix-init`** — thin wrapper for the skill above.
+- **Template `templates/project-www/`** — minimal binary-first overlay: `www/{config.json,index.html,public/,controllers/,models/,views/,routes/,middlewares/,loaders/}`. Tokens: `{{PROJECT_NAME}}`, `{{AUTHOR}}`, `{{DATE}}`, `{{HIX_ROOT}}`.
+- **Declarative live-runner `tests/run-live.ps1`** — reuses a running `hix.exe` (or starts one via `hix.exe --serve`), runs `*.test.json` against the live port, tears down only what it launched. Exit codes: 0 pass, N failures, 2 bad input, 4 server timeout. **No build phase, no `hix.json` port patching.**
+- **`{{HIX_ROOT}}` tokenization in `claude/CLAUDE.md`** — install-time render into `~\.claude\hix-claude-rendered.md` with the actual HIX root path expanded. Removes the previous hard-coded `C:\HIX.PROJECT\hix\` assumption.
+- **`.claude/settings.local.json` writer in `scripts/install.ps1`** — adds `Bash(powershell.exe *)`, `PowerShell(*)`, `Bash(curl.exe *)`, and related entries to `permissions.allow` so Claude Code does not prompt on every command the skills invoke. Idempotent.
+
+### Changed
+
+- **Skill/command `hix-scaffold` renamed to `hix-scaffold-source`** — clearly marked as legacy source-first path. Kept for users who build their own `.exe` linked against `hix_server.lib` (requires Harbour + hbmk2).
+- **`scripts/install.ps1`** — now renders the master `CLAUDE.md` template (substitutes `{{HIX_ROOT}}`) into `~\.claude\hix-claude-rendered.md` at install time; the project's `CLAUDE.md` imports the rendered file, not the master.
+- **`claude/CLAUDE.md` + `claude/CLAUDE.es.md`** — full rewrite. All paths use `{{HIX_ROOT}}`. Compilation section explains binary-first-by-default with a source-first legacy note. Skills table now lists `hix-init` first and includes `hix-run-tests`; commands table adds `/hix-init` and marks `/hix-scaffold-source` legacy. Removed rules that only apply to source-first flow (custom `.hbx` handling, `Start()` + `hb_threadJoin` in user code).
+- **Skill `hix-run-tests`** (renamed from `hix-compile-and-test`) — no build step. Wraps `tests/run-live.ps1`. Passes `--restart` when the caller signals `hix.json` / `www/routes/*.json` / `www/loaders/*.prg` changed since the last run.
+- **All `hix-add-*` skill docs** — "creating a new project" links now point at `hix-init` (default) or `hix-scaffold-source` (legacy). Removed obsolete `hix-compile-and-test` references.
+- **`claude/skills/README.md` and `claude/commands/README.md`** — split indexes into "Default flow (binary-first)" and "Legacy (source-first)" tables.
+- **Docs: `README.md`, `README.es.md`, `QUICKSTART.md`, `QUICKSTART.es.md`, `INSTALL.md`, `INSTALL.es.md`** — full rewrite for the binary-first canon. Harbour + hbmk2 explicitly removed from default prerequisites. 5-minute onboarding walks through `/hix-init` → `/hix-add-crud` → `/hix-add-route` → `/hix-add-middleware` → `/hix-test` → `/hix-review`. Verified end-to-end: **11/11 tests pass** on a fresh `C:\hix` install.
+
+### Removed
+
+- **Skill `hix-compile-and-test`** — deleted; replaced by `hix-run-tests` (no build). The old skill's build phase is meaningless when `hix.exe` is prebuilt and controllers/models/views recompile per request.
+
+---
+
 ## [0.1.0] — 2026-08-07
 
 First public release. All 8 sessions of the scoped build complete; system exercised end-to-end against a clean scratch project.

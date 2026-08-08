@@ -17,7 +17,7 @@ verifies all 7 routes work with a live HTTP test suite.
 
 ## What it does NOT do
 
-- Create a project from scratch → use `hix-scaffold`.
+- Create a project from scratch → use `hix-init` (binary-first, default) or `hix-scaffold-source` (source-first legacy).
 - Add a single route without controller/model/views → use `hix-add-route`.
 - Modify `web.json` (routes are added as a separate JSON file — HIX loads
   every `www/routes/*.json`).
