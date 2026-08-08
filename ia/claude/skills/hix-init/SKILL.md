@@ -39,6 +39,8 @@ Optional:
 
 If `name` is missing, ask the user before proceeding.
 
+Note: PowerShell / Bash / curl permissions for this project are wired by `install.bat` at install time (writes `<root>\.claude\settings.local.json`). This skill does NOT touch permissions.
+
 ## Pre-flight
 
 1. Resolve `IA_ROOT` — the directory containing this skill's parent tree. Typically the install location of the HIX AI System (contains `templates/`, `scripts/`, `tests/`).

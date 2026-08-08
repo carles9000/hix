@@ -1,25 +1,38 @@
 ---
-description: Build the current HIX project and run every *.test.json in its tests/ folder. Wraps the hix-compile-and-test skill.
-argument-hint: [project-path]
+description: Run every *.test.json in a HIX binary distribution against a live hix.exe. Wraps the hix-run-tests skill. No build phase.
+argument-hint: [root-path] [--restart] [--keep-running]
 ---
 
 # /hix-test
 
 User invocation: `/hix-test $ARGUMENTS`
 
-Invoke the **`hix-compile-and-test`** skill.
+Invoke the **`hix-run-tests`** skill.
 
 ## Argument parsing
 
-`$ARGUMENTS` is the raw text after `/hix-test`. Parse positionally:
+`$ARGUMENTS` is the raw text after `/hix-test`. Parse positionally + flags:
 
-- **Token 1** -> project path (optional, default: cwd). Must contain `hix.json`, `www/`, `go.bat`.
+- **Token 1** -> HIX root path (optional, default: cwd). Must contain `hix.exe`, `hix.json`, `tests/`.
+- **Flag `--restart`** -> pass `-Restart` to the runner. Required after edits to `www/routes/*.json`, `www/loaders/*.prg` or `hix.json`.
+- **Flag `--keep-running`** -> pass `-KeepRunning`. Leaves `hix.exe` alive after the suite ends.
+- **Flag `--timeout <ms>`** -> pass `-TimeoutMs <n>`. Default 15000.
 
-If the arg is empty, use the current working directory. If the path is not a valid HIX project (missing required files), abort with a message pointing to `/hix-scaffold`.
+If the arg is empty, use the current working directory. If the path is not a valid HIX binary distribution (missing `hix.exe` or `hix.json`), abort with a message pointing to `/hix-init`.
+
+For source-first projects (containing `app.hbp` + `go.bat` + `app.exe`), redirect the user to the legacy `hix-compile-and-test` skill instead.
 
 ## What the skill does
 
-Runs `go.bat build` in `<project>` and then `tests/run.ps1 -Project <project> -Tests <project>\tests`. Returns the runner's exit code (0 = all pass, N = N failures, 3 = build failed, 4 = server did not answer). See `~/.claude/skills/hix-compile-and-test/SKILL.md` for the full contract.
+Invokes `tests/run-live.ps1 -Root <root> -Tests <root>\tests` -- the runner reads the port from `hix.json`, reuses or starts `hix.exe`, iterates every `*.test.json`, asserts HTTP status / content-type / body, then cleans up. No `go.bat build`, no `hbmk2`. HIX hot-reloads controllers/models/views per request.
+
+Returns the runner's exit code:
+- `0` = all pass
+- `1..N` = N failures
+- `2` = bad input / missing hix.exe or hix.json
+- `4` = server did not answer within timeout
+
+See `~/.claude/skills/hix-run-tests/SKILL.md` for the full contract.
 
 ## Post-run
 

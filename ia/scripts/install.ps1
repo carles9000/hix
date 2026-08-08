@@ -169,6 +169,67 @@ $ImportLine
     Write-Host "  [CLAUDE.md] CREATED at $ProjectClaude" -ForegroundColor Green
 }
 
+# --- Wire project-local permissions (no per-command prompts) ----------------
+
+$ProjectClaudeDir = Join-Path $Target '.claude'
+$SettingsPath     = Join-Path $ProjectClaudeDir 'settings.local.json'
+
+$RequiredAllows = @(
+    'Bash(powershell.exe *)',
+    'Bash(powershell *)',
+    'PowerShell(*)',
+    'Bash(curl *)',
+    'Bash(curl.exe *)'
+)
+
+if (-not (Test-Path $ProjectClaudeDir)) {
+    New-Item -ItemType Directory -Path $ProjectClaudeDir -Force | Out-Null
+}
+
+$settings = $null
+if (Test-Path $SettingsPath) {
+    try {
+        $settings = Get-Content -Raw -Encoding UTF8 $SettingsPath | ConvertFrom-Json
+    } catch {
+        Write-Host ""
+        Write-Host "  [settings] Existing settings.local.json is not valid JSON. Leaving untouched." -ForegroundColor Yellow
+        $settings = $null
+    }
+}
+
+if ($null -eq $settings) {
+    $settings = [pscustomobject]@{ permissions = [pscustomobject]@{ allow = @() } }
+}
+if (-not $settings.PSObject.Properties.Match('permissions').Count) {
+    $settings | Add-Member -MemberType NoteProperty -Name permissions -Value ([pscustomobject]@{ allow = @() })
+}
+if (-not $settings.permissions.PSObject.Properties.Match('allow').Count) {
+    $settings.permissions | Add-Member -MemberType NoteProperty -Name allow -Value @()
+}
+
+$existing = @($settings.permissions.allow)
+$added    = @()
+foreach ($rule in $RequiredAllows) {
+    if ($existing -notcontains $rule) {
+        $existing += $rule
+        $added    += $rule
+    }
+}
+$settings.permissions.allow = $existing
+
+$json = $settings | ConvertTo-Json -Depth 20
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText($SettingsPath, $json, $utf8NoBom)
+
+Write-Host ""
+if ($added.Count -gt 0) {
+    Write-Host "  [settings] Added $($added.Count) permission entries to:" -ForegroundColor Green
+    Write-Host "             $SettingsPath"
+    foreach ($a in $added) { Write-Host "             + $a" -ForegroundColor DarkGray }
+} else {
+    Write-Host "  [settings] All permission entries already present in $SettingsPath" -ForegroundColor DarkGray
+}
+
 # --- Done --------------------------------------------------------------------
 
 Write-Host ""
@@ -177,5 +238,5 @@ Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "  cd $Target"
 Write-Host "  claude"
-Write-Host "  > /hix-scaffold web-crud MyApp    # (stub in PoC -- see README.md)"
+Write-Host "  > /hix-init MyApp        # bootstrap a HIX web app under www/"
 Write-Host ""
