@@ -8,17 +8,16 @@
                Mozilla Public License, v. 2.0. (https://mozilla.org/MPL/2.0/).
                Copyright (c) 2026 Carles Aubia Floresví - HIX Server Project
  -----------------------------------------------------------*/
-#DEFINE HIX_VERSION_SERVER                "2.0"
+#DEFINE HIX_VERSION_SERVER                "2.0.1"
 #DEFINE HIX_LOG_MODULE HIX_MOD_SERVER
 #DEFINE SW_SHOW                              5
 
 #INCLUDE "hix_logger.ch"
 #INCLUDE "hix_const.ch"
+#INCLUDE "hix_external.ch"
+
 #INCLUDE "hbssl.ch"
 
-
-//REQUEST __MVPRIVATE, UView, HIX_View_Viewer, HIX_Block, UMethod
-//REQUEST __DBGENTRY
 
 
 STATIC slStopRequested := .F.

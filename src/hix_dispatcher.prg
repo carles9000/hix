@@ -1241,7 +1241,7 @@ FUNCTION HIX_HelloPage()
         <div class="logo">           
            <img src='https://raw.githubusercontent.com/carles9000/hix/refs/heads/main/resources/images/logo240.png' alt='Logo HIX'>                
         </div>
-        <div class="text">HIX <span>2.0</span></div>
+        <div class="text">HIX <span><$ HIX_Version() $></span></div>
       </div>
       <div class="subtitle">Server is running...</div>
     </div>
