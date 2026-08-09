@@ -9,13 +9,26 @@ Versioning: aligned with git tags (`ia-vX.Y.Z`)
 
 ## [Unreleased]
 
+_(no changes yet)_
+
+---
+
+## [0.2.1] — 2026-08-09 — Migration guide + hix-init auto-bootstrap
+
+Point release: adds the v0.1 → v0.2 migration guide and removes the last manual step from onboarding (`hix.json` bootstrap).
+
 ### Added
 
 - **Migration guide `MIGRATE-v0.2.md` (+ `.es.md`)** — step-by-step upgrade path from v0.1. Covers two scenarios (stay source-first, move to binary-first), a verification checklist, troubleshooting for the most common breakage points, and an FAQ.
+- **`README.md` + `README.es.md`** — upgrade pointer to the new migration guide, right under the QUICKSTART link.
 
 ### Changed
 
 - **Skill `hix-init` pre-flight** — no longer requires `hix.json` to exist at the target root. If missing, the skill launches `hix.exe` briefly to let it self-generate the default config, then stops the process before continuing. Removes a manual step from onboarding.
+
+### Verified end-to-end
+
+Full 6-step validation protocol (`/hix-init` → `/hix-add-crud` → `/hix-add-route` → `/hix-add-middleware` → `/hix-test` → `/hix-review`) passed against a fresh `C:\hix` install on 2026-08-09.
 
 ---
 
