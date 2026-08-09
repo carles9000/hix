@@ -17,9 +17,9 @@ Trigger phrases:
 
 Precondition detection — this skill applies when the target directory already contains:
 - `hix.exe`
-- `hix.json`
 - Runtime DLLs (`libcrypto-3-x64.dll`, `libssl-3-x64.dll`, `libcurl.dll`, `z.dll`)
 - Typically an empty or missing `www/` directory
+- `hix.json` — optional. If missing, the skill launches `hix.exe` briefly to let it self-generate the default config, then stops it before continuing.
 
 Do NOT use for:
 - Adding a CRUD to an already-initialised app → `hix-add-crud`.
@@ -45,13 +45,27 @@ Note: PowerShell / Bash / curl permissions for this project are wired by `instal
 
 1. Resolve `IA_ROOT` — the directory containing this skill's parent tree. Typically the install location of the HIX AI System (contains `templates/`, `scripts/`, `tests/`).
 2. Verify `IA_ROOT/templates/project-www/` exists. If not, abort with a clear error pointing to `INSTALL.md`.
-3. Resolve `<root>` to an absolute path (default: CWD). Verify `<root>/hix.exe` and `<root>/hix.json` exist. If not, abort — this is not a binary distribution; user probably wants `hix-scaffold-source`.
+3. Resolve `<root>` to an absolute path (default: CWD). Verify `<root>/hix.exe` exists. If not, abort — this is not a HIX binary distribution; user probably wants `hix-scaffold-source`.
 4. Detect if `hix.exe` is already running:
    ```
    Get-Process hix -ErrorAction SilentlyContinue
    ```
    Store PID if any. Do NOT kill yet — decision comes later.
-5. Read current port from `<root>/hix.json`. Regex-scan (do not `ConvertFrom-Json` — the file may contain `/* ... */` comments that break the parser):
+5. Bootstrap `hix.json` if missing. `hix.exe` creates a default `hix.json` (and a bare `www/`) on first run. If `<root>/hix.json` does not exist:
+   - If step 4 detected a running `hix.exe`: abort with `Inconsistent state: hix.exe is running but hix.json is missing. Stop hix.exe manually and retry.`
+   - Otherwise, launch `hix.exe` hidden, wait up to 8 s for the file to appear polling every 250 ms, then stop the process:
+     ```
+     $proc = Start-Process -FilePath "<root>\hix.exe" -WorkingDirectory "<root>" -WindowStyle Hidden -PassThru
+     $deadline = (Get-Date).AddSeconds(8)
+     do { Start-Sleep -Milliseconds 250 } while ( -not (Test-Path "<root>\hix.json") -and (Get-Date) -lt $deadline )
+     Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+     Start-Sleep -Milliseconds 300   # let the port release
+     if (-not (Test-Path "<root>\hix.json")) {
+         abort: hix.exe did not create hix.json within 8 s. Check that hix.exe launches cleanly from <root>.
+     }
+     ```
+   - Log `Generated default hix.json via hix.exe first-run bootstrap.` so the user knows this happened.
+6. Read current port from `<root>/hix.json`. Regex-scan (do not `ConvertFrom-Json` — the file may contain `/* ... */` comments that break the parser):
    ```
    $port = [regex]::Match($json, '"port"\s*:\s*(\d+)').Groups[1].Value
    ```

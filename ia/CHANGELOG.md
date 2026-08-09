@@ -9,7 +9,13 @@ Versioning: aligned with git tags (`ia-vX.Y.Z`)
 
 ## [Unreleased]
 
-_(no changes yet)_
+### Added
+
+- **Migration guide `MIGRATE-v0.2.md` (+ `.es.md`)** — step-by-step upgrade path from v0.1. Covers two scenarios (stay source-first, move to binary-first), a verification checklist, troubleshooting for the most common breakage points, and an FAQ.
+
+### Changed
+
+- **Skill `hix-init` pre-flight** — no longer requires `hix.json` to exist at the target root. If missing, the skill launches `hix.exe` briefly to let it self-generate the default config, then stops the process before continuing. Removes a manual step from onboarding.
 
 ---
 

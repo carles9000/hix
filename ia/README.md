@@ -6,6 +6,8 @@ AI-powered tooling to help you build HIX applications with Claude Code.
 
 **Get started in 5 minutes → [QUICKSTART.md](QUICKSTART.md)** · [ES](QUICKSTART.es.md)
 
+**Upgrading from v0.1? → [MIGRATE-v0.2.md](MIGRATE-v0.2.md)** · [ES](MIGRATE-v0.2.es.md)
+
 ## What is this?
 
 A collection of Claude Code assets (skills, agents, slash commands, knowledge base) that let Claude generate correct, idiomatic HIX code for your project.

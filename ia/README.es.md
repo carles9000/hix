@@ -6,6 +6,8 @@ Herramientas de IA para ayudarte a construir aplicaciones HIX con Claude Code.
 
 **Empieza en 5 minutos → [QUICKSTART.es.md](QUICKSTART.es.md)** · [EN](QUICKSTART.md)
 
+**¿Actualizando desde v0.1? → [MIGRATE-v0.2.es.md](MIGRATE-v0.2.es.md)** · [EN](MIGRATE-v0.2.md)
+
 ## ¿Qué es esto?
 
 Un conjunto de assets para Claude Code (skills, agents, slash commands, base de conocimiento) que permiten a Claude generar código HIX correcto e idiomático para tu proyecto.
