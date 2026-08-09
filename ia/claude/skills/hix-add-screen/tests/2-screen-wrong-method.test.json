@@ -1,0 +1,10 @@
+{
+  "name": "{{SCREEN_NAME_LOWER}} rejects non-GET with 405",
+  "request": {
+    "method": "POST",
+    "path": "{{SCREEN_URL}}"
+  },
+  "expect": {
+    "status": 405
+  }
+}

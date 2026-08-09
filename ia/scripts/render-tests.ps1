@@ -27,6 +27,12 @@ param(
 
     [string]$ProbeUrl = '',
 
+    [string]$ScreenName = '',
+
+    [string]$ScreenUrl = '',
+
+    [string]$ScreenTitle = '',
+
     [string]$Prefix = '',
 
     [switch]$Force
@@ -79,8 +85,18 @@ if (-not [string]::IsNullOrWhiteSpace($MiddlewareName)) {
     $tokens['{{PROBE_URL}}']             = $ProbeUrl
 }
 
+if (-not [string]::IsNullOrWhiteSpace($ScreenName)) {
+    if ([string]::IsNullOrWhiteSpace($ScreenTitle)) {
+        $ScreenTitle = $ScreenName
+    }
+    $tokens['{{SCREEN_NAME}}']       = $ScreenName
+    $tokens['{{SCREEN_NAME_LOWER}}'] = $ScreenName.ToLower()
+    $tokens['{{SCREEN_URL}}']        = $ScreenUrl
+    $tokens['{{SCREEN_TITLE}}']      = $ScreenTitle
+}
+
 if ($tokens.Count -eq 0) {
-    Fail "No token args supplied. Pass -Entity or -RouteName or -MiddlewareName."
+    Fail "No token args supplied. Pass -Entity or -RouteName or -MiddlewareName or -ScreenName."
 }
 
 Info "Source: $Source"

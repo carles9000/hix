@@ -1,0 +1,3 @@
+[
+  { "name": "{{SCREEN_NAME_LOWER}}", "url": "{{SCREEN_URL}}", "method": "GET", "action": "controllers/index@{{SCREEN_NAME_LOWER}}.prg" }
+]

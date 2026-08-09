@@ -1,0 +1,12 @@
+{
+  "name": "{{SCREEN_NAME_LOWER}} renders HTML 200 with expected title",
+  "request": {
+    "method": "GET",
+    "path": "{{SCREEN_URL}}"
+  },
+  "expect": {
+    "status": 200,
+    "content_type_contains": "text/html",
+    "body_contains": [ "<h1>{{SCREEN_TITLE}}</h1>" ]
+  }
+}

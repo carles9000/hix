@@ -26,6 +26,12 @@ param(
 
     [string]$ProbeUrl = '',
 
+    [string]$ScreenName = '',
+
+    [string]$ScreenUrl = '',
+
+    [string]$ScreenTitle = '',
+
     [string]$Author = '',
 
     [string]$HixPath = '',
@@ -161,8 +167,27 @@ if ($kind -eq 'module') {
             $tokens['{{PROBE_URL}}']             = $ProbeUrl
             break
         }
+        'module-screen' {
+            if ([string]::IsNullOrWhiteSpace($ScreenName)) {
+                Fail "-ScreenName is required for template 'module-screen'"
+            }
+            if ([string]::IsNullOrWhiteSpace($ScreenUrl)) {
+                Fail "-ScreenUrl is required for template 'module-screen'"
+            }
+            if (-not ($ScreenUrl.StartsWith('/'))) {
+                Fail "-ScreenUrl must start with '/': got '$ScreenUrl'"
+            }
+            if ([string]::IsNullOrWhiteSpace($ScreenTitle)) {
+                $ScreenTitle = $ScreenName
+            }
+            $tokens['{{SCREEN_NAME}}']       = $ScreenName
+            $tokens['{{SCREEN_NAME_LOWER}}'] = $ScreenName.ToLower()
+            $tokens['{{SCREEN_URL}}']        = $ScreenUrl
+            $tokens['{{SCREEN_TITLE}}']      = $ScreenTitle
+            break
+        }
         default {
-            Fail "Unknown module template: '$Template'. Known: module-crud, module-route, module-middleware."
+            Fail "Unknown module template: '$Template'. Known: module-crud, module-route, module-middleware, module-screen."
         }
     }
 }
