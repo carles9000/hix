@@ -31,8 +31,13 @@ common path that works for everyone.
 has been refactored. If you wish to download it, you can find it in this repository 
 https://github.com/carles9000/hix.legacy 
 
-- You can download Harbur binaries from here 
+- You can download Harbour binaries from here 
 https://github.com/carles9000/hix.harbour 
+
+- The examples include scripts for building them on: 
+
+   - MSVC64 (Windows)  
+   - MINGW64 (Windows)  
 
 ---
 
