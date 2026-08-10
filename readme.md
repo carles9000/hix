@@ -17,16 +17,23 @@ that follows industry best practices, so you can scale and maintain your code wi
 * **Standard:** For coders who go their own way no trends, no set patterns, 
 just pure freedom.
 
---- 
+
 
 **HIX Style** is all about helping developers get on the same page. By using HIX Style, 
 sharing code, contributing to other projects, and building scalable solutions becomes second nature 
 no more friction from learning a new structure with every repo. The main goal here is to offer a 
 common path that works for everyone.
 
+
+## 📘 Documentation
+
+Full documentation is available at: https://carles9000.github.io/hix/ 
+
 ---
 
 ### ✏️ Notes 
+
+
 - The first version of HIX is completely incompatible with the current version because everything 
 has been refactored. If you wish to download it, you can find it in this repository 
 https://github.com/carles9000/hix.legacy 
@@ -39,9 +46,3 @@ https://github.com/carles9000/hix.harbour
    - MSVC64 (Windows)  
    - MINGW64 (Windows)  
 
----
-
-
-## 📘 Documentation
-
-Full documentation is available at: https://carles9000.github.io/hix/ 
