@@ -1,11 +1,13 @@
 @echo off
+cls 
 
 if exist "%ProgramFiles%\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" call "%ProgramFiles%\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64
 
 set hbdir=c:\harbour
+set hbmsvc=%hbdir%\bin\win\msvc64
 set include=%include%;%hbdir%\include
 set lib=%lib%;%hbdir%\lib
-set path=%path%;c:\windows\system32;c:\windows;%hbdir%;%hbdir%\bin
+set path=%path%;c:\windows\system32;c:\windows;%hbmsvc%;%hbdir%
 
 if exist hix_server.hbx (
    hbmk2 hix_server.hbp  -comp=msvc64

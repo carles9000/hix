@@ -26,9 +26,13 @@ common path that works for everyone.
 
 ---
 
-The first version of HIX is completely incompatible with the current version because everything 
+### ✏️ Notes 
+- The first version of HIX is completely incompatible with the current version because everything 
 has been refactored. If you wish to download it, you can find it in this repository 
 https://github.com/carles9000/hix.legacy 
+
+- You can download Harbur binaries from here 
+https://github.com/carles9000/hix.harbour 
 
 ---
 

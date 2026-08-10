@@ -1,3 +1,0 @@
-[
-  { "name": "home", "url": "/", "method": "GET", "action": "views/index.html" }
-]
