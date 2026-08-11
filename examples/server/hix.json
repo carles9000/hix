@@ -9,7 +9,7 @@
     "port": 80,
     "maxconn": 1024,
     "timeout": 30,
-    "name": "HIX",
+    "name": "My Server",
     "mode": "standalone",
     "trusted_proxies": "127.0.0.1 ::1",
     "allowed_hosts": "",
