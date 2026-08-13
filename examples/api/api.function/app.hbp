@@ -4,7 +4,7 @@
 -inc
 -head=full
 -mt
--ic:\hix.pro\src\include
+-ic:\hix.project\hix.pro\src\include
 -workdir=.hbmk/${hb_compiler}
 
 -hbexe
@@ -16,8 +16,11 @@ src/apphelpers.prg
 
 
 # Resources file
-app.res
+{msvc64}app.res
+{mingw64}app.rc
 
+# Libs
+-L${hix}
 -lhix_server
 
 ${hix}\hix_server.hbx
@@ -26,20 +29,28 @@ c:\harbour\include\harbour.hbx
 # OpensSSL
 -lhbssl
 -lhbssls
--llibcrypto-3-x64
--llibssl-3-x64
+{msvc64}-llibcrypto-4-x64
+{msvc64}-llibssl-4-x64
+{mingw64}-ldflag=-l:libcrypto-4-x64.dll
+{mingw64}-ldflag=-l:libssl-4-x64.dll
 
 # Curl
-hbcurl.hbc
+{msvc64}-lhbcurl
+{msvc64}-llibcurl-x64
+{mingw64}-lhbcurl
+{mingw64}-ldflag=-l:libcurl-x64.dll
 
 # PDF
-hbhpdf.hbc
+{msvc64}hbhpdf.hbc
+{mingw64}-lhbhpdf
+{mingw64}-llibhpdf
+{mingw64}-lpng
 
 # WAPI_OutputDebugString()
 -lhbwin
 -lxhb
 -lhbct
 
--ldflag=/NODEFAULTLIB:libucrt
--ldflag=/NODEFAULTLIB:msvcrt
--lucrt
+{msvc64}-ldflag=/NODEFAULTLIB:libucrt
+{msvc64}-ldflag=/NODEFAULTLIB:msvcrt
+{msvc64}-lucrt

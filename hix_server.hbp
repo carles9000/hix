@@ -119,12 +119,3 @@ src/lang/hix_lang.prg
 src/lang/hix_lang_en.prg
 src/lang/hix_lang_es.prg
 
-
-# Libs
--lhbwin
--lxhb
--lhbct
--lhbssl
--ldflag=/NODEFAULTLIB:libucrt
--ldflag=/NODEFAULTLIB:msvcrt
--lucrt

@@ -1231,7 +1231,10 @@ FUNCTION HIX_HelloPage()
          color: gray;
          font-size: 1.5rem;
        }
+       
       span { font-size: 2rem; }   
+      
+      .subversion { font-size: 1rem; }
    </style>
 </head>
 <body>
@@ -1241,7 +1244,7 @@ FUNCTION HIX_HelloPage()
         <div class="logo">           
            <img src='https://raw.githubusercontent.com/carles9000/hix/refs/heads/main/resources/images/logo240.png' alt='Logo HIX'>                
         </div>
-        <div class="text">HIX <span><$ HIX_Version() $></span></div>
+        <div class="text">HIX <span><$ HIX_Version() $></span><span class="subversion"><$ HIX_SubVersion() $></span></div>
       </div>
       <div class="subtitle">Server is running...</div>
     </div>

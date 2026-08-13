@@ -8,7 +8,8 @@
                Mozilla Public License, v. 2.0. (https://mozilla.org/MPL/2.0/).
                Copyright (c) 2026 Carles Aubia Floresví - HIX Server Project
  -----------------------------------------------------------*/
-#DEFINE HIX_VERSION_SERVER                "2.0.1"
+#DEFINE HIX_VERSION_SERVER                "2.0"
+#DEFINE HIX_SUBVERSION_SERVER             ".03"
 #DEFINE HIX_LOG_MODULE HIX_MOD_SERVER
 #DEFINE SW_SHOW                              5
 
@@ -951,11 +952,15 @@ RETURN HIX_RouteList()
 STATIC FUNCTION ShowInit( oSrv )
 
    LOCAL cHost    := UConfig( "server", "host", "localhost" )
-   LOCAL nPort    := UConfig( "server", "port", 80 )
+   LOCAL nPort    := UConfig( "server", "port", 80 )   
    LOCAL cDomain  := iif( cHost == "0.0.0.0", "localhost", cHost )
-   LOCAL cTitle   := "Hix server vrs. " + HIX_VERSION_SERVER + " => Running on " + cDomain
+   LOCAL cTitle   := "Hix server vrs. " + HIX_VERSION_SERVER + HIX_SUBVERSION_SERVER + " => Running on " + cDomain
    LOCAL cLang    := hb_oemtoansi(hb_langName()) + ', ' + hb_SetCodePage() + '/' + hb_cdpUniID( hb_SetCodePage() )
    LOCAL nRow, cI := ''
+   
+   if nPort <> 80 
+      cTitle += ':' + ltrim(str(nPort))
+   endif 
    
    AEval( rddList(), {| X | cI += iif( Empty( cI ), '', ', ' ) + X } )
    
@@ -971,7 +976,7 @@ STATIC FUNCTION ShowInit( oSrv )
 		'  / /_/ / / / |/_/'  
 		' / __  / / />  <  '  
 		'/_/ /_/ /_/_/|_|  '
-    */
+   */
 	
 	
 	@nRow++, 0 say '    __  __'  COLOR 'B+'		
@@ -997,7 +1002,7 @@ STATIC FUNCTION ShowInit( oSrv )
    
 	
 
-   HIX_Info( @nRow, 'Version HIX'			, 'HIX ' + HIX_VERSION_SERVER + ' ' + HIX_DATECOMPILE() )
+   HIX_Info( @nRow, 'Version HIX'			, 'HIX ' + HIX_VERSION_SERVER + HIX_SUBVERSION_SERVER + ' ' + HIX_DATECOMPILE() )
 	HIX_Info( @nRow, 'Version Harbour'		, VERSION() + ' / ' + HB_BUILDDATE() )
 	HIX_Info( @nRow, 'Version OpenSSL' 	, SSLEAY_VERSION( HB_SSLEAY_VERSION ) )
 	HIX_Info( @nRow, 'Version Curl'    	, Curl_version() )
@@ -1010,6 +1015,7 @@ STATIC FUNCTION ShowInit( oSrv )
 	nRow++
    
 	HIX_Info( @nRow, 'Server startup at'  , DToC( date() ) + ' ' + time() )
+	HIX_Info( @nRow, 'App Name'           , UConfig( "server", "name", "HIX" ) ) 
 	HIX_Info( @nRow, 'Root' 	            , UConfig( "paths", "root", "www" ) )
 	HIX_Info( @nRow, 'HIX Style Active' 	, If( UConfig( "hixstyle", "enabled", .F. ), 'Yes', 'No' ) )
    
@@ -1062,6 +1068,7 @@ RETURN NIL
 
 
 FUNCTION HIX_Version() ; RETU HIX_VERSION_SERVER
+FUNCTION HIX_SubVersion() ; RETU HIX_SUBVERSION_SERVER
 
 // Normaliza el filtro del firewall para mostrarlo en el bootlog:
 // acepta espacios o comas como separadores y devuelve una lista

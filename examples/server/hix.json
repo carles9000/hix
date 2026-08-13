@@ -1,14 +1,15 @@
 /* ----------------------------------------------
- | hix.json -- Fenix.WS.Function Server Configuration
+ | hix.json -- HIX Web Server Configuration
+ | Auto-generated. Edit values, keep structure.
  * ---------------------------------------------- */
 {
   "server":
   {
     "host": "localhost",
-    "port": 8083,
+    "port": 80,
     "maxconn": 1024,
     "timeout": 30,
-    "name": "Fenix.WS.Function",
+    "name": "My Server",
     "mode": "standalone",
     "trusted_proxies": "127.0.0.1 ::1",
     "allowed_hosts": "",
@@ -22,9 +23,9 @@
   },
   "paths":
   {
-    "root": "api",
+    "root": "www",
     "log": ".logs",
-    "tmp": ".tmp",
+    "tmp": "tmp",
     "errors": ".logs",
     "session": ".sessions",
     "certs": "certs"
@@ -32,7 +33,7 @@
   "app":
   {
     "errorsys": "",
-    "default_page": "",
+    "default_page": "index.html",
     "dispatch_mode": "full",
     "auto_close_dbf": true,
     "auto_close_dbf_log": false,
@@ -41,7 +42,7 @@
   },
   "admin":
   {
-    "enabled": false,
+    "enabled": true,
     "user": "",
     "password": "",
     "secret": ""
@@ -55,30 +56,30 @@
   },
   "pool_http":
   {
-    "workers": 32,
+    "workers": 64,
     "queue_size": 256,
-    "read_timeout_ms": 5000,
+    "read_timeout_ms": 2000,
     "keep_alive": true,
     "keep_alive_max": 100
   },
   "pool_ws":
   {
-    "workers": 0,
-    "queue_size": 64,
+    "workers": 100,
+    "queue_size": 256,
     "ping_interval_s": 30,
     "ping_timeout_s": 10
   },
   "pool_rest":
   {
-    "workers_sse": 4,
-    "workers_longpoll": 4,
-    "queue_size": 64,
-    "stream_timeout_s": 300
+    "workers_sse": 20,
+    "workers_longpoll": 10,
+    "queue_size": 128,
+    "stream_timeout_s": 3600
   },
   "pool_hix":
   {
-    "workers": 2,
-    "queue_size": 32,
+    "workers": 4,
+    "queue_size": 64,
     "read_timeout_ms": 2000
   },
   "session":
@@ -93,7 +94,7 @@
   "monitor":
   {
     "enabled": true,
-    "interval_s": 30,
+    "interval_s": 5,
     "alert_pct": 75
   },
   "log":
@@ -116,7 +117,7 @@
   },
   "hixstyle":
   {
-    "enabled": true,
+    "enabled": false,
     "cache_disk": true,
     "trace": false,
     "cache_ram": false

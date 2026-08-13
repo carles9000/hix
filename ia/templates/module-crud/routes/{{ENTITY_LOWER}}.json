@@ -1,9 +1,0 @@
-[
-  { "name": "{{ENTITY_LOWER}}.list",   "url": "/{{ENTITY_PLURAL_LOWER}}",                       "method": "GET",  "action": "controllers/list@{{ENTITY_LOWER}}.prg"   },
-  { "name": "{{ENTITY_LOWER}}.create", "url": "/{{ENTITY_PLURAL_LOWER}}/create",                "method": "GET",  "action": "controllers/create@{{ENTITY_LOWER}}.prg" },
-  { "name": "{{ENTITY_LOWER}}.store",  "url": "/{{ENTITY_PLURAL_LOWER}}/store",                 "method": "POST", "action": "controllers/store@{{ENTITY_LOWER}}.prg"  },
-  { "name": "{{ENTITY_LOWER}}.show",   "url": "/{{ENTITY_PLURAL_LOWER}}/:id([0-9]+)",           "method": "GET",  "action": "controllers/show@{{ENTITY_LOWER}}.prg"   },
-  { "name": "{{ENTITY_LOWER}}.edit",   "url": "/{{ENTITY_PLURAL_LOWER}}/:id([0-9]+)/edit",      "method": "GET",  "action": "controllers/edit@{{ENTITY_LOWER}}.prg"   },
-  { "name": "{{ENTITY_LOWER}}.update", "url": "/{{ENTITY_PLURAL_LOWER}}/:id([0-9]+)/update",    "method": "POST", "action": "controllers/update@{{ENTITY_LOWER}}.prg" },
-  { "name": "{{ENTITY_LOWER}}.delete", "url": "/{{ENTITY_PLURAL_LOWER}}/:id([0-9]+)/delete",    "method": "POST", "action": "controllers/delete@{{ENTITY_LOWER}}.prg" }
-]

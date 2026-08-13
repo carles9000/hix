@@ -1,7 +1,0 @@
-[
-  { "name": "mw_{{MIDDLEWARE_NAME_LOWER}}_probe",
-    "url": "{{PROBE_URL}}",
-    "method": "GET",
-    "action": "controllers/index@{{MIDDLEWARE_NAME_LOWER}}_probe.prg",
-    "middleware": "HixMw{{MIDDLEWARE_NAME}}" }
-]

@@ -1,3 +1,0 @@
-[
-  { "name": "{{ROUTE_NAME_LOWER}}", "url": "{{ROUTE_URL}}", "method": "{{ROUTE_METHOD}}", "action": "controllers/index@{{ROUTE_NAME_LOWER}}.prg" }
-]
