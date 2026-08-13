@@ -57,7 +57,10 @@ extra_javascript:
 
 plugins:
   - search:
-      lang: es
+      lang:
+        - en
+        - es
+        - it
   - i18n:
       docs_structure: folder        # carpetas /es /en /ca ...
       fallback_to_default: true     # si falta traducción, usa el idioma por defecto
@@ -214,6 +217,82 @@ plugins:
                 - Metrics: en/sistema/metricas.md
                 - HIX Admin: en/sistema/hix-admin.md
                 - Apache proxy: en/sistema/apache-proxy.md
+        - locale: it
+          name: Italiano
+          default: false
+          build: true
+          site_name: "HIX — Server Web per Harbour"
+          site_description: "Documentazione del server web HIX per Harbour"
+          nav:
+            - Home: it/index.md
+            - Introduzione:
+                - Benvenuto in HIX: it/intro/intro.md
+                - Modalità base: it/intro/modo-basico.md
+                - Modalità HIX Style: it/intro/hixstyle.md
+                - Roadmap: it/intro/data-driven.md
+            - Primi passi:
+                - Compilare il progetto: it/primeros-pasos/compile.md
+                - Configurazione hix.json: it/primeros-pasos/config/hix.json.md
+            - Programmazione:
+                - Helpers: it/programacion/mapa-helpers.md
+                - Dev Mode / Prod Mode: it/programacion/modo-dev-prod.md
+                - Errorsys: it/programacion/errorsys.md
+                - Error Handling: it/programacion/error-handling.md
+                - Error Code: it/programacion/error_codes.md
+            - HIX Style:
+                - Rotte: it/hixstyle/routes/routes.md
+                - Middleware:
+                    - Introduzione: it/hixstyle/middleware/middleware.md
+                    - Contesto: it/hixstyle/middleware/contexto.md
+                    - Progettazione: it/hixstyle/middleware/mw_dessign.md
+                    - Catalogo: it/hixstyle/middleware/mw_list.md
+                    - Loader: it/hixstyle/middleware/mw_loader.md
+                    - Esempio: it/hixstyle/middleware/mw_example.md
+                - Controller:
+                    - Controller: it/hixstyle/controllers/controllers.md
+                    - Request: it/hixstyle/controllers/requests.md
+                    - Validator: it/hixstyle/controllers/validator.md
+                - Models:
+                    - UDbf: it/hixstyle/models/udbf.md
+                - Response:
+                    - Encoding/Decoding: it/hixstyle/response/encoding-decoding.md
+                    - Cookies: it/hixstyle/response/cookies.md
+                    - Intestazioni: it/hixstyle/response/headers.md
+                    - Flash: it/hixstyle/response/flash.md
+                - View Engine:
+                    - Mambo: it/hixstyle/views/mambo.md
+                    - Direttive: it/hixstyle/views/directives.md
+                    - Esempi:
+                      - Introduzione: it/hixstyle/views/example.md
+                      - Esempio 1: it/hixstyle/views/example1.md
+                      - Esempio 2: it/hixstyle/views/example2.md
+                      - Esempio 3: it/hixstyle/views/example3.md
+                      - Esempio 4: it/hixstyle/views/example4.md
+                - Sicurezza:
+                    - Chiavi e segreti: it/hixstyle/seguridad/claves.md
+                    - CORS: it/hixstyle/seguridad/cors.md
+                    - Firewall: it/hixstyle/seguridad/firewall.md
+                    - Ratelimit: it/hixstyle/seguridad/ratelimit.md
+                    - Sessioni: it/hixstyle/seguridad/sesiones.md
+                    - Autenticazione: it/hixstyle/seguridad/autenticacion.md
+                    - JWT: it/hixstyle/seguridad/jwt.md
+                    - CSRF: it/hixstyle/seguridad/csrf.md
+                    - Resources IDs: it/hixstyle/seguridad/resources-ids.md
+                    - SSL: it/hixstyle/seguridad/ssl.md
+                - Loader e hook: it/sistema/loaders.md
+            - Tempo reale:
+                - SSE: it/tiempo-real/sse.md
+                - WS: it/tiempo-real/ws.md
+                - LongPolling: it/tiempo-real/longpolling.md
+            - API:
+                - Admin: it/api/admin.md
+            - Sistema:
+                - Tracciamento: it/sistema/traceando.md
+                - Logger: it/sistema/logger.md
+                - Boot Log: it/sistema/bootlog.md
+                - Metriche: it/sistema/metricas.md
+                - HIX Admin: it/sistema/hix-admin.md
+                - Apache proxy: it/sistema/apache-proxy.md
 
 markdown_extensions:
   - admonition

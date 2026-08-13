@@ -1,0 +1,4248 @@
+
+<!doctype html>
+<html lang="it" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentazione del server web HIX per Harbour">
+      
+      
+        <meta name="author" content="Charly Nou mil">
+      
+      
+        <link rel="canonical" href="https://carles9000.github.io/hix/it/api/admin/">
+      
+      
+        <link rel="prev" href="../../tiempo-real/longpolling/">
+      
+      
+        <link rel="next" href="../../sistema/traceando/">
+      
+      
+        
+          <link rel="alternate" href="../../../es/api/admin/" hreflang="es">
+        
+          <link rel="alternate" href="../../../api/admin/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="it">
+        
+      
+      
+      <link rel="icon" href="../../../assets/hix.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Admin - HIX — Server Web per Harbour</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#api-endpoint-hix-" class="md-skip">
+          Vai al contenuto
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Intestazione">
+    <a href="../../" title="HIX — Server Web per Harbour" class="md-header__button md-logo" aria-label="HIX — Server Web per Harbour" data-md-component="logo">
+      
+  <img src="../../../assets/hix_white.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            HIX — Server Web per Harbour
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Admin
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Seleziona la lingua">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../es/api/admin/" hreflang="es" class="md-select__link">
+              Español
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../api/admin/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="it" class="md-select__link">
+              Italiano
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Cerca" placeholder="Cerca" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Cerca">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Cancella" aria-label="Cancella" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inizializza la ricerca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigazione" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="HIX — Server Web per Harbour" class="md-nav__button md-logo" aria-label="HIX — Server Web per Harbour" data-md-component="logo">
+      
+  <img src="../../../assets/hix_white.png" alt="logo">
+
+    </a>
+    HIX — Server Web per Harbour
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduzione
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Introduzione
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../intro/intro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benvenuto in HIX
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../intro/modo-basico/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modalità base
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../intro/hixstyle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modalità HIX Style
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../intro/data-driven/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Primi passi
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Primi passi
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../primeros-pasos/compile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Compilare il progetto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../primeros-pasos/config/hix.json/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configurazione hix.json
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Programmazione
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Programmazione
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../programacion/mapa-helpers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Helpers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../programacion/modo-dev-prod/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dev Mode / Prod Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../programacion/errorsys/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Errorsys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../programacion/error-handling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error Handling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../programacion/error_codes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error Code
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HIX Style
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    HIX Style
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/routes/routes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rotte
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Middleware
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/middleware/middleware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduzione
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/middleware/contexto/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contesto
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/middleware/mw_dessign/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Progettazione
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/middleware/mw_list/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catalogo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/middleware/mw_loader/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loader
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/middleware/mw_example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Esempio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Controller
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/controllers/controllers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/controllers/requests/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Request
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/controllers/validator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_4" id="__nav_5_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/models/udbf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UDbf
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_5" id="__nav_5_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Response
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/response/encoding-decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Encoding/Decoding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/response/cookies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/response/headers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Intestazioni
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/response/flash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    View Engine
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    View Engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/views/mambo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mambo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/views/directives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Direttive
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_6_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6_3" id="__nav_5_6_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Esempi
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_6_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Esempi
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/views/example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduzione
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/views/example1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Esempio 1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/views/example2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Esempio 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/views/example3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Esempio 3
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/views/example4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Esempio 4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_7" id="__nav_5_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sicurezza
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Sicurezza
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/claves/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Chiavi e segreti
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/cors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CORS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/firewall/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firewall
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/ratelimit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ratelimit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/sesiones/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sessioni
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/autenticacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autenticazione
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/jwt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JWT
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/csrf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CSRF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/resources-ids/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resources IDs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hixstyle/seguridad/ssl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistema/loaders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loader e hook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tempo reale
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tempo reale
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tiempo-real/sse/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tiempo-real/ws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tiempo-real/longpolling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LongPolling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Admin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#endpoint-pubblici" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Endpoint pubblici
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Endpoint pubblici">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-ping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-ping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-slow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-slow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metriche-e-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metriche e monitor
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Metriche e monitor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-monitor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-index" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-index
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trace
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Trace">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-trace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-trace
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cache
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cache">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-cache-clear" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-cache-clear
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bench" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bench
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Bench">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-bench-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-bench-start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-bench-stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-bench-stop
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shutdown-graceful" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shutdown graceful
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Shutdown graceful">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-stop
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-di-gestione-dinamica-delle-route" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API di gestione dinamica delle route
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API di gestione dinamica delle route">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#post-hix-routesadd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /hix-routes/add
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-hix-routesdelete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /hix-routes/delete
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-routesreload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-routes/reload
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-routeslist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-routes/list
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-routeslistall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-routes/listall
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#autenticazione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autenticazione
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Autenticazione">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-login
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-hix-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /hix-login
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-logout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-logout
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-hix-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /hix-setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cookie-di-sessione-admin-hix_admin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cookie di sessione admin hix_admin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#codici-http" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Codici HTTP
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ricette-comuni" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ricette comuni
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Ricette comuni">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ricaricare-le-route-dopo-un-deploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ricaricare le route dopo un deploy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#abilitare-il-trace-websocket-al-volo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Abilitare il trace WebSocket al volo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fermare-hix-da-uno-script-di-deploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fermare HIX da uno script di deploy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#health-check-pubblico-no-auth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Health check pubblico (no auth)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#errori-comuni" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errori comuni
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best practice
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risorse-correlate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risorse correlate
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sistema
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Sistema
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistema/traceando/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tracciamento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistema/logger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistema/bootlog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Boot Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistema/metricas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metriche
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistema/hix-admin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HIX Admin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistema/apache-proxy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Apache proxy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#endpoint-pubblici" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Endpoint pubblici
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Endpoint pubblici">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-ping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-ping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-slow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-slow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metriche-e-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metriche e monitor
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Metriche e monitor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-monitor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-index" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-index
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trace
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Trace">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-trace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-trace
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cache
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cache">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-cache-clear" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-cache-clear
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bench" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bench
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Bench">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-bench-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-bench-start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-bench-stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-bench-stop
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shutdown-graceful" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shutdown graceful
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Shutdown graceful">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-stop
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-di-gestione-dinamica-delle-route" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API di gestione dinamica delle route
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API di gestione dinamica delle route">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#post-hix-routesadd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /hix-routes/add
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-hix-routesdelete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /hix-routes/delete
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-routesreload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-routes/reload
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-routeslist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-routes/list
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-routeslistall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-routes/listall
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#autenticazione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autenticazione
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Autenticazione">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-login
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-hix-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /hix-login
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-logout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-logout
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-hix-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GET /hix-setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#post-hix-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        POST /hix-setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cookie-di-sessione-admin-hix_admin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cookie di sessione admin hix_admin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#codici-http" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Codici HTTP
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ricette-comuni" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ricette comuni
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Ricette comuni">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ricaricare-le-route-dopo-un-deploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ricaricare le route dopo un deploy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#abilitare-il-trace-websocket-al-volo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Abilitare il trace WebSocket al volo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fermare-hix-da-uno-script-di-deploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fermare HIX da uno script di deploy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#health-check-pubblico-no-auth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Health check pubblico (no auth)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#errori-comuni" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errori comuni
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Best practice
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risorse-correlate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risorse correlate
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="api-endpoint-hix-">🔗 API - Endpoint <code>/hix-*</code><a class="headerlink" href="#api-endpoint-hix-" title="Permanent link">&para;</a></h1>
+<p>Riferimento completo degli endpoint del pannello admin di HIX. Per i dettagli concettuali
+(sessione, cookie firmato, configurazione iniziale) vedi
+<a href="../../sistema/hix-admin/">sistema/hix-admin</a>.</p>
+<hr />
+<h2 id="riepilogo">Riepilogo<a class="headerlink" href="#riepilogo" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Metodo</th>
+<th style="text-align: center;">Auth</th>
+<th>Funzione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/hix-ping</code></td>
+<td><code>GET</code></td>
+<td style="text-align: center;">-</td>
+<td>Health check pubblico</td>
+</tr>
+<tr>
+<td><code>/hix-slow</code></td>
+<td><code>GET</code></td>
+<td style="text-align: center;">-</td>
+<td>Endpoint lento (3s) - debug latenza</td>
+</tr>
+<tr>
+<td><code>/hix-status</code></td>
+<td><code>GET</code></td>
+<td style="text-align: center;">✅</td>
+<td>Metriche in JSON</td>
+</tr>
+<tr>
+<td><code>/hix-monitor</code></td>
+<td><code>GET</code></td>
+<td style="text-align: center;">✅</td>
+<td>Dashboard HTML live</td>
+</tr>
+<tr>
+<td><code>/hix-index</code></td>
+<td><code>GET</code></td>
+<td style="text-align: center;">✅</td>
+<td>Lista HTML delle route registrate</td>
+</tr>
+<tr>
+<td><code>/hix-trace</code></td>
+<td><code>GET POST</code></td>
+<td style="text-align: center;">✅</td>
+<td>Stato trace/toggle per modulo</td>
+</tr>
+<tr>
+<td><code>/hix-cache-clear</code></td>
+<td><code>GET</code></td>
+<td style="text-align: center;">✅</td>
+<td>Pulisce la cache delle view compilate</td>
+</tr>
+<tr>
+<td><code>/hix-stop</code></td>
+<td><code>GET</code></td>
+<td style="text-align: center;">✅</td>
+<td>Shutdown graceful di HIX</td>
+</tr>
+<tr>
+<td><code>/hix-bench-start</code></td>
+<td><code>GET</code></td>
+<td style="text-align: center;">✅</td>
+<td>Reset metriche (bench)</td>
+</tr>
+<tr>
+<td><code>/hix-bench-stop</code></td>
+<td><code>GET</code></td>
+<td style="text-align: center;">✅</td>
+<td>Dump JSON del bench</td>
+</tr>
+<tr>
+<td><code>/hix-routes/add</code></td>
+<td><code>POST</code></td>
+<td style="text-align: center;">✅</td>
+<td>Aggiunge una route dinamica</td>
+</tr>
+<tr>
+<td><code>/hix-routes/delete</code></td>
+<td><code>POST</code></td>
+<td style="text-align: center;">✅</td>
+<td>Elimina una route per nome</td>
+</tr>
+<tr>
+<td><code>/hix-routes/reload</code></td>
+<td><code>GET</code></td>
+<td style="text-align: center;">✅</td>
+<td>Ricarica <code>routes/*.json</code></td>
+</tr>
+<tr>
+<td><code>/hix-routes/list</code></td>
+<td><code>GET</code></td>
+<td style="text-align: center;">✅</td>
+<td>Lista HTML - solo route app</td>
+</tr>
+<tr>
+<td><code>/hix-routes/listall</code></td>
+<td><code>GET</code></td>
+<td style="text-align: center;">✅</td>
+<td>Lista HTML - tutte le route</td>
+</tr>
+<tr>
+<td><code>/hix-login</code></td>
+<td><code>GET POST</code></td>
+<td style="text-align: center;">-</td>
+<td>Login admin</td>
+</tr>
+<tr>
+<td><code>/hix-logout</code></td>
+<td><code>GET</code></td>
+<td style="text-align: center;">-</td>
+<td>Chiude la sessione admin</td>
+</tr>
+<tr>
+<td><code>/hix-setup</code></td>
+<td><code>GET POST</code></td>
+<td style="text-align: center;">-</td>
+<td>Configurazione iniziale credenziali</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Auth</strong> = richiede <code>HIX_AdminCheck(oReq)</code> prima di eseguire l'handler.
+In <code>env=dev</code> l'auth è disabilitata automaticamente - tutti gli endpoint rispondono senza
+cookie. In <code>env=prod</code> è richiesto un cookie <code>hix_admin</code> valido.</p>
+</blockquote>
+<hr />
+<h2 id="endpoint-pubblici">Endpoint pubblici<a class="headerlink" href="#endpoint-pubblici" title="Permanent link">&para;</a></h2>
+<h3 id="get-hix-ping"><code>GET /hix-ping</code><a class="headerlink" href="#get-hix-ping" title="Permanent link">&para;</a></h3>
+<p>Health check leggero - progettato per load balancer e monitoraggio esterno.</p>
+<p><strong>Risposta <code>200 OK</code></strong> (JSON):</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ok&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;server&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HIX/2.1&quot;</span><span class="w"> </span><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="get-hix-slow"><code>GET /hix-slow</code><a class="headerlink" href="#get-hix-slow" title="Permanent link">&para;</a></h3>
+<p>Come <code>ping</code> ma con <code>hb_idleSleep(3)</code>. Utile per testare timeout del client,
+load balancer, o proxy frontale.</p>
+<p><strong>Risposta <code>200 OK</code></strong> dopo 3 secondi:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ok&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;time&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;12:34:56&quot;</span><span class="w"> </span><span class="p">}</span>
+</span></code></pre></div>
+<hr />
+<h2 id="metriche-e-monitor">Metriche e monitor<a class="headerlink" href="#metriche-e-monitor" title="Permanent link">&para;</a></h2>
+<h3 id="get-hix-status"><code>GET /hix-status</code><a class="headerlink" href="#get-hix-status" title="Permanent link">&para;</a></h3>
+<p>Dump dello stato del server (connessioni attive, richieste totali, errori, utilizzo pool,
+alert di saturazione, ecc.) come JSON. Generato da <code>HIX_MetricsJson()</code>.</p>
+<p><strong>Risposta <code>200 OK</code></strong> (estratto):</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">&quot;uptime_s&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12345</span><span class="p">,</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">  </span><span class="nt">&quot;requests&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">9876</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;errors&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">  </span><span class="nt">&quot;pool_http&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;workers&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;queue&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;alert&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">  </span><span class="nt">&quot;pool_ws&quot;</span><span class="p">:</span><span class="w">   </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;workers&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;active&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">42</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6"></a><a href="#__codelineno-2-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">  </span><span class="nt">&quot;pool_rest&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;sse&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;longpoll&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7"></a><a href="#__codelineno-2-7"><span class="linenos" data-linenos="7 "></span></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Vedi <a href="../../sistema/metricas/">sistema/metriche</a> per i dettagli completi dello schema.</p>
+<h3 id="get-hix-monitor"><code>GET /hix-monitor</code><a class="headerlink" href="#get-hix-monitor" title="Permanent link">&para;</a></h3>
+<p>Serve <code>html/monitor.html</code> - dashboard HTML che consuma <code>/hix-status</code> ogni
+<code>[monitor] interval_s</code> secondi e renderizza grafici. Utile per l'ispezione visuale.</p>
+<h3 id="get-hix-index"><code>GET /hix-index</code><a class="headerlink" href="#get-hix-index" title="Permanent link">&para;</a></h3>
+<p>Pagina HTML self-contained con la <strong>lista di tutte le route registrate</strong> (nome,
+metodi, pattern, pulsante "Apri"). Utile per scoprire cosa ha il server
+senza accedere al codice.</p>
+<p>Ogni riga mostra:
+- <strong>Nome</strong> - nome logico (<code>hix.status</code>, <code>users.list</code>, ...)
+- <strong>Metodi</strong> - badge colorati per metodo (<code>GET</code>, <code>POST</code>, ...)
+- <strong>Pattern</strong> - pattern URL (<code>/users/:id</code>)
+- <strong>Action</strong> - pulsante "Apri" se la route accetta <code>GET</code></p>
+<hr />
+<h2 id="trace">Trace<a class="headerlink" href="#trace" title="Permanent link">&para;</a></h2>
+<h3 id="get-hix-trace"><code>GET /hix-trace</code><a class="headerlink" href="#get-hix-trace" title="Permanent link">&para;</a></h3>
+<p><strong>Senza parametri:</strong> ritorna lo stato corrente di tutti i trace per modulo in
+JSON.</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">&quot;app&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">  </span><span class="nt">&quot;server&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">  </span><span class="nt">&quot;worker_http&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">  </span><span class="nt">&quot;worker_ws&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">  </span><span class="err">...</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos="7 "></span></a><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>Con <code>?mod=&lt;module&gt;&amp;on=&lt;0|1&gt;</code>:</strong> abilita o disabilita il trace per quel
+modulo e ritorna lo stato aggiornato.</p>
+<table>
+<thead>
+<tr>
+<th>Query</th>
+<th>Effetto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>?mod=worker_http&amp;on=1</code></td>
+<td>Abilita trace per il modulo <code>worker_http</code></td>
+</tr>
+<tr>
+<td><code>?mod=worker_http&amp;on=0</code></td>
+<td>Disabilita trace per il modulo</td>
+</tr>
+<tr>
+<td><code>?mod=all&amp;on=1</code></td>
+<td>Abilita <strong>tutti</strong> i moduli</td>
+</tr>
+<tr>
+<td><code>?mod=all&amp;on=0</code></td>
+<td>Disabilita <strong>tutti</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Moduli disponibili: <code>app</code>, <code>server</code>, <code>worker_http</code>, <code>worker_ws</code>,
+<code>worker_otros</code>, <code>pool</code>, <code>pool_detector</code>, <code>metrics</code>, <code>config</code>, <code>socket</code>,
+<code>monitor</code>, <code>response</code>, <code>logger</code>, <code>error</code>.</p>
+<blockquote>
+<p><code>WARN</code>/<code>ERROR</code>/<code>FATAL</code> sono sempre loggati, indipendentemente dal trace.</p>
+</blockquote>
+<hr />
+<h2 id="cache">Cache<a class="headerlink" href="#cache" title="Permanent link">&para;</a></h2>
+<h3 id="get-hix-cache-clear"><code>GET /hix-cache-clear</code><a class="headerlink" href="#get-hix-cache-clear" title="Permanent link">&para;</a></h3>
+<p>Elimina ricorsivamente la cache delle view compilate in <code>.cached/views/</code> (file <code>.hrb</code>
+e <code>__*.prg</code>). Utile dopo un deploy in cui i file <code>.view.html</code> cambiano ma
+<code>cache_disk = true</code> mantiene i vecchi HRB.</p>
+<p><strong>Risposta <code>200 OK</code>:</strong></p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ok&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;deleted&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">42</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;C:/hix.pro/.cached/views&quot;</span><span class="w"> </span><span class="p">}</span>
+</span></code></pre></div>
+<blockquote>
+<p>Non riguarda la cache RAM (<code>cache_ram</code>); quella si invalida da sola per <code>mtime</code>.</p>
+</blockquote>
+<hr />
+<h2 id="bench">Bench<a class="headerlink" href="#bench" title="Permanent link">&para;</a></h2>
+<h3 id="get-hix-bench-start"><code>GET /hix-bench-start</code><a class="headerlink" href="#get-hix-bench-start" title="Permanent link">&para;</a></h3>
+<p>Resetta <strong>tutti i counter</strong> del modulo metriche (<code>HIX_MetricsReset()</code>) e lascia
+il server pronto per una nuova misurazione.</p>
+<p><strong>Risposta <code>200 OK</code>:</strong></p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;bench&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;start&quot;</span><span class="w"> </span><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="get-hix-bench-stop"><code>GET /hix-bench-stop</code><a class="headerlink" href="#get-hix-bench-stop" title="Permanent link">&para;</a></h3>
+<p>Chiude il bench e ritorna un dump completo di <code>HIX_MetricsJson()</code>.</p>
+<p><strong>Risposta <code>200 OK</code>:</strong></p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">&quot;bench&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;stop&quot;</span><span class="p">,</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">  </span><span class="nt">&quot;metrics&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;uptime_s&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;requests&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">50000</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos="4 "></span></a><span class="p">}</span>
+</span></code></pre></div>
+<hr />
+<h2 id="shutdown-graceful">Shutdown graceful<a class="headerlink" href="#shutdown-graceful" title="Permanent link">&para;</a></h2>
+<h3 id="get-hix-stop"><code>GET /hix-stop</code><a class="headerlink" href="#get-hix-stop" title="Permanent link">&para;</a></h3>
+<p>Marca il server per fermarsi (<code>HIX_ServerRequestStop()</code>), chiude il keep-alive della
+request corrente, e lascia che i worker finiscano i task in esecuzione prima di uscire.</p>
+<p><strong>Risposta <code>200 OK</code>:</strong></p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;stopping&quot;</span><span class="w"> </span><span class="p">}</span>
+</span></code></pre></div>
+<blockquote>
+<p>Equivalente a un <code>Ctrl+C</code> controllato via HTTP. Il main loop esce quando ogni
+pool ha la coda vuota.</p>
+</blockquote>
+<hr />
+<h2 id="api-di-gestione-dinamica-delle-route">API di gestione dinamica delle route<a class="headerlink" href="#api-di-gestione-dinamica-delle-route" title="Permanent link">&para;</a></h2>
+<p>Permette di aggiungere, eliminare e ricaricare route <strong>hot</strong> senza riavviare HIX.
+Le route create da questa API sono volatili (perse al riavvio) a meno che non le salvi
+in <code>routes/*.json</code> prima.</p>
+<blockquote>
+<p><strong>Riservato:</strong> i nomi con prefisso <code>hix.*</code> sono di proprietà del sistema e non possono
+essere registrati tramite questa API (risponde <code>400</code>).</p>
+</blockquote>
+<h3 id="post-hix-routesadd"><code>POST /hix-routes/add</code><a class="headerlink" href="#post-hix-routesadd" title="Permanent link">&para;</a></h3>
+<p>Aggiunge una nuova route. Body <strong>JSON</strong>:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w">       </span><span class="s2">&quot;users.list&quot;</span><span class="p">,</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3"></a><a href="#__codelineno-8-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">  </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w">        </span><span class="s2">&quot;/users&quot;</span><span class="p">,</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4"></a><a href="#__codelineno-8-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">  </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w">     </span><span class="s2">&quot;/controllers/users/list.prg&quot;</span><span class="p">,</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5"></a><a href="#__codelineno-8-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">  </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w">     </span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6"></a><a href="#__codelineno-8-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">  </span><span class="nt">&quot;middleware&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HIX_MwJwt&quot;</span><span class="p">,</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7"></a><a href="#__codelineno-8-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">  </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w">      </span><span class="s2">&quot;&quot;</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8"></a><a href="#__codelineno-8-8"><span class="linenos" data-linenos="8 "></span></a><span class="p">}</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th style="text-align: center;">Obbligatorio</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>string</td>
+<td style="text-align: center;">✅</td>
+<td>Non può iniziare con <code>hix.</code></td>
+</tr>
+<tr>
+<td><code>url</code></td>
+<td>string</td>
+<td style="text-align: center;">✅</td>
+<td>Pattern URL (supporta <code>:var</code>). Alias: <code>pattern</code></td>
+</tr>
+<tr>
+<td><code>action</code></td>
+<td>string</td>
+<td style="text-align: center;">✅</td>
+<td>Path al PRG/HRB/HTML da eseguire</td>
+</tr>
+<tr>
+<td><code>method</code></td>
+<td>string</td>
+<td style="text-align: center;">❌</td>
+<td>Default <code>*</code> (tutti). Separati da virgola: <code>GET,POST</code></td>
+</tr>
+<tr>
+<td><code>middleware</code></td>
+<td>string</td>
+<td style="text-align: center;">❌</td>
+<td>MW separati da virgola</td>
+</tr>
+<tr>
+<td><code>scope</code></td>
+<td>string</td>
+<td style="text-align: center;">❌</td>
+<td>Metadata liberi (es., <code>admin</code>)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Risposta <code>200 OK</code></strong> se aggiunta:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;ok&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;users.list&quot;</span><span class="w"> </span><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>Risposta <code>409 Conflict</code></strong> se la route esiste già (nessuna sovrascrittura):</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a><a href="#__codelineno-10-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;ok&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;route duplicata o non valida&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;users.list&quot;</span><span class="w"> </span><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>Risposta <code>400 Bad Request</code></strong> se il JSON non è valido o il nome è riservato:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;ok&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;JSON body non valido&quot;</span><span class="w"> </span><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="post-hix-routesdelete"><code>POST /hix-routes/delete</code><a class="headerlink" href="#post-hix-routesdelete" title="Permanent link">&para;</a></h3>
+<p>Elimina una route per nome. Body <strong>JSON</strong>:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a><a href="#__codelineno-12-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;users.list&quot;</span><span class="w"> </span><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>Risposta <code>200 OK</code>:</strong></p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a><a href="#__codelineno-13-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;ok&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;users.list&quot;</span><span class="w"> </span><span class="p">}</span>
+</span></code></pre></div>
+<p><strong>Risposta <code>400 Bad Request</code></strong> se manca <code>name</code>:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1"></a><a href="#__codelineno-14-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;ok&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;name obbligatorio&quot;</span><span class="w"> </span><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="get-hix-routesreload"><code>GET /hix-routes/reload</code><a class="headerlink" href="#get-hix-routesreload" title="Permanent link">&para;</a></h3>
+<p>Elimina <strong>tutte le route applicative</strong> (quelle che non sono <code>hix.*</code>) e ricarica quelle
+definite in <code>www/routes/*.json</code> con <code>HIX_LoadRoutes()</code>.</p>
+<p><strong>Risposta <code>200 OK</code>:</strong></p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1"></a><a href="#__codelineno-15-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;ok&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;total_deleted&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;total_loaded&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span><span class="w"> </span><span class="p">}</span>
+</span></code></pre></div>
+<p>Utile nei workflow di deploy: copi il nuovo <code>routes/users.json</code> sul server
+e lanci <code>/hix-routes/reload</code> dalla tua pipeline.</p>
+<h3 id="get-hix-routeslist"><code>GET /hix-routes/list</code><a class="headerlink" href="#get-hix-routeslist" title="Permanent link">&para;</a></h3>
+<p>Pagina HTML con le <strong>route applicative</strong> (esclude le route di sistema <code>hix.*</code>). Colonne:
+nome, metodi, pattern, middleware, action.</p>
+<h3 id="get-hix-routeslistall"><code>GET /hix-routes/listall</code><a class="headerlink" href="#get-hix-routeslistall" title="Permanent link">&para;</a></h3>
+<p>Come <code>/hix-routes/list</code> ma include <strong>tutte</strong> le route (sistema + applicative).</p>
+<hr />
+<h2 id="autenticazione">Autenticazione<a class="headerlink" href="#autenticazione" title="Permanent link">&para;</a></h2>
+<h3 id="get-hix-login"><code>GET /hix-login</code><a class="headerlink" href="#get-hix-login" title="Permanent link">&para;</a></h3>
+<p>Pagina HTML con il form di login (username + password). Self-contained - non usa
+CDN o asset esterni.</p>
+<p>Accetta <code>?next=&lt;url&gt;</code> per reindirizzare dopo un login riuscito (default:
+<code>/hix-status</code>).</p>
+<h3 id="post-hix-login"><code>POST /hix-login</code><a class="headerlink" href="#post-hix-login" title="Permanent link">&para;</a></h3>
+<p>Processa il login. Body <strong>form-urlencoded</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>user</code></td>
+<td>string</td>
+<td>Username admin</td>
+</tr>
+<tr>
+<td><code>password</code></td>
+<td>string</td>
+<td>Password in chiaro (hash MD5 sul server)</td>
+</tr>
+<tr>
+<td><code>next</code></td>
+<td>string</td>
+<td>URL a cui reindirizzare dopo il login</td>
+</tr>
+</tbody>
+</table>
+<p>Se le credenziali sono valide:
+- Emette <code>hix_admin = &lt;ts&gt;:&lt;sign&gt;</code> cookie firmato con <code>oCfg:cAdminSecret</code>,
+  valido per <code>session.lifetime</code> minuti.
+- Reindirizza a <code>next</code> (o <code>/hix-status</code> se vuoto).</p>
+<p>Se falliscono: risponde <code>401 Unauthorized</code> con il form e un messaggio di errore.</p>
+<h3 id="get-hix-logout"><code>GET /hix-logout</code><a class="headerlink" href="#get-hix-logout" title="Permanent link">&para;</a></h3>
+<p>Cancella il cookie <code>hix_admin</code> (lo fa scadere immediatamente) e reindirizza a
+<code>/hix-login</code>.</p>
+<h3 id="get-hix-setup"><code>GET /hix-setup</code><a class="headerlink" href="#get-hix-setup" title="Permanent link">&para;</a></h3>
+<p>Pagina HTML con il form per la <strong>creazione iniziale delle credenziali</strong>. Mostrata solo se
+<code>oCfg:cAdminUser</code> o <code>oCfg:cAdminPassword</code> sono vuoti.</p>
+<p>Se le credenziali esistono già: reindirizza a <code>/hix-login</code>.</p>
+<h3 id="post-hix-setup"><code>POST /hix-setup</code><a class="headerlink" href="#post-hix-setup" title="Permanent link">&para;</a></h3>
+<p>Crea le credenziali per la prima volta. Body <strong>form-urlencoded</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Validazione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>user</code></td>
+<td>string</td>
+<td>Non vuoto</td>
+</tr>
+<tr>
+<td><code>password</code></td>
+<td>string</td>
+<td>Lunghezza minima 6</td>
+</tr>
+<tr>
+<td><code>password2</code></td>
+<td>string</td>
+<td>Deve corrispondere a <code>password</code></td>
+</tr>
+</tbody>
+</table>
+<p>Se validano:
+- Salva <code>oCfg:cAdminUser = user</code>
+- Salva <code>oCfg:cAdminPassword = MD5(password)</code>
+- Genera e salva <code>oCfg:cAdminSecret = MD5(timestamp + user + password)</code>
+- Salva tutto in <code>hix.json</code> con <code>oCfg:Generate()</code>
+- Reindirizza a <code>/hix-login</code></p>
+<p>Se ci sono errori: risponde <code>422 Unprocessable Entity</code> con il form e il
+messaggio di errore corrispondente.</p>
+<hr />
+<h2 id="cookie-di-sessione-admin-hix_admin">Cookie di sessione admin <code>hix_admin</code><a class="headerlink" href="#cookie-di-sessione-admin-hix_admin" title="Permanent link">&para;</a></h2>
+<p>Formato del valore del cookie:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1"></a><a href="#__codelineno-16-1"><span class="linenos" data-linenos="1 "></span></a>&lt;unix_timestamp&gt;:&lt;md5_sign&gt;
+</span></code></pre></div>
+<p>Dove:
+- <code>unix_timestamp</code> = momento in secondi in cui il cookie è stato emesso
+- <code>md5_sign</code> = <code>MD5(secret + "|" + unix_timestamp)</code></p>
+<p>Verifica su ogni richiesta:
+1. Tokenizza per <code>:</code>
+2. Ricalcola <code>MD5(secret + "|" + ts)</code> e confronta con <code>sign</code>
+3. Se <code>nMinutes &gt; 0</code>: controlla che <code>now - ts &lt;= session.lifetime * 60</code></p>
+<p>Se un passaggio fallisce → reindirizza a <code>/hix-login?next=&lt;current_path&gt;</code>.</p>
+<blockquote>
+<p>La firma usa <code>cAdminSecret</code> che <strong>deve</strong> essere conservato in <code>hix.json</code>. Se lo
+ruoti, tutte le sessioni admin attive diventano invalide.</p>
+</blockquote>
+<hr />
+<h2 id="codici-http">Codici HTTP<a class="headerlink" href="#codici-http" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Codice</th>
+<th>Quando</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>200 OK</code></td>
+<td>Richiesta riuscita</td>
+</tr>
+<tr>
+<td><code>302 Found</code></td>
+<td>Redirect a <code>/hix-login</code>, <code>/hix-setup</code>, o <code>next=</code></td>
+</tr>
+<tr>
+<td><code>400 Bad Request</code></td>
+<td>JSON non valido o nome route riservato (<code>hix.*</code>)</td>
+</tr>
+<tr>
+<td><code>401 Unauthorized</code></td>
+<td>Login fallito</td>
+</tr>
+<tr>
+<td><code>409 Conflict</code></td>
+<td><code>/hix-routes/add</code> con nome già esistente</td>
+</tr>
+<tr>
+<td><code>422 Unprocessable</code></td>
+<td><code>/hix-setup</code> con validazione fallita (password corta, ecc.)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="ricette-comuni">Ricette comuni<a class="headerlink" href="#ricette-comuni" title="Permanent link">&para;</a></h2>
+<h3 id="ricaricare-le-route-dopo-un-deploy">Ricaricare le route dopo un deploy<a class="headerlink" href="#ricaricare-le-route-dopo-un-deploy" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1"></a><a href="#__codelineno-17-1"><span class="linenos" data-linenos="1 "></span></a><span class="c1"># 1. Carica il nuovo JSON</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2"></a><a href="#__codelineno-17-2"><span class="linenos" data-linenos="2 "></span></a>scp<span class="w"> </span>www/routes/users.json<span class="w"> </span>prod:/srv/hix/www/routes/
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3"></a><a href="#__codelineno-17-3"><span class="linenos" data-linenos="3 "></span></a>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4"></a><a href="#__codelineno-17-4"><span class="linenos" data-linenos="4 "></span></a><span class="c1"># 2. Ricarica</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5"></a><a href="#__codelineno-17-5"><span class="linenos" data-linenos="5 "></span></a>curl<span class="w"> </span>--cookie-jar<span class="w"> </span>/tmp/c.txt<span class="w"> </span>--cookie<span class="w"> </span>/tmp/c.txt<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6"></a><a href="#__codelineno-17-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">     </span>-d<span class="w"> </span><span class="s1">&#39;user=admin&amp;password=secret&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7"></a><a href="#__codelineno-17-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">     </span>https://myapp.com/hix-login
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8"></a><a href="#__codelineno-17-8"><span class="linenos" data-linenos="8 "></span></a>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9"></a><a href="#__codelineno-17-9"><span class="linenos" data-linenos="9 "></span></a>curl<span class="w"> </span>--cookie<span class="w"> </span>/tmp/c.txt<span class="w"> </span>https://myapp.com/hix-routes/reload
+</span></code></pre></div>
+<h3 id="abilitare-il-trace-websocket-al-volo">Abilitare il trace WebSocket al volo<a class="headerlink" href="#abilitare-il-trace-websocket-al-volo" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1"></a><a href="#__codelineno-18-1"><span class="linenos" data-linenos="1 "></span></a>curl<span class="w"> </span>--cookie<span class="w"> </span>/tmp/c.txt<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2"></a><a href="#__codelineno-18-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">     </span><span class="s2">&quot;https://myapp.com/hix-trace?mod=worker_ws&amp;on=1&quot;</span>
+</span></code></pre></div>
+<h3 id="fermare-hix-da-uno-script-di-deploy">Fermare HIX da uno script di deploy<a class="headerlink" href="#fermare-hix-da-uno-script-di-deploy" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1"></a><a href="#__codelineno-19-1"><span class="linenos" data-linenos="1 "></span></a>curl<span class="w"> </span>--cookie<span class="w"> </span>/tmp/c.txt<span class="w"> </span>https://myapp.com/hix-stop
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2"></a><a href="#__codelineno-19-2"><span class="linenos" data-linenos="2 "></span></a><span class="c1"># Il server risponde {&quot;status&quot;:&quot;stopping&quot;} ed esce dopo aver drenato le code.</span>
+</span></code></pre></div>
+<h3 id="health-check-pubblico-no-auth">Health check pubblico (no auth)<a class="headerlink" href="#health-check-pubblico-no-auth" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1"></a><a href="#__codelineno-20-1"><span class="linenos" data-linenos="1 "></span></a>curl<span class="w"> </span>https://myapp.com/hix-ping
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2"></a><a href="#__codelineno-20-2"><span class="linenos" data-linenos="2 "></span></a><span class="c1"># {&quot;status&quot;:&quot;ok&quot;,&quot;server&quot;:&quot;HIX/2.1&quot;}</span>
+</span></code></pre></div>
+<hr />
+<h2 id="errori-comuni">Errori comuni<a class="headerlink" href="#errori-comuni" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><code>302</code> che reindirizza a <code>/hix-setup</code> e non arriva mai al pannello</strong> - <code>hix.json</code>
+  ha <code>admin.user</code> e/o <code>password</code> vuoti. Visita <code>/hix-setup</code> dal tuo
+  browser per crearli.</li>
+<li><strong><code>302</code> che reindirizza a <code>/hix-login</code> con cookie corretto</strong> - il cookie
+  è scaduto (<code>session.lifetime</code> trascorso) o <code>cAdminSecret</code> è cambiato.</li>
+<li><strong><code>409 duplicate</code> in <code>/hix-routes/add</code></strong> - la route esiste già. Eliminala prima
+  con <code>/hix-routes/delete</code> o cambia il nome.</li>
+<li><strong><code>400 reserved name</code></strong> - stai provando a registrare <code>hix.qualcosa</code>. Rinomina.</li>
+<li><strong><code>/hix-status</code> ritorna HTML invece di JSON</strong> - <code>admin.enabled = false</code> o
+  non sei autenticato in <code>env = "prod"</code> (ti reindirizza al login HTML).</li>
+</ul>
+<hr />
+<h2 id="best-practice">Best practice<a class="headerlink" href="#best-practice" title="Permanent link">&para;</a></h2>
+<ul>
+<li>In produzione, proteggi <code>/hix-*</code> anche a livello di proxy (<code>apache</code>/<code>nginx</code>)
+  con una allowlist di IP per minimizzare la superficie d'attacco.</li>
+<li>Non registrare le tue route con prefisso <code>hix.*</code> - è riservato e HIX le rifiuterà.</li>
+<li>Le route create da <code>/hix-routes/add</code> sono <strong>volatili</strong>: se vuoi che sopravvivano
+  al riavvio, salvali in <code>www/routes/*.json</code>.</li>
+<li><code>cAdminSecret</code> è un segreto: non committarlo in git. Per ruotarlo, rigeneralo
+  con <code>/hix-setup</code> (dopo aver cancellato <code>user</code>/<code>password</code> da <code>hix.json</code>).</li>
+<li>Usa <code>/hix-cache-clear</code> dopo qualsiasi deploy che tocca <code>.view.html</code> se hai
+  <code>cache_disk = true</code>.</li>
+<li>Abilita i trace (<code>/hix-trace?mod=X&amp;on=1</code>) solo per il tempo necessario a diagnosticare</li>
+<li>il costo di logging può essere alto nei moduli hot (<code>worker_http</code>, <code>socket</code>).</li>
+</ul>
+<hr />
+<h2 id="risorse-correlate">Risorse correlate<a class="headerlink" href="#risorse-correlate" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Configurazione <code>hix.json</code></li>
+<li><a href="../../sistema/hix-admin/">Pannello Admin (overview)</a></li>
+<li><a href="../../sistema/metricas/">Metriche</a></li>
+<li><a href="../../sistema/logger/">Logger</a></li>
+<li>Errori HTTP</li>
+<li>Trace</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Torna su
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  <span class="md-footer-text"><span class="myinfo">HIX</span>  was developed with <a href="https://harbour.github.io/">Harbour</a></span>
+  <span class="md-footer-copy">&copy; 2026 Charly Aubia Floresvi</span>
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.top", "navigation.instant", "navigation.instant.progress", "navigation.tracking", "toc.follow", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiato", "clipboard.copy": "Copia", "search.result.more.one": "1 altro in questa pagina", "search.result.more.other": "# altri in questa pagina", "search.result.none": "Nessun documento trovato", "search.result.one": "1 documento trovato", "search.result.other": "# documenti trovati", "search.result.placeholder": "Scrivi per iniziare a cercare", "search.result.term.missing": "Non presente", "select.version": "Seleziona la versione"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../../javascripts/extra.js"></script>
+      
+    
+  </body>
+</html>
