@@ -1,0 +1,142 @@
+/* ------------------------------------
+ | hix.json -- HIX Web Server Configuration
+ | Auto-generated. Edit values, keep structure.
+ * ------------------------------------ */
+{
+  "server":
+  {
+    "host": "localhost",
+    "port": 8900,
+    "maxconn": 1024,
+    "timeout": 30,
+    "name": "HIX- Unit tests",
+    "mode": "standalone",
+    "trusted_proxies": "127.0.0.1 ::1",
+    "allowed_hosts": "",
+    "ssl": false,
+    "cert_private": "",
+    "cert_public": "",
+    "gzip": true,
+    "gzip_min_size": 2048,
+    "autostart": true,
+    "exec_timeout_ms": 30000
+  },
+  "paths":
+  {
+    "root": "www",
+    "log": ".logs",
+    "tmp": "tmp",
+    "errors": ".logs",
+    "session": ".sessions",
+    "certs": "certs"
+  },
+  "app":
+  {
+    "errorsys": "",
+    "default_page": "index.html",
+    "dispatch_mode": "full",
+    "auto_close_dbf": true,
+    "auto_close_dbf_log": false,
+    "env": "dev",
+    "debug": false
+  },
+  "admin":
+  {
+    "enabled": true,
+    "user": "",
+    "password": "",
+    "secret": ""
+  },
+  "detector":
+  {
+    "workers": 4,
+    "queue_size": 256,
+    "peek_timeout_ms": 100,
+    "peek_bytes": 512
+  },
+  "pool_http":
+  {
+    "workers": 64,
+    "queue_size": 256,
+    "read_timeout_ms": 2000,
+    "keep_alive": true,
+    "keep_alive_max": 100
+  },
+  "pool_ws":
+  {
+    "workers": 100,
+    "queue_size": 256,
+    "ping_interval_s": 30,
+    "ping_timeout_s": 10
+  },
+  "pool_rest":
+  {
+    "workers_sse": 20,
+    "workers_longpoll": 10,
+    "queue_size": 128,
+    "stream_timeout_s": 3600
+  },
+  "pool_hix":
+  {
+    "workers": 4,
+    "queue_size": 64,
+    "read_timeout_ms": 2000
+  },
+  "session":
+  {
+    "storage": "memory",
+    "prefix": "sess_",
+    "crypt": false,
+    "seed": "",
+    "lifetime": 60,
+    "gc_days": 3
+  },
+  "monitor":
+  {
+    "enabled": true,
+    "interval_s": 5,
+    "alert_pct": 75
+  },
+  "log":
+  {
+    "file": "hix.log",
+    "level": "info",
+    "console": true,
+    "max_size_mb": 10,
+    "max_files": 0
+  },
+  "access_log":
+  {
+    "enabled": true,
+    "file": "access.log"
+  },
+  "firewall":
+  {
+    "mode": "blacklist",
+    "filter": ""
+  },
+  "hixstyle":
+  {
+    "enabled": false,
+    "cache_disk": true,
+    "trace": false,
+    "cache_ram": false
+  },
+  "trace":
+  {
+    "app": true,
+    "server": true,
+    "worker_http": false,
+    "worker_ws": false,
+    "worker_otros": false,
+    "pool": false,
+    "pool_detector": false,
+    "metrics": false,
+    "config": false,
+    "socket": false,
+    "monitor": false,
+    "response": false,
+    "logger": false,
+    "error": false
+  }
+}
