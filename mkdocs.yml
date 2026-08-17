@@ -221,7 +221,7 @@ plugins:
           name: Italiano
           default: false
           build: true
-          site_name: "HIX — Server Web per Harbour"
+          site_name: "Web Server"
           site_description: "Documentazione del server web HIX per Harbour"
           nav:
             - Home: it/index.md
