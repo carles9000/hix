@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="./" hreflang="en">
         
+          <link rel="alternate" href="../../it/programacion/error-handling/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="./" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../it/programacion/error-handling/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -3008,13 +3016,13 @@ the entire server crashes.</p>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="nv">LOCAL</span> oDbf
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos=" 4 "></span></a>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos=" 5 "></span></a>   <span class="nv">TRY</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6"></a><a href="#__codelineno-2-6"><span class="linenos" data-linenos=" 6 "></span></a>      <span class="nv">oDbf</span> := U<span class="nf">Dbf</span>():New( <span class="s">&quot;customers&quot;</span> )
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6"></a><a href="#__codelineno-2-6"><span class="linenos" data-linenos=" 6 "></span></a>      <span class="nv">oDbf</span> := U<span class="nf">Dbf</span>():New( <span class="s">"customers"</span> )
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7"></a><a href="#__codelineno-2-7"><span class="linenos" data-linenos=" 7 "></span></a>
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8"></a><a href="#__codelineno-2-8"><span class="linenos" data-linenos=" 8 "></span></a>      <span class="nv">oDbf</span>:Append()
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9"></a><a href="#__codelineno-2-9"><span class="linenos" data-linenos=" 9 "></span></a>      <span class="nv">oDbf</span>:Save( hData )
 </span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10"></a><a href="#__codelineno-2-10"><span class="linenos" data-linenos="10 "></span></a>      <span class="nv">lOk</span> := <span class="ow">.T.</span>
 </span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11"></a><a href="#__codelineno-2-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="nv">CATCH</span> oError
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12"></a><a href="#__codelineno-2-12"><span class="linenos" data-linenos="12 "></span></a>      <span class="nv">le</span>( <span class="s">&quot;DB insert failed: &quot;</span> + oError:description )
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12"></a><a href="#__codelineno-2-12"><span class="linenos" data-linenos="12 "></span></a>      <span class="nv">le</span>( <span class="s">"DB insert failed: "</span> + oError:description )
 </span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13"></a><a href="#__codelineno-2-13"><span class="linenos" data-linenos="13 "></span></a>      <span class="nv">lOk</span> := <span class="ow">.F.</span>
 </span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14"></a><a href="#__codelineno-2-14"><span class="linenos" data-linenos="14 "></span></a>   <span class="nv">FINALLY</span>
 </span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15"></a><a href="#__codelineno-2-15"><span class="linenos" data-linenos="15 "></span></a>      <span class="nv">oDbf</span>:Close()
@@ -3073,11 +3081,11 @@ the entire server crashes.</p>
 <h2 id="patterns-in-actions">Patterns in actions<a class="headerlink" href="#patterns-in-actions" title="Permanent link">&para;</a></h2>
 <h3 id="validation-database-with-controlled-error">Validation + database with controlled error<a class="headerlink" href="#validation-database-with-controlled-error" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> _UserCreate()
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oVal, oUsers, oError, nId := 0, cMsg := <span class="s">&quot;&quot;</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oVal, oUsers, oError, nId := 0, cMsg := <span class="s">""</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">oVal</span> := UValidateOrFail( { <span class="p">;</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a>      &quot;name<span class="s">&quot;  =&gt; &quot;</span>required|string|max:50&quot;,  <span class="p">;</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a>      &quot;email<span class="s">&quot; =&gt; &quot;</span>required|string|email&quot;    <span class="p">;</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a>      "name<span class="s">"  =&gt; "</span>required|string|max:50",  <span class="p">;</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a>      "email<span class="s">" =&gt; "</span>required|string|email"    <span class="p">;</span>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos=" 7 "></span></a>   } )
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="kr">IF</span> oVal == NIL ; RETURN NIL ; ENDIF
 </span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9"></a><a href="#__codelineno-3-9"><span class="linenos" data-linenos=" 9 "></span></a>
@@ -3085,7 +3093,7 @@ the entire server crashes.</p>
 </span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11"></a><a href="#__codelineno-3-11"><span class="linenos" data-linenos="11 "></span></a>      <span class="nv">oUsers</span> := TUsers()
 </span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12"></a><a href="#__codelineno-3-12"><span class="linenos" data-linenos="12 "></span></a>      <span class="nv">nId</span>    := oUsers:Insert( oVal:Dat<span class="nf">aFields</span>(), @cMsg )
 </span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13"></a><a href="#__codelineno-3-13"><span class="linenos" data-linenos="13 "></span></a>   <span class="nv">CATCH</span> oError
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14"></a><a href="#__codelineno-3-14"><span class="linenos" data-linenos="14 "></span></a>      <span class="nv">le</span>( <span class="s">&quot;Insert error: &quot;</span> + oError:description )
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14"></a><a href="#__codelineno-3-14"><span class="linenos" data-linenos="14 "></span></a>      <span class="nv">le</span>( <span class="s">"Insert error: "</span> + oError:description )
 </span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15"></a><a href="#__codelineno-3-15"><span class="linenos" data-linenos="15 "></span></a>      <span class="kr">RETURN</span> USend<span class="nf">Error</span>( 500, oError:description )
 </span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16"></a><a href="#__codelineno-3-16"><span class="linenos" data-linenos="16 "></span></a>   <span class="nv">END</span>
 </span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17"></a><a href="#__codelineno-3-17"><span class="linenos" data-linenos="17 "></span></a>
@@ -3093,23 +3101,23 @@ the entire server crashes.</p>
 </span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19"></a><a href="#__codelineno-3-19"><span class="linenos" data-linenos="19 "></span></a>      <span class="kr">RETURN</span> USend<span class="nf">Error</span>( 422, cMsg )
 </span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20"></a><a href="#__codelineno-3-20"><span class="linenos" data-linenos="20 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21"></a><a href="#__codelineno-3-21"><span class="linenos" data-linenos="21 "></span></a>
-</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22"></a><a href="#__codelineno-3-22"><span class="linenos" data-linenos="22 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;id&quot;</span> =&gt; nId }, 201 )
+</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22"></a><a href="#__codelineno-3-22"><span class="linenos" data-linenos="22 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"id"</span> =&gt; nId }, 201 )
 </span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23"></a><a href="#__codelineno-3-23"><span class="linenos" data-linenos="23 "></span></a><span class="kr">RETURN</span> NIL
 </span></code></pre></div>
 <h3 id="parsing-incoming-json">Parsing incoming JSON<a class="headerlink" href="#parsing-incoming-json" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> hBody := UJs<span class="nf">on</span>()
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">IF</span> hBody == NIL
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="kr">RETURN</span> USend<span class="nf">Error</span>( 400, <span class="s">&quot;Body is not valid JSON&quot;</span> )
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="kr">RETURN</span> USend<span class="nf">Error</span>( 400, <span class="s">"Body is not valid JSON"</span> )
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><a href="#__codelineno-4-4"><span class="linenos" data-linenos="4 "></span></a><span class="kr">ENDIF</span>
 </span></code></pre></div>
 <p><code>UJson</code> already returns <code>NIL</code> if it fails — you don't need an explicit TRY/CATCH.</p>
 <h3 id="access-to-optional-file">Access to optional file<a class="headerlink" href="#access-to-optional-file" title="Permanent link">&para;</a></h3>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> oError, cContent := <span class="s">&quot;&quot;</span>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> oError, cContent := <span class="s">""</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">TRY</span>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="nv">cContent</span> := hb_MemoRead( cPath )
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5"></a><a href="#__codelineno-5-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">CATCH</span> oError
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6"></a><a href="#__codelineno-5-6"><span class="linenos" data-linenos="6 "></span></a>   <span class="nv">cContent</span> := <span class="s">&quot;(file not available)&quot;</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6"></a><a href="#__codelineno-5-6"><span class="linenos" data-linenos="6 "></span></a>   <span class="nv">cContent</span> := <span class="s">"(file not available)"</span>
 </span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7"></a><a href="#__codelineno-5-7"><span class="linenos" data-linenos="7 "></span></a><span class="nv">END</span>
 </span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8"></a><a href="#__codelineno-5-8"><span class="linenos" data-linenos="8 "></span></a>
 </span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9"></a><a href="#__codelineno-5-9"><span class="linenos" data-linenos="9 "></span></a><span class="kr">USe</span>ndText( cContent )
@@ -3119,7 +3127,7 @@ the entire server crashes.</p>
 <p>Any error you <strong>do not</strong> catch with TRY/CATCH falls here. The server invokes it
 with <code>(oError, oReq)</code>:</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:bOnError := {|oErr, oReq|
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">le</span>( <span class="s">&quot;Uncaught error: &quot;</span> + oErr:description )
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">le</span>( <span class="s">"Uncaught error: "</span> + oErr:description )
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="nv">HIX_HttpError</span>( oReq, 500, oErr:description )
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos="4 "></span></a>}
 </span></code></pre></div>
@@ -3133,7 +3141,7 @@ with <code>(oError, oReq)</code>:</p>
 <h3 id="automatically-differentiate-json-html">Automatically differentiate JSON / HTML<a class="headerlink" href="#automatically-differentiate-json-html" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:bOnError := {|oErr, oReq|
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="kr">IF</span> HIX_WantsJs<span class="nf">on</span>( oReq )
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos="3 "></span></a>      <span class="nv">oReq</span>:Respond( { <span class="s">&quot;error&quot;</span> =&gt; oErr:description }, 500, <span class="s">&quot;json&quot;</span> )
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos="3 "></span></a>      <span class="nv">oReq</span>:Respond( { <span class="s">"error"</span> =&gt; oErr:description }, 500, <span class="s">"json"</span> )
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4"></a><a href="#__codelineno-7-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="kr">ELSE</span>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5"></a><a href="#__codelineno-7-5"><span class="linenos" data-linenos="5 "></span></a>      <span class="nv">HIX_ShowError</span>( oErr, oReq )    // delegates to internal renderer
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6"></a><a href="#__codelineno-7-6"><span class="linenos" data-linenos="6 "></span></a>   <span class="kr">ENDIF</span>
@@ -3147,10 +3155,10 @@ template.</p>
 <hr />
 <h2 id="explicit-http-errors">Explicit HTTP errors<a class="headerlink" href="#explicit-http-errors" title="Permanent link">&para;</a></h2>
 <p>Not every error is an exception. Many are expected situations:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>nd<span class="nf">Error</span>( 404, <span class="s">&quot;User does not exist&quot;</span> )
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">&quot;No permission&quot;</span> )
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3"></a><a href="#__codelineno-8-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>nd<span class="nf">Error</span>( 422, <span class="s">&quot;Invalid data&quot;</span> )
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4"></a><a href="#__codelineno-8-4"><span class="linenos" data-linenos="4 "></span></a><span class="kr">USe</span>nd<span class="nf">Error</span>( 429, <span class="s">&quot;Too many attempts&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>nd<span class="nf">Error</span>( 404, <span class="s">"User does not exist"</span> )
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">"No permission"</span> )
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3"></a><a href="#__codelineno-8-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>nd<span class="nf">Error</span>( 422, <span class="s">"Invalid data"</span> )
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4"></a><a href="#__codelineno-8-4"><span class="linenos" data-linenos="4 "></span></a><span class="kr">USe</span>nd<span class="nf">Error</span>( 429, <span class="s">"Too many attempts"</span> )
 </span></code></pre></div>
 <p><code>USendError</code> sends the status and body as JSON or HTML depending on <code>Accept</code>.
 It's <strong>the</strong> way to respond with controlled errors from the action.</p>
@@ -3174,13 +3182,13 @@ server.</p>
 <p><code>HIX_ShowError</code> always calls <code>_HixWriteErrorLog</code> before rendering. The
 <code>errors.log</code> file (configured with <code>HIX_ErrorLogInit</code> or via
 <code>[server] errors=.logs</code>) accumulates every error with timestamp and sequence.</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">HIX_ErrorLogInit</span>( <span class="s">&quot;.logs&quot;</span> )      // dir where errors.log is written
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">HIX_ErrorLogInit</span>( <span class="s">".logs"</span> )      // dir where errors.log is written
 </span></code></pre></div>
 <p>For free logging outside the error flow, use the log helpers:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a><a href="#__codelineno-10-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">ld</span>( <span class="s">&quot;Debug detail&quot;</span> )       // DEBUG
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2"></a><a href="#__codelineno-10-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">l</span>(  <span class="s">&quot;Info&quot;</span> )               // INFO
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3"></a><a href="#__codelineno-10-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">lw</span>( <span class="s">&quot;Warning&quot;</span> )            // WARN
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4"></a><a href="#__codelineno-10-4"><span class="linenos" data-linenos="4 "></span></a><span class="nv">le</span>( <span class="s">&quot;Error description&quot;</span> )  // ERROR
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a><a href="#__codelineno-10-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">ld</span>( <span class="s">"Debug detail"</span> )       // DEBUG
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2"></a><a href="#__codelineno-10-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">l</span>(  <span class="s">"Info"</span> )               // INFO
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3"></a><a href="#__codelineno-10-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">lw</span>( <span class="s">"Warning"</span> )            // WARN
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4"></a><a href="#__codelineno-10-4"><span class="linenos" data-linenos="4 "></span></a><span class="nv">le</span>( <span class="s">"Error description"</span> )  // ERROR
 </span></code></pre></div>
 <p>See the Logger module.</p>
 

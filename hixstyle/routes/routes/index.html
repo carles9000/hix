@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="./" hreflang="en">
         
+          <link rel="alternate" href="../../../it/hixstyle/routes/routes/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="./" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../it/hixstyle/routes/routes/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -3280,17 +3288,17 @@ with <code>THixServer():New()</code>, we can define the routes using the followi
 <code>Start()</code>.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a>LOCAL oSrv := THixServer():New()
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><a href="#__codelineno-1-2"><span class="linenos" data-linenos="2 "></span></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a><a href="#__codelineno-1-3"><span class="linenos" data-linenos="3 "></span></a>   oSrv:AddRouteGet(    &quot;users.list&quot;,   &quot;/api/users&quot;,     {|| _UserList()   } )
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4"></a><a href="#__codelineno-1-4"><span class="linenos" data-linenos="4 "></span></a>   oSrv:AddRouteGet(    &quot;users.one&quot;,    &quot;/api/users/:id&quot;, {|| _UserGet()    } )
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5"></a><a href="#__codelineno-1-5"><span class="linenos" data-linenos="5 "></span></a>   oSrv:AddRoutePost(   &quot;users.create&quot;, &quot;/api/users&quot;,     {|| _UserCreate() } )
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6"></a><a href="#__codelineno-1-6"><span class="linenos" data-linenos="6 "></span></a>   oSrv:AddRoutePut(    &quot;users.update&quot;, &quot;/api/users/:id&quot;, {|| _UserUpdate() } )
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7"></a><a href="#__codelineno-1-7"><span class="linenos" data-linenos="7 "></span></a>   oSrv:AddRouteDelete( &quot;users.delete&quot;, &quot;/api/users/:id&quot;, {|| _UserDelete() } )
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a><a href="#__codelineno-1-3"><span class="linenos" data-linenos="3 "></span></a>   oSrv:AddRouteGet(    "users.list",   "/api/users",     {|| _UserList()   } )
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4"></a><a href="#__codelineno-1-4"><span class="linenos" data-linenos="4 "></span></a>   oSrv:AddRouteGet(    "users.one",    "/api/users/:id", {|| _UserGet()    } )
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5"></a><a href="#__codelineno-1-5"><span class="linenos" data-linenos="5 "></span></a>   oSrv:AddRoutePost(   "users.create", "/api/users",     {|| _UserCreate() } )
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6"></a><a href="#__codelineno-1-6"><span class="linenos" data-linenos="6 "></span></a>   oSrv:AddRoutePut(    "users.update", "/api/users/:id", {|| _UserUpdate() } )
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7"></a><a href="#__codelineno-1-7"><span class="linenos" data-linenos="7 "></span></a>   oSrv:AddRouteDelete( "users.delete", "/api/users/:id", {|| _UserDelete() } )
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8"></a><a href="#__codelineno-1-8"><span class="linenos" data-linenos="8 "></span></a>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9"></a><a href="#__codelineno-1-9"><span class="linenos" data-linenos="9 "></span></a>oSrv:Start()
 </span></code></pre></div>
 <p>A route can have multiple methods if desired, separated by a comma.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a>// Route that accepts multiple methods at once
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a>oSrv:AddRoute( &quot;hook&quot;, &quot;/webhook&quot;, {|| _Webhook() }, &quot;GET,POST&quot; )
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a>oSrv:AddRoute( "hook", "/webhook", {|| _Webhook() }, "GET,POST" )
 </span></code></pre></div>
 <h3 id="from-json-files-hixstyle">From JSON files — HixStyle<a class="headerlink" href="#from-json-files-hixstyle" title="Permanent link">&para;</a></h3>
 <p>When HixStyle is active, HIX automatically loads all <code>*.json</code> files from the
@@ -3298,24 +3306,24 @@ with <code>THixServer():New()</code>, we can define the routes using the followi
 structure as defined earlier.</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="p">[</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="w">  </span><span class="p">{</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w">       </span><span class="s2">&quot;users.list&quot;</span><span class="p">,</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos=" 4 "></span></a><span class="w">    </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w">        </span><span class="s2">&quot;/api/users&quot;</span><span class="p">,</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="w">    </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w">     </span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="w">    </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w">     </span><span class="s2">&quot;controllers/users.prg&quot;</span><span class="p">,</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="w">    </span><span class="nt">&quot;middleware&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HixMwJwt&quot;</span><span class="p">,</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="w">    </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w">      </span><span class="s2">&quot;api&quot;</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w">       </span><span class="s2">"users.list"</span><span class="p">,</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos=" 4 "></span></a><span class="w">    </span><span class="nt">"url"</span><span class="p">:</span><span class="w">        </span><span class="s2">"/api/users"</span><span class="p">,</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="w">    </span><span class="nt">"method"</span><span class="p">:</span><span class="w">     </span><span class="s2">"GET"</span><span class="p">,</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="w">    </span><span class="nt">"action"</span><span class="p">:</span><span class="w">     </span><span class="s2">"controllers/users.prg"</span><span class="p">,</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="w">    </span><span class="nt">"middleware"</span><span class="p">:</span><span class="w"> </span><span class="s2">"HixMwJwt"</span><span class="p">,</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="w">    </span><span class="nt">"scope"</span><span class="p">:</span><span class="w">      </span><span class="s2">"api"</span>
 </span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9"></a><a href="#__codelineno-3-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="w">  </span><span class="p">},</span>
 </span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10"></a><a href="#__codelineno-3-10"><span class="linenos" data-linenos="10 "></span></a><span class="w">  </span><span class="p">{</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11"></a><a href="#__codelineno-3-11"><span class="linenos" data-linenos="11 "></span></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w">    </span><span class="s2">&quot;users.one&quot;</span><span class="p">,</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12"></a><a href="#__codelineno-3-12"><span class="linenos" data-linenos="12 "></span></a><span class="w">    </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w">     </span><span class="s2">&quot;/api/users/:id&quot;</span><span class="p">,</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13"></a><a href="#__codelineno-3-13"><span class="linenos" data-linenos="13 "></span></a><span class="w">    </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w">  </span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14"></a><a href="#__codelineno-3-14"><span class="linenos" data-linenos="14 "></span></a><span class="w">    </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w">  </span><span class="s2">&quot;controllers/users.prg&quot;</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11"></a><a href="#__codelineno-3-11"><span class="linenos" data-linenos="11 "></span></a><span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w">    </span><span class="s2">"users.one"</span><span class="p">,</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12"></a><a href="#__codelineno-3-12"><span class="linenos" data-linenos="12 "></span></a><span class="w">    </span><span class="nt">"url"</span><span class="p">:</span><span class="w">     </span><span class="s2">"/api/users/:id"</span><span class="p">,</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13"></a><a href="#__codelineno-3-13"><span class="linenos" data-linenos="13 "></span></a><span class="w">    </span><span class="nt">"method"</span><span class="p">:</span><span class="w">  </span><span class="s2">"GET"</span><span class="p">,</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14"></a><a href="#__codelineno-3-14"><span class="linenos" data-linenos="14 "></span></a><span class="w">    </span><span class="nt">"action"</span><span class="p">:</span><span class="w">  </span><span class="s2">"controllers/users.prg"</span>
 </span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15"></a><a href="#__codelineno-3-15"><span class="linenos" data-linenos="15 "></span></a><span class="w">  </span><span class="p">},</span>
 </span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16"></a><a href="#__codelineno-3-16"><span class="linenos" data-linenos="16 "></span></a><span class="w">  </span><span class="p">{</span>
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17"></a><a href="#__codelineno-3-17"><span class="linenos" data-linenos="17 "></span></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w">    </span><span class="s2">&quot;home&quot;</span><span class="p">,</span>
-</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18"></a><a href="#__codelineno-3-18"><span class="linenos" data-linenos="18 "></span></a><span class="w">    </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w">     </span><span class="s2">&quot;/&quot;</span><span class="p">,</span>
-</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19"></a><a href="#__codelineno-3-19"><span class="linenos" data-linenos="19 "></span></a><span class="w">    </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w">  </span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
-</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20"></a><a href="#__codelineno-3-20"><span class="linenos" data-linenos="20 "></span></a><span class="w">    </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w">  </span><span class="s2">&quot;views/home.html&quot;</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17"></a><a href="#__codelineno-3-17"><span class="linenos" data-linenos="17 "></span></a><span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w">    </span><span class="s2">"home"</span><span class="p">,</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18"></a><a href="#__codelineno-3-18"><span class="linenos" data-linenos="18 "></span></a><span class="w">    </span><span class="nt">"url"</span><span class="p">:</span><span class="w">     </span><span class="s2">"/"</span><span class="p">,</span>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19"></a><a href="#__codelineno-3-19"><span class="linenos" data-linenos="19 "></span></a><span class="w">    </span><span class="nt">"method"</span><span class="p">:</span><span class="w">  </span><span class="s2">"GET"</span><span class="p">,</span>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20"></a><a href="#__codelineno-3-20"><span class="linenos" data-linenos="20 "></span></a><span class="w">    </span><span class="nt">"action"</span><span class="p">:</span><span class="w">  </span><span class="s2">"views/home.html"</span>
 </span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21"></a><a href="#__codelineno-3-21"><span class="linenos" data-linenos="21 "></span></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22"></a><a href="#__codelineno-3-22"><span class="linenos" data-linenos="22 "></span></a><span class="p">]</span>
 </span></code></pre></div>
@@ -3370,43 +3378,43 @@ via API.</p>
 <h2 id="what-a-route-can-execute">What a route can execute<a class="headerlink" href="#what-a-route-can-execute" title="Permanent link">&para;</a></h2>
 <h3 id="codeblock">Codeblock<a class="headerlink" href="#codeblock" title="Permanent link">&para;</a></h3>
 <p>The most direct way. Use the <code>U*</code> helpers to read the request and send the response.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a>oSrv:AddRouteGet( &quot;ping&quot;, &quot;/ping&quot;, {|| USendJson( { &quot;ok&quot; =&gt; .T. } ) } )
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a>oSrv:AddRouteGet( "ping", "/ping", {|| USendJson( { "ok" =&gt; .T. } ) } )
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a>oSrv:AddRouteGet( &quot;greet&quot;, &quot;/hello/:name&quot;, {||
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos="4 "></span></a>   USendJson( { &quot;msg&quot; =&gt; &quot;Hello, &quot; + UParam(&quot;name&quot;) } )
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a>oSrv:AddRouteGet( "greet", "/hello/:name", {||
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos="4 "></span></a>   USendJson( { "msg" =&gt; "Hello, " + UParam("name") } )
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5"></a><a href="#__codelineno-5-5"><span class="linenos" data-linenos="5 "></span></a>} )
 </span></code></pre></div>
 <h3 id="function-name">Function name<a class="headerlink" href="#function-name" title="Permanent link">&para;</a></h3>
 <p>If the action is a string <strong>without an extension</strong>, HIX treats it as a Harbour function name
 and calls it, passing it the request object.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a>oSrv:AddRouteGet( &quot;users.list&quot;, &quot;/api/users&quot;, &quot;UserListAction&quot; )
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a>oSrv:AddRouteGet( "users.list", "/api/users", "UserListAction" )
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos="2 "></span></a>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos="3 "></span></a>// In any .prg in the library:
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos="4 "></span></a>FUNCTION UserListAction( oReq )
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5"></a><a href="#__codelineno-6-5"><span class="linenos" data-linenos="5 "></span></a>   USendJson( { &quot;users&quot; =&gt; {} } )
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5"></a><a href="#__codelineno-6-5"><span class="linenos" data-linenos="5 "></span></a>   USendJson( { "users" =&gt; {} } )
 </span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6"></a><a href="#__codelineno-6-6"><span class="linenos" data-linenos="6 "></span></a>RETURN NIL
 </span></code></pre></div>
 <h3 id="prg-file"><code>.prg</code> file<a class="headerlink" href="#prg-file" title="Permanent link">&para;</a></h3>
 <p>A <code>.prg</code> file relative to <code>&lt;root&gt;/</code>. HIX compiles and executes it.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a>// In code:
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a>oSrv:AddRouteGet( &quot;home&quot;, &quot;/&quot;, &quot;views/home.prg&quot; )
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a>oSrv:AddRouteGet( "home", "/", "views/home.prg" )
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos="3 "></span></a>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4"></a><a href="#__codelineno-7-4"><span class="linenos" data-linenos="4 "></span></a>// In JSON:
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5"></a><a href="#__codelineno-7-5"><span class="linenos" data-linenos="5 "></span></a>{ &quot;name&quot;: &quot;home&quot;, &quot;url&quot;: &quot;/&quot;, &quot;action&quot;: &quot;views/home.prg&quot; }
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5"></a><a href="#__codelineno-7-5"><span class="linenos" data-linenos="5 "></span></a>{ "name": "home", "url": "/", "action": "views/home.prg" }
 </span></code></pre></div>
 <p>The file must be a compilable <code>.prg</code>. The result returned by <code>Main()</code> or
 the output accumulated with <code>UWrite()</code> is sent as an HTML response.</p>
 <h3 id="hrb-file"><code>.hrb</code> file<a class="headerlink" href="#hrb-file" title="Permanent link">&para;</a></h3>
 <p>Same as <code>.prg</code> but already precompiled. Faster in production.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a>{ &quot;name&quot;: &quot;api.data&quot;, &quot;url&quot;: &quot;/api/data&quot;, &quot;action&quot;: &quot;controllers/data.hrb&quot; }
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a>{ "name": "api.data", "url": "/api/data", "action": "controllers/data.hrb" }
 </span></code></pre></div>
 <h3 id="class-method-methodclassprg">Class method — <code>method@class.prg</code><a class="headerlink" href="#class-method-methodclassprg" title="Permanent link">&para;</a></h3>
 <p>This is the most professional way to define an action because it allows you to define different actions
 within the same module, such as a CRUD.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a>// Calls the &quot;index&quot; method of the &quot;CustomerController&quot; class in customer.prg
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos="2 "></span></a>{ &quot;name&quot;: &quot;customer.index&quot;, &quot;url&quot;: &quot;/customers&quot;,     &quot;action&quot;: &quot;index@customer.prg&quot;  }
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3"></a><a href="#__codelineno-9-3"><span class="linenos" data-linenos="3 "></span></a>{ &quot;name&quot;: &quot;customer.show&quot;,  &quot;url&quot;: &quot;/customers/:id&quot;, &quot;action&quot;: &quot;show@customer.prg&quot;   }
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4"></a><a href="#__codelineno-9-4"><span class="linenos" data-linenos="4 "></span></a>{ &quot;name&quot;: &quot;customer.save&quot;,  &quot;url&quot;: &quot;/customers&quot;,     &quot;action&quot;: &quot;save@customer.prg&quot;   }
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a>// Calls the "index" method of the "CustomerController" class in customer.prg
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos="2 "></span></a>{ "name": "customer.index", "url": "/customers",     "action": "index@customer.prg"  }
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3"></a><a href="#__codelineno-9-3"><span class="linenos" data-linenos="3 "></span></a>{ "name": "customer.show",  "url": "/customers/:id", "action": "show@customer.prg"   }
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4"></a><a href="#__codelineno-9-4"><span class="linenos" data-linenos="4 "></span></a>{ "name": "customer.save",  "url": "/customers",     "action": "save@customer.prg"   }
 </span></code></pre></div>
 <p>The <code>customer.prg</code> file defines a class with those methods:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a><a href="#__codelineno-10-1"><span class="linenos" data-linenos="1 "></span></a>CLASS CustomerController
@@ -3416,13 +3424,13 @@ within the same module, such as a CRUD.</p>
 </span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5"></a><a href="#__codelineno-10-5"><span class="linenos" data-linenos="5 "></span></a>ENDCLASS
 </span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6"></a><a href="#__codelineno-10-6"><span class="linenos" data-linenos="6 "></span></a>
 </span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7"></a><a href="#__codelineno-10-7"><span class="linenos" data-linenos="7 "></span></a>METHOD index( oReq ) CLASS CustomerController
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8"></a><a href="#__codelineno-10-8"><span class="linenos" data-linenos="8 "></span></a>   USendJson( { &quot;customers&quot; =&gt; {} } )
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8"></a><a href="#__codelineno-10-8"><span class="linenos" data-linenos="8 "></span></a>   USendJson( { "customers" =&gt; {} } )
 </span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9"></a><a href="#__codelineno-10-9"><span class="linenos" data-linenos="9 "></span></a>RETURN NIL
 </span></code></pre></div>
 <h3 id="html-file"><code>.html</code> file<a class="headerlink" href="#html-file" title="Permanent link">&para;</a></h3>
 <p>Renders the HTML file with HIX's internal view engine, Mambo.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos="1 "></span></a>{ &quot;name&quot;: &quot;home&quot;,    &quot;url&quot;: &quot;/&quot;,     &quot;action&quot;: &quot;views/home.html&quot;      }
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos="2 "></span></a>{ &quot;name&quot;: &quot;profile&quot;, &quot;url&quot;: &quot;/user&quot;, &quot;action&quot;: &quot;views/profile.view.html&quot; }
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos="1 "></span></a>{ "name": "home",    "url": "/",     "action": "views/home.html"      }
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos="2 "></span></a>{ "name": "profile", "url": "/user", "action": "views/profile.view.html" }
 </span></code></pre></div>
 <hr />
 <h2 id="url-patterns">URL patterns<a class="headerlink" href="#url-patterns" title="Permanent link">&para;</a></h2>
@@ -3432,7 +3440,7 @@ within the same module, such as a CRUD.</p>
 </span></code></pre></div>
 <h3 id="variable-parameter-name">Variable parameter - <code>:name</code><a class="headerlink" href="#variable-parameter-name" title="Permanent link">&para;</a></h3>
 <p>Captures any value except <code>/</code>. Accessible with <code>UParam("name")</code>.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a><a href="#__codelineno-13-1"><span class="linenos" data-linenos="1 "></span></a>/users/:id              → /users/42        → UParam(&quot;id&quot;) = &quot;42&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a><a href="#__codelineno-13-1"><span class="linenos" data-linenos="1 "></span></a>/users/:id              → /users/42        → UParam("id") = "42"
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2"></a><a href="#__codelineno-13-2"><span class="linenos" data-linenos="2 "></span></a>/posts/:slug/comments   → /posts/hello/comments
 </span></code></pre></div>
 <h3 id="parameter-with-regex-constraint-nameexpr">Parameter with regex constraint - <code>:name(expr)</code><a class="headerlink" href="#parameter-with-regex-constraint-nameexpr" title="Permanent link">&para;</a></h3>
@@ -3450,12 +3458,12 @@ within the same module, such as a CRUD.</p>
 <hr />
 <h2 id="route-groups">Route groups<a class="headerlink" href="#route-groups" title="Permanent link">&para;</a></h2>
 <p>Allows you to apply a URL prefix and common middleware to a set of routes.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1"></a><a href="#__codelineno-17-1"><span class="linenos" data-linenos="1 "></span></a>oSrv:AddRouteGroup( &quot;/api/v1&quot;, &quot;HixMwJwt&quot;, &quot;api&quot;, {|o|
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2"></a><a href="#__codelineno-17-2"><span class="linenos" data-linenos="2 "></span></a>   o:AddRouteGet(    &quot;items.list&quot;,   &quot;/items&quot;,     {|| _ItemList()          } )
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3"></a><a href="#__codelineno-17-3"><span class="linenos" data-linenos="3 "></span></a>   o:AddRoutePost(   &quot;items.create&quot;, &quot;/items&quot;,     {|| _ItemCreate()        } )
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4"></a><a href="#__codelineno-17-4"><span class="linenos" data-linenos="4 "></span></a>   o:AddRouteGet(    &quot;items.one&quot;,    &quot;/items/:id&quot;, {|| _ItemGet()           } )
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5"></a><a href="#__codelineno-17-5"><span class="linenos" data-linenos="5 "></span></a>   o:AddRoutePut(    &quot;items.update&quot;, &quot;/items/:id&quot;, {|| _ItemUpdate()        } )
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6"></a><a href="#__codelineno-17-6"><span class="linenos" data-linenos="6 "></span></a>   o:AddRouteDelete( &quot;items.delete&quot;, &quot;/items/:id&quot;, {|| _ItemDelete()        } )
+<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1"></a><a href="#__codelineno-17-1"><span class="linenos" data-linenos="1 "></span></a>oSrv:AddRouteGroup( "/api/v1", "HixMwJwt", "api", {|o|
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2"></a><a href="#__codelineno-17-2"><span class="linenos" data-linenos="2 "></span></a>   o:AddRouteGet(    "items.list",   "/items",     {|| _ItemList()          } )
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3"></a><a href="#__codelineno-17-3"><span class="linenos" data-linenos="3 "></span></a>   o:AddRoutePost(   "items.create", "/items",     {|| _ItemCreate()        } )
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4"></a><a href="#__codelineno-17-4"><span class="linenos" data-linenos="4 "></span></a>   o:AddRouteGet(    "items.one",    "/items/:id", {|| _ItemGet()           } )
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5"></a><a href="#__codelineno-17-5"><span class="linenos" data-linenos="5 "></span></a>   o:AddRoutePut(    "items.update", "/items/:id", {|| _ItemUpdate()        } )
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6"></a><a href="#__codelineno-17-6"><span class="linenos" data-linenos="6 "></span></a>   o:AddRouteDelete( "items.delete", "/items/:id", {|| _ItemDelete()        } )
 </span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7"></a><a href="#__codelineno-17-7"><span class="linenos" data-linenos="7 "></span></a>} )
 </span></code></pre></div>
 <p>Routes in the block inherit the <code>/api/v1</code> prefix and the <code>HixMwJwt</code> middleware.
@@ -3463,25 +3471,25 @@ A route with its own middleware keeps it; the group's middleware only applies if
 <hr />
 <h2 id="url-generation">URL generation<a class="headerlink" href="#url-generation" title="Permanent link">&para;</a></h2>
 <p><code>URoute</code> generates the URL of a route based on its name, replacing parameters in order.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1"></a><a href="#__codelineno-18-1"><span class="linenos" data-linenos="1 "></span></a>URoute( &quot;customer.show&quot;, 42 )       // → &quot;/customers/42&quot;
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2"></a><a href="#__codelineno-18-2"><span class="linenos" data-linenos="2 "></span></a>URoute( &quot;customer.index&quot; )          // → &quot;/customers&quot;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1"></a><a href="#__codelineno-18-1"><span class="linenos" data-linenos="1 "></span></a>URoute( "customer.show", 42 )       // → "/customers/42"
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2"></a><a href="#__codelineno-18-2"><span class="linenos" data-linenos="2 "></span></a>URoute( "customer.index" )          // → "/customers"
 </span></code></pre></div>
 <p>Useful for avoiding hardcoded URLs in views and redirects:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1"></a><a href="#__codelineno-19-1"><span class="linenos" data-linenos="1 "></span></a>URedirect( URoute( &quot;customer.show&quot;, nId ) )
+<div class="language-text highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1"></a><a href="#__codelineno-19-1"><span class="linenos" data-linenos="1 "></span></a>URedirect( URoute( "customer.show", nId ) )
 </span></code></pre></div>
 <hr />
 <h2 id="error-handlers">Error handlers<a class="headerlink" href="#error-handlers" title="Permanent link">&para;</a></h2>
 <p>By default, HIX responds with a standard JSON when it does not find a route (404)
 or the method is not allowed (405). They can be replaced:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1"></a><a href="#__codelineno-20-1"><span class="linenos" data-linenos="1 "></span></a>oSrv:SetRouteHandler( &quot;404&quot;, {|| USendError( 404, &quot;Page not found&quot; ) } )
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2"></a><a href="#__codelineno-20-2"><span class="linenos" data-linenos="2 "></span></a>oSrv:SetRouteHandler( &quot;405&quot;, {|| USendError( 405, &quot;Method not allowed&quot;  ) } )
+<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1"></a><a href="#__codelineno-20-1"><span class="linenos" data-linenos="1 "></span></a>oSrv:SetRouteHandler( "404", {|| USendError( 404, "Page not found" ) } )
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2"></a><a href="#__codelineno-20-2"><span class="linenos" data-linenos="2 "></span></a>oSrv:SetRouteHandler( "405", {|| USendError( 405, "Method not allowed"  ) } )
 </span></code></pre></div>
 <hr />
 <h2 id="middleware">Middleware<a class="headerlink" href="#middleware" title="Permanent link">&para;</a></h2>
 <p>Middleware is a function that executes <strong>before</strong> the route's action.
 It can validate JWT tokens, check sessions, apply rate limiting, etc. If the middleware
 rejects the request, the action is not executed.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1"></a><a href="#__codelineno-21-1"><span class="linenos" data-linenos="1 "></span></a>oSrv:AddRouteGet( &quot;dashboard&quot;, &quot;/dashboard&quot;, {|| _Dashboard() }, &quot;HixMwRequireAuth&quot; )
+<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1"></a><a href="#__codelineno-21-1"><span class="linenos" data-linenos="1 "></span></a>oSrv:AddRouteGet( "dashboard", "/dashboard", {|| _Dashboard() }, "HixMwRequireAuth" )
 </span></code></pre></div>
 <p>See the <strong><a href="../../middleware/middleware/">Middleware</a></strong> chapter for the complete reference.</p>
 

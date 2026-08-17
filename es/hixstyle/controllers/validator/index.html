@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="../../../../hixstyle/controllers/validator/" hreflang="en">
         
+          <link rel="alternate" href="../../../../it/hixstyle/controllers/validator/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="../../../../hixstyle/controllers/validator/" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../../it/hixstyle/controllers/validator/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -3403,15 +3411,15 @@ separadas por <code>|</code>.</p>
 <hr />
 <h2 id="1-concepto-basico">1. Concepto basico<a class="headerlink" href="#1-concepto-basico" title="Permanent link">&para;</a></h2>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="nv">LOCAL</span> oVal := UValidateOrFail( {
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos=" 2 "></span></a>   &quot;name<span class="s">&quot;  =&gt; &quot;</span>required|string|max:100&quot;,
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a>   &quot;email<span class="s">&quot; =&gt; &quot;</span>required|string|email&quot;,
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos=" 4 "></span></a>   &quot;age<span class="s">&quot;   =&gt; &quot;</span>required|integer|min:18&quot;
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos=" 2 "></span></a>   "name<span class="s">"  =&gt; "</span>required|string|max:100",
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a>   "email<span class="s">" =&gt; "</span>required|string|email",
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos=" 4 "></span></a>   "age<span class="s">"   =&gt; "</span>required|integer|min:18"
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a>} )
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="kr">IF</span> oVal == NIL ; RETURN NIL ; ENDIF   // ya respondio 422
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos=" 7 "></span></a>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="nv">cName</span>  := oVal:Get( <span class="s">&quot;name&quot;</span> )
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9"></a><a href="#__codelineno-0-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="nv">cEmail</span> := oVal:Get( <span class="s">&quot;email&quot;</span> )
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10"></a><a href="#__codelineno-0-10"><span class="linenos" data-linenos="10 "></span></a><span class="nv">nAge</span>   := oVal:Get( <span class="s">&quot;age&quot;</span> )           // tipo N, no string
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="nv">cName</span>  := oVal:Get( <span class="s">"name"</span> )
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9"></a><a href="#__codelineno-0-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="nv">cEmail</span> := oVal:Get( <span class="s">"email"</span> )
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10"></a><a href="#__codelineno-0-10"><span class="linenos" data-linenos="10 "></span></a><span class="nv">nAge</span>   := oVal:Get( <span class="s">"age"</span> )           // tipo N, no string
 </span></code></pre></div>
 <p><code>UValidateOrFail</code> es el camino mas corto: ejecuta <code>Make()</code>, y si hay errores envia
 automaticamente un JSON 422 y devuelve <code>NIL</code>. Si pasa, devuelve el objeto validador
@@ -3472,7 +3480,7 @@ Usar cuando el endpoint es una API pura que exige JSON.</p>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4"></a><a href="#__codelineno-1-4"><span class="linenos" data-linenos="4 "></span></a>// API pura — solo JSON
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5"></a><a href="#__codelineno-1-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">oVal</span> := UValidateJs<span class="nf">on</span>( hRules )
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6"></a><a href="#__codelineno-1-6"><span class="linenos" data-linenos="6 "></span></a><span class="kr">IF</span> ! oVal:Make()
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7"></a><a href="#__codelineno-1-7"><span class="linenos" data-linenos="7 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;errors&quot;</span> =&gt; oVal:GetErrors() }, 422 )
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7"></a><a href="#__codelineno-1-7"><span class="linenos" data-linenos="7 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"errors"</span> =&gt; oVal:GetErrors() }, 422 )
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8"></a><a href="#__codelineno-1-8"><span class="linenos" data-linenos="8 "></span></a>   <span class="kr">RETURN</span> NIL
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9"></a><a href="#__codelineno-1-9"><span class="linenos" data-linenos="9 "></span></a><span class="kr">ENDIF</span>
 </span></code></pre></div>
@@ -3480,13 +3488,13 @@ Usar cuando el endpoint es una API pura que exige JSON.</p>
 <p><code>UValidateGet</code> fusiona la query string con las variables de ruta en un unico
 hash. Cubra todos los casos de un endpoint GET:</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a>// GET /products?<span class="nc">page</span>=2&amp;q=book  (sin :vars)
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">oVal</span> := UValidateGet( { <span class="s">&quot;page&quot;</span> =&gt; <span class="s">&quot;optional|integer|min:1&quot;</span>, <span class="s">&quot;q&quot;</span> =&gt; <span class="s">&quot;optional|string&quot;</span> } )
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">oVal</span> := UValidateGet( { <span class="s">"page"</span> =&gt; <span class="s">"optional|integer|min:1"</span>, <span class="s">"q"</span> =&gt; <span class="s">"optional|string"</span> } )
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos="3 "></span></a>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos="4 "></span></a>// GET /users/:id?expand=roles  (query + :id combinados)
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">oVal</span> := UValidateGet( { <span class="s">&quot;id&quot;</span> =&gt; <span class="s">&quot;required|integer|positive&quot;</span>, <span class="s">&quot;expand&quot;</span> =&gt; <span class="s">&quot;optional|string&quot;</span> } )
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">oVal</span> := UValidateGet( { <span class="s">"id"</span> =&gt; <span class="s">"required|integer|positive"</span>, <span class="s">"expand"</span> =&gt; <span class="s">"optional|string"</span> } )
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6"></a><a href="#__codelineno-2-6"><span class="linenos" data-linenos="6 "></span></a>
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7"></a><a href="#__codelineno-2-7"><span class="linenos" data-linenos="7 "></span></a>// POST /resource/:id con body JS<span class="nf">ON</span>  (body + :id combinados)
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8"></a><a href="#__codelineno-2-8"><span class="linenos" data-linenos="8 "></span></a><span class="nv">oVal</span> := UValidatePost( { <span class="s">&quot;id&quot;</span> =&gt; <span class="s">&quot;required|integer&quot;</span>, <span class="s">&quot;name&quot;</span> =&gt; <span class="s">&quot;required|string&quot;</span> } )
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8"></a><a href="#__codelineno-2-8"><span class="linenos" data-linenos="8 "></span></a><span class="nv">oVal</span> := UValidatePost( { <span class="s">"id"</span> =&gt; <span class="s">"required|integer"</span>, <span class="s">"name"</span> =&gt; <span class="s">"required|string"</span> } )
 </span></code></pre></div>
 <hr />
 <h2 id="3-flujo-completo-con-make">3. Flujo completo con Make()<a class="headerlink" href="#3-flujo-completo-con-make" title="Permanent link">&para;</a></h2>
@@ -3495,13 +3503,13 @@ hash. Cubra todos los casos de un endpoint GET:</p>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oVal, hData
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">oVal</span> := UValidatePost( {
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a>      &quot;name<span class="s">&quot;  =&gt; &quot;</span>required|string|max:100&quot;,
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a>      &quot;email<span class="s">&quot; =&gt; &quot;</span>required|string|email&quot;
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a>      "name<span class="s">"  =&gt; "</span>required|string|max:100",
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a>      "email<span class="s">" =&gt; "</span>required|string|email"
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos=" 7 "></span></a>   } )
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos=" 8 "></span></a>
 </span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9"></a><a href="#__codelineno-3-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="kr">IF</span> ! oVal:Make()
 </span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10"></a><a href="#__codelineno-3-10"><span class="linenos" data-linenos="10 "></span></a>      // opcion A - respuesta JSON estandar
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11"></a><a href="#__codelineno-3-11"><span class="linenos" data-linenos="11 "></span></a>      <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;errors&quot;</span> =&gt; oVal:GetErrors() }, 422 )
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11"></a><a href="#__codelineno-3-11"><span class="linenos" data-linenos="11 "></span></a>      <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"errors"</span> =&gt; oVal:GetErrors() }, 422 )
 </span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12"></a><a href="#__codelineno-3-12"><span class="linenos" data-linenos="12 "></span></a>      <span class="kr">RETURN</span> NIL
 </span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13"></a><a href="#__codelineno-3-13"><span class="linenos" data-linenos="13 "></span></a>
 </span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14"></a><a href="#__codelineno-3-14"><span class="linenos" data-linenos="14 "></span></a>      // opcion B - solo el primer error
@@ -3511,7 +3519,7 @@ hash. Cubra todos los casos de un endpoint GET:</p>
 </span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18"></a><a href="#__codelineno-3-18"><span class="linenos" data-linenos="18 "></span></a>
 </span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19"></a><a href="#__codelineno-3-19"><span class="linenos" data-linenos="19 "></span></a>   <span class="nv">hData</span> := oVal:Validated()   // hash con todos los campos validados
 </span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20"></a><a href="#__codelineno-3-20"><span class="linenos" data-linenos="20 "></span></a>   // ... guardar hData ...
-</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21"></a><a href="#__codelineno-3-21"><span class="linenos" data-linenos="21 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;ok&quot;</span> =&gt; <span class="ow">.T.</span> } )
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21"></a><a href="#__codelineno-3-21"><span class="linenos" data-linenos="21 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"ok"</span> =&gt; <span class="ow">.T.</span> } )
 </span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22"></a><a href="#__codelineno-3-22"><span class="linenos" data-linenos="22 "></span></a><span class="kr">RETURN</span> NIL
 </span></code></pre></div>
 <hr />
@@ -3538,10 +3546,10 @@ se evaluan de izquierda a derecha y se detienen en el primer error del campo.</p
 </tbody>
 </table>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a>// Campo requerido
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a>&quot;name<span class="s">&quot; =&gt; &quot;</span>required|string&quot;
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a>"name<span class="s">" =&gt; "</span>required|string"
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><a href="#__codelineno-4-4"><span class="linenos" data-linenos="4 "></span></a>// Campo opcional - solo valida si viene relleno
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5"></a><a href="#__codelineno-4-5"><span class="linenos" data-linenos="5 "></span></a>&quot;nickname<span class="s">&quot; =&gt; &quot;</span>optional|string|max:50&quot;
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5"></a><a href="#__codelineno-4-5"><span class="linenos" data-linenos="5 "></span></a>"nickname<span class="s">" =&gt; "</span>optional|string|max:50"
 </span></code></pre></div>
 <h3 id="tipos-tambien-hacen-cast-ver-seccion-5">Tipos (tambien hacen cast, ver seccion 5)<a class="headerlink" href="#tipos-tambien-hacen-cast-ver-seccion-5" title="Permanent link">&para;</a></h3>
 <table>
@@ -3615,9 +3623,9 @@ se evaluan de izquierda a derecha y se detienen en el primer error del campo.</p
 </tr>
 </tbody>
 </table>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a>&quot;title<span class="s">&quot;    =&gt; &quot;</span>required|string|min:3|max:200&quot;
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a>&quot;price<span class="s">&quot;    =&gt; &quot;</span>required|numeric|min:0|max:9999&quot;
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a>&quot;score<span class="s">&quot;    =&gt; &quot;</span>required|integer|between:1,10&quot;
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a>"title<span class="s">"    =&gt; "</span>required|string|min:3|max:200"
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a>"price<span class="s">"    =&gt; "</span>required|numeric|min:0|max:9999"
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a>"score<span class="s">"    =&gt; "</span>required|integer|between:1,10"
 </span></code></pre></div>
 <h3 id="formato">Formato<a class="headerlink" href="#formato" title="Permanent link">&para;</a></h3>
 <table>
@@ -3646,10 +3654,10 @@ se evaluan de izquierda a derecha y se detienen en el primer error del campo.</p
 </tr>
 </tbody>
 </table>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a>&quot;email<span class="s">&quot;    =&gt; &quot;</span>required|string|email&quot;
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos="2 "></span></a>&quot;web<span class="s">&quot;      =&gt; &quot;</span>optional|string|url&quot;
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos="3 "></span></a>&quot;subnet<span class="s">&quot;   =&gt; &quot;</span>required|ip&quot;
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos="4 "></span></a>&quot;code<span class="s">&quot;     =&gt; &quot;</span>required|regex:[A-Z]{3}[0-9]{4}&quot;
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a>"email<span class="s">"    =&gt; "</span>required|string|email"
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos="2 "></span></a>"web<span class="s">"      =&gt; "</span>optional|string|url"
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos="3 "></span></a>"subnet<span class="s">"   =&gt; "</span>required|ip"
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos="4 "></span></a>"code<span class="s">"     =&gt; "</span>required|regex:[A-Z]{3}[0-9]{4}"
 </span></code></pre></div>
 <h3 id="listas">Listas<a class="headerlink" href="#listas" title="Permanent link">&para;</a></h3>
 <table>
@@ -3670,8 +3678,8 @@ se evaluan de izquierda a derecha y se detienen en el primer error del campo.</p
 </tr>
 </tbody>
 </table>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a>&quot;role<span class="s">&quot;     =&gt; &quot;</span>required|string|in:admin,editor,viewer&quot;
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a>&quot;status<span class="s">&quot;   =&gt; &quot;</span>required|string|notin:deleted,banned&quot;
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a>"role<span class="s">"     =&gt; "</span>required|string|in:admin,editor,viewer"
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a>"status<span class="s">"   =&gt; "</span>required|string|notin:deleted,banned"
 </span></code></pre></div>
 <h3 id="fechas">Fechas<a class="headerlink" href="#fechas" title="Permanent link">&para;</a></h3>
 <table>
@@ -3692,8 +3700,8 @@ se evaluan de izquierda a derecha y se detienen en el primer error del campo.</p
 </tr>
 </tbody>
 </table>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a>&quot;birthday<span class="s">&quot; =&gt; &quot;</span>required|date|maxdate:2010-01-01&quot;
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a>&quot;start<span class="s">&quot;    =&gt; &quot;</span>required|date|mindate:2026-01-01&quot;
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a>"birthday<span class="s">" =&gt; "</span>required|date|maxdate:2010-01-01"
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a>"start<span class="s">"    =&gt; "</span>required|date|mindate:2026-01-01"
 </span></code></pre></div>
 <h3 id="confirmacion">Confirmacion<a class="headerlink" href="#confirmacion" title="Permanent link">&para;</a></h3>
 <table>
@@ -3710,16 +3718,16 @@ se evaluan de izquierda a derecha y se detienen en el primer error del campo.</p
 </tr>
 </tbody>
 </table>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a>// El <span class="nc">form</span>ulario debe enviar <span class="s">&quot;password&quot;</span> y <span class="s">&quot;password_confirmation&quot;</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos="2 "></span></a>&quot;password<span class="s">&quot; =&gt; &quot;</span>required|string|min:8|confirmed&quot;
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a>// El <span class="nc">form</span>ulario debe enviar <span class="s">"password"</span> y <span class="s">"password_confirmation"</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos="2 "></span></a>"password<span class="s">" =&gt; "</span>required|string|min:8|confirmed"
 </span></code></pre></div>
 <h3 id="reglas-con-codeblock-personalizado">Reglas con codeblock personalizado<a class="headerlink" href="#reglas-con-codeblock-personalizado" title="Permanent link">&para;</a></h3>
 <p>Cuando ninguna regla estandar se ajusta, puedes pasar un codeblock directamente:</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a><a href="#__codelineno-10-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oVal</span> := UValidatePost( {
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2"></a><a href="#__codelineno-10-2"><span class="linenos" data-linenos="2 "></span></a>   &quot;username<span class="s">&quot; =&gt; { &quot;</span>required|string&quot;,
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3"></a><a href="#__codelineno-10-3"><span class="linenos" data-linenos="3 "></span></a>                   &quot;Username&quot;,   // etiqueta para el mensaje de error
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4"></a><a href="#__codelineno-10-4"><span class="linenos" data-linenos="4 "></span></a>                   &quot;&quot;,           // valor por defecto
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5"></a><a href="#__codelineno-10-5"><span class="linenos" data-linenos="5 "></span></a>                   {|v| <span class="nf">iif</span>( _UserExists(v), <span class="s">&quot;El usuario ya existe&quot;</span>, <span class="ow">.T.</span> ) }
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2"></a><a href="#__codelineno-10-2"><span class="linenos" data-linenos="2 "></span></a>   "username<span class="s">" =&gt; { "</span>required|string",
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3"></a><a href="#__codelineno-10-3"><span class="linenos" data-linenos="3 "></span></a>                   "Username",   // etiqueta para el mensaje de error
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4"></a><a href="#__codelineno-10-4"><span class="linenos" data-linenos="4 "></span></a>                   "",           // valor por defecto
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5"></a><a href="#__codelineno-10-5"><span class="linenos" data-linenos="5 "></span></a>                   {|v| <span class="nf">iif</span>( _UserExists(v), <span class="s">"El usuario ya existe"</span>, <span class="ow">.T.</span> ) }
 </span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6"></a><a href="#__codelineno-10-6"><span class="linenos" data-linenos="6 "></span></a>                 }
 </span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7"></a><a href="#__codelineno-10-7"><span class="linenos" data-linenos="7 "></span></a>} )
 </span></code></pre></div>
@@ -3762,19 +3770,19 @@ Esto significa que despues de <code>Make()</code>, <code>oVal:Get("age")</code> 
 </tbody>
 </table>
 <p><strong>El cast y la validacion se pueden combinar</strong>:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos="1 "></span></a>// <span class="s">&quot;integer&quot;</span> convierte Y valida que sea entero
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos="2 "></span></a>&quot;qty<span class="s">&quot;  =&gt; &quot;</span>required|integer|min:1|max:999&quot;
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos="1 "></span></a>// <span class="s">"integer"</span> convierte Y valida que sea entero
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos="2 "></span></a>"qty<span class="s">"  =&gt; "</span>required|integer|min:1|max:999"
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3"></a><a href="#__codelineno-11-3"><span class="linenos" data-linenos="3 "></span></a>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4"></a><a href="#__codelineno-11-4"><span class="linenos" data-linenos="4 "></span></a>// <span class="s">&quot;boolean&quot;</span> convierte; sin required, un <span class="nc">checkbox</span> no enviado sera <span class="ow">.F.</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5"></a><a href="#__codelineno-11-5"><span class="linenos" data-linenos="5 "></span></a>&quot;active<span class="s">&quot; =&gt; &quot;</span>boolean&quot;
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4"></a><a href="#__codelineno-11-4"><span class="linenos" data-linenos="4 "></span></a>// <span class="s">"boolean"</span> convierte; sin required, un <span class="nc">checkbox</span> no enviado sera <span class="ow">.F.</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5"></a><a href="#__codelineno-11-5"><span class="linenos" data-linenos="5 "></span></a>"active<span class="s">" =&gt; "</span>boolean"
 </span></code></pre></div>
 <hr />
 <h2 id="6-sanitizacion-fase-3">6. Sanitizacion (fase 3)<a class="headerlink" href="#6-sanitizacion-fase-3" title="Permanent link">&para;</a></h2>
 <p>La sanitizacion se ejecuta <strong>despues</strong> de que todas las validaciones han pasado.
 Se define en el segundo parametro del helper (<code>hSanitate</code>):</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a><a href="#__codelineno-12-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oVal</span> := UValidatePost(
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2"></a><a href="#__codelineno-12-2"><span class="linenos" data-linenos="2 "></span></a>   { <span class="s">&quot;name&quot;</span> =&gt; <span class="s">&quot;required|string&quot;</span>, <span class="s">&quot;bio&quot;</span> =&gt; <span class="s">&quot;optional|string&quot;</span> },
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3"></a><a href="#__codelineno-12-3"><span class="linenos" data-linenos="3 "></span></a>   { <span class="s">&quot;name&quot;</span> =&gt; <span class="s">&quot;trim|upper&quot;</span>,      <span class="s">&quot;bio&quot;</span> =&gt; <span class="s">&quot;trim|strip_tags&quot;</span> }
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2"></a><a href="#__codelineno-12-2"><span class="linenos" data-linenos="2 "></span></a>   { <span class="s">"name"</span> =&gt; <span class="s">"required|string"</span>, <span class="s">"bio"</span> =&gt; <span class="s">"optional|string"</span> },
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3"></a><a href="#__codelineno-12-3"><span class="linenos" data-linenos="3 "></span></a>   { <span class="s">"name"</span> =&gt; <span class="s">"trim|upper"</span>,      <span class="s">"bio"</span> =&gt; <span class="s">"trim|strip_tags"</span> }
 </span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4"></a><a href="#__codelineno-12-4"><span class="linenos" data-linenos="4 "></span></a>)
 </span></code></pre></div>
 <blockquote>
@@ -3839,10 +3847,10 @@ requieren <code>hSanitate</code>.</p>
 </tr>
 </tbody>
 </table>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a><a href="#__codelineno-13-1"><span class="linenos" data-linenos="1 "></span></a>&quot;title<span class="s">&quot;   =&gt; &quot;</span>required|string|trim|slug<span class="s">&quot;      // &quot;</span>Mi Articulo!<span class="s">&quot; -&gt; &quot;</span>mi-articulo&quot;
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2"></a><a href="#__codelineno-13-2"><span class="linenos" data-linenos="2 "></span></a>&quot;content<span class="s">&quot; =&gt; &quot;</span>required|string|trim|strip_tags&quot;
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3"></a><a href="#__codelineno-13-3"><span class="linenos" data-linenos="3 "></span></a>&quot;price<span class="s">&quot;   =&gt; &quot;</span>required|numeric|abs|round:2&quot;
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4"></a><a href="#__codelineno-13-4"><span class="linenos" data-linenos="4 "></span></a>&quot;email<span class="s">&quot;   =&gt; &quot;</span>required|string|trim|lower|email&quot;
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a><a href="#__codelineno-13-1"><span class="linenos" data-linenos="1 "></span></a>"title<span class="s">"   =&gt; "</span>required|string|trim|slug<span class="s">"      // "</span>Mi Articulo!<span class="s">" -&gt; "</span>mi-articulo"
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2"></a><a href="#__codelineno-13-2"><span class="linenos" data-linenos="2 "></span></a>"content<span class="s">" =&gt; "</span>required|string|trim|strip_tags"
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3"></a><a href="#__codelineno-13-3"><span class="linenos" data-linenos="3 "></span></a>"price<span class="s">"   =&gt; "</span>required|numeric|abs|round:2"
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4"></a><a href="#__codelineno-13-4"><span class="linenos" data-linenos="4 "></span></a>"email<span class="s">"   =&gt; "</span>required|string|trim|lower|email"
 </span></code></pre></div>
 <hr />
 <h2 id="7-marcadores-especiales">7. Marcadores especiales<a class="headerlink" href="#7-marcadores-especiales" title="Permanent link">&para;</a></h2>
@@ -3850,18 +3858,18 @@ requieren <code>hSanitate</code>.</p>
 <p>Marcan los campos que deben incluirse en <code>oVal:DataFields()</code>. Util para rellenar
 formularios HTML tras un error de validacion.</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1"></a><a href="#__codelineno-14-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oVal</span> := UValidatePost( {
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2"></a><a href="#__codelineno-14-2"><span class="linenos" data-linenos="2 "></span></a>   &quot;name<span class="s">&quot;  =&gt; &quot;</span>required|string|max:100|field&quot;,
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3"></a><a href="#__codelineno-14-3"><span class="linenos" data-linenos="3 "></span></a>   &quot;email<span class="s">&quot; =&gt; &quot;</span>required|string|email|escapedfield&quot;   // HTML-encoded
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2"></a><a href="#__codelineno-14-2"><span class="linenos" data-linenos="2 "></span></a>   "name<span class="s">"  =&gt; "</span>required|string|max:100|field",
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3"></a><a href="#__codelineno-14-3"><span class="linenos" data-linenos="3 "></span></a>   "email<span class="s">" =&gt; "</span>required|string|email|escapedfield"   // HTML-encoded
 </span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4"></a><a href="#__codelineno-14-4"><span class="linenos" data-linenos="4 "></span></a>} )
 </span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5"></a><a href="#__codelineno-14-5"><span class="linenos" data-linenos="5 "></span></a>
 </span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6"></a><a href="#__codelineno-14-6"><span class="linenos" data-linenos="6 "></span></a>// Si la validacion falla, los datos originales estan disponibles
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7"></a><a href="#__codelineno-14-7"><span class="linenos" data-linenos="7 "></span></a><span class="nv">hData</span> := oVal:Dat<span class="nf">aFields</span>()  // { <span class="s">&quot;name&quot;</span> =&gt; <span class="s">&quot;Carles&quot;</span>, <span class="s">&quot;email&quot;</span> =&gt; <span class="s">&quot;c&amp;lt;a&amp;gt;@...&quot;</span> }
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7"></a><a href="#__codelineno-14-7"><span class="linenos" data-linenos="7 "></span></a><span class="nv">hData</span> := oVal:Dat<span class="nf">aFields</span>()  // { <span class="s">"name"</span> =&gt; <span class="s">"Carles"</span>, <span class="s">"email"</span> =&gt; <span class="s">"c&amp;lt;a&amp;gt;@..."</span> }
 </span></code></pre></div>
 <h3 id="resume"><code>resume</code><a class="headerlink" href="#resume" title="Permanent link">&para;</a></h3>
 <p>Marca campos que se deben incluir en <code>oVal:Resume()</code>. Se usa para re-rellenar formularios
 devolviendo los datos (ya casteados) al template incluso cuando hay error.</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1"></a><a href="#__codelineno-15-1"><span class="linenos" data-linenos="1 "></span></a>&quot;name<span class="s">&quot;  =&gt; &quot;</span>required|string|max:100|resume&quot;
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2"></a><a href="#__codelineno-15-2"><span class="linenos" data-linenos="2 "></span></a>&quot;email<span class="s">&quot; =&gt; &quot;</span>required|string|email|resume&quot;
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1"></a><a href="#__codelineno-15-1"><span class="linenos" data-linenos="1 "></span></a>"name<span class="s">"  =&gt; "</span>required|string|max:100|resume"
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2"></a><a href="#__codelineno-15-2"><span class="linenos" data-linenos="2 "></span></a>"email<span class="s">" =&gt; "</span>required|string|email|resume"
 </span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3"></a><a href="#__codelineno-15-3"><span class="linenos" data-linenos="3 "></span></a>
 </span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4"></a><a href="#__codelineno-15-4"><span class="linenos" data-linenos="4 "></span></a>// Resume incluye los campos marcados con el valor ya convertido al tipo correcto.
 </span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5"></a><a href="#__codelineno-15-5"><span class="linenos" data-linenos="5 "></span></a>// Sin marcadores resume, Resume() devuelve el hash de input original sin convertir.
@@ -3905,14 +3913,14 @@ devolviendo los datos (ya casteados) al template incluso cuando hay error.</p>
 </tbody>
 </table>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1"></a><a href="#__codelineno-16-1"><span class="linenos" data-linenos="1 "></span></a>// Obtener campos individuales
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2"></a><a href="#__codelineno-16-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">cName</span>  := oVal:Get( <span class="s">&quot;name&quot;</span> )
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3"></a><a href="#__codelineno-16-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">nAge</span>   := oVal:Get( <span class="s">&quot;age&quot;</span>, 0 )
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2"></a><a href="#__codelineno-16-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">cName</span>  := oVal:Get( <span class="s">"name"</span> )
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3"></a><a href="#__codelineno-16-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">nAge</span>   := oVal:Get( <span class="s">"age"</span>, 0 )
 </span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4"></a><a href="#__codelineno-16-4"><span class="linenos" data-linenos="4 "></span></a>
 </span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5"></a><a href="#__codelineno-16-5"><span class="linenos" data-linenos="5 "></span></a>// Obtener todos los campos validados
 </span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6"></a><a href="#__codelineno-16-6"><span class="linenos" data-linenos="6 "></span></a><span class="nv">hAll</span>   := oVal:Validated()
 </span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7"></a><a href="#__codelineno-16-7"><span class="linenos" data-linenos="7 "></span></a>
 </span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8"></a><a href="#__codelineno-16-8"><span class="linenos" data-linenos="8 "></span></a>// Obtener solo los campos que interesan
-</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9"></a><a href="#__codelineno-16-9"><span class="linenos" data-linenos="9 "></span></a><span class="nv">hSaved</span> := oVal:Validated( { <span class="s">&quot;name&quot;</span>, <span class="s">&quot;email&quot;</span>, <span class="s">&quot;age&quot;</span> } )
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9"></a><a href="#__codelineno-16-9"><span class="linenos" data-linenos="9 "></span></a><span class="nv">hSaved</span> := oVal:Validated( { <span class="s">"name"</span>, <span class="s">"email"</span>, <span class="s">"age"</span> } )
 </span></code></pre></div>
 <hr />
 <h2 id="9-gestionar-errores">9. Gestionar errores<a class="headerlink" href="#9-gestionar-errores" title="Permanent link">&para;</a></h2>
@@ -3986,20 +3994,20 @@ devolviendo los datos (ya casteados) al template incluso cuando hay error.</p>
 </span><span id="__span-17-12"><a id="__codelineno-17-12" name="__codelineno-17-12"></a><a href="#__codelineno-17-12"><span class="linenos" data-linenos="12 "></span></a>
 </span><span id="__span-17-13"><a id="__codelineno-17-13" name="__codelineno-17-13"></a><a href="#__codelineno-17-13"><span class="linenos" data-linenos="13 "></span></a>// Errores por campo (para AJAX con feedback por campo)
 </span><span id="__span-17-14"><a id="__codelineno-17-14" name="__codelineno-17-14"></a><a href="#__codelineno-17-14"><span class="linenos" data-linenos="14 "></span></a><span class="kr">IF</span> oVal:Fails()
-</span><span id="__span-17-15"><a id="__codelineno-17-15" name="__codelineno-17-15"></a><a href="#__codelineno-17-15"><span class="linenos" data-linenos="15 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;errors&quot;</span> =&gt; oVal:GetErrors() }, 422 )
+</span><span id="__span-17-15"><a id="__codelineno-17-15" name="__codelineno-17-15"></a><a href="#__codelineno-17-15"><span class="linenos" data-linenos="15 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"errors"</span> =&gt; oVal:GetErrors() }, 422 )
 </span><span id="__span-17-16"><a id="__codelineno-17-16" name="__codelineno-17-16"></a><a href="#__codelineno-17-16"><span class="linenos" data-linenos="16 "></span></a>   <span class="kr">RETURN</span> NIL
 </span><span id="__span-17-17"><a id="__codelineno-17-17" name="__codelineno-17-17"></a><a href="#__codelineno-17-17"><span class="linenos" data-linenos="17 "></span></a><span class="kr">ENDIF</span>
 </span></code></pre></div>
 <hr />
 <h2 id="10-etiquetas-y-defaults-en-los-campos">10. Etiquetas y defaults en los campos<a class="headerlink" href="#10-etiquetas-y-defaults-en-los-campos" title="Permanent link">&para;</a></h2>
 <p>La regla de un campo puede ser un array de hasta 4 elementos:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1"></a><a href="#__codelineno-18-1"><span class="linenos" data-linenos="1 "></span></a>{ &quot;reglas&quot;, &quot;Etiqueta&quot;, valorDefault, codeblock }
+<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1"></a><a href="#__codelineno-18-1"><span class="linenos" data-linenos="1 "></span></a>{ "reglas", "Etiqueta", valorDefault, codeblock }
 </span></code></pre></div>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1"></a><a href="#__codelineno-19-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oVal</span> := UValidatePost( {
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2"></a><a href="#__codelineno-19-2"><span class="linenos" data-linenos="2 "></span></a>   &quot;name<span class="s">&quot;  =&gt; { &quot;</span>required|string|max:100<span class="s">&quot;, &quot;</span>Nombre completo&quot; },
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3"></a><a href="#__codelineno-19-3"><span class="linenos" data-linenos="3 "></span></a>   &quot;age<span class="s">&quot;   =&gt; { &quot;</span>required|integer|min:18<span class="s">&quot;, &quot;</span>Edad&quot;, 0 },
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4"></a><a href="#__codelineno-19-4"><span class="linenos" data-linenos="4 "></span></a>   &quot;token<span class="s">&quot; =&gt; { &quot;</span>required|string<span class="s">&quot;, &quot;</span>Token&quot;, NIL,
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5"></a><a href="#__codelineno-19-5"><span class="linenos" data-linenos="5 "></span></a>                {|v| <span class="nf">iif</span>( HIX_TokenValid(v, 3600), <span class="ow">.T.</span>, <span class="s">&quot;Token expirado&quot;</span> ) }
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2"></a><a href="#__codelineno-19-2"><span class="linenos" data-linenos="2 "></span></a>   "name<span class="s">"  =&gt; { "</span>required|string|max:100<span class="s">", "</span>Nombre completo" },
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3"></a><a href="#__codelineno-19-3"><span class="linenos" data-linenos="3 "></span></a>   "age<span class="s">"   =&gt; { "</span>required|integer|min:18<span class="s">", "</span>Edad", 0 },
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4"></a><a href="#__codelineno-19-4"><span class="linenos" data-linenos="4 "></span></a>   "token<span class="s">" =&gt; { "</span>required|string<span class="s">", "</span>Token", NIL,
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5"></a><a href="#__codelineno-19-5"><span class="linenos" data-linenos="5 "></span></a>                {|v| <span class="nf">iif</span>( HIX_TokenValid(v, 3600), <span class="ow">.T.</span>, <span class="s">"Token expirado"</span> ) }
 </span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6"></a><a href="#__codelineno-19-6"><span class="linenos" data-linenos="6 "></span></a>              }
 </span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7"></a><a href="#__codelineno-19-7"><span class="linenos" data-linenos="7 "></span></a>} )
 </span></code></pre></div>
@@ -4011,7 +4019,7 @@ devolviendo los datos (ya casteados) al template incluso cuando hay error.</p>
 <hr />
 <h2 id="11-validar-un-solo-valor">11. Validar un solo valor<a class="headerlink" href="#11-validar-un-solo-valor" title="Permanent link">&para;</a></h2>
 <p><code>UValidatorOne</code> valida un unico valor sin necesidad de construir un hash:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1"></a><a href="#__codelineno-20-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oVal</span> := UValidatorOne( <span class="s">&quot;Email&quot;</span>, cEmail, <span class="s">&quot;required|string|email&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1"></a><a href="#__codelineno-20-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oVal</span> := UValidatorOne( <span class="s">"Email"</span>, cEmail, <span class="s">"required|string|email"</span> )
 </span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2"></a><a href="#__codelineno-20-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">IF</span> oVal:Fails()
 </span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3"></a><a href="#__codelineno-20-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 422, oVal:GetFirst<span class="nf">Error</span>() )
 </span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4"></a><a href="#__codelineno-20-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="kr">RETURN</span> NIL
@@ -4020,8 +4028,8 @@ devolviendo los datos (ya casteados) al template incluso cuando hay error.</p>
 <hr />
 <h2 id="12-anadir-campos-sobre-la-marcha">12. Anadir campos sobre la marcha<a class="headerlink" href="#12-anadir-campos-sobre-la-marcha" title="Permanent link">&para;</a></h2>
 <p>Puedes enriquecer un validador despues de crearlo con <code>Add()</code>:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1"></a><a href="#__codelineno-21-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oVal</span> := UValidatePost( { <span class="s">&quot;name&quot;</span> =&gt; <span class="s">&quot;required|string&quot;</span> } )
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2"></a><a href="#__codelineno-21-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">oVal</span>:Add( { <span class="s">&quot;extra&quot;</span> =&gt; <span class="s">&quot;optional|integer&quot;</span> }, UGet(<span class="s">&quot;extra&quot;</span>) )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1"></a><a href="#__codelineno-21-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oVal</span> := UValidatePost( { <span class="s">"name"</span> =&gt; <span class="s">"required|string"</span> } )
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2"></a><a href="#__codelineno-21-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">oVal</span>:Add( { <span class="s">"extra"</span> =&gt; <span class="s">"optional|integer"</span> }, UGet(<span class="s">"extra"</span>) )
 </span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3"></a><a href="#__codelineno-21-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">oVal</span>:Make()
 </span></code></pre></div>
 <hr />
@@ -4031,18 +4039,18 @@ devolviendo los datos (ya casteados) al template incluso cuando hay error.</p>
 </span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2"></a><a href="#__codelineno-22-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oVal, hProd
 </span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3"></a><a href="#__codelineno-22-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4"></a><a href="#__codelineno-22-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">oVal</span> := UValidateOrFail( {
-</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5"></a><a href="#__codelineno-22-5"><span class="linenos" data-linenos=" 5 "></span></a>      &quot;name<span class="s">&quot;        =&gt; { &quot;</span>required|string|max:200|trim<span class="s">&quot;,     &quot;</span>Nombre&quot; },
-</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6"></a><a href="#__codelineno-22-6"><span class="linenos" data-linenos=" 6 "></span></a>      &quot;price<span class="s">&quot;       =&gt; { &quot;</span>required|numeric|min:0|round:2<span class="s">&quot;,   &quot;</span>Precio&quot; },
-</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7"></a><a href="#__codelineno-22-7"><span class="linenos" data-linenos=" 7 "></span></a>      &quot;stock<span class="s">&quot;       =&gt; { &quot;</span>required|integer|min:0<span class="s">&quot;,           &quot;</span>Stock&quot; },
-</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8"></a><a href="#__codelineno-22-8"><span class="linenos" data-linenos=" 8 "></span></a>      &quot;category_id<span class="s">&quot; =&gt; { &quot;</span>required|integer|positive<span class="s">&quot;,        &quot;</span>Categoria&quot; },
-</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9"></a><a href="#__codelineno-22-9"><span class="linenos" data-linenos=" 9 "></span></a>      &quot;active<span class="s">&quot;      =&gt; { &quot;</span>boolean<span class="s">&quot;,                          &quot;</span>Activo&quot; }
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5"></a><a href="#__codelineno-22-5"><span class="linenos" data-linenos=" 5 "></span></a>      "name<span class="s">"        =&gt; { "</span>required|string|max:200|trim<span class="s">",     "</span>Nombre" },
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6"></a><a href="#__codelineno-22-6"><span class="linenos" data-linenos=" 6 "></span></a>      "price<span class="s">"       =&gt; { "</span>required|numeric|min:0|round:2<span class="s">",   "</span>Precio" },
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7"></a><a href="#__codelineno-22-7"><span class="linenos" data-linenos=" 7 "></span></a>      "stock<span class="s">"       =&gt; { "</span>required|integer|min:0<span class="s">",           "</span>Stock" },
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8"></a><a href="#__codelineno-22-8"><span class="linenos" data-linenos=" 8 "></span></a>      "category_id<span class="s">" =&gt; { "</span>required|integer|positive<span class="s">",        "</span>Categoria" },
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9"></a><a href="#__codelineno-22-9"><span class="linenos" data-linenos=" 9 "></span></a>      "active<span class="s">"      =&gt; { "</span>boolean<span class="s">",                          "</span>Activo" }
 </span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10"></a><a href="#__codelineno-22-10"><span class="linenos" data-linenos="10 "></span></a>   } )
 </span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11"></a><a href="#__codelineno-22-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="kr">IF</span> oVal == NIL ; RETURN NIL ; ENDIF
 </span><span id="__span-22-12"><a id="__codelineno-22-12" name="__codelineno-22-12"></a><a href="#__codelineno-22-12"><span class="linenos" data-linenos="12 "></span></a>
-</span><span id="__span-22-13"><a id="__codelineno-22-13" name="__codelineno-22-13"></a><a href="#__codelineno-22-13"><span class="linenos" data-linenos="13 "></span></a>   <span class="nv">hProd</span> := oVal:Validated( { <span class="s">&quot;name&quot;</span>, <span class="s">&quot;price&quot;</span>, <span class="s">&quot;stock&quot;</span>, <span class="s">&quot;category_id&quot;</span>, <span class="s">&quot;active&quot;</span> } )
+</span><span id="__span-22-13"><a id="__codelineno-22-13" name="__codelineno-22-13"></a><a href="#__codelineno-22-13"><span class="linenos" data-linenos="13 "></span></a>   <span class="nv">hProd</span> := oVal:Validated( { <span class="s">"name"</span>, <span class="s">"price"</span>, <span class="s">"stock"</span>, <span class="s">"category_id"</span>, <span class="s">"active"</span> } )
 </span><span id="__span-22-14"><a id="__codelineno-22-14" name="__codelineno-22-14"></a><a href="#__codelineno-22-14"><span class="linenos" data-linenos="14 "></span></a>   // ... insertar hProd en BD ...
 </span><span id="__span-22-15"><a id="__codelineno-22-15" name="__codelineno-22-15"></a><a href="#__codelineno-22-15"><span class="linenos" data-linenos="15 "></span></a>
-</span><span id="__span-22-16"><a id="__codelineno-22-16" name="__codelineno-22-16"></a><a href="#__codelineno-22-16"><span class="linenos" data-linenos="16 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;id&quot;</span> =&gt; nNewId }, 201 )
+</span><span id="__span-22-16"><a id="__codelineno-22-16" name="__codelineno-22-16"></a><a href="#__codelineno-22-16"><span class="linenos" data-linenos="16 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"id"</span> =&gt; nNewId }, 201 )
 </span><span id="__span-22-17"><a id="__codelineno-22-17" name="__codelineno-22-17"></a><a href="#__codelineno-22-17"><span class="linenos" data-linenos="17 "></span></a><span class="kr">RETURN</span> NIL
 </span></code></pre></div>
 <h3 id="formulario-html-con-re-llenado">Formulario HTML con re-llenado<a class="headerlink" href="#formulario-html-con-re-llenado" title="Permanent link">&para;</a></h3>
@@ -4050,33 +4058,33 @@ devolviendo los datos (ya casteados) al template incluso cuando hay error.</p>
 </span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2"></a><a href="#__codelineno-23-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oVal
 </span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3"></a><a href="#__codelineno-23-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4"></a><a href="#__codelineno-23-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">oVal</span> := UValidatePost( {
-</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5"></a><a href="#__codelineno-23-5"><span class="linenos" data-linenos=" 5 "></span></a>      &quot;username<span class="s">&quot; =&gt; &quot;</span>required|string|min:3|max:50|trim|lower|resume&quot;,
-</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6"></a><a href="#__codelineno-23-6"><span class="linenos" data-linenos=" 6 "></span></a>      &quot;email<span class="s">&quot;    =&gt; &quot;</span>required|string|email|trim|lower|resume&quot;,
-</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7"></a><a href="#__codelineno-23-7"><span class="linenos" data-linenos=" 7 "></span></a>      &quot;password<span class="s">&quot; =&gt; &quot;</span>required|string|min:8|confirmed&quot;
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5"></a><a href="#__codelineno-23-5"><span class="linenos" data-linenos=" 5 "></span></a>      "username<span class="s">" =&gt; "</span>required|string|min:3|max:50|trim|lower|resume",
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6"></a><a href="#__codelineno-23-6"><span class="linenos" data-linenos=" 6 "></span></a>      "email<span class="s">"    =&gt; "</span>required|string|email|trim|lower|resume",
+</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7"></a><a href="#__codelineno-23-7"><span class="linenos" data-linenos=" 7 "></span></a>      "password<span class="s">" =&gt; "</span>required|string|min:8|confirmed"
 </span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8"></a><a href="#__codelineno-23-8"><span class="linenos" data-linenos=" 8 "></span></a>   } )
 </span><span id="__span-23-9"><a id="__codelineno-23-9" name="__codelineno-23-9"></a><a href="#__codelineno-23-9"><span class="linenos" data-linenos=" 9 "></span></a>
 </span><span id="__span-23-10"><a id="__codelineno-23-10" name="__codelineno-23-10"></a><a href="#__codelineno-23-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="kr">IF</span> ! oVal:Make()
 </span><span id="__span-23-11"><a id="__codelineno-23-11" name="__codelineno-23-11"></a><a href="#__codelineno-23-11"><span class="linenos" data-linenos="11 "></span></a>      // guardar flash con errores y datos del <span class="nc">form</span>ulario
-</span><span id="__span-23-12"><a id="__codelineno-23-12" name="__codelineno-23-12"></a><a href="#__codelineno-23-12"><span class="linenos" data-linenos="12 "></span></a>      <span class="nv">LOCAL</span> oFlash := UFlash( <span class="s">&quot;register&quot;</span> )
-</span><span id="__span-23-13"><a id="__codelineno-23-13" name="__codelineno-23-13"></a><a href="#__codelineno-23-13"><span class="linenos" data-linenos="13 "></span></a>      <span class="nv">oFlash</span>:<span class="nf">Set</span>( <span class="s">&quot;errors&quot;</span>,  oVal:GetErrors() )
-</span><span id="__span-23-14"><a id="__codelineno-23-14" name="__codelineno-23-14"></a><a href="#__codelineno-23-14"><span class="linenos" data-linenos="14 "></span></a>      <span class="nv">oFlash</span>:<span class="nf">Set</span>( <span class="s">&quot;data&quot;</span>,    oVal:Resume() )
+</span><span id="__span-23-12"><a id="__codelineno-23-12" name="__codelineno-23-12"></a><a href="#__codelineno-23-12"><span class="linenos" data-linenos="12 "></span></a>      <span class="nv">LOCAL</span> oFlash := UFlash( <span class="s">"register"</span> )
+</span><span id="__span-23-13"><a id="__codelineno-23-13" name="__codelineno-23-13"></a><a href="#__codelineno-23-13"><span class="linenos" data-linenos="13 "></span></a>      <span class="nv">oFlash</span>:<span class="nf">Set</span>( <span class="s">"errors"</span>,  oVal:GetErrors() )
+</span><span id="__span-23-14"><a id="__codelineno-23-14" name="__codelineno-23-14"></a><a href="#__codelineno-23-14"><span class="linenos" data-linenos="14 "></span></a>      <span class="nv">oFlash</span>:<span class="nf">Set</span>( <span class="s">"data"</span>,    oVal:Resume() )
 </span><span id="__span-23-15"><a id="__codelineno-23-15" name="__codelineno-23-15"></a><a href="#__codelineno-23-15"><span class="linenos" data-linenos="15 "></span></a>      <span class="nv">oFlash</span>:Save()
-</span><span id="__span-23-16"><a id="__codelineno-23-16" name="__codelineno-23-16"></a><a href="#__codelineno-23-16"><span class="linenos" data-linenos="16 "></span></a>      <span class="nv">URedirect</span>( <span class="s">&quot;/register&quot;</span> )
+</span><span id="__span-23-16"><a id="__codelineno-23-16" name="__codelineno-23-16"></a><a href="#__codelineno-23-16"><span class="linenos" data-linenos="16 "></span></a>      <span class="nv">URedirect</span>( <span class="s">"/register"</span> )
 </span><span id="__span-23-17"><a id="__codelineno-23-17" name="__codelineno-23-17"></a><a href="#__codelineno-23-17"><span class="linenos" data-linenos="17 "></span></a>      <span class="kr">RETURN</span> NIL
 </span><span id="__span-23-18"><a id="__codelineno-23-18" name="__codelineno-23-18"></a><a href="#__codelineno-23-18"><span class="linenos" data-linenos="18 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-23-19"><a id="__codelineno-23-19" name="__codelineno-23-19"></a><a href="#__codelineno-23-19"><span class="linenos" data-linenos="19 "></span></a>
 </span><span id="__span-23-20"><a id="__codelineno-23-20" name="__codelineno-23-20"></a><a href="#__codelineno-23-20"><span class="linenos" data-linenos="20 "></span></a>   // ... crear usuario ...
-</span><span id="__span-23-21"><a id="__codelineno-23-21" name="__codelineno-23-21"></a><a href="#__codelineno-23-21"><span class="linenos" data-linenos="21 "></span></a>   <span class="nv">URedirect</span>( <span class="s">&quot;/dashboard&quot;</span> )
+</span><span id="__span-23-21"><a id="__codelineno-23-21" name="__codelineno-23-21"></a><a href="#__codelineno-23-21"><span class="linenos" data-linenos="21 "></span></a>   <span class="nv">URedirect</span>( <span class="s">"/dashboard"</span> )
 </span><span id="__span-23-22"><a id="__codelineno-23-22" name="__codelineno-23-22"></a><a href="#__codelineno-23-22"><span class="linenos" data-linenos="22 "></span></a><span class="kr">RETURN</span> NIL
 </span></code></pre></div>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1"></a><a href="#__codelineno-24-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> _RegisterGet()
-</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2"></a><a href="#__codelineno-24-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oFlash  := UFlash( <span class="s">&quot;register&quot;</span> )
-</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3"></a><a href="#__codelineno-24-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="nv">LOCAL</span> hErrors := oFlash:Get( <span class="s">&quot;errors&quot;</span>, {=&gt;} )
-</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4"></a><a href="#__codelineno-24-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">LOCAL</span> hData   := oFlash:Get( <span class="s">&quot;data&quot;</span>,   {=&gt;} )
-</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5"></a><a href="#__codelineno-24-5"><span class="linenos" data-linenos=" 5 "></span></a>   <span class="kr">USe</span>ndView( <span class="s">&quot;auth/register.view.html&quot;</span>, {
-</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6"></a><a href="#__codelineno-24-6"><span class="linenos" data-linenos=" 6 "></span></a>      &quot;hErrors&quot;   =&gt; hErrors,
-</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7"></a><a href="#__codelineno-24-7"><span class="linenos" data-linenos=" 7 "></span></a>      &quot;cUsername<span class="s">&quot; =&gt; hb_HGetDef( hData, &quot;</span>username<span class="s">&quot;, &quot;</span>&quot; ),
-</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8"></a><a href="#__codelineno-24-8"><span class="linenos" data-linenos=" 8 "></span></a>      &quot;cEmail<span class="s">&quot;    =&gt; hb_HGetDef( hData, &quot;</span>email<span class="s">&quot;,    &quot;</span>&quot; )
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2"></a><a href="#__codelineno-24-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oFlash  := UFlash( <span class="s">"register"</span> )
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3"></a><a href="#__codelineno-24-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="nv">LOCAL</span> hErrors := oFlash:Get( <span class="s">"errors"</span>, {=&gt;} )
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4"></a><a href="#__codelineno-24-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">LOCAL</span> hData   := oFlash:Get( <span class="s">"data"</span>,   {=&gt;} )
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5"></a><a href="#__codelineno-24-5"><span class="linenos" data-linenos=" 5 "></span></a>   <span class="kr">USe</span>ndView( <span class="s">"auth/register.view.html"</span>, {
+</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6"></a><a href="#__codelineno-24-6"><span class="linenos" data-linenos=" 6 "></span></a>      "hErrors"   =&gt; hErrors,
+</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7"></a><a href="#__codelineno-24-7"><span class="linenos" data-linenos=" 7 "></span></a>      "cUsername<span class="s">" =&gt; hb_HGetDef( hData, "</span>username<span class="s">", "</span>" ),
+</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8"></a><a href="#__codelineno-24-8"><span class="linenos" data-linenos=" 8 "></span></a>      "cEmail<span class="s">"    =&gt; hb_HGetDef( hData, "</span>email<span class="s">",    "</span>" )
 </span><span id="__span-24-9"><a id="__codelineno-24-9" name="__codelineno-24-9"></a><a href="#__codelineno-24-9"><span class="linenos" data-linenos=" 9 "></span></a>   } )
 </span><span id="__span-24-10"><a id="__codelineno-24-10" name="__codelineno-24-10"></a><a href="#__codelineno-24-10"><span class="linenos" data-linenos="10 "></span></a><span class="kr">RETURN</span> NIL
 </span></code></pre></div>
@@ -4085,18 +4093,18 @@ devolviendo los datos (ya casteados) al template incluso cuando hay error.</p>
 </span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2"></a><a href="#__codelineno-25-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oVal, n<span class="nc">Page</span>, nLimit, cQ
 </span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3"></a><a href="#__codelineno-25-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4"></a><a href="#__codelineno-25-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">oVal</span> := UValidateGet( {
-</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5"></a><a href="#__codelineno-25-5"><span class="linenos" data-linenos=" 5 "></span></a>      &quot;<span class="nc">page</span><span class="s">&quot;  =&gt; { &quot;</span>optional|integer|min:1<span class="s">&quot;,    &quot;</span>Pagina&quot;,  1 },
-</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6"></a><a href="#__codelineno-25-6"><span class="linenos" data-linenos=" 6 "></span></a>      &quot;limit<span class="s">&quot; =&gt; { &quot;</span>optional|integer|between:1,100<span class="s">&quot;, &quot;</span>Limite&quot;, 20 },
-</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7"></a><a href="#__codelineno-25-7"><span class="linenos" data-linenos=" 7 "></span></a>      &quot;q<span class="s">&quot;     =&gt; { &quot;</span>optional|string|max:200|trim<span class="s">&quot;, &quot;</span>Busqueda<span class="s">&quot;, &quot;</span>&quot; }
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5"></a><a href="#__codelineno-25-5"><span class="linenos" data-linenos=" 5 "></span></a>      "<span class="nc">page</span><span class="s">"  =&gt; { "</span>optional|integer|min:1<span class="s">",    "</span>Pagina",  1 },
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6"></a><a href="#__codelineno-25-6"><span class="linenos" data-linenos=" 6 "></span></a>      "limit<span class="s">" =&gt; { "</span>optional|integer|between:1,100<span class="s">", "</span>Limite", 20 },
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7"></a><a href="#__codelineno-25-7"><span class="linenos" data-linenos=" 7 "></span></a>      "q<span class="s">"     =&gt; { "</span>optional|string|max:200|trim<span class="s">", "</span>Busqueda<span class="s">", "</span>" }
 </span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8"></a><a href="#__codelineno-25-8"><span class="linenos" data-linenos=" 8 "></span></a>   } )
 </span><span id="__span-25-9"><a id="__codelineno-25-9" name="__codelineno-25-9"></a><a href="#__codelineno-25-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="nv">oVal</span>:Make()   // nunca falla (todos opcionales con defaults)
 </span><span id="__span-25-10"><a id="__codelineno-25-10" name="__codelineno-25-10"></a><a href="#__codelineno-25-10"><span class="linenos" data-linenos="10 "></span></a>
-</span><span id="__span-25-11"><a id="__codelineno-25-11" name="__codelineno-25-11"></a><a href="#__codelineno-25-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="nv">nPage</span>  := oVal:Get( <span class="s">&quot;page&quot;</span> )
-</span><span id="__span-25-12"><a id="__codelineno-25-12" name="__codelineno-25-12"></a><a href="#__codelineno-25-12"><span class="linenos" data-linenos="12 "></span></a>   <span class="nv">nLimit</span> := oVal:Get( <span class="s">&quot;limit&quot;</span> )
-</span><span id="__span-25-13"><a id="__codelineno-25-13" name="__codelineno-25-13"></a><a href="#__codelineno-25-13"><span class="linenos" data-linenos="13 "></span></a>   <span class="nv">cQ</span>     := oVal:Get( <span class="s">&quot;q&quot;</span> )
+</span><span id="__span-25-11"><a id="__codelineno-25-11" name="__codelineno-25-11"></a><a href="#__codelineno-25-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="nv">nPage</span>  := oVal:Get( <span class="s">"page"</span> )
+</span><span id="__span-25-12"><a id="__codelineno-25-12" name="__codelineno-25-12"></a><a href="#__codelineno-25-12"><span class="linenos" data-linenos="12 "></span></a>   <span class="nv">nLimit</span> := oVal:Get( <span class="s">"limit"</span> )
+</span><span id="__span-25-13"><a id="__codelineno-25-13" name="__codelineno-25-13"></a><a href="#__codelineno-25-13"><span class="linenos" data-linenos="13 "></span></a>   <span class="nv">cQ</span>     := oVal:Get( <span class="s">"q"</span> )
 </span><span id="__span-25-14"><a id="__codelineno-25-14" name="__codelineno-25-14"></a><a href="#__codelineno-25-14"><span class="linenos" data-linenos="14 "></span></a>
 </span><span id="__span-25-15"><a id="__codelineno-25-15" name="__codelineno-25-15"></a><a href="#__codelineno-25-15"><span class="linenos" data-linenos="15 "></span></a>   // ... consultar BD ...
-</span><span id="__span-25-16"><a id="__codelineno-25-16" name="__codelineno-25-16"></a><a href="#__codelineno-25-16"><span class="linenos" data-linenos="16 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;page&quot;</span> =&gt; n<span class="nc">Page</span>, <span class="s">&quot;limit&quot;</span> =&gt; nLimit, <span class="s">&quot;results&quot;</span> =&gt; aResults } )
+</span><span id="__span-25-16"><a id="__codelineno-25-16" name="__codelineno-25-16"></a><a href="#__codelineno-25-16"><span class="linenos" data-linenos="16 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"page"</span> =&gt; n<span class="nc">Page</span>, <span class="s">"limit"</span> =&gt; nLimit, <span class="s">"results"</span> =&gt; aResults } )
 </span><span id="__span-25-17"><a id="__codelineno-25-17" name="__codelineno-25-17"></a><a href="#__codelineno-25-17"><span class="linenos" data-linenos="17 "></span></a><span class="kr">RETURN</span> NIL
 </span></code></pre></div>
 <h3 id="validacion-con-regla-personalizada-contra-bd">Validacion con regla personalizada contra BD<a class="headerlink" href="#validacion-con-regla-personalizada-contra-bd" title="Permanent link">&para;</a></h3>
@@ -4104,17 +4112,17 @@ devolviendo los datos (ya casteados) al template incluso cuando hay error.</p>
 </span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2"></a><a href="#__codelineno-26-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oVal
 </span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3"></a><a href="#__codelineno-26-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4"></a><a href="#__codelineno-26-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">oVal</span> := UValidateOrFail( {
-</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5"></a><a href="#__codelineno-26-5"><span class="linenos" data-linenos=" 5 "></span></a>      &quot;email<span class="s">&quot; =&gt; { &quot;</span>required|string|email|trim|lower&quot;,
-</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6"></a><a href="#__codelineno-26-6"><span class="linenos" data-linenos=" 6 "></span></a>                   &quot;Email&quot;,
-</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7"></a><a href="#__codelineno-26-7"><span class="linenos" data-linenos=" 7 "></span></a>                   &quot;&quot;,
-</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8"></a><a href="#__codelineno-26-8"><span class="linenos" data-linenos=" 8 "></span></a>                   {|v| <span class="nf">iif</span>( _EmailTaken(v), <span class="s">&quot;El email ya esta registrado&quot;</span>, <span class="ow">.T.</span> ) }
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5"></a><a href="#__codelineno-26-5"><span class="linenos" data-linenos=" 5 "></span></a>      "email<span class="s">" =&gt; { "</span>required|string|email|trim|lower",
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6"></a><a href="#__codelineno-26-6"><span class="linenos" data-linenos=" 6 "></span></a>                   "Email",
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7"></a><a href="#__codelineno-26-7"><span class="linenos" data-linenos=" 7 "></span></a>                   "",
+</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8"></a><a href="#__codelineno-26-8"><span class="linenos" data-linenos=" 8 "></span></a>                   {|v| <span class="nf">iif</span>( _EmailTaken(v), <span class="s">"El email ya esta registrado"</span>, <span class="ow">.T.</span> ) }
 </span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9"></a><a href="#__codelineno-26-9"><span class="linenos" data-linenos=" 9 "></span></a>                 }
 </span><span id="__span-26-10"><a id="__codelineno-26-10" name="__codelineno-26-10"></a><a href="#__codelineno-26-10"><span class="linenos" data-linenos="10 "></span></a>   } )
 </span><span id="__span-26-11"><a id="__codelineno-26-11" name="__codelineno-26-11"></a><a href="#__codelineno-26-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="kr">IF</span> oVal == NIL ; RETURN NIL ; ENDIF
 </span><span id="__span-26-12"><a id="__codelineno-26-12" name="__codelineno-26-12"></a><a href="#__codelineno-26-12"><span class="linenos" data-linenos="12 "></span></a>
-</span><span id="__span-26-13"><a id="__codelineno-26-13" name="__codelineno-26-13"></a><a href="#__codelineno-26-13"><span class="linenos" data-linenos="13 "></span></a>   <span class="nv">cEmail</span> := oVal:Get( <span class="s">&quot;email&quot;</span> )
+</span><span id="__span-26-13"><a id="__codelineno-26-13" name="__codelineno-26-13"></a><a href="#__codelineno-26-13"><span class="linenos" data-linenos="13 "></span></a>   <span class="nv">cEmail</span> := oVal:Get( <span class="s">"email"</span> )
 </span><span id="__span-26-14"><a id="__codelineno-26-14" name="__codelineno-26-14"></a><a href="#__codelineno-26-14"><span class="linenos" data-linenos="14 "></span></a>   // ... actualizar email ...
-</span><span id="__span-26-15"><a id="__codelineno-26-15" name="__codelineno-26-15"></a><a href="#__codelineno-26-15"><span class="linenos" data-linenos="15 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;ok&quot;</span> =&gt; <span class="ow">.T.</span> } )
+</span><span id="__span-26-15"><a id="__codelineno-26-15" name="__codelineno-26-15"></a><a href="#__codelineno-26-15"><span class="linenos" data-linenos="15 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"ok"</span> =&gt; <span class="ow">.T.</span> } )
 </span><span id="__span-26-16"><a id="__codelineno-26-16" name="__codelineno-26-16"></a><a href="#__codelineno-26-16"><span class="linenos" data-linenos="16 "></span></a><span class="kr">RETURN</span> NIL
 </span><span id="__span-26-17"><a id="__codelineno-26-17" name="__codelineno-26-17"></a><a href="#__codelineno-26-17"><span class="linenos" data-linenos="17 "></span></a>
 </span><span id="__span-26-18"><a id="__codelineno-26-18" name="__codelineno-26-18"></a><a href="#__codelineno-26-18"><span class="linenos" data-linenos="18 "></span></a><span class="nv">STATIC</span> FUNCTION _EmailTaken( cEmail )

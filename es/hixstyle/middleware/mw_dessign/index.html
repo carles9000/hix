@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="../../../../hixstyle/middleware/mw_dessign/" hreflang="en">
         
+          <link rel="alternate" href="../../../../it/hixstyle/middleware/mw_dessign/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="../../../../hixstyle/middleware/mw_dessign/" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../../it/hixstyle/middleware/mw_dessign/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -2943,7 +2951,7 @@
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos=" 2 "></span></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="kr">FUNCTION</span> Mw_FenixSetup( nExpSecs )
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos=" 4 "></span></a>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a>   <span class="kr">IF</span> Val<span class="nf">Type</span>( nExpSecs ) == <span class="s">&quot;N&quot;</span> <span class="ow">.AND.</span> nExpSecs &gt; 0
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a>   <span class="kr">IF</span> Val<span class="nf">Type</span>( nExpSecs ) == <span class="s">"N"</span> <span class="ow">.AND.</span> nExpSecs &gt; 0
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos=" 6 "></span></a>      <span class="nv">s_MyVar</span> := nExpSecs 
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos=" 7 "></span></a>   ENDIF
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos=" 8 "></span></a>
@@ -3067,12 +3075,12 @@ que requiere esa ruta.</p>
 </span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9"></a><a href="#__codelineno-5-9"><span class="linenos" data-linenos=" 9 "></span></a>[MW_Jwt]
 </span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10"></a><a href="#__codelineno-5-10"><span class="linenos" data-linenos="10 "></span></a>  ¿Hay cabecera Authorization: Bearer xxx?
 </span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11"></a><a href="#__codelineno-5-11"><span class="linenos" data-linenos="11 "></span></a>  ¿El token es válido y no ha expirado?
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12"></a><a href="#__codelineno-5-12"><span class="linenos" data-linenos="12 "></span></a>  Sí → deposita payload en oCtx:hData[&quot;jwt&quot;] → .T.
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12"></a><a href="#__codelineno-5-12"><span class="linenos" data-linenos="12 "></span></a>  Sí → deposita payload en oCtx:hData["jwt"] → .T.
 </span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13"></a><a href="#__codelineno-5-13"><span class="linenos" data-linenos="13 "></span></a>  No → responde 401 → .F. → corta
 </span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14"></a><a href="#__codelineno-5-14"><span class="linenos" data-linenos="14 "></span></a>     │
 </span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15"></a><a href="#__codelineno-5-15"><span class="linenos" data-linenos="15 "></span></a>     ▼
-</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16"></a><a href="#__codelineno-5-16"><span class="linenos" data-linenos="16 "></span></a>[MW_RequireRole(&quot;editor&quot;)]
-</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17"></a><a href="#__codelineno-5-17"><span class="linenos" data-linenos="17 "></span></a>  ¿oCtx:hData[&quot;jwt&quot;][&quot;role&quot;] == &quot;editor&quot;?
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16"></a><a href="#__codelineno-5-16"><span class="linenos" data-linenos="16 "></span></a>[MW_RequireRole("editor")]
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17"></a><a href="#__codelineno-5-17"><span class="linenos" data-linenos="17 "></span></a>  ¿oCtx:hData["jwt"]["role"] == "editor"?
 </span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18"></a><a href="#__codelineno-5-18"><span class="linenos" data-linenos="18 "></span></a>  Sí → .T.
 </span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19"></a><a href="#__codelineno-5-19"><span class="linenos" data-linenos="19 "></span></a>  No → responde 403 → .F. → corta
 </span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20"></a><a href="#__codelineno-5-20"><span class="linenos" data-linenos="20 "></span></a>     │

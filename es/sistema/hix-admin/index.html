@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="../../../sistema/hix-admin/" hreflang="en">
         
+          <link rel="alternate" href="../../../it/sistema/hix-admin/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="../../../sistema/hix-admin/" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../it/sistema/hix-admin/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -3052,11 +3060,11 @@ redirige a <code>/hix-setup</code> para que crees el usuario/contraseña inicial
 <code>user</code> / <code>password</code> vacíos activan <code>/hix-setup</code>. La vida de la sesión admin
 la controla <code>session.lifetime</code> (minutos).</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">&quot;admin&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">    </span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="w">  </span><span class="kc">true</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">    </span><span class="nt">&quot;user&quot;</span><span class="p">:</span><span class="w">     </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">    </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">    </span><span class="nt">&quot;secret&quot;</span><span class="p">:</span><span class="w">   </span><span class="s2">&quot;&quot;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">"admin"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">    </span><span class="nt">"enabled"</span><span class="p">:</span><span class="w">  </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">    </span><span class="nt">"user"</span><span class="p">:</span><span class="w">     </span><span class="s2">""</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">    </span><span class="nt">"password"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">    </span><span class="nt">"secret"</span><span class="p">:</span><span class="w">   </span><span class="s2">""</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos="8 "></span></a><span class="p">}</span>
 </span></code></pre></div>
@@ -3228,7 +3236,7 @@ cualquier petición a <code>/hix-*</code> devuelve 404.</p>
 <hr />
 <h2 id="sesion-y-cookie">Sesión y cookie<a class="headerlink" href="#sesion-y-cookie" title="Permanent link">&para;</a></h2>
 <p>Cuando el login es correcto, HIX firma la cookie con HMAC simulado:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a>hix_admin = &lt;timestamp&gt;:&lt;md5( cAdminSecret + &quot;|&quot; + timestamp )&gt;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a>hix_admin = &lt;timestamp&gt;:&lt;md5( cAdminSecret + "|" + timestamp )&gt;
 </span></code></pre></div>
 <p>En cada petición admin, <code>HIX_AdminCheck(oReq)</code>:</p>
 <ol>
@@ -3270,23 +3278,23 @@ setup/login.</p>
 <h2 id="ejemplo-consumir-hix-status-desde-monitorizacion">Ejemplo: consumir <code>/hix-status</code> desde monitorización<a class="headerlink" href="#ejemplo-consumir-hix-status-desde-monitorizacion" title="Permanent link">&para;</a></h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos="1 "></span></a><span class="c1"># 1. Login y guarda la cookie</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos="2 "></span></a>curl<span class="w"> </span>-c<span class="w"> </span>hix.jar<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://miservidor.com/hix-login<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;user=admin&amp;password=secreto&#39;</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'user=admin&amp;password=secreto'</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos="4 "></span></a>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos="5 "></span></a><span class="c1"># 2. Consume status</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos="6 "></span></a>curl<span class="w"> </span>-b<span class="w"> </span>hix.jar<span class="w"> </span>https://miservidor.com/hix-status
 </span></code></pre></div>
 <p>Salida:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;requests&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">18472</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;errors&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;uptimesec&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">78423</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">"requests"</span><span class="p">:</span><span class="w"> </span><span class="mi">18472</span><span class="p">,</span><span class="w"> </span><span class="nt">"errors"</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="nt">"uptimesec"</span><span class="p">:</span><span class="w"> </span><span class="mi">78423</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
 </span></code></pre></div>
 <p>Para integración con <strong>Prometheus</strong>, basta envolverlo en un exporter
 trivial que haga GET cada 30 s.</p>
 <hr />
 <h2 id="trazas-dinamicas-con-hix-trace">Trazas dinámicas con <code>/hix-trace</code><a class="headerlink" href="#trazas-dinamicas-con-hix-trace" title="Permanent link">&para;</a></h2>
 <p><code>GET /hix-trace</code> devuelve el hash de trazas activas por módulo:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;router&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;session&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;auth&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">"router"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nt">"session"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="nt">"auth"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
 </span></code></pre></div>
 <p><code>POST /hix-trace</code> con body JSON ajusta una traza concreta:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;module&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;router&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">"module"</span><span class="p">:</span><span class="w"> </span><span class="s2">"router"</span><span class="p">,</span><span class="w"> </span><span class="nt">"enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
 </span></code></pre></div>
 <p>Útil para diagnosticar un problema en producción sin tocar <code>hix.json</code>.
 Cuando termines, vuelve a desactivar la traza para no inflar el log.</p>
@@ -3297,8 +3305,8 @@ Cuando termines, vuelve a desactivar la traza para no inflar el log.</p>
 <h2 id="deshabilitar-el-panel">Deshabilitar el panel<a class="headerlink" href="#deshabilitar-el-panel" title="Permanent link">&para;</a></h2>
 <p>En entornos muy restrictivos puedes apagar el panel entero:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">&quot;admin&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">    </span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">"admin"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">    </span><span class="nt">"enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4"></a><a href="#__codelineno-7-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5"></a><a href="#__codelineno-7-5"><span class="linenos" data-linenos="5 "></span></a><span class="p">}</span>
 </span></code></pre></div>

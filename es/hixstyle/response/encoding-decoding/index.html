@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="../../../../hixstyle/response/encoding-decoding/" hreflang="en">
         
+          <link rel="alternate" href="../../../../it/hixstyle/response/encoding-decoding/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="../../../../hixstyle/response/encoding-decoding/" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../../it/hixstyle/response/encoding-decoding/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -3215,21 +3223,21 @@ estándar donde tiene sentido.</p>
 <h2 id="html">HTML<a class="headerlink" href="#html" title="Permanent link">&para;</a></h2>
 <h3 id="uhtmlencode-ctext"><code>UHtmlEncode( cText )</code><a class="headerlink" href="#uhtmlencode-ctext" title="Permanent link">&para;</a></h3>
 <p>Escapa los 5 caracteres peligrosos: <code>&amp; &lt; &gt; " '</code>.</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">UHtmlEncode</span>( <span class="s">&#39;&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;&#39;</span> )
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos="2 "></span></a>// → <span class="s">&quot;&amp;lt;script&amp;gt;alert(&amp;quot;x&amp;quot;)&amp;lt;/script&amp;gt;&quot;</span>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">UHtmlEncode</span>( <span class="s">'&lt;script&gt;alert("x")&lt;/script&gt;'</span> )
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos="2 "></span></a>// → <span class="s">"&amp;lt;script&amp;gt;alert(&amp;quot;x&amp;quot;)&amp;lt;/script&amp;gt;"</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos="3 "></span></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos="4 "></span></a><span class="nv">UHtmlEncode</span>( <span class="s">&quot;Pérez &amp; Sons&quot;</span> )
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos="5 "></span></a>// → <span class="s">&quot;Pérez &amp;amp; Sons&quot;</span>      (&amp; → &amp;amp;)
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos="4 "></span></a><span class="nv">UHtmlEncode</span>( <span class="s">"Pérez &amp; Sons"</span> )
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos="5 "></span></a>// → <span class="s">"Pérez &amp;amp; Sons"</span>      (&amp; → &amp;amp;)
 </span></code></pre></div>
 <h4 id="cuando-usarlo">Cuándo usarlo<a class="headerlink" href="#cuando-usarlo" title="Permanent link">&para;</a></h4>
 <p>Siempre que insertes <strong>input del usuario</strong> dentro de HTML:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> cName := UPost( <span class="s">&quot;name&quot;</span>, <span class="s">&quot;&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> cName := UPost( <span class="s">"name"</span>, <span class="s">""</span> )
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><a href="#__codelineno-1-2"><span class="linenos" data-linenos="2 "></span></a>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a><a href="#__codelineno-1-3"><span class="linenos" data-linenos="3 "></span></a>// MAL - el usuario puede inyectar &lt;script&gt;
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4"></a><a href="#__codelineno-1-4"><span class="linenos" data-linenos="4 "></span></a><span class="kr">USe</span>ndHtml( <span class="s">&quot;&lt;h1&gt;Hola &quot;</span> + cName + <span class="s">&quot;&lt;/h1&gt;&quot;</span> )
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4"></a><a href="#__codelineno-1-4"><span class="linenos" data-linenos="4 "></span></a><span class="kr">USe</span>ndHtml( <span class="s">"&lt;h1&gt;Hola "</span> + cName + <span class="s">"&lt;/h1&gt;"</span> )
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5"></a><a href="#__codelineno-1-5"><span class="linenos" data-linenos="5 "></span></a>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6"></a><a href="#__codelineno-1-6"><span class="linenos" data-linenos="6 "></span></a>// BIEN - escapado
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7"></a><a href="#__codelineno-1-7"><span class="linenos" data-linenos="7 "></span></a><span class="kr">USe</span>ndHtml( <span class="s">&quot;&lt;h1&gt;Hola &quot;</span> + UHtmlEncode( cName ) + <span class="s">&quot;&lt;/h1&gt;&quot;</span> )
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7"></a><a href="#__codelineno-1-7"><span class="linenos" data-linenos="7 "></span></a><span class="kr">USe</span>ndHtml( <span class="s">"&lt;h1&gt;Hola "</span> + UHtmlEncode( cName ) + <span class="s">"&lt;/h1&gt;"</span> )
 </span></code></pre></div>
 <blockquote>
 <p>En templates <code>.view.html</code>, el motor <strong>no escapa automáticamente</strong> - la
@@ -3251,16 +3259,16 @@ si tu BD guarda texto plano, no aparecerán entities ya escapados.</p>
 <h2 id="url">URL<a class="headerlink" href="#url" title="Permanent link">&para;</a></h2>
 <p>Para encodear valores en query strings o paths, usar las funciones de
 Harbour:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">hb_URLEncode</span>( <span class="s">&quot;Pérez &amp; Sons&quot;</span> )
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a>// → <span class="s">&quot;P%C3%A9rez%20%26%20Sons&quot;</span>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">hb_URLEncode</span>( <span class="s">"Pérez &amp; Sons"</span> )
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a>// → <span class="s">"P%C3%A9rez%20%26%20Sons"</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos="3 "></span></a>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos="4 "></span></a><span class="nv">hb_URLDecode</span>( <span class="s">&quot;P%C3%A9rez%20%26%20Sons&quot;</span> )
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos="5 "></span></a>// → <span class="s">&quot;Pérez &amp; Sons&quot;</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos="4 "></span></a><span class="nv">hb_URLDecode</span>( <span class="s">"P%C3%A9rez%20%26%20Sons"</span> )
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos="5 "></span></a>// → <span class="s">"Pérez &amp; Sons"</span>
 </span></code></pre></div>
 <h3 id="cuando-usarlo_1">Cuándo usarlo<a class="headerlink" href="#cuando-usarlo_1" title="Permanent link">&para;</a></h3>
 <p>Cuando construyas URLs con datos dinámicos:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> cName := <span class="s">&quot;Pérez &amp; Sons&quot;</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">LOCAL</span> cUrl  := <span class="s">&quot;/search?q=&quot;</span> + hb_URLEncode( cName )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> cName := <span class="s">"Pérez &amp; Sons"</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">LOCAL</span> cUrl  := <span class="s">"/search?q="</span> + hb_URLEncode( cName )
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">URedirect</span>( cUrl )
 </span></code></pre></div>
 <blockquote>
@@ -3274,10 +3282,10 @@ no hay que hacer nada extra al leer.</p>
 </span></code></pre></div>
 <p>Convierte hash/array/escalar a un string JSON válido. Es lo que usa
 <code>USendJson</code> por dentro:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;ok&quot;</span> =&gt; <span class="ow">.T.</span>, <span class="s">&quot;user&quot;</span> =&gt; <span class="s">&quot;Carles&quot;</span> } )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"ok"</span> =&gt; <span class="ow">.T.</span>, <span class="s">"user"</span> =&gt; <span class="s">"Carles"</span> } )
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a>// equivale a:
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>tMime( <span class="s">&quot;json&quot;</span> )
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos="4 "></span></a><span class="nv">UWrite</span>( hb_jsonEncode( { <span class="s">&quot;ok&quot;</span> =&gt; <span class="ow">.T.</span>, <span class="s">&quot;user&quot;</span> =&gt; <span class="s">&quot;Carles&quot;</span> } ) )
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>tMime( <span class="s">"json"</span> )
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos="4 "></span></a><span class="nv">UWrite</span>( hb_jsonEncode( { <span class="s">"ok"</span> =&gt; <span class="ow">.T.</span>, <span class="s">"user"</span> =&gt; <span class="s">"Carles"</span> } ) )
 </span></code></pre></div>
 <h4 id="tipos-soportados">Tipos soportados<a class="headerlink" href="#tipos-soportados" title="Permanent link">&para;</a></h4>
 <table>
@@ -3329,10 +3337,10 @@ una acción:</p>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">LOCAL</span> hBody := UJs<span class="nf">on</span>()
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3"></a><a href="#__codelineno-8-3"><span class="linenos" data-linenos="3 "></span></a>
 </span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4"></a><a href="#__codelineno-8-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="kr">IF</span> hBody == NIL
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5"></a><a href="#__codelineno-8-5"><span class="linenos" data-linenos="5 "></span></a>      <span class="kr">RETURN</span> USend<span class="nf">Error</span>( 400, <span class="s">&quot;Body no es JSON&quot;</span> )
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5"></a><a href="#__codelineno-8-5"><span class="linenos" data-linenos="5 "></span></a>      <span class="kr">RETURN</span> USend<span class="nf">Error</span>( 400, <span class="s">"Body no es JSON"</span> )
 </span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6"></a><a href="#__codelineno-8-6"><span class="linenos" data-linenos="6 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7"></a><a href="#__codelineno-8-7"><span class="linenos" data-linenos="7 "></span></a>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8"></a><a href="#__codelineno-8-8"><span class="linenos" data-linenos="8 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;received&quot;</span> =&gt; hBody } )
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8"></a><a href="#__codelineno-8-8"><span class="linenos" data-linenos="8 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"received"</span> =&gt; hBody } )
 </span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9"></a><a href="#__codelineno-8-9"><span class="linenos" data-linenos="9 "></span></a><span class="kr">RETURN</span> NIL
 </span></code></pre></div>
 <hr />
@@ -3360,8 +3368,8 @@ una acción:</p>
 </tr>
 </tbody>
 </table>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> cTexto := <span class="s">&quot;Niño&quot;</span>    // code<span class="nc">page</span> local (CP1252 / ISO-8859-1)
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">LOCAL</span> cUtf8  := hb_StrToUtf8( cTexto )    // <span class="s">&quot;Ni\xc3\xb1o&quot;</span>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> cTexto := <span class="s">"Niño"</span>    // code<span class="nc">page</span> local (CP1252 / ISO-8859-1)
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">LOCAL</span> cUtf8  := hb_StrToUtf8( cTexto )    // <span class="s">"Ni\xc3\xb1o"</span>
 </span></code></pre></div>
 <h3 id="cuando-importa">Cuándo importa<a class="headerlink" href="#cuando-importa" title="Permanent link">&para;</a></h3>
 <ul>
@@ -3372,7 +3380,7 @@ una acción:</p>
 <li><code>UDbf:Row( lToStringWeb := .T. )</code> ya hace la conversión a UTF-8 si le
   pasas <code>lToUtf8</code> en el constructor. Ver <a href="../../models/udbf/">UDbf</a>.</li>
 </ul>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a><a href="#__codelineno-10-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> oDbf := U<span class="nf">Dbf</span>():New( <span class="s">&quot;customers&quot;</span>, <span class="ow">.T.</span>, <span class="ow">.T.</span> )  // lToUtf8=<span class="ow">.T.</span>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a><a href="#__codelineno-10-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> oDbf := U<span class="nf">Dbf</span>():New( <span class="s">"customers"</span>, <span class="ow">.T.</span>, <span class="ow">.T.</span> )  // lToUtf8=<span class="ow">.T.</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2"></a><a href="#__codelineno-10-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">oDbf</span>:Open()
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3"></a><a href="#__codelineno-10-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>ndJs<span class="nf">on</span>( oDbf:<span class="nf">Row</span>( <span class="ow">.T.</span> ) )    // ya viene en UTF-8
 </span></code></pre></div>
@@ -3380,26 +3388,26 @@ una acción:</p>
 <h2 id="base64">Base64<a class="headerlink" href="#base64" title="Permanent link">&para;</a></h2>
 <p>Para datos binarios dentro de JSON, URL o cookies firmadas:</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">hb_Base64Encode</span>( cBinary )
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos="2 "></span></a>// → <span class="s">&quot;SGVsbG8gV29ybGQ=&quot;</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos="2 "></span></a>// → <span class="s">"SGVsbG8gV29ybGQ="</span>
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3"></a><a href="#__codelineno-11-3"><span class="linenos" data-linenos="3 "></span></a>
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4"></a><a href="#__codelineno-11-4"><span class="linenos" data-linenos="4 "></span></a><span class="nv">hb_Base64Decode</span>( cEncoded )
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5"></a><a href="#__codelineno-11-5"><span class="linenos" data-linenos="5 "></span></a>// → <span class="s">&quot;Hello World&quot;</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5"></a><a href="#__codelineno-11-5"><span class="linenos" data-linenos="5 "></span></a>// → <span class="s">"Hello World"</span>
 </span></code></pre></div>
 <h3 id="ejemplo-embed-de-imagen-en-json">Ejemplo - embed de imagen en JSON<a class="headerlink" href="#ejemplo-embed-de-imagen-en-json" title="Permanent link">&para;</a></h3>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a><a href="#__codelineno-12-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> cBytes := hb_MemoRead( <span class="s">&quot;logo.png&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a><a href="#__codelineno-12-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> cBytes := hb_MemoRead( <span class="s">"logo.png"</span> )
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2"></a><a href="#__codelineno-12-2"><span class="linenos" data-linenos="2 "></span></a>
 </span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3"></a><a href="#__codelineno-12-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="p">;</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4"></a><a href="#__codelineno-12-4"><span class="linenos" data-linenos="4 "></span></a>   &quot;name<span class="s">&quot;      =&gt; &quot;</span>logo.png&quot;,       <span class="p">;</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5"></a><a href="#__codelineno-12-5"><span class="linenos" data-linenos="5 "></span></a>   &quot;mime<span class="s">&quot;      =&gt; &quot;</span><span class="nc">image</span>/png&quot;,      <span class="p">;</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6"></a><a href="#__codelineno-12-6"><span class="linenos" data-linenos="6 "></span></a>   &quot;data_b64&quot;  =&gt; hb_Base64Encode( cBytes ) <span class="p">;</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4"></a><a href="#__codelineno-12-4"><span class="linenos" data-linenos="4 "></span></a>   "name<span class="s">"      =&gt; "</span>logo.png",       <span class="p">;</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5"></a><a href="#__codelineno-12-5"><span class="linenos" data-linenos="5 "></span></a>   "mime<span class="s">"      =&gt; "</span><span class="nc">image</span>/png",      <span class="p">;</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6"></a><a href="#__codelineno-12-6"><span class="linenos" data-linenos="6 "></span></a>   "data_b64"  =&gt; hb_Base64Encode( cBytes ) <span class="p">;</span>
 </span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7"></a><a href="#__codelineno-12-7"><span class="linenos" data-linenos="7 "></span></a>} )
 </span></code></pre></div>
 <h3 id="ejemplo-cookie-firmada">Ejemplo - cookie firmada<a class="headerlink" href="#ejemplo-cookie-firmada" title="Permanent link">&para;</a></h3>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a><a href="#__codelineno-13-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> cPayload := hb_jsonEncode( { <span class="s">&quot;uid&quot;</span> =&gt; 42, <span class="s">&quot;exp&quot;</span> =&gt; _Now() + 3600 } )
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2"></a><a href="#__codelineno-13-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">LOCAL</span> cSig     := hb_HMAC( cPayload, <span class="s">&quot;secret-key&quot;</span> )
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3"></a><a href="#__codelineno-13-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">LOCAL</span> cToken   := hb_Base64Encode( cPayload + <span class="s">&quot;.&quot;</span> + cSig )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a><a href="#__codelineno-13-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> cPayload := hb_jsonEncode( { <span class="s">"uid"</span> =&gt; 42, <span class="s">"exp"</span> =&gt; _Now() + 3600 } )
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2"></a><a href="#__codelineno-13-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">LOCAL</span> cSig     := hb_HMAC( cPayload, <span class="s">"secret-key"</span> )
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3"></a><a href="#__codelineno-13-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">LOCAL</span> cToken   := hb_Base64Encode( cPayload + <span class="s">"."</span> + cSig )
 </span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4"></a><a href="#__codelineno-13-4"><span class="linenos" data-linenos="4 "></span></a>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5"></a><a href="#__codelineno-13-5"><span class="linenos" data-linenos="5 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;auth&quot;</span>, cToken, 3600 )
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5"></a><a href="#__codelineno-13-5"><span class="linenos" data-linenos="5 "></span></a><span class="kr">USe</span>tCookie( <span class="s">"auth"</span>, cToken, 3600 )
 </span></code></pre></div>
 <hr />
 <h2 id="url-safe-base64">URL-safe Base64<a class="headerlink" href="#url-safe-base64" title="Permanent link">&para;</a></h2>
@@ -3407,9 +3415,9 @@ una acción:</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1"></a><a href="#__codelineno-14-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> cToken := hb_Base64Encode( cBin )
 </span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2"></a><a href="#__codelineno-14-2"><span class="linenos" data-linenos="2 "></span></a>
 </span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3"></a><a href="#__codelineno-14-3"><span class="linenos" data-linenos="3 "></span></a>// Convertir a URL-safe
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4"></a><a href="#__codelineno-14-4"><span class="linenos" data-linenos="4 "></span></a><span class="nv">cToken</span> := <span class="nf">StrTran</span>( cToken, <span class="s">&quot;+&quot;</span>, <span class="s">&quot;-&quot;</span> )
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5"></a><a href="#__codelineno-14-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">cToken</span> := <span class="nf">StrTran</span>( cToken, <span class="s">&quot;/&quot;</span>, <span class="s">&quot;_&quot;</span> )
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6"></a><a href="#__codelineno-14-6"><span class="linenos" data-linenos="6 "></span></a><span class="nv">cToken</span> := <span class="nf">StrTran</span>( cToken, <span class="s">&quot;=&quot;</span>, <span class="s">&quot;&quot;</span>  )    // sin padding
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4"></a><a href="#__codelineno-14-4"><span class="linenos" data-linenos="4 "></span></a><span class="nv">cToken</span> := <span class="nf">StrTran</span>( cToken, <span class="s">"+"</span>, <span class="s">"-"</span> )
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5"></a><a href="#__codelineno-14-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">cToken</span> := <span class="nf">StrTran</span>( cToken, <span class="s">"/"</span>, <span class="s">"_"</span> )
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6"></a><a href="#__codelineno-14-6"><span class="linenos" data-linenos="6 "></span></a><span class="nv">cToken</span> := <span class="nf">StrTran</span>( cToken, <span class="s">"="</span>, <span class="s">""</span>  )    // sin padding
 </span></code></pre></div>
 <p>Es la convención que usa JWT. Para revertirlo, deshacer los <code>StrTran</code> y
 re-añadir padding hasta múltiplo de 4.</p>

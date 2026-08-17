@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="../../../sistema/logger/" hreflang="en">
         
+          <link rel="alternate" href="../../../it/sistema/logger/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="../../../sistema/logger/" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../it/sistema/logger/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -2983,8 +2991,8 @@ estilo CLF</strong> (<code>access.log</code>) con una línea por cada petición 
 <h3 id="seccion-paths">Sección <code>paths</code><a class="headerlink" href="#seccion-paths" title="Permanent link">&para;</a></h3>
 <p>Define el directorio común donde se escriben todos los logs:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">&quot;paths&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">    </span><span class="nt">&quot;log&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;.logs&quot;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">"paths"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">    </span><span class="nt">"log"</span><span class="p">:</span><span class="w"> </span><span class="s2">".logs"</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos="5 "></span></a><span class="p">}</span>
 </span></code></pre></div>
@@ -2994,20 +3002,20 @@ estilo CLF</strong> (<code>access.log</code>) con una línea por cada petición 
 <code>max_size_mb</code>: MB para rotación al superar este tamaño.
 <code>max_files = 0</code>: sin límite de backups.</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><a href="#__codelineno-1-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">&quot;log&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a><a href="#__codelineno-1-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">    </span><span class="nt">&quot;file&quot;</span><span class="p">:</span><span class="w">        </span><span class="s2">&quot;hix.log&quot;</span><span class="p">,</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4"></a><a href="#__codelineno-1-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">    </span><span class="nt">&quot;level&quot;</span><span class="p">:</span><span class="w">       </span><span class="s2">&quot;info&quot;</span><span class="p">,</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5"></a><a href="#__codelineno-1-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">    </span><span class="nt">&quot;console&quot;</span><span class="p">:</span><span class="w">     </span><span class="kc">true</span><span class="p">,</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6"></a><a href="#__codelineno-1-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">    </span><span class="nt">&quot;max_size_mb&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7"></a><a href="#__codelineno-1-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">    </span><span class="nt">&quot;max_files&quot;</span><span class="p">:</span><span class="w">   </span><span class="mi">0</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><a href="#__codelineno-1-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">"log"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a><a href="#__codelineno-1-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">    </span><span class="nt">"file"</span><span class="p">:</span><span class="w">        </span><span class="s2">"hix.log"</span><span class="p">,</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4"></a><a href="#__codelineno-1-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">    </span><span class="nt">"level"</span><span class="p">:</span><span class="w">       </span><span class="s2">"info"</span><span class="p">,</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5"></a><a href="#__codelineno-1-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">    </span><span class="nt">"console"</span><span class="p">:</span><span class="w">     </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6"></a><a href="#__codelineno-1-6"><span class="linenos" data-linenos="6 "></span></a><span class="w">    </span><span class="nt">"max_size_mb"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7"></a><a href="#__codelineno-1-7"><span class="linenos" data-linenos="7 "></span></a><span class="w">    </span><span class="nt">"max_files"</span><span class="p">:</span><span class="w">   </span><span class="mi">0</span>
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8"></a><a href="#__codelineno-1-8"><span class="linenos" data-linenos="8 "></span></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9"></a><a href="#__codelineno-1-9"><span class="linenos" data-linenos="9 "></span></a><span class="p">}</span>
 </span></code></pre></div>
 <h3 id="seccion-access_log-log-de-peticiones">Sección <code>access_log</code> - log de peticiones<a class="headerlink" href="#seccion-access_log-log-de-peticiones" title="Permanent link">&para;</a></h3>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">&quot;access_log&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">    </span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">    </span><span class="nt">&quot;file&quot;</span><span class="p">:</span><span class="w">    </span><span class="s2">&quot;access.log&quot;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">"access_log"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">    </span><span class="nt">"enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos="4 "></span></a><span class="w">    </span><span class="nt">"file"</span><span class="p">:</span><span class="w">    </span><span class="s2">"access.log"</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos="5 "></span></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6"></a><a href="#__codelineno-2-6"><span class="linenos" data-linenos="6 "></span></a><span class="p">}</span>
 </span></code></pre></div>
@@ -3068,15 +3076,15 @@ configurado. <code>level=info</code> filtra los <code>ld()</code>; <code>level=w
 <hr />
 <h2 id="uso-desde-codigo">Uso desde código<a class="headerlink" href="#uso-desde-codigo" title="Permanent link">&para;</a></h2>
 <p>Cualquier <code>.prg</code> que quiera loguear debe incluir el header de macros:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="cp">#include</span> <span class="s">&quot;hix_logger.ch&quot;</span>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="cp">#include</span> <span class="s">"hix_logger.ch"</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos=" 2 "></span></a>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="kr">FUNCTION</span> Mi<span class="nc">Control</span>ador()
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">l</span>( <span class="s">&quot;Acceso a panel de usuario&quot;</span> )
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">l</span>( <span class="s">"Acceso a panel de usuario"</span> )
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a>   <span class="kr">IF</span> ! _CheckPermissions()
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a>      <span class="nv">lw</span>( <span class="s">&quot;Intento de acceso sin permisos desde &quot;</span> + UIP() )
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a>      <span class="nv">lw</span>( <span class="s">"Intento de acceso sin permisos desde "</span> + UIP() )
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos=" 7 "></span></a>      <span class="kr">RETURN</span> USend<span class="nf">Error</span>( 403 )
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="kr">ENDIF</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9"></a><a href="#__codelineno-3-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="nv">le</span>( <span class="s">&quot;Algo fue mal con la base de datos&quot;</span> )
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9"></a><a href="#__codelineno-3-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="nv">le</span>( <span class="s">"Algo fue mal con la base de datos"</span> )
 </span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10"></a><a href="#__codelineno-3-10"><span class="linenos" data-linenos="10 "></span></a><span class="kr">RETURN</span> NIL
 </span></code></pre></div>
 <h3 id="formato-de-salida">Formato de salida<a class="headerlink" href="#formato-de-salida" title="Permanent link">&para;</a></h3>
@@ -3094,8 +3102,8 @@ configurado. <code>level=info</code> filtra los <code>ld()</code>; <code>level=w
 <blockquote>
 <p>📚 El módulo se declara así en cada fichero <code>.prg</code> del framework
 (y puedes hacer lo mismo en el tuyo):</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="cp">#define</span> HIX_LOG_MODULE <span class="s">&quot;miapp.users&quot;</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a><span class="cp">#include</span> <span class="s">&quot;hix_logger.ch&quot;</span>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="cp">#define</span> HIX_LOG_MODULE <span class="s">"miapp.users"</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a><span class="cp">#include</span> <span class="s">"hix_logger.ch"</span>
 </span></code></pre></div>
 </blockquote>
 <hr />
@@ -3123,17 +3131,17 @@ alto, configura <code>logrotate</code> (Linux) o un script programado (Windows).
 <h2 id="access-log-formato-clf">Access log: formato CLF<a class="headerlink" href="#access-log-formato-clf" title="Permanent link">&para;</a></h2>
 <p><code>access.log</code> sigue el <a href="https://en.wikipedia.org/wiki/Common_Log_Format">Common Log Format</a>
 estándar de Apache:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a>192.168.1.100 - - [27/Jun/2026:09:14:32 +0000] &quot;GET /users/42 HTTP/1.1&quot; 200
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a>192.168.1.100 - - [27/Jun/2026:09:14:35 +0000] &quot;POST /login HTTP/1.1&quot; 302
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos="3 "></span></a>10.0.0.5      - - [27/Jun/2026:09:14:40 +0000] &quot;GET /admin HTTP/1.1&quot; 403
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a>192.168.1.100 - - [27/Jun/2026:09:14:32 +0000] "GET /users/42 HTTP/1.1" 200
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a>192.168.1.100 - - [27/Jun/2026:09:14:35 +0000] "POST /login HTTP/1.1" 302
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos="3 "></span></a>10.0.0.5      - - [27/Jun/2026:09:14:40 +0000] "GET /admin HTTP/1.1" 403
 </span></code></pre></div>
 <p>Compatible con herramientas estándar (<code>awstats</code>, <code>goaccess</code>, <code>lnav</code>...).</p>
 <hr />
 <h2 id="trace-por-modulo">Trace por módulo<a class="headerlink" href="#trace-por-modulo" title="Permanent link">&para;</a></h2>
 <p><code>ld()</code> y <code>l()</code> admiten un filtro adicional por <strong>módulo emisor</strong>. Esto te
 permite activar el detalle sólo de un subsistema sin inundar el log:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">HIX_TraceSet</span>( <span class="s">&quot;router&quot;</span>,  <span class="ow">.T.</span> )   // activa DEBUG/INFO de router
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">HIX_TraceSet</span>( <span class="s">&quot;session&quot;</span>, <span class="ow">.F.</span> )   // silencia DEBUG/INFO de <span class="nc">session</span>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">HIX_TraceSet</span>( <span class="s">"router"</span>,  <span class="ow">.T.</span> )   // activa DEBUG/INFO de router
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">HIX_TraceSet</span>( <span class="s">"session"</span>, <span class="ow">.F.</span> )   // silencia DEBUG/INFO de <span class="nc">session</span>
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3"></a><a href="#__codelineno-8-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">HIX_TraceAll</span>( <span class="ow">.T.</span> )              // activa todo
 </span></code></pre></div>
 <p>Los niveles <code>WARN</code>, <code>ERROR</code> y <code>FATAL</code> <strong>siempre pasan</strong> sin importar el
@@ -3150,7 +3158,7 @@ general a <code>debug</code> (lo que generaría logs enormes).</p>
 <h2 id="inicializacion-manual">Inicialización manual<a class="headerlink" href="#inicializacion-manual" title="Permanent link">&para;</a></h2>
 <p>En aplicaciones standalone que arrancan <code>THixServer</code> sin pasar por
 <code>hix.json</code>, debes inicializar el logger tú mismo:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">HIX_LoggerInit</span>( <span class="s">&quot;logs/app.log&quot;</span>, HIX_LOG_DEBUG, <span class="ow">.T.</span>, 10485760, 5 )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">HIX_LoggerInit</span>( <span class="s">"logs/app.log"</span>, HIX_LOG_DEBUG, <span class="ow">.T.</span>, 10485760, 5 )
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos="2 "></span></a>//              ^c<span class="nc">File</span>           ^level         ^console ^maxsize  ^max<span class="nc">files</span>
 </span></code></pre></div>
 <p>En el flujo normal con <code>hix.json</code>, <code>THixServer:New()</code> se encarga.</p>

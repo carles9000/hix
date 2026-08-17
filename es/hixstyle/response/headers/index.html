@@ -22,6 +22,8 @@
         
           <link rel="alternate" href="../../../../hixstyle/response/headers/" hreflang="en">
         
+          <link rel="alternate" href="../../../../it/hixstyle/response/headers/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../../../assets/hix.ico">
@@ -166,6 +168,12 @@
           <li class="md-select__item">
             <a href="../../../../hixstyle/response/headers/" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../../it/hixstyle/response/headers/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -2799,8 +2807,8 @@ the body: content type, cache, redirects, cookies, security,
 to read and write them without touching the object directly.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos=" 1 "></span></a>Browser  ──── GET /api/users ────▶ HIX
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos=" 2 "></span></a>                                    │
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a>                                    │  USetHeader( &quot;Cache-Control&quot;, &quot;no-store&quot; )
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos=" 4 "></span></a>                                    │  USetHeader( &quot;X-Request-Id&quot;, &quot;abc123&quot; )
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a>                                    │  USetHeader( "Cache-Control", "no-store" )
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos=" 4 "></span></a>                                    │  USetHeader( "X-Request-Id", "abc123" )
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a>                                    │  USendJson( hData )
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos=" 6 "></span></a>                                    ▼
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos=" 7 "></span></a>         &lt;──── 200 OK ──────────────┤
@@ -2840,13 +2848,13 @@ to read and write them without touching the object directly.</p>
 </tbody>
 </table>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">FUNCTION</span> _ApiHandler()
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">LOCAL</span> cKey := U<span class="nf">Header</span>( <span class="s">&quot;x-api-key&quot;</span>, <span class="s">&quot;&quot;</span> )
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">LOCAL</span> cKey := U<span class="nf">Header</span>( <span class="s">"x-api-key"</span>, <span class="s">""</span> )
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos="3 "></span></a>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="kr">IF</span> <span class="nf">Empty</span>( cKey )
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos="5 "></span></a>      <span class="kr">RETURN</span> USend<span class="nf">Error</span>( 401, <span class="s">&quot;Missing API key&quot;</span> )
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos="5 "></span></a>      <span class="kr">RETURN</span> USend<span class="nf">Error</span>( 401, <span class="s">"Missing API key"</span> )
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6"></a><a href="#__codelineno-2-6"><span class="linenos" data-linenos="6 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7"></a><a href="#__codelineno-2-7"><span class="linenos" data-linenos="7 "></span></a>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8"></a><a href="#__codelineno-2-8"><span class="linenos" data-linenos="8 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;ok&quot;</span> =&gt; <span class="ow">.T.</span> } )
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8"></a><a href="#__codelineno-2-8"><span class="linenos" data-linenos="8 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"ok"</span> =&gt; <span class="ow">.T.</span> } )
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9"></a><a href="#__codelineno-2-9"><span class="linenos" data-linenos="9 "></span></a><span class="kr">RETURN</span> NIL
 </span></code></pre></div>
 <blockquote>
@@ -2859,19 +2867,19 @@ to read and write them without touching the object directly.</p>
 </span></code></pre></div>
 <p>Accumulates the header in <code>oReq:hExtraHeaders</code>; when sending the response, HIX
 adds them to the output:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;Cache-Control&quot;</span>, <span class="s">&quot;no-store&quot;</span> )
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;X-Request-Id&quot;</span>,  <span class="s">&quot;abc123&quot;</span> )
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;X-Frame-Options&quot;</span>, <span class="s">&quot;DENY&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"Cache-Control"</span>, <span class="s">"no-store"</span> )
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"X-Request-Id"</span>,  <span class="s">"abc123"</span> )
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"X-Frame-Options"</span>, <span class="s">"DENY"</span> )
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><a href="#__codelineno-4-4"><span class="linenos" data-linenos="4 "></span></a>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5"></a><a href="#__codelineno-4-5"><span class="linenos" data-linenos="5 "></span></a><span class="kr">USe</span>ndJs<span class="nf">on</span>( hData )
 </span></code></pre></div>
 <p>If you call the same header twice, <strong>the last one wins</strong>:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;X-Version&quot;</span>, <span class="s">&quot;1&quot;</span> )
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;X-Version&quot;</span>, <span class="s">&quot;2&quot;</span> )    // <span class="s">&quot;2&quot;</span> wins
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"X-Version"</span>, <span class="s">"1"</span> )
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"X-Version"</span>, <span class="s">"2"</span> )    // <span class="s">"2"</span> wins
 </span></code></pre></div>
 <h3 id="direct-access-to-hextraheaders">Direct access to <code>hExtraHeaders</code><a class="headerlink" href="#direct-access-to-hextraheaders" title="Permanent link">&para;</a></h3>
 <p>From a middleware with <code>oCtx:oReq</code>:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oCtx</span>:oReq:hExtra<span class="nc">Header</span>s[ <span class="s">&quot;X-Custom&quot;</span> ] := <span class="s">&quot;value&quot;</span>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oCtx</span>:oReq:hExtra<span class="nc">Header</span>s[ <span class="s">"X-Custom"</span> ] := <span class="s">"value"</span>
 </span></code></pre></div>
 <p>Equivalent to the helper, but only when you're not in a route action.</p>
 <hr />
@@ -2906,7 +2914,7 @@ adds them to the output:</p>
 <p>HIX sets <code>Content-Type</code> automatically based on the helper you use
 (<code>USendJson</code> → json, <code>USendHtml</code> → html, ...). Only override it if
 you want something non-standard:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;Content-Type&quot;</span>, <span class="s">&quot;application/xml; charset=utf-8&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"Content-Type"</span>, <span class="s">"application/xml; charset=utf-8"</span> )
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>ndText( cXml )
 </span></code></pre></div>
 <h3 id="cache">Cache<a class="headerlink" href="#cache" title="Permanent link">&para;</a></h3>
@@ -2940,8 +2948,8 @@ you want something non-standard:</p>
 </tr>
 </tbody>
 </table>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;Cache-Control&quot;</span>, <span class="s">&quot;no-store, no-cache, must-revalidate&quot;</span> )
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;Pragma&quot;</span>, <span class="s">&quot;no-cache&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"Cache-Control"</span>, <span class="s">"no-store, no-cache, must-revalidate"</span> )
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"Pragma"</span>, <span class="s">"no-cache"</span> )
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3"></a><a href="#__codelineno-8-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>ndJs<span class="nf">on</span>( hUserPrivateData )
 </span></code></pre></div>
 <h3 id="redirects-and-location">Redirects and location<a class="headerlink" href="#redirects-and-location" title="Permanent link">&para;</a></h3>
@@ -3000,12 +3008,12 @@ you want something non-standard:</p>
 </tbody>
 </table>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">PROCEDURE</span> _ApplySecurity<span class="nc">Header</span>s()
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;X-Frame-Options&quot;</span>,        <span class="s">&quot;DENY&quot;</span> )
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3"></a><a href="#__codelineno-9-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;X-Content-Type-Options&quot;</span>, <span class="s">&quot;nosniff&quot;</span> )
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4"></a><a href="#__codelineno-9-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;Referrer-Policy&quot;</span>,        <span class="s">&quot;strict-origin-when-cross-origin&quot;</span> )
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"X-Frame-Options"</span>,        <span class="s">"DENY"</span> )
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3"></a><a href="#__codelineno-9-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"X-Content-Type-Options"</span>, <span class="s">"nosniff"</span> )
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4"></a><a href="#__codelineno-9-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"Referrer-Policy"</span>,        <span class="s">"strict-origin-when-cross-origin"</span> )
 </span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5"></a><a href="#__codelineno-9-5"><span class="linenos" data-linenos="5 "></span></a>
 </span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6"></a><a href="#__codelineno-9-6"><span class="linenos" data-linenos="6 "></span></a>   <span class="kr">IF</span> UIsHttps()
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7"></a><a href="#__codelineno-9-7"><span class="linenos" data-linenos="7 "></span></a>      <span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;Strict-Transport-Security&quot;</span>, <span class="s">&quot;max-age=31536000; includeSubDomains&quot;</span> )
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7"></a><a href="#__codelineno-9-7"><span class="linenos" data-linenos="7 "></span></a>      <span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"Strict-Transport-Security"</span>, <span class="s">"max-age=31536000; includeSubDomains"</span> )
 </span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8"></a><a href="#__codelineno-9-8"><span class="linenos" data-linenos="8 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9"></a><a href="#__codelineno-9-9"><span class="linenos" data-linenos="9 "></span></a><span class="kr">RETURN</span>
 </span></code></pre></div>
@@ -3014,18 +3022,18 @@ you want something non-standard:</p>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2"></a><a href="#__codelineno-10-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">_ApplySecurityHeaders</span>()
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3"></a><a href="#__codelineno-10-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">RETURN</span> <span class="ow">.T.</span>
 </span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4"></a><a href="#__codelineno-10-4"><span class="linenos" data-linenos="4 "></span></a>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5"></a><a href="#__codelineno-10-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">oSrv</span>:Use( <span class="s">&quot;MyAppSecurityHeaders&quot;</span> )
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5"></a><a href="#__codelineno-10-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">oSrv</span>:Use( <span class="s">"MyAppSecurityHeaders"</span> )
 </span></code></pre></div>
 <h3 id="cors">CORS<a class="headerlink" href="#cors" title="Permanent link">&para;</a></h3>
 <p>The <code>Access-Control-*</code> headers are managed by the
 <a href="../../seguridad/cors/"><code>HIX_MwCors</code></a> middleware. Don't set them manually:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:Use( <span class="s">&quot;HIX_MwCors&quot;</span> )    // injects Allow-Origin / Allow-Methods / etc.
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:Use( <span class="s">"HIX_MwCors"</span> )    // injects Allow-Origin / Allow-Methods / etc.
 </span></code></pre></div>
 <h3 id="cookies">Cookies<a class="headerlink" href="#cookies" title="Permanent link">&para;</a></h3>
 <p><code>Set-Cookie</code> is special: it can appear <strong>multiple times</strong> in the same
 response (one per cookie). Use <code>USetCookie</code> instead of <code>USetHeader</code>:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a><a href="#__codelineno-12-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;session&quot;</span>, cSid, 3600 )
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2"></a><a href="#__codelineno-12-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;lang&quot;</span>,    <span class="s">&quot;es&quot;</span>,  86400 * 30 )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a><a href="#__codelineno-12-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>tCookie( <span class="s">"session"</span>, cSid, 3600 )
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2"></a><a href="#__codelineno-12-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>tCookie( <span class="s">"lang"</span>,    <span class="s">"es"</span>,  86400 * 30 )
 </span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3"></a><a href="#__codelineno-12-3"><span class="linenos" data-linenos="3 "></span></a>// → two Set-Cookie in the response
 </span></code></pre></div>
 <p>See <a href="../cookies/">Cookies</a>.</p>
@@ -3056,26 +3064,26 @@ response (one per cookie). Use <code>USetCookie</code> instead of <code>USetHead
 </tr>
 </tbody>
 </table>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a><a href="#__codelineno-13-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> nCount := UContext():hData[ <span class="s">&quot;rate_count&quot;</span> ]
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2"></a><a href="#__codelineno-13-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;X-RateLimit-Limit&quot;</span>,     <span class="s">&quot;100&quot;</span> )
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3"></a><a href="#__codelineno-13-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;X-RateLimit-Remaining&quot;</span>, hb_NT<span class="nf">oS</span>( 100 - nCount ) )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1"></a><a href="#__codelineno-13-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> nCount := UContext():hData[ <span class="s">"rate_count"</span> ]
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2"></a><a href="#__codelineno-13-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"X-RateLimit-Limit"</span>,     <span class="s">"100"</span> )
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3"></a><a href="#__codelineno-13-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"X-RateLimit-Remaining"</span>, hb_NT<span class="nf">oS</span>( 100 - nCount ) )
 </span></code></pre></div>
 <hr />
 <h2 id="useful-patterns">Useful patterns<a class="headerlink" href="#useful-patterns" title="Permanent link">&para;</a></h2>
 <h3 id="force-file-download">Force file download<a class="headerlink" href="#force-file-download" title="Permanent link">&para;</a></h3>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1"></a><a href="#__codelineno-14-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;Content-Type&quot;</span>,        <span class="s">&quot;application/octet-stream&quot;</span> )
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2"></a><a href="#__codelineno-14-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;Content-Disposition&quot;</span>, <span class="s">&#39;attachment; filename=&quot;export.csv&quot;&#39;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1"></a><a href="#__codelineno-14-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"Content-Type"</span>,        <span class="s">"application/octet-stream"</span> )
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2"></a><a href="#__codelineno-14-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"Content-Disposition"</span>, <span class="s">'attachment; filename="export.csv"'</span> )
 </span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3"></a><a href="#__codelineno-14-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>ndText( cCsv )
 </span></code></pre></div>
 <h3 id="sse-stream-disable-buffering">SSE stream - disable buffering<a class="headerlink" href="#sse-stream-disable-buffering" title="Permanent link">&para;</a></h3>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1"></a><a href="#__codelineno-15-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>ndStreamStart( <span class="s">&quot;text/event-stream&quot;</span>, 200, { <span class="p">;</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2"></a><a href="#__codelineno-15-2"><span class="linenos" data-linenos="2 "></span></a>   &quot;Cache-<span class="nc">Control</span><span class="s">&quot;     =&gt; &quot;</span>no-cache&quot;,    <span class="p">;</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3"></a><a href="#__codelineno-15-3"><span class="linenos" data-linenos="3 "></span></a>   &quot;X-Accel-Buffering<span class="s">&quot; =&gt; &quot;</span>no&quot;           ;   // nginx won&#39;t buffer
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1"></a><a href="#__codelineno-15-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>ndStreamStart( <span class="s">"text/event-stream"</span>, 200, { <span class="p">;</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2"></a><a href="#__codelineno-15-2"><span class="linenos" data-linenos="2 "></span></a>   "Cache-<span class="nc">Control</span><span class="s">"     =&gt; "</span>no-cache",    <span class="p">;</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3"></a><a href="#__codelineno-15-3"><span class="linenos" data-linenos="3 "></span></a>   "X-Accel-Buffering<span class="s">" =&gt; "</span>no"           ;   // nginx won't buffer
 </span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4"></a><a href="#__codelineno-15-4"><span class="linenos" data-linenos="4 "></span></a>} )
 </span></code></pre></div>
 <h3 id="pass-request-id-between-frontend-and-backend">Pass request-id between frontend and backend<a class="headerlink" href="#pass-request-id-between-frontend-and-backend" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1"></a><a href="#__codelineno-16-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> MyAppRequestId( oCtx )
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2"></a><a href="#__codelineno-16-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> cId := U<span class="nf">Header</span>( <span class="s">&quot;X-Request-Id&quot;</span>, <span class="s">&quot;&quot;</span> )
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2"></a><a href="#__codelineno-16-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> cId := U<span class="nf">Header</span>( <span class="s">"X-Request-Id"</span>, <span class="s">""</span> )
 </span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3"></a><a href="#__codelineno-16-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4"></a><a href="#__codelineno-16-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="kr">IF</span> <span class="nf">Empty</span>( cId )
 </span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5"></a><a href="#__codelineno-16-5"><span class="linenos" data-linenos=" 5 "></span></a>      <span class="nv">cId</span> := hb_MD5( hb_NT<span class="nf">oS</span>( <span class="nf">Int</span>( hb_TTo<span class="nf">Sec</span>( hb_<span class="nf">DateTime</span>() ) ) ) + <span class="p">;</span>
@@ -3083,8 +3091,8 @@ response (one per cookie). Use <code>USetCookie</code> instead of <code>USetHead
 </span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7"></a><a href="#__codelineno-16-7"><span class="linenos" data-linenos=" 7 "></span></a>      <span class="nv">cId</span> := <span class="nf">Left</span>( cId, 16 )
 </span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8"></a><a href="#__codelineno-16-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9"></a><a href="#__codelineno-16-9"><span class="linenos" data-linenos=" 9 "></span></a>
-</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10"></a><a href="#__codelineno-16-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="nv">oCtx</span>:hData[ <span class="s">&quot;request_id&quot;</span> ] := cId
-</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11"></a><a href="#__codelineno-16-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;X-Request-Id&quot;</span>, cId )
+</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10"></a><a href="#__codelineno-16-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="nv">oCtx</span>:hData[ <span class="s">"request_id"</span> ] := cId
+</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11"></a><a href="#__codelineno-16-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"X-Request-Id"</span>, cId )
 </span><span id="__span-16-12"><a id="__codelineno-16-12" name="__codelineno-16-12"></a><a href="#__codelineno-16-12"><span class="linenos" data-linenos="12 "></span></a><span class="kr">RETURN</span> <span class="ow">.T.</span>
 </span></code></pre></div>
 <hr />

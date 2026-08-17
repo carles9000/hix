@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="./" hreflang="en">
         
+          <link rel="alternate" href="../../../it/hixstyle/seguridad/ratelimit/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="./" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../it/hixstyle/seguridad/ratelimit/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -3029,15 +3037,15 @@ and the mutex protecting it.</p>
 <h2 id="activation">Activation<a class="headerlink" href="#activation" title="Permanent link">&para;</a></h2>
 <h3 id="global-entire-app">Global - entire app<a class="headerlink" href="#global-entire-app" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">HIX_MwRateLimitSetup</span>( 100, 60 )
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">oSrv</span>:Use( <span class="s">&quot;HIX_MwRateLimit&quot;</span> )
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">oSrv</span>:Use( <span class="s">"HIX_MwRateLimit"</span> )
 </span></code></pre></div>
 <p>Every request goes through here, whatever route.</p>
 <h3 id="per-route">Per route<a class="headerlink" href="#per-route" title="Permanent link">&para;</a></h3>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">&quot;api&quot;</span>, <span class="s">&quot;/api/data&quot;</span>, bAction, <span class="s">&quot;HIX_MwRateLimit&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">"api"</span>, <span class="s">"/api/data"</span>, bAction, <span class="s">"HIX_MwRateLimit"</span> )
 </span></code></pre></div>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;api.data&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/api/data&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;controllers/api/data.prg&quot;</span><span class="p">,</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">  </span><span class="nt">&quot;middleware&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HIX_MwRateLimit&quot;</span><span class="w"> </span><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"api.data"</span><span class="p">,</span><span class="w"> </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/api/data"</span><span class="p">,</span><span class="w"> </span><span class="nt">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GET"</span><span class="p">,</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"controllers/api/data.prg"</span><span class="p">,</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">  </span><span class="nt">"middleware"</span><span class="p">:</span><span class="w"> </span><span class="s2">"HIX_MwRateLimit"</span><span class="w"> </span><span class="p">}</span>
 </span></code></pre></div>
 <blockquote>
 <p>In "global + per route" mode, the <strong>same counter</strong> increments in both
@@ -3050,7 +3058,7 @@ login 5/min) use the factory.</p>
 its own configuration:</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> bMwLogin := HIX_MwRateLimitFactory( 5, 60 )    // 5 attempts/min
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos="2 "></span></a>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">oSrv</span>:AddRoutePost( <span class="s">&quot;login&quot;</span>, <span class="s">&quot;/login&quot;</span>, bActionLogin, bMwLogin )
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">oSrv</span>:AddRoutePost( <span class="s">"login"</span>, <span class="s">"/login"</span>, bActionLogin, bMwLogin )
 </span></code></pre></div>
 <blockquote>
 <p>⚠️ Internally all factories and the global <strong>share</strong> the counter hash.
@@ -3070,32 +3078,32 @@ you need to write your own middleware.</p>
 <h2 id="read-the-counter-in-the-controller">Read the counter in the controller<a class="headerlink" href="#read-the-counter-in-the-controller" title="Permanent link">&para;</a></h2>
 <p><code>HIX_MwRateLimit</code> leaves the current count in <code>oCtx:hData["rate_count"]</code>,
 useful to return it in informative headers:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> nCount := UContext():hData[ <span class="s">&quot;rate_count&quot;</span> ]
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;X-RateLimit-Remaining&quot;</span>, hb_NT<span class="nf">oS</span>( 100 - nCount ) )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> nCount := UContext():hData[ <span class="s">"rate_count"</span> ]
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"X-RateLimit-Remaining"</span>, hb_NT<span class="nf">oS</span>( 100 - nCount ) )
 </span></code></pre></div>
 <hr />
 <h2 id="usage-patterns">Usage patterns<a class="headerlink" href="#usage-patterns" title="Permanent link">&para;</a></h2>
 <h3 id="login-endpoint-anti-bruteforce-protection">Login endpoint - anti-bruteforce protection<a class="headerlink" href="#login-endpoint-anti-bruteforce-protection" title="Permanent link">&para;</a></h3>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">HIX_MwSessionSetup</span>( <span class="s">&quot;HIXSID&quot;</span>, 3600, 60, <span class="s">&quot;memory&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">HIX_MwSessionSetup</span>( <span class="s">"HIXSID"</span>, 3600, 60, <span class="s">"memory"</span> )
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos="2 "></span></a>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3"></a><a href="#__codelineno-9-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">LOCAL</span> bMwLogin := HIX_MwRateLimitFactory( 5, 60 )    // 5 attempts/min
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4"></a><a href="#__codelineno-9-4"><span class="linenos" data-linenos="4 "></span></a>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5"></a><a href="#__codelineno-9-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">oSrv</span>:AddRoutePost( <span class="s">&quot;login&quot;</span>, <span class="s">&quot;/login&quot;</span>, <span class="p">;</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5"></a><a href="#__codelineno-9-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">oSrv</span>:AddRoutePost( <span class="s">"login"</span>, <span class="s">"/login"</span>, <span class="p">;</span>
 </span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6"></a><a href="#__codelineno-9-6"><span class="linenos" data-linenos="6 "></span></a>   {|| _LoginActi<span class="nf">on</span>() }, <span class="p">;</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7"></a><a href="#__codelineno-9-7"><span class="linenos" data-linenos="7 "></span></a>   { <span class="s">&quot;HIX_MwSession&quot;</span>, <span class="s">&quot;HIX_MwCsrfCheck&quot;</span>, bMwLogin } )
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7"></a><a href="#__codelineno-9-7"><span class="linenos" data-linenos="7 "></span></a>   { <span class="s">"HIX_MwSession"</span>, <span class="s">"HIX_MwCsrfCheck"</span>, bMwLogin } )
 </span></code></pre></div>
 <p>After 5 failed POSTs in 1 minute from the same IP → 429 for ~60s.</p>
 <h3 id="public-api">Public API<a class="headerlink" href="#public-api" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a><a href="#__codelineno-10-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">HIX_MwRateLimitSetup</span>( 1000, 60 )    // 1000 req/min generous
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2"></a><a href="#__codelineno-10-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">oSrv</span>:Use( { <span class="s">&quot;HIX_MwCors&quot;</span>, <span class="s">&quot;HIX_MwRateLimit&quot;</span> } )
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2"></a><a href="#__codelineno-10-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">oSrv</span>:Use( { <span class="s">"HIX_MwCors"</span>, <span class="s">"HIX_MwRateLimit"</span> } )
 </span></code></pre></div>
 <h3 id="different-tiers-by-header">Different tiers by header<a class="headerlink" href="#different-tiers-by-header" title="Permanent link">&para;</a></h3>
 <p>For "premium" clients identified by a header you can skip the
 rate limit with a middleware that runs first:</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">FUNCTION</span> MyAppSkipRateLimit( oCtx )
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="kr">IF</span> oCtx:oReq:<span class="nf">Header</span>( <span class="s">&quot;x-premium-key&quot;</span>, <span class="s">&quot;&quot;</span> ) == <span class="s">&quot;SECRET&quot;</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="kr">IF</span> oCtx:oReq:<span class="nf">Header</span>( <span class="s">"x-premium-key"</span>, <span class="s">""</span> ) == <span class="s">"SECRET"</span>
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3"></a><a href="#__codelineno-11-3"><span class="linenos" data-linenos="3 "></span></a>      <span class="nv">oCtx</span>:lHandled := <span class="ow">.T.</span>        // mark handled... no, better:
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4"></a><a href="#__codelineno-11-4"><span class="linenos" data-linenos="4 "></span></a>      <span class="kr">RETURN</span> <span class="ow">.T.</span>                  // just continue, next MW won&#39;t apply
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4"></a><a href="#__codelineno-11-4"><span class="linenos" data-linenos="4 "></span></a>      <span class="kr">RETURN</span> <span class="ow">.T.</span>                  // just continue, next MW won't apply
 </span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5"></a><a href="#__codelineno-11-5"><span class="linenos" data-linenos="5 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6"></a><a href="#__codelineno-11-6"><span class="linenos" data-linenos="6 "></span></a><span class="kr">RETURN</span> <span class="ow">.T.</span>
 </span></code></pre></div>

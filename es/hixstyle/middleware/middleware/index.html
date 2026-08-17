@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="../../../../hixstyle/middleware/middleware/" hreflang="en">
         
+          <link rel="alternate" href="../../../../it/hixstyle/middleware/middleware/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="../../../../hixstyle/middleware/middleware/" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../../it/hixstyle/middleware/middleware/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -2779,10 +2787,10 @@ para acceder mas facilmente a ellos.</p>
 header <code>X-Api-Key</code>:</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> MW_Api<span class="nf">Key</span>()
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos=" 2 "></span></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="nv">LOCAL</span> cKey := U<span class="nf">Header</span>( <span class="s">&quot;X-Api-Key&quot;</span>, <span class="s">&quot;&quot;</span> )
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="nv">LOCAL</span> cKey := U<span class="nf">Header</span>( <span class="s">"X-Api-Key"</span>, <span class="s">""</span> )
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos=" 4 "></span></a>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a>   <span class="kr">IF</span> cKey != <span class="s">&quot;clave-secreta-123&quot;</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos=" 6 "></span></a>      <span class="kr">USe</span>nd<span class="nf">Error</span>( 401, <span class="s">&quot;API Key invalida&quot;</span> )
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a>   <span class="kr">IF</span> cKey != <span class="s">"clave-secreta-123"</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos=" 6 "></span></a>      <span class="kr">USe</span>nd<span class="nf">Error</span>( 401, <span class="s">"API Key invalida"</span> )
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos=" 7 "></span></a>      <span class="kr">RETURN</span> <span class="ow">.F.</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9"></a><a href="#__codelineno-0-9"><span class="linenos" data-linenos=" 9 "></span></a>
@@ -2795,7 +2803,7 @@ cabecera 'X-Api-Key' y validamos su clave.</p>
 middleware, ya sea una función por nombre o un codeblock. Esta clase nos devolverá 
 un objeto que será el encargado de ejecutar nuestra funcion y manejarla.
 Siguiendo nuestro ejemplo definiariamos asi nuestro MW.</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">UMiddleware</span>():New( <span class="s">&quot;MW_ApiKey&quot;</span>, <span class="s">&quot;apikey&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">UMiddleware</span>():New( <span class="s">"MW_ApiKey"</span>, <span class="s">"apikey"</span> )
 </span></code></pre></div>
 <p>El segundo parámetro es un nombre descriptivo que aparece en los logs cuando el
 middleware corta la cadena y nos sirve para tracear. </p>
@@ -2805,12 +2813,12 @@ superar la capa de seguridad del MW, el servidor ejecuta la ruta.
 En caso contrario el middleware ya se encargará en función de como le definamos lo 
 que debe hacer.</p>
 <p>Ex: Definimos una ruta que usará el middleware que hemos diseñado <code>MW_ApiKey</code></p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">&quot;data&quot;</span>, <span class="s">&quot;/data&quot;</span>, <span class="s">&#39;mydata.prg&#39;</span>, <span class="s">&quot;MW_ApiKey&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">"data"</span>, <span class="s">"/data"</span>, <span class="s">'mydata.prg'</span>, <span class="s">"MW_ApiKey"</span> )
 </span></code></pre></div>
 <p>Definimos <code>mydata.prg</code>, una simple funcion que devuelve una respuesta, pero que solo 
 se ejecutara si ha pasado con éxito el control del middleware. </p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">FUNCTION</span> MyData()
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;info&quot;</span> =&gt; <span class="s">&quot;solo para clientes con API Key&quot;</span>, <span class="s">&quot;ok&quot;</span> =&gt; <span class="ow">.T.</span> } )
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"info"</span> =&gt; <span class="s">"solo para clientes con API Key"</span>, <span class="s">"ok"</span> =&gt; <span class="ow">.T.</span> } )
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">RETURN</span> NIL
 </span></code></pre></div>
 <h3 id="flujo-en-tiempo-de-ejecucion">Flujo en tiempo de ejecución<a class="headerlink" href="#flujo-en-tiempo-de-ejecucion" title="Permanent link">&para;</a></h3>
@@ -2877,9 +2885,9 @@ primer fallo.</p>
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5"></a><a href="#__codelineno-6-5"><span class="linenos" data-linenos=" 5 "></span></a>
 </span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6"></a><a href="#__codelineno-6-6"><span class="linenos" data-linenos=" 6 "></span></a>   <span class="nv">LOCAL</span> o := UBaseMiddleware():New( oCtx )
 </span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7"></a><a href="#__codelineno-6-7"><span class="linenos" data-linenos=" 7 "></span></a>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8"></a><a href="#__codelineno-6-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="nv">o</span>:Add( UMiddleware():New( <span class="s">&quot;HixMwRateLimit&quot;</span>, <span class="s">&quot;rate&quot;</span>  ) )
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9"></a><a href="#__codelineno-6-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="nv">o</span>:Add( UMiddleware():New( <span class="s">&quot;HixMwJwt&quot;</span>      , <span class="s">&quot;jwt&quot;</span>   ) )
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10"></a><a href="#__codelineno-6-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="nv">o</span>:Add( UMiddleware():New( <span class="s">&quot;MW_ApiKey&quot;</span>     , <span class="s">&quot;roles&quot;</span> ) )
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8"></a><a href="#__codelineno-6-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="nv">o</span>:Add( UMiddleware():New( <span class="s">"HixMwRateLimit"</span>, <span class="s">"rate"</span>  ) )
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9"></a><a href="#__codelineno-6-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="nv">o</span>:Add( UMiddleware():New( <span class="s">"HixMwJwt"</span>      , <span class="s">"jwt"</span>   ) )
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10"></a><a href="#__codelineno-6-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="nv">o</span>:Add( UMiddleware():New( <span class="s">"MW_ApiKey"</span>     , <span class="s">"roles"</span> ) )
 </span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11"></a><a href="#__codelineno-6-11"><span class="linenos" data-linenos="11 "></span></a>
 </span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12"></a><a href="#__codelineno-6-12"><span class="linenos" data-linenos="12 "></span></a><span class="kr">RETURN</span> o:Run()
 </span></code></pre></div>
@@ -2891,14 +2899,14 @@ diferentes rutas.</p>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4"></a><a href="#__codelineno-7-4"><span class="linenos" data-linenos=" 4 "></span></a>    // --- Configuración (antes de Start) ---
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5"></a><a href="#__codelineno-7-5"><span class="linenos" data-linenos=" 5 "></span></a>    <span class="nv">HIX_MwRateLimitSetup</span>( 60, 60 )          // 60 req/min por IP
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6"></a><a href="#__codelineno-7-6"><span class="linenos" data-linenos=" 6 "></span></a>    <span class="nv">HIX_MwJwtSetup</span>( <span class="s">&quot;mi-clave-secreta&quot;</span>, 3600 )
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6"></a><a href="#__codelineno-7-6"><span class="linenos" data-linenos=" 6 "></span></a>    <span class="nv">HIX_MwJwtSetup</span>( <span class="s">"mi-clave-secreta"</span>, 3600 )
 </span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7"></a><a href="#__codelineno-7-7"><span class="linenos" data-linenos=" 7 "></span></a>
 </span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8"></a><a href="#__codelineno-7-8"><span class="linenos" data-linenos=" 8 "></span></a>...
 </span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9"></a><a href="#__codelineno-7-9"><span class="linenos" data-linenos=" 9 "></span></a>
 </span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10"></a><a href="#__codelineno-7-10"><span class="linenos" data-linenos="10 "></span></a>    // --- Rutas del panel de admin ---
-</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11"></a><a href="#__codelineno-7-11"><span class="linenos" data-linenos="11 "></span></a>    <span class="nv">oSrv</span>:AddRouteGet(    <span class="s">&quot;admin.users&quot;</span>,   <span class="s">&quot;/admin/users&quot;</span>,     <span class="s">&#39;users.prg&#39;</span>      , <span class="s">&quot;MW_Admin&quot;</span> )
-</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12"></a><a href="#__codelineno-7-12"><span class="linenos" data-linenos="12 "></span></a>    <span class="nv">oSrv</span>:AddRouteDelete( <span class="s">&quot;admin.user&quot;</span>,    <span class="s">&quot;/admin/users/:id&quot;</span>, <span class="s">&#39;users_del.prg&#39;</span>  , <span class="s">&quot;MW_Admin&quot;</span> )
-</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13"></a><a href="#__codelineno-7-13"><span class="linenos" data-linenos="13 "></span></a>    <span class="nv">oSrv</span>:AddRouteGet(    <span class="s">&quot;admin.metrics&quot;</span>, <span class="s">&quot;/admin/metrics&quot;</span>,   <span class="s">&#39;metrics.prg&#39;</span>    , <span class="s">&quot;MW_Admin&quot;</span> )
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11"></a><a href="#__codelineno-7-11"><span class="linenos" data-linenos="11 "></span></a>    <span class="nv">oSrv</span>:AddRouteGet(    <span class="s">"admin.users"</span>,   <span class="s">"/admin/users"</span>,     <span class="s">'users.prg'</span>      , <span class="s">"MW_Admin"</span> )
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12"></a><a href="#__codelineno-7-12"><span class="linenos" data-linenos="12 "></span></a>    <span class="nv">oSrv</span>:AddRouteDelete( <span class="s">"admin.user"</span>,    <span class="s">"/admin/users/:id"</span>, <span class="s">'users_del.prg'</span>  , <span class="s">"MW_Admin"</span> )
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13"></a><a href="#__codelineno-7-13"><span class="linenos" data-linenos="13 "></span></a>    <span class="nv">oSrv</span>:AddRouteGet(    <span class="s">"admin.metrics"</span>, <span class="s">"/admin/metrics"</span>,   <span class="s">'metrics.prg'</span>    , <span class="s">"MW_Admin"</span> )
 </span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14"></a><a href="#__codelineno-7-14"><span class="linenos" data-linenos="14 "></span></a>
 </span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15"></a><a href="#__codelineno-7-15"><span class="linenos" data-linenos="15 "></span></a>...
 </span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16"></a><a href="#__codelineno-7-16"><span class="linenos" data-linenos="16 "></span></a>
@@ -2916,12 +2924,12 @@ diferentes rutas.</p>
 </span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9"></a><a href="#__codelineno-8-9"><span class="linenos" data-linenos=" 9 "></span></a>     ▼
 </span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10"></a><a href="#__codelineno-8-10"><span class="linenos" data-linenos="10 "></span></a>[HixMwJwt]
 </span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11"></a><a href="#__codelineno-8-11"><span class="linenos" data-linenos="11 "></span></a>  ¿Token Bearer válido?
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12"></a><a href="#__codelineno-8-12"><span class="linenos" data-linenos="12 "></span></a>  Sí → deposita payload en oCtx:hData[&quot;jwt&quot;] → .T.
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12"></a><a href="#__codelineno-8-12"><span class="linenos" data-linenos="12 "></span></a>  Sí → deposita payload en oCtx:hData["jwt"] → .T.
 </span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13"></a><a href="#__codelineno-8-13"><span class="linenos" data-linenos="13 "></span></a>  No → 401 Unauthorized → .F. → corta
 </span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14"></a><a href="#__codelineno-8-14"><span class="linenos" data-linenos="14 "></span></a>     │
 </span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15"></a><a href="#__codelineno-8-15"><span class="linenos" data-linenos="15 "></span></a>     ▼
 </span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16"></a><a href="#__codelineno-8-16"><span class="linenos" data-linenos="16 "></span></a>[MW_ApiKey]
-</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17"></a><a href="#__codelineno-8-17"><span class="linenos" data-linenos="17 "></span></a>  ¿oCtx:hData[&quot;jwt&quot;][&quot;role&quot;] == &quot;admin&quot;?
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17"></a><a href="#__codelineno-8-17"><span class="linenos" data-linenos="17 "></span></a>  ¿oCtx:hData["jwt"]["role"] == "admin"?
 </span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18"></a><a href="#__codelineno-8-18"><span class="linenos" data-linenos="18 "></span></a>  Sí → .T.
 </span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19"></a><a href="#__codelineno-8-19"><span class="linenos" data-linenos="19 "></span></a>  No → 403 Forbidden → .F. → corta
 </span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20"></a><a href="#__codelineno-8-20"><span class="linenos" data-linenos="20 "></span></a>     │
@@ -2937,10 +2945,10 @@ automáticamente, y el mantenimiento se hace solo en 1 fichero !!!</p>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3"></a><a href="#__codelineno-9-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4"></a><a href="#__codelineno-9-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">LOCAL</span> o := UBaseMiddleware():New( oCtx )
 </span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5"></a><a href="#__codelineno-9-5"><span class="linenos" data-linenos=" 5 "></span></a>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6"></a><a href="#__codelineno-9-6"><span class="linenos" data-linenos=" 6 "></span></a>   <span class="nv">o</span>:Add( UMiddleware():New( <span class="s">&quot;HixMwRateLimit&quot;</span>, <span class="s">&quot;rate&quot;</span>    ) )
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7"></a><a href="#__codelineno-9-7"><span class="linenos" data-linenos=" 7 "></span></a>   <span class="nv">o</span>:Add( UMiddleware():New( <span class="s">&quot;HixMwJwt&quot;</span>      , <span class="s">&quot;jwt&quot;</span>     ) )
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8"></a><a href="#__codelineno-9-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="nv">o</span>:Add( UMiddleware():New( <span class="s">&quot;MW_ApiKey&quot;</span>     , <span class="s">&quot;roles&quot;</span>   ) )
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9"></a><a href="#__codelineno-9-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="nv">o</span>:Add( UMiddleware():New( <span class="s">&quot;MW_AuditLog&quot;</span>   , <span class="s">&quot;audit&quot;</span>   ) )  // nuevo
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6"></a><a href="#__codelineno-9-6"><span class="linenos" data-linenos=" 6 "></span></a>   <span class="nv">o</span>:Add( UMiddleware():New( <span class="s">"HixMwRateLimit"</span>, <span class="s">"rate"</span>    ) )
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7"></a><a href="#__codelineno-9-7"><span class="linenos" data-linenos=" 7 "></span></a>   <span class="nv">o</span>:Add( UMiddleware():New( <span class="s">"HixMwJwt"</span>      , <span class="s">"jwt"</span>     ) )
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8"></a><a href="#__codelineno-9-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="nv">o</span>:Add( UMiddleware():New( <span class="s">"MW_ApiKey"</span>     , <span class="s">"roles"</span>   ) )
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9"></a><a href="#__codelineno-9-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="nv">o</span>:Add( UMiddleware():New( <span class="s">"MW_AuditLog"</span>   , <span class="s">"audit"</span>   ) )  // nuevo
 </span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10"></a><a href="#__codelineno-9-10"><span class="linenos" data-linenos="10 "></span></a>
 </span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11"></a><a href="#__codelineno-9-11"><span class="linenos" data-linenos="11 "></span></a><span class="kr">RETURN</span> o:Run()
 </span></code></pre></div>

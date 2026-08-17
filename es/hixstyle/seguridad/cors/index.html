@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="../../../../hixstyle/seguridad/cors/" hreflang="en">
         
+          <link rel="alternate" href="../../../../it/hixstyle/seguridad/cors/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="../../../../hixstyle/seguridad/cors/" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../../it/hixstyle/seguridad/cors/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -2976,9 +2984,9 @@ un servidor propio no sufre CORS — la regla la aplica solo el navegador.</p>
 <hr />
 <h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h2>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">HIX_MwCorsSetup</span>( <span class="p">;</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><a href="#__codelineno-1-2"><span class="linenos" data-linenos="2 "></span></a>   &quot;https://app.com&quot;,                                 ;   // cOrigin
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a><a href="#__codelineno-1-3"><span class="linenos" data-linenos="3 "></span></a>   &quot;GET,POST,PUT,DELETE,OPTIONS,PATCH&quot;,               ;   // cMethods
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4"></a><a href="#__codelineno-1-4"><span class="linenos" data-linenos="4 "></span></a>   &quot;Content-Type,Authorization,X-Requested-With&quot; )        // c<span class="nc">Header</span>s
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><a href="#__codelineno-1-2"><span class="linenos" data-linenos="2 "></span></a>   "https://app.com",                                 ;   // cOrigin
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a><a href="#__codelineno-1-3"><span class="linenos" data-linenos="3 "></span></a>   "GET,POST,PUT,DELETE,OPTIONS,PATCH",               ;   // cMethods
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4"></a><a href="#__codelineno-1-4"><span class="linenos" data-linenos="4 "></span></a>   "Content-Type,Authorization,X-Requested-With" )        // c<span class="nc">Header</span>s
 </span></code></pre></div>
 <p>Valores por defecto si no llamas a <code>HIX_MwCorsSetup</code>:</p>
 <table>
@@ -3008,27 +3016,27 @@ un servidor propio no sufre CORS — la regla la aplica solo el navegador.</p>
 <h2 id="activacion">Activación<a class="headerlink" href="#activacion" title="Permanent link">&para;</a></h2>
 <p><code>HIX_MwCors</code> es un middleware <strong>global</strong> — lo normal es aplicarlo a todo
 el servidor con <code>oSrv:Use()</code> para que cada response salga con los headers:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:Use( <span class="s">&quot;HIX_MwCors&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:Use( <span class="s">"HIX_MwCors"</span> )
 </span></code></pre></div>
 <p>O por ruta concreta:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">&quot;api&quot;</span>, <span class="s">&quot;/api/users&quot;</span>, bAction, <span class="s">&quot;HIX_MwCors&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">"api"</span>, <span class="s">"/api/users"</span>, bAction, <span class="s">"HIX_MwCors"</span> )
 </span></code></pre></div>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;api.users&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/api/users&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;controllers/api/users.prg&quot;</span><span class="p">,</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">  </span><span class="nt">&quot;middleware&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HIX_MwCors&quot;</span><span class="w"> </span><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"api.users"</span><span class="p">,</span><span class="w"> </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/api/users"</span><span class="p">,</span><span class="w"> </span><span class="nt">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GET"</span><span class="p">,</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">"action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"controllers/api/users.prg"</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">  </span><span class="nt">"middleware"</span><span class="p">:</span><span class="w"> </span><span class="s2">"HIX_MwCors"</span><span class="w"> </span><span class="p">}</span>
 </span></code></pre></div>
 <hr />
 <h2 id="como-funciona">Cómo funciona<a class="headerlink" href="#como-funciona" title="Permanent link">&para;</a></h2>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> HIX_MwCors( oCtx )
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> hCors := { <span class="p">;</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos=" 3 "></span></a>      &quot;Access-<span class="nc">Control</span>-Allow-Origin&quot;  =&gt; s_cCorsOrigin,  <span class="p">;</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos=" 4 "></span></a>      &quot;Access-<span class="nc">Control</span>-Allow-Methods&quot; =&gt; s_cCorsMethods, <span class="p">;</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5"></a><a href="#__codelineno-5-5"><span class="linenos" data-linenos=" 5 "></span></a>      &quot;Access-<span class="nc">Control</span>-Allow-<span class="nc">Header</span>s&quot; =&gt; s_cCors<span class="nc">Header</span>s, <span class="p">;</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6"></a><a href="#__codelineno-5-6"><span class="linenos" data-linenos=" 6 "></span></a>      &quot;Access-<span class="nc">Control</span>-Max-Age<span class="s">&quot;       =&gt; &quot;</span>86400&quot;          <span class="p">;</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos=" 3 "></span></a>      "Access-<span class="nc">Control</span>-Allow-Origin"  =&gt; s_cCorsOrigin,  <span class="p">;</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos=" 4 "></span></a>      "Access-<span class="nc">Control</span>-Allow-Methods" =&gt; s_cCorsMethods, <span class="p">;</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5"></a><a href="#__codelineno-5-5"><span class="linenos" data-linenos=" 5 "></span></a>      "Access-<span class="nc">Control</span>-Allow-<span class="nc">Header</span>s" =&gt; s_cCors<span class="nc">Header</span>s, <span class="p">;</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6"></a><a href="#__codelineno-5-6"><span class="linenos" data-linenos=" 6 "></span></a>      "Access-<span class="nc">Control</span>-Max-Age<span class="s">"       =&gt; "</span>86400"          <span class="p">;</span>
 </span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7"></a><a href="#__codelineno-5-7"><span class="linenos" data-linenos=" 7 "></span></a>   }
 </span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8"></a><a href="#__codelineno-5-8"><span class="linenos" data-linenos=" 8 "></span></a>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9"></a><a href="#__codelineno-5-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="kr">IF</span> oCtx:oReq:cMethod == <span class="s">&quot;OPTIONS&quot;</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10"></a><a href="#__codelineno-5-10"><span class="linenos" data-linenos="10 "></span></a>      <span class="nv">oCtx</span>:oReq:Respond( <span class="s">&quot;&quot;</span>, 204, <span class="s">&quot;text&quot;</span>, hCors )   // preflight
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9"></a><a href="#__codelineno-5-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="kr">IF</span> oCtx:oReq:cMethod == <span class="s">"OPTIONS"</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10"></a><a href="#__codelineno-5-10"><span class="linenos" data-linenos="10 "></span></a>      <span class="nv">oCtx</span>:oReq:Respond( <span class="s">""</span>, 204, <span class="s">"text"</span>, hCors )   // preflight
 </span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11"></a><a href="#__codelineno-5-11"><span class="linenos" data-linenos="11 "></span></a>      <span class="nv">oCtx</span>:lHandled := <span class="ow">.T.</span>
 </span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12"></a><a href="#__codelineno-5-12"><span class="linenos" data-linenos="12 "></span></a>      <span class="kr">RETURN</span> <span class="ow">.F.</span>                                     // corta la cadena
 </span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13"></a><a href="#__codelineno-5-13"><span class="linenos" data-linenos="13 "></span></a>   <span class="kr">ENDIF</span>
@@ -3060,10 +3068,10 @@ respuesta del preflight 24h, evitando un OPTIONS extra por cada request.</p>
 <h2 id="combinar-con-otros-middlewares">Combinar con otros middlewares<a class="headerlink" href="#combinar-con-otros-middlewares" title="Permanent link">&para;</a></h2>
 <p>CORS suele ir <strong>primero</strong> en la pila, antes de auth, para que el
 preflight se resuelva sin tropezar con un 401:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:Use( { <span class="s">&quot;HIX_MwCors&quot;</span>, <span class="s">&quot;HIX_MwSession&quot;</span> } )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:Use( { <span class="s">"HIX_MwCors"</span>, <span class="s">"HIX_MwSession"</span> } )
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos="2 "></span></a>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">&quot;api.me&quot;</span>, <span class="s">&quot;/api/me&quot;</span>, bAction, <span class="p">;</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos="4 "></span></a>   &quot;HIX_MwCors,HIX_MwJwt&quot; )
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">"api.me"</span>, <span class="s">"/api/me"</span>, bAction, <span class="p">;</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos="4 "></span></a>   "HIX_MwCors,HIX_MwJwt" )
 </span></code></pre></div>
 <blockquote>
 <p>Si <code>HIX_MwJwt</code> corriera antes que CORS, el OPTIONS sin Bearer recibiría
@@ -3072,10 +3080,10 @@ un 401 y el navegador no llegaría a hacer el request real.</p>
 <hr />
 <h2 id="patrones-utiles">Patrones útiles<a class="headerlink" href="#patrones-utiles" title="Permanent link">&para;</a></h2>
 <h3 id="cors-abierto-solo-en-desarrollo">CORS abierto solo en desarrollo<a class="headerlink" href="#cors-abierto-solo-en-desarrollo" title="Permanent link">&para;</a></h3>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">IF</span> HIX_Config( <span class="s">&quot;env&quot;</span> ) == <span class="s">&quot;dev&quot;</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">HIX_MwCorsSetup</span>( <span class="s">&quot;*&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">IF</span> HIX_Config( <span class="s">"env"</span> ) == <span class="s">"dev"</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">HIX_MwCorsSetup</span>( <span class="s">"*"</span> )
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">ELSE</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4"></a><a href="#__codelineno-7-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="nv">HIX_MwCorsSetup</span>( <span class="s">&quot;https://app.com&quot;</span> )
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4"></a><a href="#__codelineno-7-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="nv">HIX_MwCorsSetup</span>( <span class="s">"https://app.com"</span> )
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5"></a><a href="#__codelineno-7-5"><span class="linenos" data-linenos="5 "></span></a><span class="kr">ENDIF</span>
 </span></code></pre></div>
 <h3 id="multiples-origenes-no-soportado-nativamente">Múltiples orígenes (no soportado nativamente)<a class="headerlink" href="#multiples-origenes-no-soportado-nativamente" title="Permanent link">&para;</a></h3>
@@ -3083,11 +3091,11 @@ un 401 y el navegador no llegaría a hacer el request real.</p>
 middleware propio que mire el <code>Origin</code> del request y devuelva el header
 adecuado:</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">FUNCTION</span> MyAppCors( oCtx )
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">LOCAL</span> aAllowed := { <span class="s">&quot;https://app.com&quot;</span>, <span class="s">&quot;https://admin.app.com&quot;</span> }
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3"></a><a href="#__codelineno-8-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="nv">LOCAL</span> cOrigin  := oCtx:oReq:<span class="nf">Header</span>( <span class="s">&quot;origin&quot;</span>, <span class="s">&quot;&quot;</span> )
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">LOCAL</span> aAllowed := { <span class="s">"https://app.com"</span>, <span class="s">"https://admin.app.com"</span> }
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3"></a><a href="#__codelineno-8-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="nv">LOCAL</span> cOrigin  := oCtx:oReq:<span class="nf">Header</span>( <span class="s">"origin"</span>, <span class="s">""</span> )
 </span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4"></a><a href="#__codelineno-8-4"><span class="linenos" data-linenos="4 "></span></a>
 </span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5"></a><a href="#__codelineno-8-5"><span class="linenos" data-linenos="5 "></span></a>   <span class="kr">IF</span> <span class="nf">AScan</span>( aAllowed, cOrigin ) &gt; 0
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6"></a><a href="#__codelineno-8-6"><span class="linenos" data-linenos="6 "></span></a>      <span class="nv">oCtx</span>:oReq:hExtra<span class="nc">Header</span>s[ <span class="s">&quot;Access-Control-Allow-Origin&quot;</span> ] := cOrigin
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6"></a><a href="#__codelineno-8-6"><span class="linenos" data-linenos="6 "></span></a>      <span class="nv">oCtx</span>:oReq:hExtra<span class="nc">Header</span>s[ <span class="s">"Access-Control-Allow-Origin"</span> ] := cOrigin
 </span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7"></a><a href="#__codelineno-8-7"><span class="linenos" data-linenos="7 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8"></a><a href="#__codelineno-8-8"><span class="linenos" data-linenos="8 "></span></a>
 </span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9"></a><a href="#__codelineno-8-9"><span class="linenos" data-linenos="9 "></span></a><span class="kr">RETURN</span> HIX_MwCors( oCtx )   // delega el resto al middleware estándar
@@ -3096,7 +3104,7 @@ adecuado:</p>
 <p>Si la API envía cookies (sesión) y el frontend está en otro dominio,
 añade <code>Access-Control-Allow-Credentials: true</code> y especifica un origen
 concreto (<code>*</code> no es compatible con credentials):</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oReq</span>:hExtra<span class="nc">Header</span>s[ <span class="s">&quot;Access-Control-Allow-Credentials&quot;</span> ] := <span class="s">&quot;true&quot;</span>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oReq</span>:hExtra<span class="nc">Header</span>s[ <span class="s">"Access-Control-Allow-Credentials"</span> ] := <span class="s">"true"</span>
 </span></code></pre></div>
 <hr />
 <h2 id="errores-tipicos">Errores típicos<a class="headerlink" href="#errores-tipicos" title="Permanent link">&para;</a></h2>

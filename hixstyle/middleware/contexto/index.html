@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="./" hreflang="en">
         
+          <link rel="alternate" href="../../../it/hixstyle/middleware/contexto/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="./" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../it/hixstyle/middleware/contexto/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -2922,8 +2930,8 @@ throughout the chain, and when it reaches the route action it remains available.
 <h2 id="octxoreq-the-request"><code>oCtx:oReq</code> - the request<a class="headerlink" href="#octxoreq-the-request" title="Permanent link">&para;</a></h2>
 <p>It's the <code>THixRequest</code> object of the current request. We can read headers,
 cookies, body, query params, etc. from there:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> cKey := oCtx:oReq:<span class="nf">Header</span>( <span class="s">&quot;X-Api-Key&quot;</span>, <span class="s">&quot;&quot;</span> )
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><a href="#__codelineno-1-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">LOCAL</span> cSid := oCtx:oReq:Cookie( <span class="s">&quot;hix_sess&quot;</span>, <span class="s">&quot;&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> cKey := oCtx:oReq:<span class="nf">Header</span>( <span class="s">"X-Api-Key"</span>, <span class="s">""</span> )
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><a href="#__codelineno-1-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">LOCAL</span> cSid := oCtx:oReq:Cookie( <span class="s">"hix_sess"</span>, <span class="s">""</span> )
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a><a href="#__codelineno-1-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">LOCAL</span> cIp  := oCtx:oReq:IP()
 </span></code></pre></div>
 <h3 id="recommended-alternative-u-helpers">Recommended alternative - <code>U*</code> helpers<a class="headerlink" href="#recommended-alternative-u-helpers" title="Permanent link">&para;</a></h3>
@@ -2933,11 +2941,11 @@ which are usually shorter and more consistent with action code:</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> MW_Api<span class="nf">Key</span>( oCtx )
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos=" 2 "></span></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos=" 3 "></span></a>   // Both <span class="nc">line</span>s are equivalent:
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">LOCAL</span> cKey := oCtx:oReq:<span class="nf">Header</span>( <span class="s">&quot;X-Api-Key&quot;</span>, <span class="s">&quot;&quot;</span> )
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos=" 5 "></span></a>   <span class="nv">LOCAL</span> cKey := U<span class="nf">Header</span>( <span class="s">&quot;X-Api-Key&quot;</span>, <span class="s">&quot;&quot;</span> )    // shorter <span class="ow">and</span> more readable
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">LOCAL</span> cKey := oCtx:oReq:<span class="nf">Header</span>( <span class="s">"X-Api-Key"</span>, <span class="s">""</span> )
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos=" 5 "></span></a>   <span class="nv">LOCAL</span> cKey := U<span class="nf">Header</span>( <span class="s">"X-Api-Key"</span>, <span class="s">""</span> )    // shorter <span class="ow">and</span> more readable
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6"></a><a href="#__codelineno-2-6"><span class="linenos" data-linenos=" 6 "></span></a>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7"></a><a href="#__codelineno-2-7"><span class="linenos" data-linenos=" 7 "></span></a>   <span class="kr">IF</span> cKey != <span class="s">&quot;clave-secreta-123&quot;</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8"></a><a href="#__codelineno-2-8"><span class="linenos" data-linenos=" 8 "></span></a>      <span class="kr">USe</span>nd<span class="nf">Error</span>( 401, <span class="s">&quot;Invalid API Key&quot;</span> )
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7"></a><a href="#__codelineno-2-7"><span class="linenos" data-linenos=" 7 "></span></a>   <span class="kr">IF</span> cKey != <span class="s">"clave-secreta-123"</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8"></a><a href="#__codelineno-2-8"><span class="linenos" data-linenos=" 8 "></span></a>      <span class="kr">USe</span>nd<span class="nf">Error</span>( 401, <span class="s">"Invalid API Key"</span> )
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9"></a><a href="#__codelineno-2-9"><span class="linenos" data-linenos=" 9 "></span></a>      <span class="kr">RETURN</span> <span class="ow">.F.</span>
 </span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10"></a><a href="#__codelineno-2-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11"></a><a href="#__codelineno-2-11"><span class="linenos" data-linenos="11 "></span></a>
@@ -3015,18 +3023,18 @@ information between links.</p>
 <p>Example - a roles middleware that reads what <code>HixMwJwt</code> already left:</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> MW_RequireAd<span class="nf">min</span>( oCtx )
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos=" 2 "></span></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="nv">LOCAL</span> hJwt := hb_HGetDef( oCtx:hData, <span class="s">&quot;jwt&quot;</span>, NIL )
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="nv">LOCAL</span> hJwt := hb_HGetDef( oCtx:hData, <span class="s">"jwt"</span>, NIL )
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos=" 4 "></span></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a>   <span class="kr">IF</span> hJwt == NIL <span class="ow">.OR.</span> hb_HGetDef( hJwt, <span class="s">&quot;role&quot;</span>, <span class="s">&quot;&quot;</span> ) != <span class="s">&quot;admin&quot;</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a>      <span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">&quot;Admins only&quot;</span> )
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a>   <span class="kr">IF</span> hJwt == NIL <span class="ow">.OR.</span> hb_HGetDef( hJwt, <span class="s">"role"</span>, <span class="s">""</span> ) != <span class="s">"admin"</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a>      <span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">"Admins only"</span> )
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos=" 7 "></span></a>      <span class="kr">RETURN</span> <span class="ow">.F.</span>
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9"></a><a href="#__codelineno-3-9"><span class="linenos" data-linenos=" 9 "></span></a>
 </span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10"></a><a href="#__codelineno-3-10"><span class="linenos" data-linenos="10 "></span></a><span class="kr">RETURN</span> <span class="ow">.T.</span>
 </span></code></pre></div>
 <p>You can add your own keys without touching anything in the system:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oCtx</span>:hData[<span class="s">&quot;mi_flag&quot;</span>]   := <span class="ow">.T.</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">oCtx</span>:hData[<span class="s">&quot;tenant_id&quot;</span>] := 42
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oCtx</span>:hData[<span class="s">"mi_flag"</span>]   := <span class="ow">.T.</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">oCtx</span>:hData[<span class="s">"tenant_id"</span>] := 42
 </span></code></pre></div>
 <hr />
 <h2 id="octxlhandled-i-already-responded-dont-execute-the-action"><code>oCtx:lHandled</code> - "I already responded, don't execute the action"<a class="headerlink" href="#octxlhandled-i-already-responded-dont-execute-the-action" title="Permanent link">&para;</a></h2>
@@ -3041,8 +3049,8 @@ information between links.</p>
 <code>lHandled</code> internally</strong> - you don't need to do it manually.</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">FUNCTION</span> MW_Api<span class="nf">Key</span>( oCtx )
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="kr">IF</span> U<span class="nf">Header</span>( <span class="s">&quot;X-Api-Key&quot;</span>, <span class="s">&quot;&quot;</span> ) != <span class="s">&quot;clave-secreta-123&quot;</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos="4 "></span></a>      <span class="kr">USe</span>nd<span class="nf">Error</span>( 401, <span class="s">&quot;Invalid API Key&quot;</span> )   // marks lHandled
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="kr">IF</span> U<span class="nf">Header</span>( <span class="s">"X-Api-Key"</span>, <span class="s">""</span> ) != <span class="s">"clave-secreta-123"</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos="4 "></span></a>      <span class="kr">USe</span>nd<span class="nf">Error</span>( 401, <span class="s">"Invalid API Key"</span> )   // marks lHandled
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5"></a><a href="#__codelineno-5-5"><span class="linenos" data-linenos="5 "></span></a>      <span class="kr">RETURN</span> <span class="ow">.F.</span>
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6"></a><a href="#__codelineno-5-6"><span class="linenos" data-linenos="6 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7"></a><a href="#__codelineno-5-7"><span class="linenos" data-linenos="7 "></span></a>
@@ -3053,13 +3061,13 @@ information between links.</p>
 <p>When you register a route you can attach it a free string as <code>scope</code>. That
 value reaches the middleware via <code>oCtx:cScope</code> and serves to vary the behavior
 according to the "logical group" to which the route belongs.</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">&quot;admin.users&quot;</span>, <span class="s">&quot;/admin/users&quot;</span>, <span class="s">&#39;users.prg&#39;</span>, <span class="s">&quot;MW_Log&quot;</span>, <span class="s">&quot;admin&quot;</span> )
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">&quot;api.stats&quot;</span>,   <span class="s">&quot;/api/stats&quot;</span>,   <span class="s">&#39;stats.prg&#39;</span>, <span class="s">&quot;MW_Log&quot;</span>, <span class="s">&quot;public&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">"admin.users"</span>, <span class="s">"/admin/users"</span>, <span class="s">'users.prg'</span>, <span class="s">"MW_Log"</span>, <span class="s">"admin"</span> )
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">"api.stats"</span>,   <span class="s">"/api/stats"</span>,   <span class="s">'stats.prg'</span>, <span class="s">"MW_Log"</span>, <span class="s">"public"</span> )
 </span></code></pre></div>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">FUNCTION</span> MW_<span class="nf">Log</span>( oCtx )
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="kr">IF</span> oCtx:cScope == <span class="s">&quot;admin&quot;</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4"></a><a href="#__codelineno-7-4"><span class="linenos" data-linenos="4 "></span></a>      <span class="nv">l</span>( <span class="s">&quot;[AUDIT] &quot;</span> + UMethod() + <span class="s">&quot; &quot;</span> + UPath() + <span class="s">&quot; by &quot;</span> + UIP() )
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="kr">IF</span> oCtx:cScope == <span class="s">"admin"</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4"></a><a href="#__codelineno-7-4"><span class="linenos" data-linenos="4 "></span></a>      <span class="nv">l</span>( <span class="s">"[AUDIT] "</span> + UMethod() + <span class="s">" "</span> + UPath() + <span class="s">" by "</span> + UIP() )
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5"></a><a href="#__codelineno-7-5"><span class="linenos" data-linenos="5 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6"></a><a href="#__codelineno-7-6"><span class="linenos" data-linenos="6 "></span></a>
 </span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7"></a><a href="#__codelineno-7-7"><span class="linenos" data-linenos="7 "></span></a><span class="kr">RETURN</span> <span class="ow">.T.</span>

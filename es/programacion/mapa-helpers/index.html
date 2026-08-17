@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="../../../programacion/mapa-helpers/" hreflang="en">
         
+          <link rel="alternate" href="../../../it/programacion/mapa-helpers/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="../../../programacion/mapa-helpers/" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../it/programacion/mapa-helpers/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -3643,20 +3651,20 @@ tienen acceso al request del hilo actual.</p>
 </table>
 <p><strong>UGet / UPost sin argumentos</strong>: devuelven un hash con todos los campos.</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos=" 1 "></span></a>// Obtener todos los parametros GET de una vez
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="nv">hParams</span> := UGet()   // { <span class="s">&quot;page&quot;</span> =&gt; <span class="s">&quot;1&quot;</span>, <span class="s">&quot;limit&quot;</span> =&gt; <span class="s">&quot;10&quot;</span> }
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="nv">hParams</span> := UGet()   // { <span class="s">"page"</span> =&gt; <span class="s">"1"</span>, <span class="s">"limit"</span> =&gt; <span class="s">"10"</span> }
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos=" 4 "></span></a>// Obtener un campo con default
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="nv">cNombre</span> := UPost( <span class="s">&quot;nombre&quot;</span>, <span class="s">&quot;Anonimo&quot;</span> )
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="nv">cNombre</span> := UPost( <span class="s">"nombre"</span>, <span class="s">"Anonimo"</span> )
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos=" 6 "></span></a>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos=" 7 "></span></a>// Variable de ruta con default seguro
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="nv">nId</span> := <span class="nf">Val</span>( UParam( <span class="s">&quot;id&quot;</span>, <span class="s">&quot;0&quot;</span> ) )
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="nv">nId</span> := <span class="nf">Val</span>( UParam( <span class="s">"id"</span>, <span class="s">"0"</span> ) )
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9"></a><a href="#__codelineno-0-9"><span class="linenos" data-linenos=" 9 "></span></a>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10"></a><a href="#__codelineno-0-10"><span class="linenos" data-linenos="10 "></span></a>// Variable de ruta sin default — lanza 400 si falta
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11"></a><a href="#__codelineno-0-11"><span class="linenos" data-linenos="11 "></span></a><span class="nv">cSlug</span> := UParam( <span class="s">&quot;slug&quot;</span> )
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11"></a><a href="#__codelineno-0-11"><span class="linenos" data-linenos="11 "></span></a><span class="nv">cSlug</span> := UParam( <span class="s">"slug"</span> )
 </span></code></pre></div>
 <p><strong>UParam con indice numerico</strong>: cuando la ruta usa <code>*</code> el comodin se captura como <code>_1</code>.</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">&quot;static&quot;</span>, <span class="s">&quot;/static/*&quot;</span>, {||
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><a href="#__codelineno-1-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">cFile</span> := UParam( 1 )   // equivale a UParam(<span class="s">&quot;_1&quot;</span>)
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">"static"</span>, <span class="s">"/static/*"</span>, {||
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><a href="#__codelineno-1-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">cFile</span> := UParam( 1 )   // equivale a UParam(<span class="s">"_1"</span>)
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a><a href="#__codelineno-1-3"><span class="linenos" data-linenos="3 "></span></a>} )
 </span></code></pre></div>
 <h3 id="tipo-y-negociacion-de-contenido">Tipo y negociacion de contenido<a class="headerlink" href="#tipo-y-negociacion-de-contenido" title="Permanent link">&para;</a></h3>
@@ -3746,11 +3754,11 @@ tienen acceso al request del hilo actual.</p>
 <h3 id="uploads-multipart">Uploads multipart<a class="headerlink" href="#uploads-multipart" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">aFiles</span> := U<span class="nc">Files</span>()
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">FOR</span> EACH h<span class="nc">File</span> IN a<span class="nc">Files</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos="3 "></span></a>   // h<span class="nc">File</span>[<span class="s">&quot;name&quot;</span>]  -&gt; nombre del campo
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos="4 "></span></a>   // h<span class="nc">File</span>[<span class="s">&quot;data&quot;</span>]  -&gt; contenido binario
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos="5 "></span></a>   // h<span class="nc">File</span>[<span class="s">&quot;mime&quot;</span>]  -&gt; Content-Type del archivo
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6"></a><a href="#__codelineno-2-6"><span class="linenos" data-linenos="6 "></span></a>   // h<span class="nc">File</span>[<span class="s">&quot;size&quot;</span>]  -&gt; tamano en bytes
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7"></a><a href="#__codelineno-2-7"><span class="linenos" data-linenos="7 "></span></a>   <span class="nv">hb_MemoWrit</span>( <span class="s">&quot;uploads/&quot;</span> + h<span class="nc">File</span>[<span class="s">&quot;name&quot;</span>], h<span class="nc">File</span>[<span class="s">&quot;data&quot;</span>] )
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos="3 "></span></a>   // h<span class="nc">File</span>[<span class="s">"name"</span>]  -&gt; nombre del campo
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos="4 "></span></a>   // h<span class="nc">File</span>[<span class="s">"data"</span>]  -&gt; contenido binario
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos="5 "></span></a>   // h<span class="nc">File</span>[<span class="s">"mime"</span>]  -&gt; Content-Type del archivo
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6"></a><a href="#__codelineno-2-6"><span class="linenos" data-linenos="6 "></span></a>   // h<span class="nc">File</span>[<span class="s">"size"</span>]  -&gt; tamano en bytes
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7"></a><a href="#__codelineno-2-7"><span class="linenos" data-linenos="7 "></span></a>   <span class="nv">hb_MemoWrit</span>( <span class="s">"uploads/"</span> + h<span class="nc">File</span>[<span class="s">"name"</span>], h<span class="nc">File</span>[<span class="s">"data"</span>] )
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8"></a><a href="#__codelineno-2-8"><span class="linenos" data-linenos="8 "></span></a><span class="kr">NEXT</span>
 </span></code></pre></div>
 <hr />
@@ -3795,16 +3803,16 @@ tienen acceso al request del hilo actual.</p>
 </tbody>
 </table>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos=" 1 "></span></a>// Respuesta JSON simple
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;ok&quot;</span> =&gt; <span class="ow">.T.</span> } )
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"ok"</span> =&gt; <span class="ow">.T.</span> } )
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos=" 4 "></span></a>// Con status <span class="nc">custom</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;id&quot;</span> =&gt; 42, <span class="s">&quot;name&quot;</span> =&gt; <span class="s">&quot;Test&quot;</span> }, 201 )
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"id"</span> =&gt; 42, <span class="s">"name"</span> =&gt; <span class="s">"Test"</span> }, 201 )
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos=" 7 "></span></a>// Redireccion permanente
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="nv">URedirect</span>( <span class="s">&quot;/nueva-url&quot;</span>, 301 )
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="nv">URedirect</span>( <span class="s">"/nueva-url"</span>, 301 )
 </span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9"></a><a href="#__codelineno-3-9"><span class="linenos" data-linenos=" 9 "></span></a>
 </span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10"></a><a href="#__codelineno-3-10"><span class="linenos" data-linenos="10 "></span></a>// Error HTTP
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11"></a><a href="#__codelineno-3-11"><span class="linenos" data-linenos="11 "></span></a><span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">&quot;Sin permisos&quot;</span> )
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11"></a><a href="#__codelineno-3-11"><span class="linenos" data-linenos="11 "></span></a><span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">"Sin permisos"</span> )
 </span></code></pre></div>
 <h3 id="control-fino-del-buffer">Control fino del buffer<a class="headerlink" href="#control-fino-del-buffer" title="Permanent link">&para;</a></h3>
 <p>Cuando necesitas construir la respuesta paso a paso antes de enviarla:</p>
@@ -3848,9 +3856,9 @@ tienen acceso al request del hilo actual.</p>
 </table>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a>// Construir JSON manualmente
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>tStatus( 201 )
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>tMime( <span class="s">&quot;json&quot;</span> )
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><a href="#__codelineno-4-4"><span class="linenos" data-linenos="4 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">&quot;X-Request-Id&quot;</span>, <span class="s">&quot;abc123&quot;</span> )
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5"></a><a href="#__codelineno-4-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">UWrite</span>( hb_jsonEncode( { <span class="s">&quot;created&quot;</span> =&gt; <span class="ow">.T.</span> } ) )
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>tMime( <span class="s">"json"</span> )
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><a href="#__codelineno-4-4"><span class="linenos" data-linenos="4 "></span></a><span class="kr">USe</span>t<span class="nf">Header</span>( <span class="s">"X-Request-Id"</span>, <span class="s">"abc123"</span> )
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5"></a><a href="#__codelineno-4-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">UWrite</span>( hb_jsonEncode( { <span class="s">"created"</span> =&gt; <span class="ow">.T.</span> } ) )
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6"></a><a href="#__codelineno-4-6"><span class="linenos" data-linenos="6 "></span></a>// El dispatcher envia el buffer al terminar la accion
 </span></code></pre></div>
 <h3 id="cookies-en-respuesta">Cookies en respuesta<a class="headerlink" href="#cookies-en-respuesta" title="Permanent link">&para;</a></h3>
@@ -3873,9 +3881,9 @@ tienen acceso al request del hilo actual.</p>
 - <code>-1</code> — expirar inmediatamente (<code>Max-Age=0</code>)
 - <code>&gt; 0</code> — duracion en segundos</p>
 <p>Los flags <code>HttpOnly; SameSite=Lax; Path=/</code> se agregan automaticamente.</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;session_id&quot;</span>, cSid, 3600 )   // 1 hora
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;pref&quot;</span>, <span class="s">&quot;dark&quot;</span>, 0 )          // sesion
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;old_cookie&quot;</span>, <span class="s">&quot;&quot;</span>, -1 )       // expirar
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>tCookie( <span class="s">"session_id"</span>, cSid, 3600 )   // 1 hora
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>tCookie( <span class="s">"pref"</span>, <span class="s">"dark"</span>, 0 )          // sesion
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>tCookie( <span class="s">"old_cookie"</span>, <span class="s">""</span>, -1 )       // expirar
 </span></code></pre></div>
 <hr />
 <h2 id="3-streaming-chunked">3. Streaming chunked<a class="headerlink" href="#3-streaming-chunked" title="Permanent link">&para;</a></h2>
@@ -3903,13 +3911,13 @@ tienen acceso al request del hilo actual.</p>
 </tbody>
 </table>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos=" 1 "></span></a>// SSE — <span class="nc">Server</span>-Sent Events
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">&quot;events&quot;</span>, <span class="s">&quot;/events&quot;</span>, {||
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="nv">oSrv</span>:AddRouteGet( <span class="s">"events"</span>, <span class="s">"/events"</span>, {||
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="nv">LOCAL</span> i := 0
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="kr">USe</span>ndStreamStart( <span class="s">&quot;text/event-stream&quot;</span>, 200, <span class="p">;</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5"></a><a href="#__codelineno-6-5"><span class="linenos" data-linenos=" 5 "></span></a>      { <span class="s">&quot;Cache-Control&quot;</span> =&gt; <span class="s">&quot;no-cache&quot;</span>, <span class="s">&quot;X-Accel-Buffering&quot;</span> =&gt; <span class="s">&quot;no&quot;</span> } )
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="kr">USe</span>ndStreamStart( <span class="s">"text/event-stream"</span>, 200, <span class="p">;</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5"></a><a href="#__codelineno-6-5"><span class="linenos" data-linenos=" 5 "></span></a>      { <span class="s">"Cache-Control"</span> =&gt; <span class="s">"no-cache"</span>, <span class="s">"X-Accel-Buffering"</span> =&gt; <span class="s">"no"</span> } )
 </span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6"></a><a href="#__codelineno-6-6"><span class="linenos" data-linenos=" 6 "></span></a>   <span class="kr">DO</span> WHILE i &lt; 10
 </span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7"></a><a href="#__codelineno-6-7"><span class="linenos" data-linenos=" 7 "></span></a>      <span class="nv">i</span>++
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8"></a><a href="#__codelineno-6-8"><span class="linenos" data-linenos=" 8 "></span></a>      <span class="kr">USe</span>ndChunk( <span class="s">&quot;data: &quot;</span> + hb_jsonEncode( { <span class="s">&quot;n&quot;</span> =&gt; i } ) + hb_eol() + hb_eol() )
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8"></a><a href="#__codelineno-6-8"><span class="linenos" data-linenos=" 8 "></span></a>      <span class="kr">USe</span>ndChunk( <span class="s">"data: "</span> + hb_jsonEncode( { <span class="s">"n"</span> =&gt; i } ) + hb_eol() + hb_eol() )
 </span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9"></a><a href="#__codelineno-6-9"><span class="linenos" data-linenos=" 9 "></span></a>      <span class="nv">hb_idleSleep</span>( 1 )
 </span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10"></a><a href="#__codelineno-6-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="kr">ENDDO</span>
 </span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11"></a><a href="#__codelineno-6-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="kr">USe</span>ndStreamEnd()
@@ -3940,11 +3948,11 @@ tienen acceso al request del hilo actual.</p>
 </tbody>
 </table>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos=" 1 "></span></a>// Leer un campo
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="nv">cUser</span> := U<span class="nc">Session</span>( <span class="s">&quot;user&quot;</span> )
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="nv">cUser</span> := U<span class="nc">Session</span>( <span class="s">"user"</span> )
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4"></a><a href="#__codelineno-7-4"><span class="linenos" data-linenos=" 4 "></span></a>// Escribir y guardar
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5"></a><a href="#__codelineno-7-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="kr">USe</span>ssi<span class="nf">on</span>():<span class="nf">Set</span>( <span class="s">&quot;user&quot;</span>, <span class="s">&quot;carles&quot;</span> )
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6"></a><a href="#__codelineno-7-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="kr">USe</span>ssi<span class="nf">on</span>():<span class="nf">Set</span>( <span class="s">&quot;role&quot;</span>, <span class="s">&quot;admin&quot;</span> )
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5"></a><a href="#__codelineno-7-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="kr">USe</span>ssi<span class="nf">on</span>():<span class="nf">Set</span>( <span class="s">"user"</span>, <span class="s">"carles"</span> )
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6"></a><a href="#__codelineno-7-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="kr">USe</span>ssi<span class="nf">on</span>():<span class="nf">Set</span>( <span class="s">"role"</span>, <span class="s">"admin"</span> )
 </span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7"></a><a href="#__codelineno-7-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="kr">USe</span>ssi<span class="nf">on</span>():Save()   // renueva TTL y emite Set-Cookie
 </span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8"></a><a href="#__codelineno-7-8"><span class="linenos" data-linenos=" 8 "></span></a>
 </span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9"></a><a href="#__codelineno-7-9"><span class="linenos" data-linenos=" 9 "></span></a>// Destruir sesion
@@ -3982,12 +3990,12 @@ tienen acceso al request del hilo actual.</p>
 </tbody>
 </table>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a>// Leer claim
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">cSub</span>  := UJwt( <span class="s">&quot;sub&quot;</span> )
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3"></a><a href="#__codelineno-8-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">nExp</span>  := UJwt( <span class="s">&quot;exp&quot;</span>, 0 )
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">cSub</span>  := UJwt( <span class="s">"sub"</span> )
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3"></a><a href="#__codelineno-8-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">nExp</span>  := UJwt( <span class="s">"exp"</span>, 0 )
 </span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4"></a><a href="#__codelineno-8-4"><span class="linenos" data-linenos="4 "></span></a>
 </span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5"></a><a href="#__codelineno-8-5"><span class="linenos" data-linenos="5 "></span></a>// Verificar scope
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6"></a><a href="#__codelineno-8-6"><span class="linenos" data-linenos="6 "></span></a><span class="kr">IF</span> ! UHasScope( <span class="s">&quot;read:products&quot;</span> )
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7"></a><a href="#__codelineno-8-7"><span class="linenos" data-linenos="7 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">&quot;Scope insuficiente&quot;</span> )
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6"></a><a href="#__codelineno-8-6"><span class="linenos" data-linenos="6 "></span></a><span class="kr">IF</span> ! UHasScope( <span class="s">"read:products"</span> )
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7"></a><a href="#__codelineno-8-7"><span class="linenos" data-linenos="7 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">"Scope insuficiente"</span> )
 </span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8"></a><a href="#__codelineno-8-8"><span class="linenos" data-linenos="8 "></span></a>   <span class="kr">RETURN</span>
 </span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9"></a><a href="#__codelineno-8-9"><span class="linenos" data-linenos="9 "></span></a><span class="kr">ENDIF</span>
 </span></code></pre></div>
@@ -4040,24 +4048,24 @@ tienen acceso al request del hilo actual.</p>
 </tbody>
 </table>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos=" 1 "></span></a>// Verificar rol
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="kr">IF</span> ! UHasRole( <span class="s">&quot;admin&quot;</span> )
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3"></a><a href="#__codelineno-9-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">&quot;Solo administradores&quot;</span> )
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="kr">IF</span> ! UHasRole( <span class="s">"admin"</span> )
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3"></a><a href="#__codelineno-9-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">"Solo administradores"</span> )
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4"></a><a href="#__codelineno-9-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="kr">RETURN</span>
 </span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5"></a><a href="#__codelineno-9-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="kr">ENDIF</span>
 </span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6"></a><a href="#__codelineno-9-6"><span class="linenos" data-linenos=" 6 "></span></a>
 </span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7"></a><a href="#__codelineno-9-7"><span class="linenos" data-linenos=" 7 "></span></a>// Verificar rol con operacion granular
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8"></a><a href="#__codelineno-9-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="kr">IF</span> ! UHasRole( <span class="s">&quot;products&quot;</span>, <span class="s">&quot;delete&quot;</span> )
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9"></a><a href="#__codelineno-9-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">&quot;Sin permiso de borrado&quot;</span> )
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8"></a><a href="#__codelineno-9-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="kr">IF</span> ! UHasRole( <span class="s">"products"</span>, <span class="s">"delete"</span> )
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9"></a><a href="#__codelineno-9-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">"Sin permiso de borrado"</span> )
 </span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10"></a><a href="#__codelineno-9-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="kr">RETURN</span>
 </span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11"></a><a href="#__codelineno-9-11"><span class="linenos" data-linenos="11 "></span></a><span class="kr">ENDIF</span>
 </span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12"></a><a href="#__codelineno-9-12"><span class="linenos" data-linenos="12 "></span></a>
 </span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13"></a><a href="#__codelineno-9-13"><span class="linenos" data-linenos="13 "></span></a>// Leer datos del usuario
 </span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14"></a><a href="#__codelineno-9-14"><span class="linenos" data-linenos="14 "></span></a><span class="nv">hUser</span> := UAuthUser()
-</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15"></a><a href="#__codelineno-9-15"><span class="linenos" data-linenos="15 "></span></a><span class="nv">cEmail</span> := UAuthUser( <span class="s">&quot;email&quot;</span>, <span class="s">&quot;&quot;</span> )
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15"></a><a href="#__codelineno-9-15"><span class="linenos" data-linenos="15 "></span></a><span class="nv">cEmail</span> := UAuthUser( <span class="s">"email"</span>, <span class="s">""</span> )
 </span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16"></a><a href="#__codelineno-9-16"><span class="linenos" data-linenos="16 "></span></a>
 </span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17"></a><a href="#__codelineno-9-17"><span class="linenos" data-linenos="17 "></span></a>// Cerrar sesion
 </span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18"></a><a href="#__codelineno-9-18"><span class="linenos" data-linenos="18 "></span></a><span class="nv">UAuthLogout</span>()
-</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19"></a><a href="#__codelineno-9-19"><span class="linenos" data-linenos="19 "></span></a><span class="nv">URedirect</span>( <span class="s">&quot;/login&quot;</span> )
+</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19"></a><a href="#__codelineno-9-19"><span class="linenos" data-linenos="19 "></span></a><span class="nv">URedirect</span>( <span class="s">"/login"</span> )
 </span></code></pre></div>
 <hr />
 <h2 id="7-validacion">7. Validacion<a class="headerlink" href="#7-validacion" title="Permanent link">&para;</a></h2>
@@ -4104,23 +4112,23 @@ tienen acceso al request del hilo actual.</p>
 <h3 id="flujo-tipico">Flujo tipico<a class="headerlink" href="#flujo-tipico" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a><a href="#__codelineno-10-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> _CreateUser()
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2"></a><a href="#__codelineno-10-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> oVal := UValidateOrFail( { <span class="p">;</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3"></a><a href="#__codelineno-10-3"><span class="linenos" data-linenos=" 3 "></span></a>      &quot;name<span class="s">&quot;  =&gt; &quot;</span>required|string|max:100&quot;, <span class="p">;</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4"></a><a href="#__codelineno-10-4"><span class="linenos" data-linenos=" 4 "></span></a>      &quot;email<span class="s">&quot; =&gt; &quot;</span>required|string|email&quot;,   <span class="p">;</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5"></a><a href="#__codelineno-10-5"><span class="linenos" data-linenos=" 5 "></span></a>      &quot;age<span class="s">&quot;   =&gt; &quot;</span>required|integer|min:18&quot;  <span class="p">;</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3"></a><a href="#__codelineno-10-3"><span class="linenos" data-linenos=" 3 "></span></a>      "name<span class="s">"  =&gt; "</span>required|string|max:100", <span class="p">;</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4"></a><a href="#__codelineno-10-4"><span class="linenos" data-linenos=" 4 "></span></a>      "email<span class="s">" =&gt; "</span>required|string|email",   <span class="p">;</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5"></a><a href="#__codelineno-10-5"><span class="linenos" data-linenos=" 5 "></span></a>      "age<span class="s">"   =&gt; "</span>required|integer|min:18"  <span class="p">;</span>
 </span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6"></a><a href="#__codelineno-10-6"><span class="linenos" data-linenos=" 6 "></span></a>   } )
 </span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7"></a><a href="#__codelineno-10-7"><span class="linenos" data-linenos=" 7 "></span></a>   <span class="kr">IF</span> oVal == NIL ; RETURN NIL ; ENDIF   // ya respondio 422
 </span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8"></a><a href="#__codelineno-10-8"><span class="linenos" data-linenos=" 8 "></span></a>
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9"></a><a href="#__codelineno-10-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="nv">cName</span>  := oVal:Get( <span class="s">&quot;name&quot;</span> )
-</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10"></a><a href="#__codelineno-10-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="nv">cEmail</span> := oVal:Get( <span class="s">&quot;email&quot;</span> )
-</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11"></a><a href="#__codelineno-10-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="nv">nAge</span>   := oVal:Get( <span class="s">&quot;age&quot;</span> )
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9"></a><a href="#__codelineno-10-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="nv">cName</span>  := oVal:Get( <span class="s">"name"</span> )
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10"></a><a href="#__codelineno-10-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="nv">cEmail</span> := oVal:Get( <span class="s">"email"</span> )
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11"></a><a href="#__codelineno-10-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="nv">nAge</span>   := oVal:Get( <span class="s">"age"</span> )
 </span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12"></a><a href="#__codelineno-10-12"><span class="linenos" data-linenos="12 "></span></a>   // ...
-</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13"></a><a href="#__codelineno-10-13"><span class="linenos" data-linenos="13 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;ok&quot;</span> =&gt; <span class="ow">.T.</span> }, 201 )
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13"></a><a href="#__codelineno-10-13"><span class="linenos" data-linenos="13 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"ok"</span> =&gt; <span class="ow">.T.</span> }, 201 )
 </span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14"></a><a href="#__codelineno-10-14"><span class="linenos" data-linenos="14 "></span></a><span class="kr">RETURN</span> NIL
 </span></code></pre></div>
 <h3 id="manejo-manual-de-errores">Manejo manual de errores<a class="headerlink" href="#manejo-manual-de-errores" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">LOCAL</span> oVal := UValidatePost( hRules )
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">IF</span> ! oVal:Make()
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3"></a><a href="#__codelineno-11-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;errors&quot;</span> =&gt; oVal:GetErrorsJs<span class="nf">on</span>() }, 422 )
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3"></a><a href="#__codelineno-11-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"errors"</span> =&gt; oVal:GetErrorsJs<span class="nf">on</span>() }, 422 )
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4"></a><a href="#__codelineno-11-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="kr">RETURN</span>
 </span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5"></a><a href="#__codelineno-11-5"><span class="linenos" data-linenos="5 "></span></a><span class="kr">ENDIF</span>
 </span></code></pre></div>
@@ -4202,17 +4210,17 @@ tienen acceso al request del hilo actual.</p>
 </table>
 <p>Los templates se ubican en <code>www/views/</code> con extension <code>.html</code>.</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1"></a><a href="#__codelineno-14-1"><span class="linenos" data-linenos=" 1 "></span></a>// Renderizar y enviar
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2"></a><a href="#__codelineno-14-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="kr">USe</span>ndView( <span class="s">&quot;users/list.html&quot;</span> )
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2"></a><a href="#__codelineno-14-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="kr">USe</span>ndView( <span class="s">"users/list.html"</span> )
 </span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3"></a><a href="#__codelineno-14-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4"></a><a href="#__codelineno-14-4"><span class="linenos" data-linenos=" 4 "></span></a>// Con variables
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5"></a><a href="#__codelineno-14-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="kr">USe</span>ndView( <span class="s">&quot;users/edit.html&quot;</span>, { <span class="p">;</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6"></a><a href="#__codelineno-14-6"><span class="linenos" data-linenos=" 6 "></span></a>   &quot;cName<span class="s">&quot; =&gt; &quot;</span>Carles&quot;, <span class="p">;</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7"></a><a href="#__codelineno-14-7"><span class="linenos" data-linenos=" 7 "></span></a>   &quot;nAge&quot;  =&gt; 42        <span class="p">;</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5"></a><a href="#__codelineno-14-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="kr">USe</span>ndView( <span class="s">"users/edit.html"</span>, { <span class="p">;</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6"></a><a href="#__codelineno-14-6"><span class="linenos" data-linenos=" 6 "></span></a>   "cName<span class="s">" =&gt; "</span>Carles", <span class="p">;</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7"></a><a href="#__codelineno-14-7"><span class="linenos" data-linenos=" 7 "></span></a>   "nAge"  =&gt; 42        <span class="p">;</span>
 </span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8"></a><a href="#__codelineno-14-8"><span class="linenos" data-linenos=" 8 "></span></a>} )
 </span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9"></a><a href="#__codelineno-14-9"><span class="linenos" data-linenos=" 9 "></span></a>
 </span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10"></a><a href="#__codelineno-14-10"><span class="linenos" data-linenos="10 "></span></a>// Solo obtener el HTML (para componer partials)
-</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11"></a><a href="#__codelineno-14-11"><span class="linenos" data-linenos="11 "></span></a><span class="nv">cPartial</span> := UView( <span class="s">&quot;partials/header.html&quot;</span>, { <span class="s">&quot;cTitle&quot;</span> =&gt; <span class="s">&quot;Mi app&quot;</span> } )
-</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12"></a><a href="#__codelineno-14-12"><span class="linenos" data-linenos="12 "></span></a><span class="kr">USe</span>ndHtml( cPartial + <span class="s">&quot;&lt;main&gt;contenido&lt;/main&gt;&quot;</span> )
+</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11"></a><a href="#__codelineno-14-11"><span class="linenos" data-linenos="11 "></span></a><span class="nv">cPartial</span> := UView( <span class="s">"partials/header.html"</span>, { <span class="s">"cTitle"</span> =&gt; <span class="s">"Mi app"</span> } )
+</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12"></a><a href="#__codelineno-14-12"><span class="linenos" data-linenos="12 "></span></a><span class="kr">USe</span>ndHtml( cPartial + <span class="s">"&lt;main&gt;contenido&lt;/main&gt;"</span> )
 </span></code></pre></div>
 <p>Formato del template:</p>
 <div class="language-html highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1"></a><a href="#__codelineno-15-1"><span class="linenos" data-linenos="1 "></span></a>@args cName, nAge
@@ -4261,20 +4269,20 @@ tienen acceso al request del hilo actual.</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1"></a><a href="#__codelineno-16-1"><span class="linenos" data-linenos=" 1 "></span></a>// UHashToHtml<span class="nf">Select</span>( aHash, cSelect, cKey, cValue )
 </span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2"></a><a href="#__codelineno-16-2"><span class="linenos" data-linenos=" 2 "></span></a>// aHash: array de hashes con campos clave y valor
 </span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3"></a><a href="#__codelineno-16-3"><span class="linenos" data-linenos=" 3 "></span></a>// cSelect: valor actualmente seleccionado
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4"></a><a href="#__codelineno-16-4"><span class="linenos" data-linenos=" 4 "></span></a>// cKey: nombre del campo clave en cada hash (default <span class="s">&quot;key&quot;</span>)
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5"></a><a href="#__codelineno-16-5"><span class="linenos" data-linenos=" 5 "></span></a>// cValue: nombre del campo valor en cada hash (default <span class="s">&quot;value&quot;</span>)
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4"></a><a href="#__codelineno-16-4"><span class="linenos" data-linenos=" 4 "></span></a>// cKey: nombre del campo clave en cada hash (default <span class="s">"key"</span>)
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5"></a><a href="#__codelineno-16-5"><span class="linenos" data-linenos=" 5 "></span></a>// cValue: nombre del campo valor en cada hash (default <span class="s">"value"</span>)
 </span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6"></a><a href="#__codelineno-16-6"><span class="linenos" data-linenos=" 6 "></span></a>
-</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7"></a><a href="#__codelineno-16-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="nv">aItems</span> := { { <span class="s">&quot;key&quot;</span> =&gt; <span class="s">&quot;es&quot;</span>, <span class="s">&quot;value&quot;</span> =&gt; <span class="s">&quot;Espanol&quot;</span> }, <span class="p">;</span>
-</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8"></a><a href="#__codelineno-16-8"><span class="linenos" data-linenos=" 8 "></span></a>            { <span class="s">&quot;key&quot;</span> =&gt; <span class="s">&quot;en&quot;</span>, <span class="s">&quot;value&quot;</span> =&gt; <span class="s">&quot;English&quot;</span> } }
-</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9"></a><a href="#__codelineno-16-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="nv">cHtml</span> := UHashToHtml<span class="nf">Select</span>( aItems, <span class="s">&quot;es&quot;</span>, <span class="s">&quot;key&quot;</span>, <span class="s">&quot;value&quot;</span> )
-</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10"></a><a href="#__codelineno-16-10"><span class="linenos" data-linenos="10 "></span></a>// &lt;option value=<span class="s">&quot;&quot;</span> &gt;&lt;/option&gt;
-</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11"></a><a href="#__codelineno-16-11"><span class="linenos" data-linenos="11 "></span></a>// &lt;option value=<span class="s">&quot;es&quot;</span> selected&gt;Espanol&lt;/option&gt;
-</span><span id="__span-16-12"><a id="__codelineno-16-12" name="__codelineno-16-12"></a><a href="#__codelineno-16-12"><span class="linenos" data-linenos="12 "></span></a>// &lt;option value=<span class="s">&quot;en&quot;</span>&gt;English&lt;/option&gt;
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7"></a><a href="#__codelineno-16-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="nv">aItems</span> := { { <span class="s">"key"</span> =&gt; <span class="s">"es"</span>, <span class="s">"value"</span> =&gt; <span class="s">"Espanol"</span> }, <span class="p">;</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8"></a><a href="#__codelineno-16-8"><span class="linenos" data-linenos=" 8 "></span></a>            { <span class="s">"key"</span> =&gt; <span class="s">"en"</span>, <span class="s">"value"</span> =&gt; <span class="s">"English"</span> } }
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9"></a><a href="#__codelineno-16-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="nv">cHtml</span> := UHashToHtml<span class="nf">Select</span>( aItems, <span class="s">"es"</span>, <span class="s">"key"</span>, <span class="s">"value"</span> )
+</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10"></a><a href="#__codelineno-16-10"><span class="linenos" data-linenos="10 "></span></a>// &lt;option value=<span class="s">""</span> &gt;&lt;/option&gt;
+</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11"></a><a href="#__codelineno-16-11"><span class="linenos" data-linenos="11 "></span></a>// &lt;option value=<span class="s">"es"</span> selected&gt;Espanol&lt;/option&gt;
+</span><span id="__span-16-12"><a id="__codelineno-16-12" name="__codelineno-16-12"></a><a href="#__codelineno-16-12"><span class="linenos" data-linenos="12 "></span></a>// &lt;option value=<span class="s">"en"</span>&gt;English&lt;/option&gt;
 </span></code></pre></div>
 <h3 id="rutas-nombradas">Rutas nombradas<a class="headerlink" href="#rutas-nombradas" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1"></a><a href="#__codelineno-17-1"><span class="linenos" data-linenos="1 "></span></a>// URoute( cName, param1, param2, ... )
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2"></a><a href="#__codelineno-17-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">cUrl</span> := URoute( <span class="s">&quot;user&quot;</span>, 42 )       // -&gt; <span class="s">&quot;/users/42&quot;</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3"></a><a href="#__codelineno-17-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">cUrl</span> := URoute( <span class="s">&quot;post&quot;</span>, <span class="s">&quot;mi-slug&quot;</span> ) // -&gt; <span class="s">&quot;/posts/mi-slug&quot;</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2"></a><a href="#__codelineno-17-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">cUrl</span> := URoute( <span class="s">"user"</span>, 42 )       // -&gt; <span class="s">"/users/42"</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3"></a><a href="#__codelineno-17-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">cUrl</span> := URoute( <span class="s">"post"</span>, <span class="s">"mi-slug"</span> ) // -&gt; <span class="s">"/posts/mi-slug"</span>
 </span></code></pre></div>
 <hr />
 <h2 id="10-csrf">10. CSRF<a class="headerlink" href="#10-csrf" title="Permanent link">&para;</a></h2>
@@ -4306,14 +4314,14 @@ tienen acceso al request del hilo actual.</p>
 </tbody>
 </table>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1"></a><a href="#__codelineno-18-1"><span class="linenos" data-linenos=" 1 "></span></a>// En la accion GET que sirve el <span class="nc">form</span>ulario
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2"></a><a href="#__codelineno-18-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="kr">USe</span>ndView( <span class="s">&quot;form.html&quot;</span>, { <span class="s">&quot;cCsrf&quot;</span> =&gt; UCsrfToHtml() } )
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2"></a><a href="#__codelineno-18-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="kr">USe</span>ndView( <span class="s">"form.html"</span>, { <span class="s">"cCsrf"</span> =&gt; UCsrfToHtml() } )
 </span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3"></a><a href="#__codelineno-18-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4"></a><a href="#__codelineno-18-4"><span class="linenos" data-linenos=" 4 "></span></a>// En el template
 </span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5"></a><a href="#__codelineno-18-5"><span class="linenos" data-linenos=" 5 "></span></a>// {{ cCsrf }}   -- emite el &lt;input hidden&gt;
 </span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6"></a><a href="#__codelineno-18-6"><span class="linenos" data-linenos=" 6 "></span></a>
 </span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7"></a><a href="#__codelineno-18-7"><span class="linenos" data-linenos=" 7 "></span></a>// En la accion POST que procesa el <span class="nc">form</span>ulario
-</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8"></a><a href="#__codelineno-18-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="kr">IF</span> ! HIX_CsrfValidToken( UPost( <span class="s">&quot;_csrf&quot;</span> ), 3600 )
-</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9"></a><a href="#__codelineno-18-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">&quot;Token CSRF invalido&quot;</span> )
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8"></a><a href="#__codelineno-18-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="kr">IF</span> ! HIX_CsrfValidToken( UPost( <span class="s">"_csrf"</span> ), 3600 )
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9"></a><a href="#__codelineno-18-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 403, <span class="s">"Token CSRF invalido"</span> )
 </span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10"></a><a href="#__codelineno-18-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="kr">RETURN</span>
 </span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11"></a><a href="#__codelineno-18-11"><span class="linenos" data-linenos="11 "></span></a><span class="kr">ENDIF</span>
 </span></code></pre></div>
@@ -4344,7 +4352,7 @@ tienen acceso al request del hilo actual.</p>
 </span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4"></a><a href="#__codelineno-19-4"><span class="linenos" data-linenos=" 4 "></span></a>// En la accion POST (eliminar, editar, ...)
 </span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5"></a><a href="#__codelineno-19-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="nv">cId</span> := UGetResource()   // lee _resource_id del POST automaticamente
 </span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6"></a><a href="#__codelineno-19-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="kr">IF</span> <span class="nf">Empty</span>( cId )
-</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7"></a><a href="#__codelineno-19-7"><span class="linenos" data-linenos=" 7 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 400, <span class="s">&quot;ID de recurso invalido&quot;</span> )
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7"></a><a href="#__codelineno-19-7"><span class="linenos" data-linenos=" 7 "></span></a>   <span class="kr">USe</span>nd<span class="nf">Error</span>( 400, <span class="s">"ID de recurso invalido"</span> )
 </span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8"></a><a href="#__codelineno-19-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="kr">RETURN</span>
 </span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9"></a><a href="#__codelineno-19-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="kr">ENDIF</span>
 </span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10"></a><a href="#__codelineno-19-10"><span class="linenos" data-linenos="10 "></span></a><span class="nv">nId</span> := <span class="nf">Val</span>( cId )
@@ -4395,16 +4403,16 @@ tienen acceso al request del hilo actual.</p>
 </tbody>
 </table>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1"></a><a href="#__codelineno-20-1"><span class="linenos" data-linenos=" 1 "></span></a>// Guardar error en el POST
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2"></a><a href="#__codelineno-20-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="nv">oFlash</span> := UFlash( <span class="s">&quot;login-form&quot;</span> )
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3"></a><a href="#__codelineno-20-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="nv">oFlash</span>:<span class="nf">Set</span>( <span class="s">&quot;error&quot;</span>, <span class="s">&quot;Credenciales incorrectas&quot;</span> )
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4"></a><a href="#__codelineno-20-4"><span class="linenos" data-linenos=" 4 "></span></a><span class="nv">oFlash</span>:<span class="nf">Set</span>( <span class="s">&quot;email&quot;</span>, UPost( <span class="s">&quot;email&quot;</span> ) )
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2"></a><a href="#__codelineno-20-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="nv">oFlash</span> := UFlash( <span class="s">"login-form"</span> )
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3"></a><a href="#__codelineno-20-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="nv">oFlash</span>:<span class="nf">Set</span>( <span class="s">"error"</span>, <span class="s">"Credenciales incorrectas"</span> )
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4"></a><a href="#__codelineno-20-4"><span class="linenos" data-linenos=" 4 "></span></a><span class="nv">oFlash</span>:<span class="nf">Set</span>( <span class="s">"email"</span>, UPost( <span class="s">"email"</span> ) )
 </span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5"></a><a href="#__codelineno-20-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="nv">oFlash</span>:Save()
-</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6"></a><a href="#__codelineno-20-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="nv">URedirect</span>( <span class="s">&quot;/login&quot;</span> )
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6"></a><a href="#__codelineno-20-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="nv">URedirect</span>( <span class="s">"/login"</span> )
 </span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7"></a><a href="#__codelineno-20-7"><span class="linenos" data-linenos=" 7 "></span></a>
 </span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8"></a><a href="#__codelineno-20-8"><span class="linenos" data-linenos=" 8 "></span></a>// Leer en el GET siguiente
-</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9"></a><a href="#__codelineno-20-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="nv">oFlash</span> := UFlash( <span class="s">&quot;login-form&quot;</span> )
-</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10"></a><a href="#__codelineno-20-10"><span class="linenos" data-linenos="10 "></span></a><span class="nv">cError</span> := oFlash:Get( <span class="s">&quot;error&quot;</span>, <span class="s">&quot;&quot;</span> )
-</span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11"></a><a href="#__codelineno-20-11"><span class="linenos" data-linenos="11 "></span></a><span class="nv">cEmail</span> := oFlash:Get( <span class="s">&quot;email&quot;</span>, <span class="s">&quot;&quot;</span> )
+</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9"></a><a href="#__codelineno-20-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="nv">oFlash</span> := UFlash( <span class="s">"login-form"</span> )
+</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10"></a><a href="#__codelineno-20-10"><span class="linenos" data-linenos="10 "></span></a><span class="nv">cError</span> := oFlash:Get( <span class="s">"error"</span>, <span class="s">""</span> )
+</span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11"></a><a href="#__codelineno-20-11"><span class="linenos" data-linenos="11 "></span></a><span class="nv">cEmail</span> := oFlash:Get( <span class="s">"email"</span>, <span class="s">""</span> )
 </span></code></pre></div>
 <hr />
 <h2 id="13-entorno-y-configuracion">13. Entorno y configuracion<a class="headerlink" href="#13-entorno-y-configuracion" title="Permanent link">&para;</a></h2>
@@ -4451,11 +4459,11 @@ tienen acceso al request del hilo actual.</p>
 </tbody>
 </table>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1"></a><a href="#__codelineno-21-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">IF</span> UIsDev()
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2"></a><a href="#__codelineno-21-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">l</span>( <span class="s">&quot;Debug: &quot;</span> + hb_jsonEncode( hData ) )
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2"></a><a href="#__codelineno-21-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">l</span>( <span class="s">"Debug: "</span> + hb_jsonEncode( hData ) )
 </span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3"></a><a href="#__codelineno-21-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">ENDIF</span>
 </span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4"></a><a href="#__codelineno-21-4"><span class="linenos" data-linenos="4 "></span></a>
-</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5"></a><a href="#__codelineno-21-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">cPort</span> := UConfig( <span class="s">&quot;nPort&quot;</span>, <span class="s">&quot;8080&quot;</span> )
-</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6"></a><a href="#__codelineno-21-6"><span class="linenos" data-linenos="6 "></span></a><span class="nv">cKey</span>  := UMwConfig( <span class="s">&quot;auth&quot;</span>, <span class="s">&quot;session_user_key&quot;</span>, <span class="s">&quot;_auth_user&quot;</span> )
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5"></a><a href="#__codelineno-21-5"><span class="linenos" data-linenos="5 "></span></a><span class="nv">cPort</span> := UConfig( <span class="s">"nPort"</span>, <span class="s">"8080"</span> )
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6"></a><a href="#__codelineno-21-6"><span class="linenos" data-linenos="6 "></span></a><span class="nv">cKey</span>  := UMwConfig( <span class="s">"auth"</span>, <span class="s">"session_user_key"</span>, <span class="s">"_auth_user"</span> )
 </span></code></pre></div>
 <hr />
 <h2 id="14-tabla-rapida-de-referencia">14. Tabla rapida de referencia<a class="headerlink" href="#14-tabla-rapida-de-referencia" title="Permanent link">&para;</a></h2>

@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="./" hreflang="en">
         
+          <link rel="alternate" href="../../it/programacion/modo-dev-prod/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="./" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../it/programacion/modo-dev-prod/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -2925,9 +2933,9 @@
 </ul>
 <p>Switching modes is <strong>a single line</strong> — and it alters the behavior of half the framework.</p>
 <p><code>hix.json</code>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">&quot;app&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">  </span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">&quot;env&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dev&quot;</span><span class="w">          </span><span class="err">◀─────</span><span class="w"> </span><span class="err">Local</span><span class="p">:</span><span class="w"> </span><span class="err">F</span><span class="mi">5</span><span class="w"> </span><span class="err">reloads</span><span class="p">,</span><span class="w"> </span><span class="kc">full</span><span class="w"> </span><span class="kc">tra</span><span class="err">ceback</span><span class="p">,</span><span class="w"> </span><span class="kc">n</span><span class="err">o</span><span class="w"> </span><span class="err">cache</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">  </span><span class="nt">&quot;env&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;prod&quot;</span><span class="w">         </span><span class="err">◀─────</span><span class="w"> </span><span class="err">Real</span><span class="w"> </span><span class="err">server</span><span class="p">:</span><span class="w"> </span><span class="err">ge</span><span class="kc">ner</span><span class="err">ic</span><span class="w"> </span><span class="mi">500</span><span class="p">,</span><span class="w"> </span><span class="err">asse</span><span class="kc">ts</span><span class="w"> </span><span class="err">cached</span><span class="w"> </span><span class="mi">1</span><span class="err">h</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos="1 "></span></a><span class="nt">"app"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">  </span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos="2 "></span></a><span class="w">  </span><span class="nt">"env"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"dev"</span><span class="w">          </span><span class="err">◀─────</span><span class="w"> </span><span class="err">Local</span><span class="p">:</span><span class="w"> </span><span class="err">F</span><span class="mi">5</span><span class="w"> </span><span class="err">reloads</span><span class="p">,</span><span class="w"> </span><span class="kc">full</span><span class="w"> </span><span class="kc">tra</span><span class="err">ceback</span><span class="p">,</span><span class="w"> </span><span class="kc">n</span><span class="err">o</span><span class="w"> </span><span class="err">cache</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos="3 "></span></a><span class="w">  </span><span class="nt">"env"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"prod"</span><span class="w">         </span><span class="err">◀─────</span><span class="w"> </span><span class="err">Real</span><span class="w"> </span><span class="err">server</span><span class="p">:</span><span class="w"> </span><span class="err">ge</span><span class="kc">ner</span><span class="err">ic</span><span class="w"> </span><span class="mi">500</span><span class="p">,</span><span class="w"> </span><span class="err">asse</span><span class="kc">ts</span><span class="w"> </span><span class="err">cached</span><span class="w"> </span><span class="mi">1</span><span class="err">h</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos="4 "></span></a><span class="p">}</span>
 </span></code></pre></div></p>
 <hr />
@@ -2988,9 +2996,9 @@
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6"></a><a href="#__codelineno-1-6"><span class="linenos" data-linenos=" 6 "></span></a>│  File       : views/login.html  │
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7"></a><a href="#__codelineno-1-7"><span class="linenos" data-linenos=" 7 "></span></a>│  Line       : 23                │
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8"></a><a href="#__codelineno-1-8"><span class="linenos" data-linenos=" 8 "></span></a>│                                 │
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9"></a><a href="#__codelineno-1-9"><span class="linenos" data-linenos=" 9 "></span></a>│    0020  &lt;form action=&quot;..&quot;&gt;     │
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10"></a><a href="#__codelineno-1-10"><span class="linenos" data-linenos="10 "></span></a>│    0021    &lt;input name=&quot;user&quot;&gt;  │
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11"></a><a href="#__codelineno-1-11"><span class="linenos" data-linenos="11 "></span></a>│    0022    &lt;input name=&quot;pass&quot;&gt;  │
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9"></a><a href="#__codelineno-1-9"><span class="linenos" data-linenos=" 9 "></span></a>│    0020  &lt;form action=".."&gt;     │
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10"></a><a href="#__codelineno-1-10"><span class="linenos" data-linenos="10 "></span></a>│    0021    &lt;input name="user"&gt;  │
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11"></a><a href="#__codelineno-1-11"><span class="linenos" data-linenos="11 "></span></a>│    0022    &lt;input name="pass"&gt;  │
 </span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12"></a><a href="#__codelineno-1-12"><span class="linenos" data-linenos="12 "></span></a>│ =&gt; 0023  {{ X + 1 }}            │
 </span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13"></a><a href="#__codelineno-1-13"><span class="linenos" data-linenos="13 "></span></a>│    0024    &lt;button&gt;OK&lt;/button&gt;  │
 </span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14"></a><a href="#__codelineno-1-14"><span class="linenos" data-linenos="14 "></span></a>│    0025  &lt;/form&gt;                │
@@ -3006,10 +3014,10 @@
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos="2 "></span></a>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos="3 "></span></a>@if UIsProd()
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos="4 "></span></a>  <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Something went wrong.<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos="5 "></span></a>  <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>We&#39;re investigating. Please try again in a few minutes.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos="5 "></span></a>  <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>We're investigating. Please try again in a few minutes.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos="6 "></span></a>@else
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos="7 "></span></a>  <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>{{ UHtmlEncode(hErr[&quot;description&quot;]) }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos="8 "></span></a>  <span class="p">&lt;</span><span class="nt">pre</span><span class="p">&gt;</span>{{ UHtmlEncode(hErr[&quot;file&quot;]) }}:{{ hb_NToS(hErr[&quot;line&quot;]) }}<span class="p">&lt;/</span><span class="nt">pre</span><span class="p">&gt;</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos="7 "></span></a>  <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>{{ UHtmlEncode(hErr["description"]) }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos="8 "></span></a>  <span class="p">&lt;</span><span class="nt">pre</span><span class="p">&gt;</span>{{ UHtmlEncode(hErr["file"]) }}:{{ hb_NToS(hErr["line"]) }}<span class="p">&lt;/</span><span class="nt">pre</span><span class="p">&gt;</span>
 </span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9"></a><a href="#__codelineno-3-9"><span class="linenos" data-linenos="9 "></span></a>@endif
 </span></code></pre></div>
 <h3 id="dev">DEV<a class="headerlink" href="#dev" title="Permanent link">&para;</a></h3>
@@ -3062,16 +3070,16 @@
 <hr />
 <h3 id="different-logs-per-environment">Different logs per environment<a class="headerlink" href="#different-logs-per-environment" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">IF</span> UIsDev()
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">HIX_LoggerInit</span>( <span class="s">&quot;logs/hix.log&quot;</span>, HIX_LOG_DEBUG, <span class="ow">.T.</span> )    // verbose + console
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">HIX_LoggerInit</span>( <span class="s">"logs/hix.log"</span>, HIX_LOG_DEBUG, <span class="ow">.T.</span> )    // verbose + console
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">ELSE</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><a href="#__codelineno-4-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="nv">HIX_LoggerInit</span>( <span class="s">&quot;logs/hix.log&quot;</span>, HIX_LOG_INFO,  <span class="ow">.F.</span> )    // <span class="nc">file</span> only, info+
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><a href="#__codelineno-4-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="nv">HIX_LoggerInit</span>( <span class="s">"logs/hix.log"</span>, HIX_LOG_INFO,  <span class="ow">.F.</span> )    // <span class="nc">file</span> only, info+
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5"></a><a href="#__codelineno-4-5"><span class="linenos" data-linenos="5 "></span></a><span class="kr">ENDIF</span>
 </span></code></pre></div>
 <h3 id="csrf-stricter-session-in-prod">CSRF / stricter session in prod<a class="headerlink" href="#csrf-stricter-session-in-prod" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">IF</span> UIsProd()
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">HIX_MwSessionSetup</span>( <span class="s">&quot;HIXSID&quot;</span>, 1800, 60, <span class="s">&quot;file&quot;</span>, <span class="s">&quot;.sessions/&quot;</span> )    // 30 min
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">HIX_MwSessionSetup</span>( <span class="s">"HIXSID"</span>, 1800, 60, <span class="s">"file"</span>, <span class="s">".sessions/"</span> )    // 30 min
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">ELSE</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="nv">HIX_MwSessionSetup</span>( <span class="s">&quot;HIXSID&quot;</span>, 86400, 60, <span class="s">&quot;memory&quot;</span> )               // 1 day in RAM
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="nv">HIX_MwSessionSetup</span>( <span class="s">"HIXSID"</span>, 86400, 60, <span class="s">"memory"</span> )               // 1 day in RAM
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5"></a><a href="#__codelineno-5-5"><span class="linenos" data-linenos="5 "></span></a><span class="kr">ENDIF</span>
 </span></code></pre></div>
 <hr />

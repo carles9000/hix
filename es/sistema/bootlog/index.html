@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="../../../sistema/bootlog/" hreflang="en">
         
+          <link rel="alternate" href="../../../it/sistema/bootlog/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="../../../sistema/bootlog/" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../it/sistema/bootlog/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -3145,11 +3153,11 @@ mostrarlo en una UI de administración.</p>
 <h3 id="hix_bootlog"><code>HIX_BootLog()</code><a class="headerlink" href="#hix_bootlog" title="Permanent link">&para;</a></h3>
 <p>Devuelve una <strong>copia clonada</strong> del hash completo, thread-safe. Ideal para
 enviar como JSON:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a>oSrv:AddRouteGet( &quot;hix.boot&quot;, &quot;/hix-boot&quot;, {|| USendJson( HIX_BootLog() ) } )
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a>oSrv:AddRouteGet( "hix.boot", "/hix-boot", {|| USendJson( HIX_BootLog() ) } )
 </span></code></pre></div>
 <h3 id="hix_bootlogsection-ckey"><code>HIX_BootLogSection( cKey )</code><a class="headerlink" href="#hix_bootlogsection-ckey" title="Permanent link">&para;</a></h3>
 <p>Devuelve el array de una sección concreta (o <code>{}</code> si no existe):</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos="1 "></span></a>aRoutes := HIX_BootLogSection( &quot;routes&quot; )
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos="1 "></span></a>aRoutes := HIX_BootLogSection( "routes" )
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos="2 "></span></a>FOR EACH aItem IN aRoutes
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos="3 "></span></a>   ? aItem[3], aItem[4]     // cValue, xCargo
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos="4 "></span></a>NEXT
@@ -3158,8 +3166,8 @@ enviar como JSON:</p>
 <p>Añade una entrada. <code>lStatus</code> es <code>.T.</code> por defecto; <code>xCargo</code> es <code>NIL</code> por
 defecto. Si <code>lStatus == .F.</code> y <code>xCargo == NIL</code>, se sustituye por el placeholder
 localizado (<code>BOOT_ERR_NO_DESC</code>) para que la UI no vea <code>NIL</code> en errores.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a>HIX_BootLogAdd( &quot;loaders&quot;, &quot;file&quot;, .T., &quot;myapp.prg&quot; )
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a>HIX_BootLogAdd( &quot;loaders&quot;, &quot;file&quot;, .F., &quot;bad.prg&quot;, oErr:description )
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a>HIX_BootLogAdd( "loaders", "file", .T., "myapp.prg" )
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a>HIX_BootLogAdd( "loaders", "file", .F., "bad.prg", oErr:description )
 </span></code></pre></div>
 <h3 id="hix_bootlogreset"><code>HIX_BootLogReset()</code><a class="headerlink" href="#hix_bootlogreset" title="Permanent link">&para;</a></h3>
 <p>Vacía el hash. Se llama automáticamente al inicio de <code>_Init()</code> si el proceso
@@ -3178,7 +3186,7 @@ es dueño de los globales.</p>
 </span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9"></a><a href="#__codelineno-5-9"><span class="linenos" data-linenos=" 9 "></span></a>  OK  init     socket ssl=F
 </span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10"></a><a href="#__codelineno-5-10"><span class="linenos" data-linenos="10 "></span></a>[loaders]
 </span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11"></a><a href="#__codelineno-5-11"><span class="linenos" data-linenos="11 "></span></a>  OK  file     myapp.prg
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12"></a><a href="#__codelineno-5-12"><span class="linenos" data-linenos="12 "></span></a>  ERR file     bad.prg  -&gt; Unterminated string &#39;x, HB_COMPILEFROMBUF
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12"></a><a href="#__codelineno-5-12"><span class="linenos" data-linenos="12 "></span></a>  ERR file     bad.prg  -&gt; Unterminated string 'x, HB_COMPILEFROMBUF
 </span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13"></a><a href="#__codelineno-5-13"><span class="linenos" data-linenos="13 "></span></a>[middlewares]
 </span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14"></a><a href="#__codelineno-5-14"><span class="linenos" data-linenos="14 "></span></a>  OK  file     cors.prg
 </span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15"></a><a href="#__codelineno-5-15"><span class="linenos" data-linenos="15 "></span></a>  OK  config   session: cookie=hix_sess ttl=3600 storage=memory
@@ -3209,9 +3217,9 @@ restaurarlo.</p>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4"></a><a href="#__codelineno-7-4"><span class="linenos" data-linenos=" 4 "></span></a>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5"></a><a href="#__codelineno-7-5"><span class="linenos" data-linenos=" 5 "></span></a>// Funcion auxiliar en tu app
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6"></a><a href="#__codelineno-7-6"><span class="linenos" data-linenos=" 6 "></span></a>FUNCTION MyBootLog( cKey, cAction, lStatus, cValue, xCargo )
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7"></a><a href="#__codelineno-7-7"><span class="linenos" data-linenos=" 7 "></span></a>   _t( &quot;[BOOT/&quot; + cKey + &quot;] &quot; + cAction + &quot; &quot; + ;
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8"></a><a href="#__codelineno-7-8"><span class="linenos" data-linenos=" 8 "></span></a>       iif( lStatus, &quot;OK&quot;, &quot;ERR&quot; ) + &quot; &quot; + cValue + ;
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9"></a><a href="#__codelineno-7-9"><span class="linenos" data-linenos=" 9 "></span></a>       iif( xCargo == NIL, &quot;&quot;, &quot; -&gt; &quot; + hb_CStr( xCargo ) ) )
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7"></a><a href="#__codelineno-7-7"><span class="linenos" data-linenos=" 7 "></span></a>   _t( "[BOOT/" + cKey + "] " + cAction + " " + ;
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8"></a><a href="#__codelineno-7-8"><span class="linenos" data-linenos=" 8 "></span></a>       iif( lStatus, "OK", "ERR" ) + " " + cValue + ;
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9"></a><a href="#__codelineno-7-9"><span class="linenos" data-linenos=" 9 "></span></a>       iif( xCargo == NIL, "", " -&gt; " + hb_CStr( xCargo ) ) )
 </span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10"></a><a href="#__codelineno-7-10"><span class="linenos" data-linenos="10 "></span></a>RETURN NIL
 </span></code></pre></div>
 <p>Cada entrada añadida al boot log dispara <code>MyBootLog()</code> con los datos del
@@ -3262,16 +3270,16 @@ recurso con sus parámetros clave (<code>logger level=info console=T</code>,
 <h2 id="exponer-el-boot-log-al-usuario">Exponer el boot log al usuario<a class="headerlink" href="#exponer-el-boot-log-al-usuario" title="Permanent link">&para;</a></h2>
 <p>Como el hash es serializable, la forma más directa es una ruta HTTP:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos=" 1 "></span></a>// Endpoint JSON crudo
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos=" 2 "></span></a>oSrv:AddRouteGet( &quot;hix.boot&quot;, &quot;/hix-boot&quot;, ;
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos=" 2 "></span></a>oSrv:AddRouteGet( "hix.boot", "/hix-boot", ;
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3"></a><a href="#__codelineno-11-3"><span class="linenos" data-linenos=" 3 "></span></a>   {|| USendJson( HIX_BootLog() ) } )
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4"></a><a href="#__codelineno-11-4"><span class="linenos" data-linenos=" 4 "></span></a>
 </span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5"></a><a href="#__codelineno-11-5"><span class="linenos" data-linenos=" 5 "></span></a>// Sección concreta
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6"></a><a href="#__codelineno-11-6"><span class="linenos" data-linenos=" 6 "></span></a>oSrv:AddRouteGet( &quot;hix.boot.routes&quot;, &quot;/hix-boot/routes&quot;, ;
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7"></a><a href="#__codelineno-11-7"><span class="linenos" data-linenos=" 7 "></span></a>   {|| USendJson( HIX_BootLogSection( &quot;routes&quot; ) ) } )
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6"></a><a href="#__codelineno-11-6"><span class="linenos" data-linenos=" 6 "></span></a>oSrv:AddRouteGet( "hix.boot.routes", "/hix-boot/routes", ;
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7"></a><a href="#__codelineno-11-7"><span class="linenos" data-linenos=" 7 "></span></a>   {|| USendJson( HIX_BootLogSection( "routes" ) ) } )
 </span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8"></a><a href="#__codelineno-11-8"><span class="linenos" data-linenos=" 8 "></span></a>
 </span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9"></a><a href="#__codelineno-11-9"><span class="linenos" data-linenos=" 9 "></span></a>// Vista HTML tabulada
-</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10"></a><a href="#__codelineno-11-10"><span class="linenos" data-linenos="10 "></span></a>oSrv:AddRouteGet( &quot;hix.boot.html&quot;, &quot;/hix-boot.html&quot;, ;
-</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11"></a><a href="#__codelineno-11-11"><span class="linenos" data-linenos="11 "></span></a>   {|| USendView( &quot;hix/bootlog.html&quot;, { &quot;hLog&quot; =&gt; HIX_BootLog() } ) } )
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10"></a><a href="#__codelineno-11-10"><span class="linenos" data-linenos="10 "></span></a>oSrv:AddRouteGet( "hix.boot.html", "/hix-boot.html", ;
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11"></a><a href="#__codelineno-11-11"><span class="linenos" data-linenos="11 "></span></a>   {|| USendView( "hix/bootlog.html", { "hLog" =&gt; HIX_BootLog() } ) } )
 </span></code></pre></div>
 <p>Estas rutas conviene protegerlas con <code>HixMwAdmin</code> o el middleware de sesión
 que uses en tu panel de administración.</p>
@@ -3283,9 +3291,9 @@ aplicación:</p>
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2"></a><a href="#__codelineno-12-2"><span class="linenos" data-linenos=" 2 "></span></a>   LOCAL oSrv := THixServer():New()
 </span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3"></a><a href="#__codelineno-12-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4"></a><a href="#__codelineno-12-4"><span class="linenos" data-linenos=" 4 "></span></a>   oSrv:bInit := {||
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5"></a><a href="#__codelineno-12-5"><span class="linenos" data-linenos=" 5 "></span></a>      HIX_BootLogAdd( &quot;app&quot;, &quot;init&quot;, .T., &quot;warmup cache&quot; )
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5"></a><a href="#__codelineno-12-5"><span class="linenos" data-linenos=" 5 "></span></a>      HIX_BootLogAdd( "app", "init", .T., "warmup cache" )
 </span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6"></a><a href="#__codelineno-12-6"><span class="linenos" data-linenos=" 6 "></span></a>      IF ! _LoadCatalog()
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7"></a><a href="#__codelineno-12-7"><span class="linenos" data-linenos=" 7 "></span></a>         HIX_BootLogAdd( &quot;app&quot;, &quot;init&quot;, .F., &quot;catalog&quot;, &quot;fichero corrupto&quot; )
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7"></a><a href="#__codelineno-12-7"><span class="linenos" data-linenos=" 7 "></span></a>         HIX_BootLogAdd( "app", "init", .F., "catalog", "fichero corrupto" )
 </span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8"></a><a href="#__codelineno-12-8"><span class="linenos" data-linenos=" 8 "></span></a>      ENDIF
 </span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9"></a><a href="#__codelineno-12-9"><span class="linenos" data-linenos=" 9 "></span></a>   }
 </span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10"></a><a href="#__codelineno-12-10"><span class="linenos" data-linenos="10 "></span></a>

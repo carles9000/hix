@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="./" hreflang="en">
         
+          <link rel="alternate" href="../../it/sistema/traceando/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="./" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../it/sistema/traceando/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -2871,9 +2879,9 @@ formatted, with type and context.</p>
 lets us quickly see what's happening in our code.</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">function</span> main() 
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos="2 "></span></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos="3 "></span></a>   LOCAL hData := { <span class="s">&quot;user&quot;</span> =&gt; <span class="s">&quot;Carles&quot;</span>, <span class="s">&quot;roles&quot;</span> =&gt; { <span class="s">&quot;admin&quot;</span>, <span class="s">&quot;ops&quot;</span> } }
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos="3 "></span></a>   LOCAL hData := { <span class="s">"user"</span> =&gt; <span class="s">"Carles"</span>, <span class="s">"roles"</span> =&gt; { <span class="s">"admin"</span>, <span class="s">"ops"</span> } }
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos="4 "></span></a>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos="5 "></span></a>   <span class="nv">_t</span>( <span class="s">&#39;My trace system...&#39;</span> )    // Only message 
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos="5 "></span></a>   <span class="nv">_t</span>( <span class="s">'My trace system...'</span> )    // Only message 
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos="6 "></span></a>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos="7 "></span></a>   _d( hData )
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos="8 "></span></a>
@@ -2884,7 +2892,7 @@ lets us quickly see what's happening in our code.</p>
 web format, and we can output the trace in the browser if we want.</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">function</span> main() 
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><a href="#__codelineno-1-2"><span class="linenos" data-linenos="2 "></span></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a><a href="#__codelineno-1-3"><span class="linenos" data-linenos="3 "></span></a>   LOCAL hData := { <span class="s">&quot;user&quot;</span> =&gt; <span class="s">&quot;Carles&quot;</span>, <span class="s">&quot;roles&quot;</span> =&gt; { <span class="s">&quot;admin&quot;</span>, <span class="s">&quot;ops&quot;</span> } }   
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a><a href="#__codelineno-1-3"><span class="linenos" data-linenos="3 "></span></a>   LOCAL hData := { <span class="s">"user"</span> =&gt; <span class="s">"Carles"</span>, <span class="s">"roles"</span> =&gt; { <span class="s">"admin"</span>, <span class="s">"ops"</span> } }   
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4"></a><a href="#__codelineno-1-4"><span class="linenos" data-linenos="4 "></span></a>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5"></a><a href="#__codelineno-1-5"><span class="linenos" data-linenos="5 "></span></a>   ? _w( hData )
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6"></a><a href="#__codelineno-1-6"><span class="linenos" data-linenos="6 "></span></a>
@@ -2920,8 +2928,8 @@ web format, and we can output the trace in the browser if we want.</p>
 </tbody>
 </table>
 <p>The functions accept <strong>N arguments</strong> of any type:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">_d</span>( <span class="s">&quot;Before query&quot;</span>, hParams, nResults )
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">_d</span>( <span class="s">&quot;After:&quot;</span>, oUser )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">_d</span>( <span class="s">"Before query"</span>, hParams, nResults )
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">_d</span>( <span class="s">"After:"</span>, oUser )
 </span></code></pre></div>
 <hr />
 <h2 id="trace-examples">Trace examples<a class="headerlink" href="#trace-examples" title="Permanent link">&para;</a></h2>
@@ -2929,52 +2937,52 @@ web format, and we can output the trace in the browser if we want.</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> _Process<span class="nf">Order</span>( nId )
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2"></a><a href="#__codelineno-3-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> hOrder, lOk
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3"></a><a href="#__codelineno-3-3"><span class="linenos" data-linenos=" 3 "></span></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">_d</span>( <span class="s">&quot;→ _ProcessOrder&quot;</span>, nId )
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4"></a><a href="#__codelineno-3-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="nv">_d</span>( <span class="s">"→ _ProcessOrder"</span>, nId )
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5"></a><a href="#__codelineno-3-5"><span class="linenos" data-linenos=" 5 "></span></a>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6"></a><a href="#__codelineno-3-6"><span class="linenos" data-linenos=" 6 "></span></a>   <span class="nv">hOrder</span> := _Load<span class="nf">Order</span>( nId )
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7"></a><a href="#__codelineno-3-7"><span class="linenos" data-linenos=" 7 "></span></a>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="nv">_d</span>( <span class="s">&quot;loaded:&quot;</span>, hOrder )
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8"></a><a href="#__codelineno-3-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="nv">_d</span>( <span class="s">"loaded:"</span>, hOrder )
 </span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9"></a><a href="#__codelineno-3-9"><span class="linenos" data-linenos=" 9 "></span></a>
 </span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10"></a><a href="#__codelineno-3-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="nv">lOk</span> := _Save( hOrder )
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11"></a><a href="#__codelineno-3-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="nv">_d</span>( <span class="s">&quot;← _ProcessOrder&quot;</span>, lOk )
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11"></a><a href="#__codelineno-3-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="nv">_d</span>( <span class="s">"← _ProcessOrder"</span>, lOk )
 </span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12"></a><a href="#__codelineno-3-12"><span class="linenos" data-linenos="12 "></span></a>
 </span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13"></a><a href="#__codelineno-3-13"><span class="linenos" data-linenos="13 "></span></a><span class="kr">RETURN</span> lOk
 </span></code></pre></div>
 <h3 id="dev-only">Dev-only<a class="headerlink" href="#dev-only" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">IF</span> UIsDev()
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">_d</span>( <span class="s">&quot;Query:&quot;</span>, cSql, <span class="s">&quot;Params:&quot;</span>, aParams )
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">_d</span>( <span class="s">"Query:"</span>, cSql, <span class="s">"Params:"</span>, aParams )
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">ENDIF</span>
 </span></code></pre></div>
 <h3 id="inspecting-an-unknown-object-hash">Inspecting an unknown object / hash<a class="headerlink" href="#inspecting-an-unknown-object-hash" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">FUNCTION</span> _Dump( xValue, c<span class="nc">Label</span> )
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">_d</span>( c<span class="nc">Label</span> + <span class="s">&quot;:&quot;</span>, xValue )
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">_d</span>( c<span class="nc">Label</span> + <span class="s">":"</span>, xValue )
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">RETURN</span> NIL
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4"></a><a href="#__codelineno-5-4"><span class="linenos" data-linenos="4 "></span></a>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5"></a><a href="#__codelineno-5-5"><span class="linenos" data-linenos="5 "></span></a>// ...
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6"></a><a href="#__codelineno-5-6"><span class="linenos" data-linenos="6 "></span></a><span class="nv">_Dump</span>( oReq, <span class="s">&quot;request&quot;</span> )
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7"></a><a href="#__codelineno-5-7"><span class="linenos" data-linenos="7 "></span></a><span class="nv">_Dump</span>( UContext():hData, <span class="s">&quot;context.data&quot;</span> )
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6"></a><a href="#__codelineno-5-6"><span class="linenos" data-linenos="6 "></span></a><span class="nv">_Dump</span>( oReq, <span class="s">"request"</span> )
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7"></a><a href="#__codelineno-5-7"><span class="linenos" data-linenos="7 "></span></a><span class="nv">_Dump</span>( UContext():hData, <span class="s">"context.data"</span> )
 </span></code></pre></div>
 <h3 id="after-each-middleware">After each middleware<a class="headerlink" href="#after-each-middleware" title="Permanent link">&para;</a></h3>
 <p>To understand why a middleware fails:</p>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1"></a><a href="#__codelineno-6-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> HixMwMiAuth( oCtx )
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">_d</span>( <span class="s">&quot;session:&quot;</span>, U<span class="nc">Session</span>(<span class="s">&quot;user&quot;</span>) )
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="nv">_d</span>( <span class="s">&quot;headers:&quot;</span>, oCtx:oReq:h<span class="nc">Header</span>s )
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2"></a><a href="#__codelineno-6-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">_d</span>( <span class="s">"session:"</span>, U<span class="nc">Session</span>(<span class="s">"user"</span>) )
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3"></a><a href="#__codelineno-6-3"><span class="linenos" data-linenos=" 3 "></span></a>   <span class="nv">_d</span>( <span class="s">"headers:"</span>, oCtx:oReq:h<span class="nc">Header</span>s )
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4"></a><a href="#__codelineno-6-4"><span class="linenos" data-linenos=" 4 "></span></a>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5"></a><a href="#__codelineno-6-5"><span class="linenos" data-linenos=" 5 "></span></a>   <span class="kr">IF</span> <span class="nf">Empty</span>( U<span class="nc">Session</span>(<span class="s">&quot;user&quot;</span>) )
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6"></a><a href="#__codelineno-6-6"><span class="linenos" data-linenos=" 6 "></span></a>      <span class="nv">_d</span>( <span class="s">&quot;Auth FAIL — no session&quot;</span> )
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5"></a><a href="#__codelineno-6-5"><span class="linenos" data-linenos=" 5 "></span></a>   <span class="kr">IF</span> <span class="nf">Empty</span>( U<span class="nc">Session</span>(<span class="s">"user"</span>) )
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6"></a><a href="#__codelineno-6-6"><span class="linenos" data-linenos=" 6 "></span></a>      <span class="nv">_d</span>( <span class="s">"Auth FAIL — no session"</span> )
 </span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7"></a><a href="#__codelineno-6-7"><span class="linenos" data-linenos=" 7 "></span></a>      <span class="nv">oCtx</span>:lHandled := <span class="ow">.T.</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8"></a><a href="#__codelineno-6-8"><span class="linenos" data-linenos=" 8 "></span></a>      <span class="nv">oCtx</span>:oReq:Redirect( <span class="s">&quot;/login&quot;</span>, 302 )
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8"></a><a href="#__codelineno-6-8"><span class="linenos" data-linenos=" 8 "></span></a>      <span class="nv">oCtx</span>:oReq:Redirect( <span class="s">"/login"</span>, 302 )
 </span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9"></a><a href="#__codelineno-6-9"><span class="linenos" data-linenos=" 9 "></span></a>      <span class="kr">RETURN</span> <span class="ow">.F.</span>
 </span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10"></a><a href="#__codelineno-6-10"><span class="linenos" data-linenos="10 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11"></a><a href="#__codelineno-6-11"><span class="linenos" data-linenos="11 "></span></a>
-</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12"></a><a href="#__codelineno-6-12"><span class="linenos" data-linenos="12 "></span></a>   <span class="nv">_d</span>( <span class="s">&quot;Auth OK&quot;</span> )
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12"></a><a href="#__codelineno-6-12"><span class="linenos" data-linenos="12 "></span></a>   <span class="nv">_d</span>( <span class="s">"Auth OK"</span> )
 </span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13"></a><a href="#__codelineno-6-13"><span class="linenos" data-linenos="13 "></span></a><span class="kr">RETURN</span> <span class="ow">.T.</span>
 </span></code></pre></div>
 <h3 id="clean-output-with-_t">Clean output with <code>_t()</code><a class="headerlink" href="#clean-output-with-_t" title="Permanent link">&para;</a></h3>
 <p>When you already know where you are and only want the value (without
 <code>MYFUNC (42) Type (H)</code>):</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">_t</span>( <span class="s">&quot;Result:&quot;</span>, nTotal )
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a>// → <span class="s">&quot;Result: 42&quot;</span> instead of <span class="s">&quot;MYFUNC (50) Type (N) 42&quot;</span>
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">_t</span>( <span class="s">"Result:"</span>, nTotal )
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a>// → <span class="s">"Result: 42"</span> instead of <span class="s">"MYFUNC (50) Type (N) 42"</span>
 </span></code></pre></div>
 <hr />
 <h2 id="difference-from-logger">Difference from Logger<a class="headerlink" href="#difference-from-logger" title="Permanent link">&para;</a></h2>

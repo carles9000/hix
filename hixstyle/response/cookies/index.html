@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="./" hreflang="en">
         
+          <link rel="alternate" href="../../../it/hixstyle/response/cookies/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="./" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../it/hixstyle/response/cookies/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -3005,13 +3013,13 @@ request via <code>Cookie</code>. It's the basic mechanism for maintaining state
 own have no memory.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos=" 1 "></span></a>Browser  ─── GET /login ───────────────▶ HIX
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos=" 2 "></span></a>                                          │  validates user/pass
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a>                                          │  USetCookie( &quot;HIXSID&quot;, cSid, 3600 )
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a>                                          │  USetCookie( "HIXSID", cSid, 3600 )
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos=" 4 "></span></a>         &lt;── 200 + Set-Cookie  ───────────┤
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a>            HIXSID=abc...; Max-Age=3600;
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos=" 6 "></span></a>            Path=/; HttpOnly; SameSite=Lax
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos=" 7 "></span></a>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos=" 8 "></span></a>Browser  ─── GET /dashboard ───────────▶ HIX
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9"></a><a href="#__codelineno-0-9"><span class="linenos" data-linenos=" 9 "></span></a>            Cookie: HIXSID=abc...         │  UCookie( &quot;HIXSID&quot; )  → &quot;abc...&quot;
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9"></a><a href="#__codelineno-0-9"><span class="linenos" data-linenos=" 9 "></span></a>            Cookie: HIXSID=abc...         │  UCookie( "HIXSID" )  → "abc..."
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10"></a><a href="#__codelineno-0-10"><span class="linenos" data-linenos="10 "></span></a>                                          │  identifies the user
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11"></a><a href="#__codelineno-0-11"><span class="linenos" data-linenos="11 "></span></a>         &lt;── 200 + data  ─────────────────┤
 </span></code></pre></div>
@@ -3019,19 +3027,19 @@ own have no memory.</p>
 <h2 id="read-a-cookie">Read a cookie<a class="headerlink" href="#read-a-cookie" title="Permanent link">&para;</a></h2>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">UCookie</span>( cName, xDef )
 </span></code></pre></div>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">cSid</span>   := UCookie( <span class="s">&quot;HIXSID&quot;</span>,     <span class="s">&quot;&quot;</span> )
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">cTheme</span> := UCookie( <span class="s">&quot;ui_theme&quot;</span>,   <span class="s">&quot;light&quot;</span> )
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">cLang</span>  := UCookie( <span class="s">&quot;lang&quot;</span>,       <span class="s">&quot;es&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos="1 "></span></a><span class="nv">cSid</span>   := UCookie( <span class="s">"HIXSID"</span>,     <span class="s">""</span> )
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos="2 "></span></a><span class="nv">cTheme</span> := UCookie( <span class="s">"ui_theme"</span>,   <span class="s">"light"</span> )
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">cLang</span>  := UCookie( <span class="s">"lang"</span>,       <span class="s">"es"</span> )
 </span></code></pre></div>
 <p>Internally it parses the <code>Cookie</code> header only once per request (lazy).</p>
 <hr />
 <h2 id="write-a-cookie">Write a cookie<a class="headerlink" href="#write-a-cookie" title="Permanent link">&para;</a></h2>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1"></a><a href="#__codelineno-3-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>tCookie( cName, cValue, nMaxAge )
 </span></code></pre></div>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;ui_theme&quot;</span>, <span class="s">&quot;dark&quot;</span>, 86400 * 30 )    // 30 days
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;HIXSID&quot;</span>,   cSid,   3600 )          // 1 hour
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;pref&quot;</span>,     <span class="s">&quot;x&quot;</span>,    0 )             // <span class="nc">session</span> cookie
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><a href="#__codelineno-4-4"><span class="linenos" data-linenos="4 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;old&quot;</span>,      <span class="s">&quot;&quot;</span>,     -1 )            // expire
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><a href="#__codelineno-4-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>tCookie( <span class="s">"ui_theme"</span>, <span class="s">"dark"</span>, 86400 * 30 )    // 30 days
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><a href="#__codelineno-4-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>tCookie( <span class="s">"HIXSID"</span>,   cSid,   3600 )          // 1 hour
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><a href="#__codelineno-4-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>tCookie( <span class="s">"pref"</span>,     <span class="s">"x"</span>,    0 )             // <span class="nc">session</span> cookie
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><a href="#__codelineno-4-4"><span class="linenos" data-linenos="4 "></span></a><span class="kr">USe</span>tCookie( <span class="s">"old"</span>,      <span class="s">""</span>,     -1 )            // expire
 </span></code></pre></div>
 <h3 id="meaning-of-nmaxage">Meaning of <code>nMaxAge</code><a class="headerlink" href="#meaning-of-nmaxage" title="Permanent link">&para;</a></h3>
 <table>
@@ -3057,8 +3065,8 @@ own have no memory.</p>
 </tbody>
 </table>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><a href="#__codelineno-5-1"><span class="linenos" data-linenos="1 "></span></a>// Logout
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;HIXSID&quot;</span>, <span class="s">&quot;&quot;</span>, -1 )    // browser forgets the cookie
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">URedirect</span>( <span class="s">&quot;/login&quot;</span> )
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2"></a><a href="#__codelineno-5-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>tCookie( <span class="s">"HIXSID"</span>, <span class="s">""</span>, -1 )    // browser forgets the cookie
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3"></a><a href="#__codelineno-5-3"><span class="linenos" data-linenos="3 "></span></a><span class="nv">URedirect</span>( <span class="s">"/login"</span> )
 </span></code></pre></div>
 <hr />
 <h2 id="automatic-flags">Automatic flags<a class="headerlink" href="#automatic-flags" title="Permanent link">&para;</a></h2>
@@ -3102,9 +3110,9 @@ to include <code>Secure</code>.</p>
 <h2 id="multiple-cookies">Multiple cookies<a class="headerlink" href="#multiple-cookies" title="Permanent link">&para;</a></h2>
 <p>Each <code>USetCookie</code> generates an independent <code>Set-Cookie</code> header — browsers
 accept multiple in the same response:</p>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;HIXSID&quot;</span>,   cSid,    3600 )
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;ui_theme&quot;</span>, <span class="s">&quot;dark&quot;</span>,  86400 * 30 )
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>tCookie( <span class="s">&quot;lang&quot;</span>,     <span class="s">&quot;es&quot;</span>,    86400 * 30 )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1"></a><a href="#__codelineno-7-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">USe</span>tCookie( <span class="s">"HIXSID"</span>,   cSid,    3600 )
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2"></a><a href="#__codelineno-7-2"><span class="linenos" data-linenos="2 "></span></a><span class="kr">USe</span>tCookie( <span class="s">"ui_theme"</span>, <span class="s">"dark"</span>,  86400 * 30 )
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3"></a><a href="#__codelineno-7-3"><span class="linenos" data-linenos="3 "></span></a><span class="kr">USe</span>tCookie( <span class="s">"lang"</span>,     <span class="s">"es"</span>,    86400 * 30 )
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4"></a><a href="#__codelineno-7-4"><span class="linenos" data-linenos="4 "></span></a>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5"></a><a href="#__codelineno-7-5"><span class="linenos" data-linenos="5 "></span></a>// In the response:
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6"></a><a href="#__codelineno-7-6"><span class="linenos" data-linenos="6 "></span></a>// Set-Cookie: HIXSID=...; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600
@@ -3120,7 +3128,7 @@ instead of duplicating — you don't end up with two different <code>HIXSID</cod
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1"></a><a href="#__codelineno-8-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">FUNCTION</span> MyAppRememberMeMw( oCtx )
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2"></a><a href="#__codelineno-8-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="nv">LOCAL</span> cToken := _GenerateRememberToken( oCtx )
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3"></a><a href="#__codelineno-8-3"><span class="linenos" data-linenos="3 "></span></a>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4"></a><a href="#__codelineno-8-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="nv">HIX_SetCookie</span>( oCtx:oReq, <span class="s">&quot;remember&quot;</span>, cToken, 86400 * 30 )
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4"></a><a href="#__codelineno-8-4"><span class="linenos" data-linenos="4 "></span></a>   <span class="nv">HIX_SetCookie</span>( oCtx:oReq, <span class="s">"remember"</span>, cToken, 86400 * 30 )
 </span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5"></a><a href="#__codelineno-8-5"><span class="linenos" data-linenos="5 "></span></a><span class="kr">RETURN</span> <span class="ow">.T.</span>
 </span></code></pre></div>
 <p>It's exactly the same as <code>USetCookie</code>, but receives <code>oReq</code> as the first
@@ -3130,52 +3138,52 @@ current thread.</p>
 <h2 id="useful-patterns">Useful patterns<a class="headerlink" href="#useful-patterns" title="Permanent link">&para;</a></h2>
 <h3 id="login-with-session-remember-me">Login with session + remember-me<a class="headerlink" href="#login-with-session-remember-me" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1"></a><a href="#__codelineno-9-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> _LoginActi<span class="nf">on</span>()
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> hUser := _CheckCredentials( UPost(<span class="s">&quot;user&quot;</span>), UPost(<span class="s">&quot;pass&quot;</span>) )
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2"></a><a href="#__codelineno-9-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> hUser := _CheckCredentials( UPost(<span class="s">"user"</span>), UPost(<span class="s">"pass"</span>) )
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3"></a><a href="#__codelineno-9-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4"></a><a href="#__codelineno-9-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="kr">IF</span> hUser == NIL
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5"></a><a href="#__codelineno-9-5"><span class="linenos" data-linenos=" 5 "></span></a>      <span class="kr">RETURN</span> USend<span class="nf">Error</span>( 401, <span class="s">&quot;Invalid credentials&quot;</span> )
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5"></a><a href="#__codelineno-9-5"><span class="linenos" data-linenos=" 5 "></span></a>      <span class="kr">RETURN</span> USend<span class="nf">Error</span>( 401, <span class="s">"Invalid credentials"</span> )
 </span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6"></a><a href="#__codelineno-9-6"><span class="linenos" data-linenos=" 6 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7"></a><a href="#__codelineno-9-7"><span class="linenos" data-linenos=" 7 "></span></a>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8"></a><a href="#__codelineno-9-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="kr">USe</span>ssi<span class="nf">on</span>():<span class="nf">Set</span>( <span class="s">&quot;user_id&quot;</span>, hUser[<span class="s">&quot;id&quot;</span>] )
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8"></a><a href="#__codelineno-9-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="kr">USe</span>ssi<span class="nf">on</span>():<span class="nf">Set</span>( <span class="s">"user_id"</span>, hUser[<span class="s">"id"</span>] )
 </span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9"></a><a href="#__codelineno-9-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="kr">USe</span>ssi<span class="nf">on</span>():Save()
 </span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10"></a><a href="#__codelineno-9-10"><span class="linenos" data-linenos="10 "></span></a>
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11"></a><a href="#__codelineno-9-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="kr">IF</span> UPost( <span class="s">&quot;remember&quot;</span>, <span class="s">&quot;&quot;</span> ) == <span class="s">&quot;1&quot;</span>
-</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12"></a><a href="#__codelineno-9-12"><span class="linenos" data-linenos="12 "></span></a>      <span class="kr">USe</span>tCookie( <span class="s">&quot;remember&quot;</span>, _MakeRememberToken( hUser ), 86400 * 30 )
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11"></a><a href="#__codelineno-9-11"><span class="linenos" data-linenos="11 "></span></a>   <span class="kr">IF</span> UPost( <span class="s">"remember"</span>, <span class="s">""</span> ) == <span class="s">"1"</span>
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12"></a><a href="#__codelineno-9-12"><span class="linenos" data-linenos="12 "></span></a>      <span class="kr">USe</span>tCookie( <span class="s">"remember"</span>, _MakeRememberToken( hUser ), 86400 * 30 )
 </span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13"></a><a href="#__codelineno-9-13"><span class="linenos" data-linenos="13 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14"></a><a href="#__codelineno-9-14"><span class="linenos" data-linenos="14 "></span></a>
-</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15"></a><a href="#__codelineno-9-15"><span class="linenos" data-linenos="15 "></span></a>   <span class="nv">URedirect</span>( <span class="s">&quot;/dashboard&quot;</span> )
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15"></a><a href="#__codelineno-9-15"><span class="linenos" data-linenos="15 "></span></a>   <span class="nv">URedirect</span>( <span class="s">"/dashboard"</span> )
 </span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16"></a><a href="#__codelineno-9-16"><span class="linenos" data-linenos="16 "></span></a><span class="kr">RETURN</span> NIL
 </span></code></pre></div>
 <h3 id="logout-clean-cookies">Logout — clean cookies<a class="headerlink" href="#logout-clean-cookies" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1"></a><a href="#__codelineno-10-1"><span class="linenos" data-linenos="1 "></span></a><span class="kr">FUNCTION</span> _LogoutActi<span class="nf">on</span>()
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2"></a><a href="#__codelineno-10-2"><span class="linenos" data-linenos="2 "></span></a>   <span class="kr">USe</span>ssi<span class="nf">on</span>():Destroy()              // expires HIXSID
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3"></a><a href="#__codelineno-10-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="kr">USe</span>tCookie( <span class="s">&quot;remember&quot;</span>, <span class="s">&quot;&quot;</span>, -1 )  // deletes the remember-me
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3"></a><a href="#__codelineno-10-3"><span class="linenos" data-linenos="3 "></span></a>   <span class="kr">USe</span>tCookie( <span class="s">"remember"</span>, <span class="s">""</span>, -1 )  // deletes the remember-me
 </span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4"></a><a href="#__codelineno-10-4"><span class="linenos" data-linenos="4 "></span></a>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5"></a><a href="#__codelineno-10-5"><span class="linenos" data-linenos="5 "></span></a>   <span class="nv">URedirect</span>( <span class="s">&quot;/&quot;</span> )
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5"></a><a href="#__codelineno-10-5"><span class="linenos" data-linenos="5 "></span></a>   <span class="nv">URedirect</span>( <span class="s">"/"</span> )
 </span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6"></a><a href="#__codelineno-10-6"><span class="linenos" data-linenos="6 "></span></a><span class="kr">RETURN</span> NIL
 </span></code></pre></div>
 <h3 id="ui-preferences-lightdark">UI preferences (light/dark)<a class="headerlink" href="#ui-preferences-lightdark" title="Permanent link">&para;</a></h3>
-<div class="language-clipper highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="nv">oSrv</span>:AddRoutePost( <span class="s">&quot;ui.theme.set&quot;</span>, <span class="s">&quot;/ui/theme&quot;</span>, {||
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> cTheme := UPost( <span class="s">&quot;theme&quot;</span>, <span class="s">&quot;light&quot;</span> )
+<div class="language-clipper highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1"></a><a href="#__codelineno-11-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="nv">oSrv</span>:AddRoutePost( <span class="s">"ui.theme.set"</span>, <span class="s">"/ui/theme"</span>, {||
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2"></a><a href="#__codelineno-11-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> cTheme := UPost( <span class="s">"theme"</span>, <span class="s">"light"</span> )
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3"></a><a href="#__codelineno-11-3"><span class="linenos" data-linenos=" 3 "></span></a>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4"></a><a href="#__codelineno-11-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="kr">IF</span> <span class="nf">AScan</span>( { <span class="s">&quot;light&quot;</span>, <span class="s">&quot;dark&quot;</span>, <span class="s">&quot;auto&quot;</span> }, cTheme ) == 0
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5"></a><a href="#__codelineno-11-5"><span class="linenos" data-linenos=" 5 "></span></a>      <span class="kr">RETURN</span> USend<span class="nf">Error</span>( 400, <span class="s">&quot;Invalid theme&quot;</span> )
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4"></a><a href="#__codelineno-11-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="kr">IF</span> <span class="nf">AScan</span>( { <span class="s">"light"</span>, <span class="s">"dark"</span>, <span class="s">"auto"</span> }, cTheme ) == 0
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5"></a><a href="#__codelineno-11-5"><span class="linenos" data-linenos=" 5 "></span></a>      <span class="kr">RETURN</span> USend<span class="nf">Error</span>( 400, <span class="s">"Invalid theme"</span> )
 </span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6"></a><a href="#__codelineno-11-6"><span class="linenos" data-linenos=" 6 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7"></a><a href="#__codelineno-11-7"><span class="linenos" data-linenos=" 7 "></span></a>
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8"></a><a href="#__codelineno-11-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="kr">USe</span>tCookie( <span class="s">&quot;ui_theme&quot;</span>, cTheme, 86400 * 365 )
-</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9"></a><a href="#__codelineno-11-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">&quot;ok&quot;</span> =&gt; <span class="ow">.T.</span>, <span class="s">&quot;theme&quot;</span> =&gt; cTheme } )
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8"></a><a href="#__codelineno-11-8"><span class="linenos" data-linenos=" 8 "></span></a>   <span class="kr">USe</span>tCookie( <span class="s">"ui_theme"</span>, cTheme, 86400 * 365 )
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9"></a><a href="#__codelineno-11-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="kr">USe</span>ndJs<span class="nf">on</span>( { <span class="s">"ok"</span> =&gt; <span class="ow">.T.</span>, <span class="s">"theme"</span> =&gt; cTheme } )
 </span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10"></a><a href="#__codelineno-11-10"><span class="linenos" data-linenos="10 "></span></a>} )
 </span></code></pre></div>
 <h3 id="persistent-language">Persistent language<a class="headerlink" href="#persistent-language" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1"></a><a href="#__codelineno-12-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">FUNCTION</span> MyAppLangMw( oCtx )
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2"></a><a href="#__codelineno-12-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> cLang := UCookie( <span class="s">&quot;lang&quot;</span>, <span class="s">&quot;&quot;</span> )
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2"></a><a href="#__codelineno-12-2"><span class="linenos" data-linenos=" 2 "></span></a>   <span class="nv">LOCAL</span> cLang := UCookie( <span class="s">"lang"</span>, <span class="s">""</span> )
 </span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3"></a><a href="#__codelineno-12-3"><span class="linenos" data-linenos=" 3 "></span></a>
 </span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4"></a><a href="#__codelineno-12-4"><span class="linenos" data-linenos=" 4 "></span></a>   <span class="kr">IF</span> <span class="nf">Empty</span>( cLang )
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5"></a><a href="#__codelineno-12-5"><span class="linenos" data-linenos=" 5 "></span></a>      <span class="nv">cLang</span> := <span class="nf">Left</span>( U<span class="nf">Header</span>( <span class="s">&quot;accept-language&quot;</span>, <span class="s">&quot;es&quot;</span> ), 2 )
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6"></a><a href="#__codelineno-12-6"><span class="linenos" data-linenos=" 6 "></span></a>      <span class="kr">USe</span>tCookie( <span class="s">&quot;lang&quot;</span>, cLang, 86400 * 365 )
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5"></a><a href="#__codelineno-12-5"><span class="linenos" data-linenos=" 5 "></span></a>      <span class="nv">cLang</span> := <span class="nf">Left</span>( U<span class="nf">Header</span>( <span class="s">"accept-language"</span>, <span class="s">"es"</span> ), 2 )
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6"></a><a href="#__codelineno-12-6"><span class="linenos" data-linenos=" 6 "></span></a>      <span class="kr">USe</span>tCookie( <span class="s">"lang"</span>, cLang, 86400 * 365 )
 </span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7"></a><a href="#__codelineno-12-7"><span class="linenos" data-linenos=" 7 "></span></a>   <span class="kr">ENDIF</span>
 </span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8"></a><a href="#__codelineno-12-8"><span class="linenos" data-linenos=" 8 "></span></a>
-</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9"></a><a href="#__codelineno-12-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="nv">oCtx</span>:hData[ <span class="s">&quot;lang&quot;</span> ] := cLang
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9"></a><a href="#__codelineno-12-9"><span class="linenos" data-linenos=" 9 "></span></a>   <span class="nv">oCtx</span>:hData[ <span class="s">"lang"</span> ] := cLang
 </span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10"></a><a href="#__codelineno-12-10"><span class="linenos" data-linenos="10 "></span></a><span class="kr">RETURN</span> <span class="ow">.T.</span>
 </span></code></pre></div>
 <hr />

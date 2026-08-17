@@ -1,12 +1,12 @@
 
 <!doctype html>
-<html lang="en" class="no-js">
+<html lang="it" class="no-js">
   <head>
     
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Documentación del servidor web HIX para Harbour">
+        <meta name="description" content="Documentazione del server web HIX per Harbour">
       
       
         <meta name="author" content="Charly Nou mil">
@@ -16,9 +16,11 @@
       
       
         
-          <link rel="alternate" href="/hix/es/hixstyle/response/cabeceras/" hreflang="es">
+          <link rel="alternate" href="/hix/es/tiempo-real/ws/" hreflang="es">
         
-          <link rel="alternate" href="/hix/" hreflang="en">
+          <link rel="alternate" href="/hix/tiempo-real/ws/" hreflang="en">
+        
+          <link rel="alternate" href="/hix/it/tiempo-real/ws/" hreflang="it">
         
       
       
@@ -27,7 +29,7 @@
     
     
       
-        <title>Web Server</title>
+        <title>HIX — Server Web per Harbour</title>
       
     
     
@@ -84,8 +86,8 @@
   
 
 <header class="md-header md-header--shadow" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="/hix/." title="Web Server" class="md-header__button md-logo" aria-label="Web Server" data-md-component="logo">
+  <nav class="md-header__inner md-grid" aria-label="Intestazione">
+    <a href="/hix/it/" title="HIX — Server Web per Harbour" class="md-header__button md-logo" aria-label="HIX — Server Web per Harbour" data-md-component="logo">
       
   <img src="/hix/assets/hix_white.png" alt="logo">
 
@@ -98,7 +100,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            Web Server
+            HIX — Server Web per Harbour
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -144,21 +146,27 @@
       <div class="md-header__option">
   <div class="md-select">
     
-    <button class="md-header__button md-icon" aria-label="Select language">
+    <button class="md-header__button md-icon" aria-label="Seleziona la lingua">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
     </button>
     <div class="md-select__inner">
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="/hix/es/hixstyle/response/cabeceras/" hreflang="es" class="md-select__link">
+            <a href="/hix/es/tiempo-real/ws/" hreflang="es" class="md-select__link">
               Español
             </a>
           </li>
         
           <li class="md-select__item">
-            <a href="/hix/" hreflang="en" class="md-select__link">
+            <a href="/hix/tiempo-real/ws/" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="/hix/it/tiempo-real/ws/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -178,16 +186,16 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <input type="text" class="md-search__input" name="query" aria-label="Cerca" placeholder="Cerca" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
       </label>
-      <nav class="md-search__options" aria-label="Search">
+      <nav class="md-search__options" aria-label="Cerca">
         
-        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+        <button type="reset" class="md-search__icon md-icon" title="Cancella" aria-label="Cancella" tabindex="-1">
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
@@ -200,7 +208,7 @@
       <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
-            Initializing search
+            Inizializza la ricerca
           </div>
           <ol class="md-search-result__list" role="presentation"></ol>
         </div>
@@ -234,14 +242,14 @@
 
 
 
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+<nav class="md-nav md-nav--primary" aria-label="Navigazione" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/hix/." title="Web Server" class="md-nav__button md-logo" aria-label="Web Server" data-md-component="logo">
+    <a href="/hix/it/" title="HIX — Server Web per Harbour" class="md-nav__button md-logo" aria-label="HIX — Server Web per Harbour" data-md-component="logo">
       
   <img src="/hix/assets/hix_white.png" alt="logo">
 
     </a>
-    Web Server
+    HIX — Server Web per Harbour
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -253,7 +261,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/." class="md-nav__link">
+      <a href="/hix/it/" class="md-nav__link">
         
   
   
@@ -298,7 +306,7 @@
   <span class="md-ellipsis">
     
   
-    Introduction
+    Introduzione
   
 
     
@@ -314,7 +322,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Introduction
+    Introduzione
   
 
           </label>
@@ -327,14 +335,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/intro/intro/" class="md-nav__link">
+      <a href="/hix/it/intro/intro/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Welcome to HIX
+    Benvenuto in HIX
   
 
     
@@ -355,14 +363,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/intro/modo-basico/" class="md-nav__link">
+      <a href="/hix/it/intro/modo-basico/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Basic Mode
+    Modalità base
   
 
     
@@ -383,14 +391,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/intro/hixstyle/" class="md-nav__link">
+      <a href="/hix/it/intro/hixstyle/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    HixStyle Mode
+    Modalità HIX Style
   
 
     
@@ -411,7 +419,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/intro/data-driven/" class="md-nav__link">
+      <a href="/hix/it/intro/data-driven/" class="md-nav__link">
         
   
   
@@ -464,7 +472,7 @@
   <span class="md-ellipsis">
     
   
-    Getting Started
+    Primi passi
   
 
     
@@ -480,7 +488,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Getting Started
+    Primi passi
   
 
           </label>
@@ -493,14 +501,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/primeros-pasos/compile/" class="md-nav__link">
+      <a href="/hix/it/primeros-pasos/compile/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Compile Project
+    Compilare il progetto
   
 
     
@@ -521,14 +529,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/primeros-pasos/config/hix.json/" class="md-nav__link">
+      <a href="/hix/it/primeros-pasos/config/hix.json/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    hix.json Configuration
+    Configurazione hix.json
   
 
     
@@ -574,7 +582,7 @@
   <span class="md-ellipsis">
     
   
-    Programming
+    Programmazione
   
 
     
@@ -590,7 +598,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Programming
+    Programmazione
   
 
           </label>
@@ -603,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/programacion/mapa-helpers/" class="md-nav__link">
+      <a href="/hix/it/programacion/mapa-helpers/" class="md-nav__link">
         
   
   
@@ -631,7 +639,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/programacion/modo-dev-prod/" class="md-nav__link">
+      <a href="/hix/it/programacion/modo-dev-prod/" class="md-nav__link">
         
   
   
@@ -659,7 +667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/programacion/errorsys/" class="md-nav__link">
+      <a href="/hix/it/programacion/errorsys/" class="md-nav__link">
         
   
   
@@ -687,7 +695,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/programacion/error-handling/" class="md-nav__link">
+      <a href="/hix/it/programacion/error-handling/" class="md-nav__link">
         
   
   
@@ -715,7 +723,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/programacion/error_codes/" class="md-nav__link">
+      <a href="/hix/it/programacion/error_codes/" class="md-nav__link">
         
   
   
@@ -797,14 +805,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/routes/routes/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/routes/routes/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Routes
+    Rotte
   
 
     
@@ -872,14 +880,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/middleware/middleware/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/middleware/middleware/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Introduction
+    Introduzione
   
 
     
@@ -900,14 +908,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/middleware/contexto/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/middleware/contexto/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Context
+    Contesto
   
 
     
@@ -928,14 +936,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/middleware/mw_dessign/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/middleware/mw_dessign/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Design
+    Progettazione
   
 
     
@@ -956,14 +964,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/middleware/mw_list/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/middleware/mw_list/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Catalog
+    Catalogo
   
 
     
@@ -984,7 +992,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/middleware/mw_loader/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/middleware/mw_loader/" class="md-nav__link">
         
   
   
@@ -1012,14 +1020,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/middleware/mw_example/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/middleware/mw_example/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Example
+    Esempio
   
 
     
@@ -1066,7 +1074,7 @@
   <span class="md-ellipsis">
     
   
-    Controllers
+    Controller
   
 
     
@@ -1082,7 +1090,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Controllers
+    Controller
   
 
           </label>
@@ -1095,14 +1103,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/controllers/controllers/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/controllers/controllers/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Controllers
+    Controller
   
 
     
@@ -1123,14 +1131,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/controllers/requests/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/controllers/requests/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Requests
+    Request
   
 
     
@@ -1151,7 +1159,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/controllers/validator/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/controllers/validator/" class="md-nav__link">
         
   
   
@@ -1234,7 +1242,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/models/udbf/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/models/udbf/" class="md-nav__link">
         
   
   
@@ -1317,7 +1325,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/response/encoding-decoding/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/response/encoding-decoding/" class="md-nav__link">
         
   
   
@@ -1345,7 +1353,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/response/cookies/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/response/cookies/" class="md-nav__link">
         
   
   
@@ -1373,14 +1381,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/response/headers/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/response/headers/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Headers
+    Intestazioni
   
 
     
@@ -1401,7 +1409,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/response/flash/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/response/flash/" class="md-nav__link">
         
   
   
@@ -1484,7 +1492,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/views/mambo/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/views/mambo/" class="md-nav__link">
         
   
   
@@ -1512,14 +1520,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/views/directives/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/views/directives/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Directives
+    Direttive
   
 
     
@@ -1558,7 +1566,7 @@
   <span class="md-ellipsis">
     
   
-    Examples
+    Esempi
   
 
     
@@ -1574,7 +1582,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Examples
+    Esempi
   
 
           </label>
@@ -1587,14 +1595,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/views/example/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/views/example/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Introduction
+    Introduzione
   
 
     
@@ -1615,14 +1623,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/views/example1/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/views/example1/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Example 1
+    Esempio 1
   
 
     
@@ -1643,14 +1651,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/views/example2/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/views/example2/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Example 2
+    Esempio 2
   
 
     
@@ -1671,14 +1679,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/views/example3/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/views/example3/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Example 3
+    Esempio 3
   
 
     
@@ -1699,14 +1707,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/views/example4/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/views/example4/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Example 4
+    Esempio 4
   
 
     
@@ -1761,7 +1769,7 @@
   <span class="md-ellipsis">
     
   
-    Security
+    Sicurezza
   
 
     
@@ -1777,7 +1785,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Security
+    Sicurezza
   
 
           </label>
@@ -1790,14 +1798,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/seguridad/claves/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/seguridad/claves/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Keys and Secrets
+    Chiavi e segreti
   
 
     
@@ -1818,7 +1826,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/seguridad/cors/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/seguridad/cors/" class="md-nav__link">
         
   
   
@@ -1846,7 +1854,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/seguridad/firewall/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/seguridad/firewall/" class="md-nav__link">
         
   
   
@@ -1874,7 +1882,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/seguridad/ratelimit/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/seguridad/ratelimit/" class="md-nav__link">
         
   
   
@@ -1902,14 +1910,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/seguridad/sesiones/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/seguridad/sesiones/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Sessions
+    Sessioni
   
 
     
@@ -1930,14 +1938,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/seguridad/autenticacion/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/seguridad/autenticacion/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Authentication
+    Autenticazione
   
 
     
@@ -1958,7 +1966,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/seguridad/jwt/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/seguridad/jwt/" class="md-nav__link">
         
   
   
@@ -1986,7 +1994,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/seguridad/csrf/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/seguridad/csrf/" class="md-nav__link">
         
   
   
@@ -2014,7 +2022,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/seguridad/resources-ids/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/seguridad/resources-ids/" class="md-nav__link">
         
   
   
@@ -2042,7 +2050,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/hixstyle/seguridad/ssl/" class="md-nav__link">
+      <a href="/hix/it/hixstyle/seguridad/ssl/" class="md-nav__link">
         
   
   
@@ -2078,14 +2086,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/sistema/loaders/" class="md-nav__link">
+      <a href="/hix/it/sistema/loaders/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Loaders and hooks
+    Loader e hook
   
 
     
@@ -2131,7 +2139,7 @@
   <span class="md-ellipsis">
     
   
-    Real Time
+    Tempo reale
   
 
     
@@ -2147,7 +2155,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Real Time
+    Tempo reale
   
 
           </label>
@@ -2160,7 +2168,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/tiempo-real/sse/" class="md-nav__link">
+      <a href="/hix/it/tiempo-real/sse/" class="md-nav__link">
         
   
   
@@ -2188,7 +2196,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/tiempo-real/ws/" class="md-nav__link">
+      <a href="/hix/it/tiempo-real/ws/" class="md-nav__link">
         
   
   
@@ -2216,7 +2224,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/tiempo-real/longpolling/" class="md-nav__link">
+      <a href="/hix/it/tiempo-real/longpolling/" class="md-nav__link">
         
   
   
@@ -2298,7 +2306,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/api/admin/" class="md-nav__link">
+      <a href="/hix/it/api/admin/" class="md-nav__link">
         
   
   
@@ -2351,7 +2359,7 @@
   <span class="md-ellipsis">
     
   
-    System
+    Sistema
   
 
     
@@ -2367,7 +2375,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    System
+    Sistema
   
 
           </label>
@@ -2380,14 +2388,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/sistema/traceando/" class="md-nav__link">
+      <a href="/hix/it/sistema/traceando/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Tracing
+    Tracciamento
   
 
     
@@ -2408,7 +2416,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/sistema/logger/" class="md-nav__link">
+      <a href="/hix/it/sistema/logger/" class="md-nav__link">
         
   
   
@@ -2436,7 +2444,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/sistema/bootlog/" class="md-nav__link">
+      <a href="/hix/it/sistema/bootlog/" class="md-nav__link">
         
   
   
@@ -2464,14 +2472,14 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/sistema/metricas/" class="md-nav__link">
+      <a href="/hix/it/sistema/metricas/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Metrics
+    Metriche
   
 
     
@@ -2492,7 +2500,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/sistema/hix-admin/" class="md-nav__link">
+      <a href="/hix/it/sistema/hix-admin/" class="md-nav__link">
         
   
   
@@ -2520,7 +2528,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/hix/sistema/apache-proxy/" class="md-nav__link">
+      <a href="/hix/it/sistema/apache-proxy/" class="md-nav__link">
         
   
   
@@ -2561,7 +2569,7 @@
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
   
   
   
@@ -2589,7 +2597,7 @@
           <button type="button" class="md-top md-icon" data-md-component="top" hidden>
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
-  Back to top
+  Torna su
 </button>
         
       </main>
@@ -2619,7 +2627,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "/hix/", "features": ["navigation.top", "navigation.instant", "navigation.instant.progress", "navigation.tracking", "toc.follow", "search.highlight", "search.suggest", "content.code.copy"], "search": "/hix/assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "/hix/", "features": ["navigation.top", "navigation.instant", "navigation.instant.progress", "navigation.tracking", "toc.follow", "search.highlight", "search.suggest", "content.code.copy"], "search": "/hix/assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiato", "clipboard.copy": "Copia", "search.result.more.one": "1 altro in questa pagina", "search.result.more.other": "# altri in questa pagina", "search.result.none": "Nessun documento trovato", "search.result.one": "1 documento trovato", "search.result.other": "# documenti trovati", "search.result.placeholder": "Scrivi per iniziare a cercare", "search.result.term.missing": "Non presente", "select.version": "Seleziona la versione"}, "version": null}</script>
     
     
       <script src="/hix/assets/javascripts/bundle.d7400e89.min.js"></script>

@@ -26,6 +26,8 @@
         
           <link rel="alternate" href="../../../../hixstyle/views/example1/" hreflang="en">
         
+          <link rel="alternate" href="../../../../it/hixstyle/views/example1/" hreflang="it">
+        
       
       
       <link rel="icon" href="../../../../assets/hix.ico">
@@ -170,6 +172,12 @@
           <li class="md-select__item">
             <a href="../../../../hixstyle/views/example1/" hreflang="en" class="md-select__link">
               English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../../../it/hixstyle/views/example1/" hreflang="it" class="md-select__link">
+              Italiano
             </a>
           </li>
         
@@ -2757,16 +2765,16 @@ and how to use them in a simple loop.</p>
 <h3 id="controller-example1prg">Controller: example1.prg<a class="headerlink" href="#controller-example1prg" title="Permanent link">&para;</a></h3>
 <div class="language-clipper highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="kr">function</span> main() 
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos=" 2 "></span></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a>    local cTicket := <span class="s">&#39;ABC-&#39;</span> + <span class="nf">ltrim</span>( <span class="nf">Str</span>( hb_Random<span class="nf">Int</span>(100000, 999999) ) )
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a>    local cTicket := <span class="s">'ABC-'</span> + <span class="nf">ltrim</span>( <span class="nf">Str</span>( hb_Random<span class="nf">Int</span>(100000, 999999) ) )
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos=" 4 "></span></a>    <span class="nv">local</span> aData   := {<span class="p">;</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a>        { <span class="s">&quot;Harbour&quot;</span>, <span class="s">&quot;Open-source language derived from Clipper, focused on business applications and databases with classic syntax.&quot;</span>, <span class="ow">.T.</span> },<span class="p">;</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos=" 6 "></span></a>        { <span class="s">&quot;PHP&quot;</span>, <span class="s">&quot;Server-side scripting language designed specifically for web development and building dynamic applications.&quot;</span>, <span class="ow">.F.</span> },<span class="p">;</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos=" 7 "></span></a>        { <span class="s">&quot;Python&quot;</span>, <span class="s">&quot;High-level language with clean, readable syntax, widely used in data science, backend, and automation.&quot;</span>, <span class="ow">.F.</span> },<span class="p">;</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos=" 8 "></span></a>        { <span class="s">&quot;Rust&quot;</span>, <span class="s">&quot;Systems language focused on safety, performance, and concurrency without the need for a garbage collector.&quot;</span>, <span class="ow">.F.</span> },<span class="p">;</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9"></a><a href="#__codelineno-0-9"><span class="linenos" data-linenos=" 9 "></span></a>        { <span class="s">&quot;Kotlin&quot;</span>, <span class="s">&quot;Modern JVM language that combines functional and object-oriented programming with concise, safe syntax.&quot;</span>, <span class="ow">.F.</span> }<span class="p">;</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a>        { <span class="s">"Harbour"</span>, <span class="s">"Open-source language derived from Clipper, focused on business applications and databases with classic syntax."</span>, <span class="ow">.T.</span> },<span class="p">;</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos=" 6 "></span></a>        { <span class="s">"PHP"</span>, <span class="s">"Server-side scripting language designed specifically for web development and building dynamic applications."</span>, <span class="ow">.F.</span> },<span class="p">;</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos=" 7 "></span></a>        { <span class="s">"Python"</span>, <span class="s">"High-level language with clean, readable syntax, widely used in data science, backend, and automation."</span>, <span class="ow">.F.</span> },<span class="p">;</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos=" 8 "></span></a>        { <span class="s">"Rust"</span>, <span class="s">"Systems language focused on safety, performance, and concurrency without the need for a garbage collector."</span>, <span class="ow">.F.</span> },<span class="p">;</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9"></a><a href="#__codelineno-0-9"><span class="linenos" data-linenos=" 9 "></span></a>        { <span class="s">"Kotlin"</span>, <span class="s">"Modern JVM language that combines functional and object-oriented programming with concise, safe syntax."</span>, <span class="ow">.F.</span> }<span class="p">;</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10"></a><a href="#__codelineno-0-10"><span class="linenos" data-linenos="10 "></span></a>    }
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11"></a><a href="#__codelineno-0-11"><span class="linenos" data-linenos="11 "></span></a>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12"></a><a href="#__codelineno-0-12"><span class="linenos" data-linenos="12 "></span></a><span class="kr">return</span> UView( <span class="s">&#39;example1.html&#39;</span>, aData, cTicket )
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12"></a><a href="#__codelineno-0-12"><span class="linenos" data-linenos="12 "></span></a><span class="kr">return</span> UView( <span class="s">'example1.html'</span>, aData, cTicket )
 </span></code></pre></div>
 <h3 id="view-example1html">View: example1.html<a class="headerlink" href="#view-example1html" title="Permanent link">&para;</a></h3>
 <div class="language-html highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos=" 1 "></span></a>@args mydata, cId
