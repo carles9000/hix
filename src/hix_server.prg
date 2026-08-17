@@ -9,7 +9,7 @@
                Copyright (c) 2026 Carles Aubia Floresví - HIX Server Project
  -----------------------------------------------------------*/
 #DEFINE HIX_VERSION_SERVER                "2.0"
-#DEFINE HIX_SUBVERSION_SERVER             ".03"
+#DEFINE HIX_SUBVERSION_SERVER             ".04"
 #DEFINE HIX_LOG_MODULE HIX_MOD_SERVER
 #DEFINE SW_SHOW                              5
 
@@ -1015,6 +1015,7 @@ STATIC FUNCTION ShowInit( oSrv )
 	nRow++
    
 	HIX_Info( @nRow, 'Server startup at'  , DToC( date() ) + ' ' + time() )
+	HIX_Info( @nRow, 'App Path'           , hb_dirbase() ) 
 	HIX_Info( @nRow, 'App Name'           , UConfig( "server", "name", "HIX" ) ) 
 	HIX_Info( @nRow, 'Root' 	            , UConfig( "paths", "root", "www" ) )
 	HIX_Info( @nRow, 'HIX Style Active' 	, If( UConfig( "hixstyle", "enabled", .F. ), 'Yes', 'No' ) )

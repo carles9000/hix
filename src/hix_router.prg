@@ -396,6 +396,16 @@ FUNCTION HIX_RouteList()
    LOCAL aResult := {}, cName, hRoute, hItem
    LOCAL hRoutes
 
+   // Router no inicializado (sin HIX_RoutesLoad() ni THixServer:Start()):
+   // s_hRoutes y s_mtxRoutes siguen a NIL y hb_mutexLock()/hb_HKeys()
+   // abortarian con "Argument error". Coherente con el resto de la API
+   // publica del router, que ya comprueba HIX_RoutesIsInit().
+   IF s_hRoutes == NIL
+
+      RETURN aResult
+
+   ENDIF
+
    hb_mutexLock( s_mtxRoutes )
    hRoutes := s_hRoutes
    hb_mutexUnlock( s_mtxRoutes )
