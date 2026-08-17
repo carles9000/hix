@@ -8,4 +8,7 @@
 *.exe
 *.lib
 
+# MkDocs generated site (published to gh-pages by CI)
+site/
+
 
