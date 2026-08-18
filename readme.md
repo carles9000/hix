@@ -24,6 +24,7 @@ sharing code, contributing to other projects, and building scalable solutions be
 no more friction from learning a new structure with every repo. The main goal here is to offer a 
 common path that works for everyone.
 
+--- 
 
 ## 📘 Documentation
 
