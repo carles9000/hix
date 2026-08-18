@@ -4,6 +4,10 @@ docs_dir: site-docs
 site_description: Documentación del servidor web HIX para Harbour
 site_author: Charly Nou mil
 
+repo_url: https://github.com/carles9000/hix
+repo_name: carles9000/hix
+edit_uri: ""
+
 
 theme:
   name: material
