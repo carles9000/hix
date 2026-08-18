@@ -1,0 +1,6 @@
+2.0.05 Change order include path. First HB_INCLUDE if it exist 
+2.0.04 Add app path to show init screen
+       Add go_lib_gcc.bat
+2.0.03 Add app name to show init screen
+2.0.02 Add mingw64 script
+2.0.01 Force link __MVPRIVATE

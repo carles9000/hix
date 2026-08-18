@@ -103,6 +103,12 @@ FUNCTION UGetPPRules()
 
    __PP_Reset( __hPP )
 
+   IF ! Empty( hb_GetEnv( "HB_INCLUDE" ) )
+
+      __pp_Path( __hPP, hb_GetEnv( "HB_INCLUDE" ) )
+
+   ENDIF
+   
    DO CASE
 
       CASE "Windows" $ cOs   ; __pp_Path( __hPP, "c:\harbour\include" )
@@ -110,11 +116,6 @@ FUNCTION UGetPPRules()
 
    ENDCASE
 
-   IF ! Empty( hb_GetEnv( "HB_INCLUDE" ) )
-
-      __pp_Path( __hPP, hb_GetEnv( "HB_INCLUDE" ) )
-
-   ENDIF
 
    __pp_AddRule( __hPP, "#xcommand ? [<explist,...>] => UWrite( '<br>' [,<explist>] )" )
    __pp_AddRule( __hPP, "#xcommand ?? [<explist,...>] => UWrite( [<explist>] )" )
@@ -214,9 +215,9 @@ FUNCTION HIX_CompileFile( cPath )
    // Build arg list filtering empty strings — hb_CompileFromBuf treats ""
    // as an empty filename and throws "Invalid filename ''"
    aArgs := { _HixPreamble() + cCode, .T., "-n", "-q2" }
-   IF ! Empty( cHBHeader )  ; AAdd( aArgs, "-I" + cHBHeader ) ; ENDIF
    AAdd( aArgs, "-I" + HIX_GetRootAbsolute() )
    IF ! Empty( cHBInclude ) ; AAdd( aArgs, "-I" + cHBInclude ) ; ENDIF
+   IF ! Empty( cHBHeader )  ; AAdd( aArgs, "-I" + cHBHeader ) ; ENDIF
    IF ! Empty( cUserFlags ) ; AAdd( aArgs, cUserFlags ) ; ENDIF
 
    TRY
