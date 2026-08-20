@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
         <loc>https://carles9000.github.io/hix/charly.doc/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/charly.doc/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/charly.doc/"/>
@@ -10,7 +10,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/"/>
@@ -18,7 +18,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/api/admin/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/api/admin/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/api/admin/"/>
@@ -26,7 +26,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/controllers/controllers/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/controllers/controllers/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/controllers/controllers/"/>
@@ -34,7 +34,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/controllers/requests/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/controllers/requests/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/controllers/requests/"/>
@@ -42,7 +42,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/controllers/validator/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/controllers/validator/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/controllers/validator/"/>
@@ -50,7 +50,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/middleware/contexto/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/contexto/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/middleware/contexto/"/>
@@ -58,7 +58,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/middleware/middleware/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/middleware/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/middleware/middleware/"/>
@@ -66,7 +66,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/middleware/mw_dessign/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/mw_dessign/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/middleware/mw_dessign/"/>
@@ -74,7 +74,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/middleware/mw_example/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/mw_example/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/middleware/mw_example/"/>
@@ -82,7 +82,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/middleware/mw_list/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/mw_list/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/middleware/mw_list/"/>
@@ -90,7 +90,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/middleware/mw_loader/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/mw_loader/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/middleware/mw_loader/"/>
@@ -98,7 +98,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/models/udbf/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/models/udbf/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/models/udbf/"/>
@@ -106,7 +106,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/response/cookies/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/response/cookies/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/response/cookies/"/>
@@ -114,7 +114,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/response/encoding-decoding/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/response/encoding-decoding/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/response/encoding-decoding/"/>
@@ -122,7 +122,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/response/flash/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/response/flash/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/response/flash/"/>
@@ -130,7 +130,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/response/headers/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/response/headers/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/response/headers/"/>
@@ -138,7 +138,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/routes/routes/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/routes/routes/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/routes/routes/"/>
@@ -146,7 +146,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/seguridad/autenticacion/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/autenticacion/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/autenticacion/"/>
@@ -154,7 +154,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/seguridad/claves/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/claves/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/claves/"/>
@@ -162,7 +162,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/seguridad/cors/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/cors/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/cors/"/>
@@ -170,7 +170,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/seguridad/csrf/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/csrf/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/csrf/"/>
@@ -178,7 +178,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/seguridad/firewall/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/firewall/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/firewall/"/>
@@ -186,7 +186,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/seguridad/jwt/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/jwt/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/jwt/"/>
@@ -194,7 +194,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/seguridad/ratelimit/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/ratelimit/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/ratelimit/"/>
@@ -202,7 +202,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/seguridad/resources-ids/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/resources-ids/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/resources-ids/"/>
@@ -210,7 +210,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/seguridad/sesiones/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/sesiones/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/sesiones/"/>
@@ -218,7 +218,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/seguridad/ssl/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/ssl/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/ssl/"/>
@@ -226,7 +226,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/views/directives/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/directives/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/views/directives/"/>
@@ -234,7 +234,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/views/example/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/example/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/views/example/"/>
@@ -242,7 +242,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/views/example1/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/example1/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/views/example1/"/>
@@ -250,7 +250,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/views/example2/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/example2/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/views/example2/"/>
@@ -258,7 +258,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/views/example3/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/example3/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/views/example3/"/>
@@ -266,7 +266,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/views/example4/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/example4/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/views/example4/"/>
@@ -274,7 +274,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/hixstyle/views/mambo/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/mambo/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/views/mambo/"/>
@@ -282,7 +282,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/intro/data-driven/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/intro/data-driven/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/intro/data-driven/"/>
@@ -290,7 +290,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/intro/hixstyle/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/intro/hixstyle/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/intro/hixstyle/"/>
@@ -298,7 +298,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/intro/intro/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/intro/intro/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/intro/intro/"/>
@@ -306,7 +306,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/intro/modo-basico/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/intro/modo-basico/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/intro/modo-basico/"/>
@@ -314,7 +314,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/primeros-pasos/compile/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/primeros-pasos/compile/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/primeros-pasos/compile/"/>
@@ -322,7 +322,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/primeros-pasos/config/hix.json/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/primeros-pasos/config/hix.json/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/primeros-pasos/config/hix.json/"/>
@@ -330,7 +330,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/programacion/error-handling/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/programacion/error-handling/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/programacion/error-handling/"/>
@@ -338,7 +338,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/programacion/error_codes/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/programacion/error_codes/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/programacion/error_codes/"/>
@@ -346,7 +346,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/programacion/errorsys/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/programacion/errorsys/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/programacion/errorsys/"/>
@@ -354,7 +354,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/programacion/mapa-helpers/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/programacion/mapa-helpers/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/programacion/mapa-helpers/"/>
@@ -362,7 +362,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/programacion/modo-dev-prod/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/programacion/modo-dev-prod/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/programacion/modo-dev-prod/"/>
@@ -370,7 +370,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/sistema/apache-proxy/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/apache-proxy/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/sistema/apache-proxy/"/>
@@ -378,7 +378,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/sistema/bootlog/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/bootlog/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/sistema/bootlog/"/>
@@ -386,7 +386,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/sistema/hix-admin/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/hix-admin/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/sistema/hix-admin/"/>
@@ -394,7 +394,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/sistema/loaders/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/loaders/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/sistema/loaders/"/>
@@ -402,7 +402,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/sistema/logger/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/logger/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/sistema/logger/"/>
@@ -410,7 +410,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/sistema/metricas/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/metricas/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/sistema/metricas/"/>
@@ -418,7 +418,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/sistema/traceando/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/traceando/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/sistema/traceando/"/>
@@ -426,7 +426,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/tiempo-real/longpolling/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/tiempo-real/longpolling/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/tiempo-real/longpolling/"/>
@@ -434,7 +434,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/tiempo-real/sse/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/tiempo-real/sse/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/tiempo-real/sse/"/>
@@ -442,7 +442,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/tiempo-real/ws/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/tiempo-real/ws/"/>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/tiempo-real/ws/"/>
@@ -450,7 +450,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/charly.doc/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/charly.doc/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/charly.doc/"/>
@@ -458,7 +458,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/"/>
@@ -466,7 +466,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/api/admin/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/api/admin/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/api/admin/"/>
@@ -474,7 +474,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/controllers/controllers/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/controllers/controllers/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/controllers/controllers/"/>
@@ -482,7 +482,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/controllers/requests/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/controllers/requests/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/controllers/requests/"/>
@@ -490,7 +490,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/controllers/validator/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/controllers/validator/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/controllers/validator/"/>
@@ -498,7 +498,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/middleware/contexto/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/middleware/contexto/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/contexto/"/>
@@ -506,7 +506,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/middleware/middleware/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/middleware/middleware/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/middleware/"/>
@@ -514,7 +514,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/middleware/mw_dessign/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/middleware/mw_dessign/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/mw_dessign/"/>
@@ -522,7 +522,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/middleware/mw_example/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/middleware/mw_example/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/mw_example/"/>
@@ -530,7 +530,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/middleware/mw_list/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/middleware/mw_list/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/mw_list/"/>
@@ -538,7 +538,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/middleware/mw_loader/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/middleware/mw_loader/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/mw_loader/"/>
@@ -546,7 +546,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/models/udbf/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/models/udbf/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/models/udbf/"/>
@@ -554,7 +554,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/response/cookies/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/response/cookies/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/response/cookies/"/>
@@ -562,7 +562,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/response/encoding-decoding/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/response/encoding-decoding/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/response/encoding-decoding/"/>
@@ -570,7 +570,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/response/flash/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/response/flash/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/response/flash/"/>
@@ -578,7 +578,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/response/headers/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/response/headers/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/response/headers/"/>
@@ -586,7 +586,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/routes/routes/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/routes/routes/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/routes/routes/"/>
@@ -594,7 +594,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/seguridad/autenticacion/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/autenticacion/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/autenticacion/"/>
@@ -602,7 +602,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/seguridad/claves/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/claves/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/claves/"/>
@@ -610,7 +610,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/seguridad/cors/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/cors/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/cors/"/>
@@ -618,7 +618,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/seguridad/csrf/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/csrf/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/csrf/"/>
@@ -626,7 +626,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/seguridad/firewall/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/firewall/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/firewall/"/>
@@ -634,7 +634,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/seguridad/jwt/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/jwt/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/jwt/"/>
@@ -642,7 +642,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/seguridad/ratelimit/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/ratelimit/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/ratelimit/"/>
@@ -650,7 +650,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/seguridad/resources-ids/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/resources-ids/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/resources-ids/"/>
@@ -658,7 +658,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/seguridad/sesiones/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/sesiones/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/sesiones/"/>
@@ -666,7 +666,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/seguridad/ssl/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/seguridad/ssl/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/ssl/"/>
@@ -674,7 +674,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/views/directives/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/views/directives/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/directives/"/>
@@ -682,7 +682,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/views/example/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/views/example/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/example/"/>
@@ -690,7 +690,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/views/example1/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/views/example1/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/example1/"/>
@@ -698,7 +698,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/views/example2/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/views/example2/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/example2/"/>
@@ -706,7 +706,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/views/example3/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/views/example3/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/example3/"/>
@@ -714,7 +714,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/views/example4/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/views/example4/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/example4/"/>
@@ -722,7 +722,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/views/mambo/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/views/mambo/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/mambo/"/>
@@ -730,7 +730,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/intro/data-driven/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/intro/data-driven/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/intro/data-driven/"/>
@@ -738,7 +738,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/intro/hixstyle/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/intro/hixstyle/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/intro/hixstyle/"/>
@@ -746,7 +746,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/intro/intro/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/intro/intro/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/intro/intro/"/>
@@ -754,7 +754,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/intro/modo-basico/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/intro/modo-basico/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/intro/modo-basico/"/>
@@ -762,7 +762,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/primeros-pasos/compile/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/primeros-pasos/compile/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/primeros-pasos/compile/"/>
@@ -770,7 +770,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/primeros-pasos/config/hix.json/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/primeros-pasos/config/hix.json/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/primeros-pasos/config/hix.json/"/>
@@ -778,7 +778,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/programacion/error-handling/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/programacion/error-handling/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/programacion/error-handling/"/>
@@ -786,7 +786,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/programacion/error_codes/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/programacion/error_codes/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/programacion/error_codes/"/>
@@ -794,7 +794,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/programacion/errorsys/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/programacion/errorsys/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/programacion/errorsys/"/>
@@ -802,7 +802,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/programacion/mapa-helpers/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/programacion/mapa-helpers/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/programacion/mapa-helpers/"/>
@@ -810,7 +810,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/programacion/modo-dev-prod/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/programacion/modo-dev-prod/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/programacion/modo-dev-prod/"/>
@@ -818,7 +818,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/sistema/apache-proxy/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/sistema/apache-proxy/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/apache-proxy/"/>
@@ -826,7 +826,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/sistema/bootlog/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/sistema/bootlog/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/bootlog/"/>
@@ -834,7 +834,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/sistema/hix-admin/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/sistema/hix-admin/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/hix-admin/"/>
@@ -842,7 +842,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/sistema/loaders/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/sistema/loaders/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/loaders/"/>
@@ -850,7 +850,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/sistema/logger/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/sistema/logger/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/logger/"/>
@@ -858,7 +858,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/sistema/metricas/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/sistema/metricas/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/metricas/"/>
@@ -866,7 +866,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/sistema/traceando/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/sistema/traceando/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/traceando/"/>
@@ -874,7 +874,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/tiempo-real/longpolling/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/tiempo-real/longpolling/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/tiempo-real/longpolling/"/>
@@ -882,7 +882,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/tiempo-real/sse/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/tiempo-real/sse/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/tiempo-real/sse/"/>
@@ -890,7 +890,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/tiempo-real/ws/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/tiempo-real/ws/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/tiempo-real/ws/"/>
@@ -898,13 +898,13 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/es/hixstyle/response/cabeceras/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="es" href="https://carles9000.github.io/hix/es/hixstyle/response/cabeceras/"/>
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/charly.doc/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/charly.doc/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/charly.doc/"/>
@@ -912,7 +912,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/"/>
@@ -920,7 +920,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/api/admin/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/api/admin/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/api/admin/"/>
@@ -928,7 +928,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/controllers/controllers/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/controllers/controllers/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/controllers/controllers/"/>
@@ -936,7 +936,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/controllers/requests/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/controllers/requests/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/controllers/requests/"/>
@@ -944,7 +944,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/controllers/validator/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/controllers/validator/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/controllers/validator/"/>
@@ -952,7 +952,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/middleware/contexto/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/middleware/contexto/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/contexto/"/>
@@ -960,7 +960,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/middleware/middleware/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/middleware/middleware/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/middleware/"/>
@@ -968,7 +968,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/middleware/mw_dessign/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/middleware/mw_dessign/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/mw_dessign/"/>
@@ -976,7 +976,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/middleware/mw_example/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/middleware/mw_example/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/mw_example/"/>
@@ -984,7 +984,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/middleware/mw_list/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/middleware/mw_list/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/mw_list/"/>
@@ -992,7 +992,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/middleware/mw_loader/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/middleware/mw_loader/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/middleware/mw_loader/"/>
@@ -1000,7 +1000,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/models/udbf/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/models/udbf/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/models/udbf/"/>
@@ -1008,7 +1008,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/response/cookies/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/response/cookies/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/response/cookies/"/>
@@ -1016,7 +1016,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/response/encoding-decoding/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/response/encoding-decoding/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/response/encoding-decoding/"/>
@@ -1024,7 +1024,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/response/flash/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/response/flash/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/response/flash/"/>
@@ -1032,7 +1032,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/response/headers/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/response/headers/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/response/headers/"/>
@@ -1040,7 +1040,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/routes/routes/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/routes/routes/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/routes/routes/"/>
@@ -1048,7 +1048,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/seguridad/autenticacion/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/seguridad/autenticacion/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/autenticacion/"/>
@@ -1056,7 +1056,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/seguridad/claves/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/seguridad/claves/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/claves/"/>
@@ -1064,7 +1064,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/seguridad/cors/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/seguridad/cors/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/cors/"/>
@@ -1072,7 +1072,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/seguridad/csrf/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/seguridad/csrf/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/csrf/"/>
@@ -1080,7 +1080,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/seguridad/firewall/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/seguridad/firewall/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/firewall/"/>
@@ -1088,7 +1088,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/seguridad/jwt/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/seguridad/jwt/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/jwt/"/>
@@ -1096,7 +1096,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/seguridad/ratelimit/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/seguridad/ratelimit/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/ratelimit/"/>
@@ -1104,7 +1104,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/seguridad/resources-ids/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/seguridad/resources-ids/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/resources-ids/"/>
@@ -1112,7 +1112,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/seguridad/sesiones/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/seguridad/sesiones/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/sesiones/"/>
@@ -1120,7 +1120,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/seguridad/ssl/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/seguridad/ssl/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/seguridad/ssl/"/>
@@ -1128,7 +1128,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/views/directives/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/views/directives/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/directives/"/>
@@ -1136,7 +1136,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/views/example/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/views/example/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/example/"/>
@@ -1144,7 +1144,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/views/example1/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/views/example1/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/example1/"/>
@@ -1152,7 +1152,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/views/example2/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/views/example2/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/example2/"/>
@@ -1160,7 +1160,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/views/example3/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/views/example3/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/example3/"/>
@@ -1168,7 +1168,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/views/example4/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/views/example4/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/example4/"/>
@@ -1176,7 +1176,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/hixstyle/views/mambo/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/hixstyle/views/mambo/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/hixstyle/views/mambo/"/>
@@ -1184,7 +1184,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/intro/data-driven/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/intro/data-driven/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/intro/data-driven/"/>
@@ -1192,7 +1192,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/intro/hixstyle/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/intro/hixstyle/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/intro/hixstyle/"/>
@@ -1200,7 +1200,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/intro/intro/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/intro/intro/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/intro/intro/"/>
@@ -1208,7 +1208,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/intro/modo-basico/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/intro/modo-basico/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/intro/modo-basico/"/>
@@ -1216,7 +1216,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/primeros-pasos/compile/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/primeros-pasos/compile/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/primeros-pasos/compile/"/>
@@ -1224,7 +1224,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/primeros-pasos/config/hix.json/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/primeros-pasos/config/hix.json/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/primeros-pasos/config/hix.json/"/>
@@ -1232,7 +1232,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/programacion/error-handling/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/programacion/error-handling/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/programacion/error-handling/"/>
@@ -1240,7 +1240,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/programacion/error_codes/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/programacion/error_codes/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/programacion/error_codes/"/>
@@ -1248,7 +1248,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/programacion/errorsys/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/programacion/errorsys/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/programacion/errorsys/"/>
@@ -1256,7 +1256,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/programacion/mapa-helpers/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/programacion/mapa-helpers/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/programacion/mapa-helpers/"/>
@@ -1264,7 +1264,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/programacion/modo-dev-prod/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/programacion/modo-dev-prod/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/programacion/modo-dev-prod/"/>
@@ -1272,7 +1272,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/sistema/apache-proxy/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/sistema/apache-proxy/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/apache-proxy/"/>
@@ -1280,7 +1280,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/sistema/bootlog/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/sistema/bootlog/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/bootlog/"/>
@@ -1288,7 +1288,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/sistema/hix-admin/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/sistema/hix-admin/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/hix-admin/"/>
@@ -1296,7 +1296,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/sistema/loaders/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/sistema/loaders/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/loaders/"/>
@@ -1304,7 +1304,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/sistema/logger/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/sistema/logger/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/logger/"/>
@@ -1312,7 +1312,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/sistema/metricas/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/sistema/metricas/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/metricas/"/>
@@ -1320,7 +1320,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/sistema/traceando/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/sistema/traceando/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/sistema/traceando/"/>
@@ -1328,7 +1328,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/tiempo-real/longpolling/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/tiempo-real/longpolling/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/tiempo-real/longpolling/"/>
@@ -1336,7 +1336,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/tiempo-real/sse/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/tiempo-real/sse/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/tiempo-real/sse/"/>
@@ -1344,7 +1344,7 @@
     </url>
     <url>
         <loc>https://carles9000.github.io/hix/it/tiempo-real/ws/</loc>
-        <lastmod>2026-08-18</lastmod>
+        <lastmod>2026-08-20</lastmod>
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="it" href="https://carles9000.github.io/hix/it/tiempo-real/ws/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://carles9000.github.io/hix/tiempo-real/ws/"/>
