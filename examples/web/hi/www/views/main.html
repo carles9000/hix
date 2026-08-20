@@ -1,0 +1,89 @@
+@args cName = '', hUser = {=>}, cRoles = ''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	@view 'common/header.html' 
+   
+   <link href='/public/css/main.css' rel='stylesheet'>
+   
+</head>
+
+<body>
+
+	<!-- Navbar -->	
+	
+	@view 'common/navbar.html'
+
+
+  <!--
+   <div class='contenedor'>
+     <img src='/public/images/logo.png'/>     
+     <span class='title'>Welcome, {{ cName }} ! </span>
+   </div><hr>   
+   -->
+  
+   <main class="container-fluid mycontainer pb-5 mb-4">
+
+      <!--<br><strong>Authorization roles for user: {{ time() }}</strong>-->
+
+      <!-- Grid 2 x 3 -->
+
+      <div class="row row-cols-2 g-3 mt-2">
+         <div class="col">
+            <a href="/server-info" class="btn btn-outline-dark w-100 btn-tile">
+               <i class="bi bi-speedometer2 fs-3 d-block mb-1"></i>Server
+            </a>
+         </div>
+         <div class="col">
+            <a href="/http-test" class="btn btn-outline-dark w-100 btn-tile">
+               <i class="bi bi-arrow-left-right fs-3 d-block mb-1"></i>HTTP Test
+            </a>
+         </div>
+         <div class="col">
+            <a href="/ws-test" class="btn btn-outline-dark w-100 btn-tile">
+               <i class="bi bi-hdd-network fs-3 d-block mb-1"></i>WS Test
+            </a>
+         </div>
+         <div class="col">
+            <a href="/stress-test" class="btn btn-outline-dark w-100 btn-tile">
+               <i class="bi bi-lightning-charge fs-3 d-block mb-1"></i>Stress Test
+            </a>
+         </div>
+         <div class="col">
+            <a href="/file-test" class="btn btn-outline-dark w-100 btn-tile">
+               <i class="bi bi-file-earmark-arrow-up fs-3 d-block mb-1"></i>File Test
+            </a>
+         </div>
+         <div class="col">
+            <a href="/users" class="btn btn-outline-dark w-100 btn-tile">
+               <i class="bi bi-people fs-3 d-block mb-1"></i>Users (dbf)
+            </a>
+         </div>
+         <div class="col">
+            <a href="/message" class="btn btn-outline-dark w-100 btn-tile">
+               <i class="bi bi-chat-dots fs-3 d-block mb-1"></i>Message
+            </a>
+         </div>
+         <div class="col">
+            <a href="/your-module" class="btn btn-outline-dark w-100 btn-tile">
+               <i class="bi bi-mortarboard fs-3 d-block mb-1"></i>Your module
+            </a>
+         </div>
+      </div>
+
+   </main>
+
+	<!-- Bottom nav -->
+
+	<nav class="navbar navbar-dark bg-dark fixed-bottom p-0">
+		<div class="d-flex w-100" role="group" aria-label="Bottom navigation">
+			<a href="/" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0">
+				<i class="bi bi-house"></i><span class="btn-lbl">Home</span>
+			</a>
+		</div>
+	</nav>
+
+</body>
+
+</html>   

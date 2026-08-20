@@ -9,6 +9,8 @@ It's not more powerful because it has more features - HIX has those in both mode
 It's more powerful because **all developers work the same way**. That's real
 maintainability, real collaboration, and interchangeable modules between projects.
 
+Config HixStyle ➡ hix.json ➡ hixstyle.enabled = **true**
+
 ---
 
 ## 🎯 One single way to work

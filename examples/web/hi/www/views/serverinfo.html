@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	@view 'common/header.html'
+
+   <link href='/public/css/main.css' rel='stylesheet'>
+
+   <style>
+      .tile        { background:#212529; color:#dee2e6; border-radius:.5rem; padding:.65rem .75rem; height:100%; }
+      .tile .lbl   { font-size:.7rem; text-transform:uppercase; letter-spacing:.04em; color:#8b949e; }
+      .tile .val   { font-size:1.45rem; font-weight:600; line-height:1.15; }
+      .tile .unit  { font-size:.75rem; color:#8b949e; margin-left:.15rem; }
+      .val-ok      { color:#75e08b }
+      .val-warn    { color:#fd9843 }
+      .val-err     { color:#ea868f }
+      .val-info    { color:#6ea8fe }
+      .val-ws      { color:#ffda6a }
+      .panel       { background:#212529; color:#dee2e6; border-radius:.5rem; }
+      .panel h6    { color:#6ea8fe; font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; }
+      .kv          { display:flex; justify-content:space-between; gap:.75rem; font-size:.82rem; padding:.2rem 0; border-bottom:1px solid #2c3136; }
+      .kv:last-child { border-bottom:0 }
+      .kv .k       { color:#8b949e; white-space:nowrap }
+      .kv .v       { text-align:right; word-break:break-all }
+      .kv .at      { color:#6c757d; font-size:.75rem; white-space:nowrap; margin-left:.5rem }
+
+      /* Tabs — same dark family as tiles and panels */
+      .nav-pills .nav-link        { color:#495057; font-size:.85rem; padding:.35rem .5rem; border-radius:.5rem; }
+      .nav-pills .nav-link.active { background:#212529; color:#dee2e6; }
+   </style>
+
+</head>
+
+<body>
+
+	<!-- Navbar -->
+
+	@view 'common/navbar.html'
+
+   <!-- body has 60px top/bottom margin (main.css): that is the room taken by both fixed navbars -->
+
+   <main class="container-fluid mycontainer d-flex flex-column"
+         style="height:calc(100vh - 120px);height:calc(100dvh - 120px)">
+
+      <div class="d-flex align-items-center justify-content-between mb-1 flex-shrink-0">
+         <h4 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Server</h4>
+      </div>
+
+      <!-- Stays outside the tabs: it is the proof that polling is alive -->
+
+      <div id="head" class="small text-muted mb-2 flex-shrink-0">—</div>
+
+      <!-- Static nav: never regenerated, or the 1s refresh would steal the active tab -->
+
+      <ul class="nav nav-pills nav-fill mb-2 flex-shrink-0" id="tabs" role="tablist">
+         <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#pane-run"
+                    type="button" role="tab">Run</button>
+         </li>
+         <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#pane-slow"
+                    type="button" role="tab">Slowest</button>
+         </li>
+         <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#pane-boot"
+                    type="button" role="tab">Boot</button>
+         </li>
+         <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#pane-system"
+                    type="button" role="tab">System</button>
+         </li>
+      </ul>
+
+      <div class="tab-content flex-grow-1" style="min-height:0;overflow:auto">
+
+         <div class="tab-pane fade show active" id="pane-run" role="tabpanel">
+            <!-- 2 tiles on phone, 4 from tablet up -->
+            <div id="tiles" class="row row-cols-2 row-cols-md-4 g-2 mb-2"></div>
+            <div id="run-detail"></div>
+         </div>
+
+         <div class="tab-pane fade" id="pane-slow"   role="tabpanel"><div id="slow-detail"></div></div>
+         <div class="tab-pane fade" id="pane-boot"   role="tabpanel"><div id="boot-detail"></div></div>
+         <div class="tab-pane fade" id="pane-system" role="tabpanel"><div id="sys-detail"></div></div>
+
+      </div>
+
+   </main>
+
+	<!-- Bottom nav -->
+
+   <nav class="navbar navbar-dark bg-dark fixed-bottom p-0">
+      <div class="d-flex w-100" role="group" aria-label="Bottom navigation">
+         <a href="/main" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0">
+            <i class="bi bi-box-arrow-left"></i><span class="btn-lbl">Back</span>
+         </a>
+         <button id="btnStart" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="startAuto()">
+            <i class="bi bi-play-fill"></i><span class="btn-lbl">Start</span>
+         </button>
+         <button id="btnStop" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="stopAuto()" disabled>
+            <i class="bi bi-stop-fill"></i><span class="btn-lbl">Stop</span>
+         </button>
+      </div>
+   </nav>
+
+<script>
+
+   const API      = '/api/server-info';
+   const AUTO_MS  = 1000;          // auto refresh period
+   const TAB_KEY  = 'srvTab';      // sessionStorage — remembers the open tab
+
+   const el   = id => document.getElementById( id );
+   const esc  = s => String( s ).replace( /&/g, '&amp;' ).replace( /</g, '&lt;' );
+   const nf   = n => Number( n ).toLocaleString();
+
+   function bytes( n ) {
+      n = Number( n ) || 0;
+      if ( n >= 1048576 ) return [ ( n / 1048576 ).toFixed( 1 ), 'MB' ];
+      if ( n >= 1024 )    return [ ( n / 1024 ).toFixed( 1 ),    'KB' ];
+      return [ String( n ), 'B' ];
+   }
+
+   function uptime( s ) {
+      s = Number( s ) || 0;
+      if ( s >= 86400 ) return [ Math.floor( s / 86400 ) + 'd ' + Math.floor( s % 86400 / 3600 ) + 'h', '' ];
+      if ( s >= 3600 )  return [ Math.floor( s / 3600 )  + 'h ' + Math.floor( s % 3600 / 60 )   + 'm', '' ];
+      if ( s >= 60 )    return [ Math.floor( s / 60 )    + 'm ' + ( s % 60 )                    + 's', '' ];
+      return [ String( s ), 's' ];
+   }
+
+   const tile = ( lbl, val, unit, cls ) => `
+      <div class="col">
+         <div class="tile">
+            <div class="lbl">${esc( lbl )}</div>
+            <div class="val ${cls || 'val-ok'}">${esc( val )}<span class="unit">${esc( unit || '' )}</span></div>
+         </div>
+      </div>`;
+
+   const kv = ( k, v, cls ) =>
+      `<div class="kv"><span class="k">${esc( k )}</span><span class="v ${cls || ''}">${esc( v )}</span></div>`;
+
+   const panel = ( title, body ) => `
+      <div class="panel p-3 mb-2">
+         <h6 class="mb-2">${esc( title )}</h6>
+         ${body || '<div class="kv"><span class="k">(empty)</span></div>'}
+      </div>`;
+
+   // Colour of the pool ceiling tiles: green until 75% of the workers are
+   // taken, orange over it, red when the pool is full and answering 503.
+   function cap( nUsed, nMax ) {
+      if ( ! Number( nMax ) ) return 'val-info';
+      const pct = Number( nUsed ) / Number( nMax );
+      return pct >= 1 ? 'val-err' : pct > .75 ? 'val-warn' : 'val-ok';
+   }
+
+   // Built by hand instead of kv(): the path and its timestamp need
+   // separate colours, and kv() paints the whole value with one class.
+   function slowRows( aList ) {
+      if ( !aList || !aList.length ) return '';
+      return aList.map( r =>
+         `<div class="kv">` +
+            `<span class="k">${esc( r.ms )} ms</span>` +
+            `<span class="v">` +
+               `<span class="val-warn">${esc( r.path )}</span>` +
+               `<span class="at">${esc( r.at )}</span>` +
+            `</span>` +
+         `</div>` ).join( '' );
+   }
+
+   // ---- traffic sparkline ----
+   // Incoming requests per second, split ok / ko. The payload only carries
+   // cumulative counters, so every sample is the delta against the previous poll,
+   // divided by the real elapsed time (the chained poll is never exactly 1000 ms).
+
+   const HIST = 60;        // samples kept — about one minute at AUTO_MS
+   const hist = [];        // { ok, ko } per second
+   let   prev = null;      // { req, err, t } of the previous poll
+
+   const fmt = v => v >= 10 ? String( Math.round( v ) ) : String( Math.round( v * 10 ) / 10 );
+
+   function pushSample( nReq, nErr, nWs, tNow ) {
+
+      if ( prev ) {
+
+         const secs = Math.max( ( tNow - prev.t ) / 1000, .001 );
+         const dReq = nReq - prev.req;
+         const dErr = nErr - prev.err;
+
+         if ( dReq < 0 || dErr < 0 ) {
+            hist.length = 0;                 // counters went backwards: server restarted
+         } else {
+            // ok/ko are rates; ws is a gauge — open sockets at this instant
+            hist.push( { ok: Math.max( dReq - dErr, 0 ) / secs, ko: dErr / secs, ws: nWs } );
+            if ( hist.length > HIST ) hist.shift();
+         }
+      }
+
+      prev = { req: nReq, err: nErr, t: tNow };
+   }
+
+   function spark() {
+
+      const W = 240, H = 54;
+
+      if ( hist.length < 2 )
+         return '<div class="k" style="font-size:.78rem">collecting…</div>';
+
+      const peak   = Math.max( 1, ...hist.map( s => Math.max( s.ok, s.ko ) ) );
+      const wsPeak = Math.max( 1, ...hist.map( s => s.ws ) );
+
+      const x    = i => ( i / ( HIST - 1 ) ) * W;
+      const y    = ( v, max ) => H - 2 - ( v / max ) * ( H - 6 );
+
+      // ws rides on its own scale: a couple of sockets against hundreds of req/s
+      // would sit flat on the floor and show nothing.
+      const pts  = ( key, max ) => hist.map( ( s, i ) =>
+                      x( i ).toFixed( 1 ) + ',' + y( s[ key ], max ).toFixed( 1 ) ).join( ' ' );
+
+      const last = hist[ hist.length - 1 ];
+
+      // preserveAspectRatio=none stretches the box to the panel width;
+      // non-scaling-stroke keeps the line 1.5px thick anyway.
+      return `
+         <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"
+              style="width:100%;height:${H}px;display:block;overflow:visible">
+            <polyline points="${pts( 'ws', wsPeak )}" fill="none" stroke="#ffda6a"
+                      stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+            <polyline points="${pts( 'ok', peak )}" fill="none" stroke="#75e08b"
+                      stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+            <polyline points="${pts( 'ko', peak )}" fill="none" stroke="#ea868f"
+                      stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+         </svg>
+         <div class="kv" style="border-bottom:0;padding-top:.4rem">
+            <span class="k">
+               <span class="val-ok">●</span> ok ${fmt( last.ok )}/s
+               &nbsp;<span class="val-err">●</span> ko ${fmt( last.ko )}/s
+               &nbsp;<span class="val-ws">●</span> ws ${last.ws} conn
+            </span>
+            <span class="v k">peak ${fmt( peak )}/s · ws ${wsPeak} · ${hist.length}s</span>
+         </div>`;
+   }
+
+   // ---- tabs ----
+   // Only the inner content of each pane is rewritten on every poll, never the
+   // nav itself: regenerating it would send the focus back to Run once a second.
+
+   document.querySelectorAll( '#tabs button' ).forEach( b =>
+      b.addEventListener( 'shown.bs.tab', e =>
+         sessionStorage.setItem( TAB_KEY, e.target.dataset.bsTarget ) ) );
+
+   function restoreTab() {
+      const saved = sessionStorage.getItem( TAB_KEY );
+      if ( ! saved ) return;
+      const btn = document.querySelector( `#tabs button[data-bs-target="${saved}"]` );
+      if ( btn && ! btn.classList.contains( 'active' ) ) bootstrap.Tab.getOrCreateInstance( btn ).show();
+   }
+
+   // ---- auto refresh ----
+   // Chained timeout instead of setInterval: the next poll is scheduled
+   // only after the previous one came back, so slow answers never pile up.
+
+   let auto    = false;
+   let timer   = null;
+   let wasAuto = false;   // polling was on before the tab got hidden
+
+   function syncButtons() {
+      el( 'btnStart' ).disabled = auto;
+      el( 'btnStop'  ).disabled = ! auto;
+   }
+
+   async function autoLoop() {
+      while ( auto ) {
+         await load();
+         if ( ! auto ) break;
+         await new Promise( resolve => { timer = setTimeout( resolve, AUTO_MS ); } );
+      }
+   }
+
+   function startAuto() {
+      if ( auto ) return;
+      auto = true;
+      syncButtons();
+      autoLoop();
+   }
+
+   function stopAuto() {
+      auto = false;
+      if ( timer ) { clearTimeout( timer ); timer = null; }
+      prev = null;   // drop the baseline: on resume the gap would look like one huge spike
+      syncButtons();
+   }
+
+   // Stop polling while the tab is hidden, resume when it comes back
+   document.addEventListener( 'visibilitychange', () => {
+      if ( document.hidden && auto ) {
+         stopAuto();
+         wasAuto = true;
+      } else if ( ! document.hidden && wasAuto ) {
+         wasAuto = false;
+         startAuto();
+      }
+   } );
+
+   // Shows what actually came back instead of throwing
+   function fail( msg, raw ) {
+      el( 'head' ).innerHTML = '<span class="text-danger">● ' + esc( msg ) + '</span>';
+      el( 'tiles' ).innerHTML = '';
+      el( 'run-detail' ).innerHTML = panel( 'Response received',
+         `<div class="kv"><span class="v" style="text-align:left">${esc( String( raw ).slice( 0, 1500 ) )}</span></div>` );
+      el( 'slow-detail' ).innerHTML = '';
+      el( 'boot-detail' ).innerHTML = '';
+      el( 'sys-detail'  ).innerHTML = '';
+      syncButtons();
+   }
+
+   async function load() {
+
+      const t0 = performance.now();
+
+      try {
+
+         const res  = await fetch( API, { cache: 'no-store' } );
+         const raw  = await res.text();
+         const ms   = Math.round( performance.now() - t0 );
+         let   d;
+
+         try {
+            d = JSON.parse( raw );
+         } catch ( e ) {
+            return fail( `${API} did not answer JSON (HTTP ${res.status})`, raw );
+         }
+
+         // The server answered something, but not our payload
+         if ( !d || !d.traffic || !d.server ) {
+            return fail( d && d.error ? 'server error: ' + d.error
+                                      : `unexpected payload (HTTP ${res.status})`, raw );
+         }
+
+         pushSample( Number( d.traffic.requests ), Number( d.traffic.errors ),
+                     Number( d.traffic.active_ws ), t0 );
+
+         const active = Number( d.traffic.active_http ) +
+                        Number( d.traffic.active_ws )   +
+                        Number( d.traffic.active_otros );
+
+         const lim = d.limits || {};   // pool ceilings — absent on older payloads
+
+         const [ upV, upU ] = uptime( d.server.uptime_sec );
+         const [ memV, memU ] = bytes( d.memory.used_now || d.memory.used_mon );
+         const [ outV, outU ] = bytes( d.traffic.bytes_out );
+
+         el( 'head' ).innerHTML =
+            `<span class="${d.server.running ? 'text-success' : 'text-danger'}">●</span> ` +
+            `${esc( d.server.name )} · ${esc( d.server.host )}:${esc( d.server.port )} · ` +
+            `${esc( d.server.mode )}/${esc( d.server.env )} · ${ms} ms` +
+            ( auto ? ` · <span class="text-info">auto ${AUTO_MS / 1000}s</span>` : '' );
+
+         // ---- tab 1: Run ----
+
+         el( 'tiles' ).innerHTML =
+            tile( 'Uptime',   upV, upU, 'val-info' ) +
+            tile( 'Requests', nf( d.traffic.requests ), '' ) +
+            tile( 'Memory',   memV, memU, 'val-info' ) +
+            tile( 'Active',   active, 'conn' ) +
+            tile( 'Avg',      d.timing.ms_avg, 'ms' ) +
+            tile( 'Max',      d.timing.ms_max, 'ms',
+                  Number( d.timing.ms_max ) > 1000 ? 'val-warn' : 'val-ok' ) +
+            tile( 'Sent',     outV, outU, 'val-info' ) +
+            tile( 'Max http', lim.http, '· ' + d.traffic.active_http  + ' now',
+                  cap( d.traffic.active_http,  lim.http ) ) +
+            tile( 'Max ws',   lim.ws,   '· ' + d.traffic.active_ws    + ' now',
+                  cap( d.traffic.active_ws,    lim.ws   ) ) +
+            tile( 'Max sse',  lim.sse,  '· ' + d.traffic.active_otros + ' now',
+                  cap( d.traffic.active_otros, lim.sse  ) );
+
+         el( 'run-detail' ).innerHTML = panel( 'Incoming — req/s', spark() ) + panel( 'Connections',
+            kv( 'http',      d.traffic.active_http ) +
+            kv( 'websocket', d.traffic.active_ws ) +
+            kv( 'sse / longpoll', d.traffic.active_otros ) +
+            kv( 'saturations', d.traffic.saturated,
+                Number( d.traffic.saturated ) ? 'val-warn' : '' ) +
+            kv( 'bytes in',  bytes( d.traffic.bytes_in ).join( ' ' ) ) +
+            kv( 'bytes out', bytes( d.traffic.bytes_out ).join( ' ' ) ) );
+
+         // ---- tab 2: Slowest ----
+
+         let slow = panel( 'Slowest — dynamic', slowRows( d.slowest.dyn )  || kv( 'none yet', '' ) ) +
+                    panel( 'Slowest — static',  slowRows( d.slowest.stat ) || kv( 'none yet', '' ) );
+
+         if ( d.timing.max_path ) {
+            slow += panel( 'Peak request',
+               kv( 'path', d.timing.max_path ) +
+               kv( 'at',   d.timing.max_at ) +
+               kv( 'time', d.timing.ms_max + ' ms', 'val-warn' ) +
+               kv( 'measured', nf( d.timing.count ) ) );
+         }
+
+         el( 'slow-detail' ).innerHTML = slow;
+
+         // ---- tab 3: Boot ----
+
+         let boot = '';
+         for ( const sec in d.boot ) {
+            const rows = d.boot[ sec ] || [];
+            const ko   = rows.filter( r => r.status === false ).length;
+            boot += kv( sec, rows.length + ' loaded' + ( ko ? ' · ' + ko + ' failed' : '' ),
+                        ko ? 'val-err' : 'val-ok' );
+            rows.filter( r => r.status === false )
+                .forEach( r => boot += kv( '  ' + ( r.action || '' ), r.value || '', 'val-err' ) );
+         }
+         el( 'boot-detail' ).innerHTML = panel( 'Boot', boot );
+
+         // ---- tab 4: System ----
+
+         el( 'sys-detail' ).innerHTML = panel( 'System',
+            kv( 'harbour',  d.system.harbour ) +
+            kv( 'compiler', d.system.compiler ) +
+            kv( 'os',       d.system.os ) +
+            kv( 'host',     d.system.host ) +
+            kv( 'now',      d.system.date + ' ' + d.system.time ) +
+            kv( 'monitor',  d.server.monitor ? 'on' : 'off',
+                d.server.monitor ? 'val-ok' : 'val-warn' ) +
+            kv( 'gzip',     d.server.gzip ) +
+            kv( 'hixstyle', d.server.hixstyle ) +
+            kv( 'mem peak', bytes( d.memory.peak_now || d.memory.peak_mon ).join( ' ' ) ) );
+
+      } catch ( err ) {
+         el( 'head' ).innerHTML = '<span class="text-danger">● request failed</span>';
+         el( 'run-detail' ).innerHTML = panel( 'Error', kv( 'message', String( err ), 'val-err' ) );
+      }
+   }
+
+   // First load and auto refresh start together when the page opens
+   restoreTab();
+   startAuto();
+
+</script>
+
+</body>
+
+</html>

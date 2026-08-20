@@ -9,6 +9,9 @@ Non è più potente perché ha più funzionalità — HIX le ha in entrambe le m
 È più potente perché **tutti gli sviluppatori lavorano allo stesso modo**. Questa è vera
 manutenibilità, vera collaborazione e moduli intercambiabili tra progetti.
 
+Config HixStyle ➡ hix.json ➡ hixstyle.enabled = **true**
+
+
 ---
 
 ## 🎯 Un unico modo di lavorare

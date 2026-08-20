@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	@view 'common/header.html'
+
+   <link href='/public/css/main.css' rel='stylesheet'>
+
+</head>
+
+<body>
+
+	<!-- Navbar -->
+
+	@view 'common/navbar.html'
+
+   <!-- body has 60px top/bottom margin (main.css): that is the room taken by both fixed navbars -->
+
+   <main class="container-fluid mycontainer d-flex flex-column"
+         style="height:calc(100vh - 120px);height:calc(100dvh - 120px)">
+
+      <div class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0">
+         <h4 class="mb-0"><i class="bi bi-hdd-network me-2"></i>WebSocket test</h4>
+      </div>
+
+      <pre id="output" class="bg-dark text-light p-3 rounded flex-grow-1 mb-0"
+           style="min-height:0;overflow:auto;font-size:.85rem">—</pre>
+
+   </main>
+
+	<!-- Bottom nav -->
+
+   <nav class="navbar navbar-dark bg-dark fixed-bottom p-0">
+      <div class="d-flex w-100" role="group" aria-label="Bottom navigation">
+         <a href="/main" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0">
+            <i class="bi bi-box-arrow-left"></i><span class="btn-lbl">Back</span>
+         </a>
+         <button id="btnRun" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="runAll()">
+            <i class="bi bi-play-fill"></i><span class="btn-lbl">Run</span>
+         </button>
+      </div>
+   </nav>
+
+<script>
+
+   const WS_URL = ( location.protocol === 'https:' ? 'wss://' : 'ws://' ) + location.host + '/ws';
+   const COUNT  = 10;     // messages per run
+   const DELAY  = 50;    // ms between messages
+
+   const out = document.getElementById( 'output' );
+
+   // Log palette
+   const C = {
+      info : '#6ea8fe',   // blue   — connection info
+      sent : '#ffda6a',   // yellow — outgoing message
+      recv : '#75e08b',   // green  — server answer
+      warn : '#fd9843',   // orange — closing / aborted
+      err  : '#ea868f'    // red    — errors and timeouts
+   };
+
+   const esc = s => String( s ).replace( /&/g, '&amp;' ).replace( /</g, '&lt;' );
+
+   function log( txt, color ) {
+      out.innerHTML += `<span style="color:${color || C.info}">${esc( txt )}</span>\n`;
+      out.scrollTop = out.scrollHeight;
+   }
+
+   const sleep = ms => new Promise( r => setTimeout( r, ms ) );
+
+   function runAll() {
+
+      const btn = document.getElementById( 'btnRun' );
+      const t0  = performance.now();
+      const aSent = [];        // timestamp of each sent message (FIFO)
+      let   nRecv = 0;
+      let   ws;
+
+      btn.disabled  = true;
+      out.innerHTML = '';
+
+      log( `Connecting to ${WS_URL}`, C.info );
+      log( `${COUNT} messages, ${DELAY} ms apart, single connection\n`, C.info );
+
+      const finish = () => {
+         clearTimeout( timeout );
+         log( `\n${nRecv}/${COUNT} ok — total ${Math.round( performance.now() - t0 )} ms`,
+              nRecv === COUNT ? C.recv : C.err );
+         btn.disabled = false;
+      };
+
+      const timeout = setTimeout( () => {
+         log( 'TIMEOUT — closing connection', C.err );
+         try { ws.close(); } catch ( e ) {}
+      }, 15000 );
+
+      try {
+         ws = new WebSocket( WS_URL );
+      } catch ( err ) {
+         log( `ERROR    ${err}`, C.err );
+         return finish();
+      }
+
+      ws.onopen = async () => {
+
+         log( `open     ${Math.round( performance.now() - t0 )} ms`, C.info );
+
+         for ( let i = 1; i <= COUNT; i++ ) {
+
+            if ( ws.readyState !== WebSocket.OPEN ) {
+               log( 'connection lost — loop aborted', C.warn );
+               break;
+            }
+
+            aSent.push( performance.now() );
+            ws.send( 'ping ' + i );
+            //log( `#${String( i ).padStart( 2, '0' )} sent`, C.sent );
+
+            if ( i < COUNT ) await sleep( DELAY );
+         }
+      };
+
+      ws.onmessage = e => {
+
+         const rtt = Math.round( performance.now() - aSent[ nRecv ] );
+
+         nRecv++;
+         log( `#${String( nRecv ).padStart( 2, '0' )} recv     ${rtt} ms   ${e.data}`, C.recv );
+
+         if ( nRecv >= COUNT ) {
+            log( '\nclosing…', C.warn );
+            ws.close();
+         }
+      };
+
+      ws.onerror = () => log( 'ERROR    connection failed', C.err );
+
+      ws.onclose = ev => {
+         log( `closed   code ${ev.code}`, C.warn );
+         finish();
+      };
+   }
+
+</script>
+
+</body>
+
+</html>

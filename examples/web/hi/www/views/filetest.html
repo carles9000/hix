@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	@view 'common/header.html'
+
+   <link href='/public/css/main.css' rel='stylesheet'>
+
+</head>
+
+<body>
+
+	<!-- Navbar -->
+
+	@view 'common/navbar.html'
+
+   <!-- body has 60px top/bottom margin (main.css): that is the room taken by both fixed navbars -->
+
+   <main class="container-fluid mycontainer d-flex flex-column"
+         style="height:calc(100vh - 120px);height:calc(100dvh - 120px)">
+
+      <div class="d-flex align-items-center justify-content-between mb-2 flex-shrink-0">
+         <h4 class="mb-0"><i class="bi bi-file-earmark-arrow-up me-2"></i>File transfer</h4>
+      </div>
+
+      <!-- Run parameters -->
+
+      <div class="row g-2 mb-2 flex-shrink-0">
+         <div class="col-4 col-sm-3">
+            <label class="form-label mb-0 small text-muted">Size</label>
+            <select id="selSize" class="form-select form-select-sm">
+               <option value="1">1 MB</option>
+               <option value="5" selected>5 MB</option>
+               <option value="10">10 MB</option>
+               <option value="25">25 MB</option>
+            </select>
+         </div>
+         <div class="col-4 col-sm-3">
+            <label class="form-label mb-0 small text-muted">Rounds</label>
+            <select id="selRounds" class="form-select form-select-sm">
+               <option>1</option>
+               <option selected>3</option>
+               <option>5</option>
+            </select>
+         </div>
+         <div class="col-4 col-sm-4">
+            <label class="form-label mb-0 small text-muted">Over-limit probe</label>
+            <select id="selProbe" class="form-select form-select-sm">
+               <option value="1" selected>yes — 12 MB upload</option>
+               <option value="0">no</option>
+            </select>
+         </div>
+      </div>
+
+      <pre id="output" class="bg-dark text-light p-3 rounded flex-grow-1 mb-0"
+           style="min-height:0;overflow:auto;font-size:.85rem">—</pre>
+
+   </main>
+
+	<!-- Bottom nav -->
+
+   <nav class="navbar navbar-dark bg-dark fixed-bottom p-0">
+      <div class="d-flex w-100" role="group" aria-label="Bottom navigation">
+         <a href="/main" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0">
+            <i class="bi bi-box-arrow-left"></i><span class="btn-lbl">Back</span>
+         </a>
+         <button id="btnRun" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="runAll()">
+            <i class="bi bi-play-fill"></i><span class="btn-lbl">Run</span>
+         </button>
+         <button id="btnStop" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="stopRun()" disabled>
+            <i class="bi bi-stop-fill"></i><span class="btn-lbl">Stop</span>
+         </button>
+      </div>
+   </nav>
+
+<script>
+
+   const MB       = 1048576;
+   const BODY_CAP = 10;          // HIX_MAX_BODY_SIZE — 10 MB, bodies above it are dropped
+   const out      = document.getElementById( 'output' );
+
+   // Log palette
+   const C = {
+      info : '#6ea8fe',   // blue   — headers and summary
+      down : '#75e08b',   // green  — download rows
+      up   : '#ffda6a',   // yellow — upload rows
+      warn : '#fd9843',   // orange — capped / unexpected
+      dim  : '#8a94a6',   // grey   — detail
+      err  : '#ea868f'    // red    — failures
+   };
+
+   const esc = s => String( s ).replace( /&/g, '&amp;' ).replace( /</g, '&lt;' );
+
+   function log( txt, color ) {
+      out.innerHTML += `<span style="color:${color || C.info}">${esc( txt )}</span>\n`;
+      out.scrollTop = out.scrollHeight;
+   }
+
+   let stopped = false;
+
+   function stopRun() {
+      stopped = true;
+      log( '\nstopping — waiting for the transfer in flight…', C.warn );
+   }
+
+   // Blob of n bytes: one random 64 KB block repeated, so generation
+   // costs nothing and the payload is not a run of zeros
+   function makeBlob( bytes ) {
+
+      const CHUNK = 64 * 1024;
+      const seed  = new Uint8Array( CHUNK );
+      const parts = [];
+      let   left  = bytes;
+
+      crypto.getRandomValues( seed );
+
+      while ( left > 0 ) {
+         const n = Math.min( CHUNK, left );
+         parts.push( seed.subarray( 0, n ) );
+         left -= n;
+      }
+
+      return new Blob( parts, { type: 'application/octet-stream' } );
+   }
+
+   const rate = ( bytes, ms ) => ( bytes / MB ) / ( ms / 1000 );
+
+   function row( label, bytes, ms, code, note, color ) {
+      log( `${label.padEnd( 20 )} ${( bytes / MB ).toFixed( 1 ).padStart( 6 )} MB ` +
+           `${String( Math.round( ms ) ).padStart( 6 )} ms ` +
+           `${rate( bytes, ms ).toFixed( 1 ).padStart( 7 )} MB/s   ${String( code ).padStart( 3 )}`, color );
+      if ( note ) log( `                     ${note}`, C.dim );
+   }
+
+   // ---- one download ----
+
+   async function download( nMb, cKind, aStats ) {
+
+      const url = `/api/download?mb=${nMb}&mime=${cKind}`;
+      const t0  = performance.now();
+
+      try {
+
+         const res  = await fetch( url, { cache: 'no-store' } );
+         const buf  = await res.arrayBuffer();
+         const ms   = performance.now() - t0;
+         const wire = parseInt( res.headers.get( 'content-length' ) || '0', 10 );
+
+         let note = '';
+         if ( wire > 0 && wire < buf.byteLength ) {
+            note = `gzipped on the wire: ${( wire / MB ).toFixed( 2 )} MB sent, ` +
+                   `${( buf.byteLength / wire ).toFixed( 1 )}x ratio — the rate above is decompressed bytes`;
+         }
+
+         row( `download ${cKind}`, buf.byteLength, ms, res.status, note,
+              res.status === 200 ? C.down : C.err );
+
+         if ( res.status === 200 ) aStats.push( { op: 'download ' + cKind, mbs: rate( buf.byteLength, ms ) } );
+
+      } catch ( err ) {
+         log( `download ${cKind} — network error: ${err}`, C.err );
+      }
+   }
+
+   // ---- one upload ----
+
+   async function upload( nMb, cKind, aStats ) {
+
+      const bytes = nMb * MB;
+      const blob  = makeBlob( bytes );
+      const opt   = { method: 'POST' };
+
+      if ( cKind === 'multipart' ) {
+         const fd = new FormData();
+         fd.append( 'file', blob, 'payload.bin' );
+         opt.body = fd;
+      } else {
+         opt.headers = { 'Content-Type': 'application/octet-stream' };
+         opt.body    = blob;
+      }
+
+      const t0 = performance.now();
+
+      try {
+
+         const res  = await fetch( '/api/upload', opt );
+         const ms   = performance.now() - t0;
+         const json = await res.json().catch( () => ( {} ) );
+         const got  = json.received || 0;
+
+         let note = '', col = res.status === 200 && got > 0 ? C.up : C.warn;
+
+         if ( got === 0 ) {
+            note = `server received 0 bytes — body over the ${BODY_CAP} MB cap (HIX_MAX_BODY_SIZE), dropped by ReadBody()`;
+         } else if ( Math.abs( got - bytes ) > 1024 ) {
+            note = `server counted ${( got / MB ).toFixed( 2 )} MB of the ${nMb} MB sent (multipart framing)`;
+         }
+
+         row( `upload ${cKind}`, bytes, ms, res.status, note, col );
+
+         if ( got > 0 ) aStats.push( { op: 'upload ' + cKind, mbs: rate( bytes, ms ) } );
+
+      } catch ( err ) {
+         log( `upload ${cKind} — network error: ${err}`, C.err );
+      }
+   }
+
+   // ---- runner ----
+
+   async function runAll() {
+
+      const btnRun  = document.getElementById( 'btnRun' );
+      const btnStop = document.getElementById( 'btnStop' );
+
+      const nSize   = parseInt( document.getElementById( 'selSize'   ).value, 10 );
+      const nRounds = parseInt( document.getElementById( 'selRounds' ).value, 10 );
+      const lProbe  = document.getElementById( 'selProbe' ).value === '1';
+
+      // uploads must stay under the server body cap
+      const nUp     = Math.min( nSize, BODY_CAP - 2 );
+      const aStats  = [];
+
+      stopped          = false;
+      btnRun.disabled  = true;
+      btnStop.disabled = false;
+      out.innerHTML    = '';
+
+      log( `Target      ${location.origin}`, C.info );
+      log( `Download    ${nSize} MB per transfer`, C.info );
+      log( `Upload      ${nUp} MB per transfer   (server body cap is ${BODY_CAP} MB)`, C.info );
+      log( `Rounds      ${nRounds}\n`, C.info );
+
+      const t0 = performance.now();
+
+      for ( let r = 1; r <= nRounds && ! stopped; r++ ) {
+
+         log( `— round ${r} —`, C.dim );
+
+         await download( nSize, 'bin', aStats );   if ( stopped ) break;
+         await download( nSize, 'txt', aStats );   if ( stopped ) break;
+         await upload( nUp, 'raw', aStats );       if ( stopped ) break;
+         await upload( nUp, 'multipart', aStats );
+      }
+
+      if ( lProbe && ! stopped ) {
+         log( `\n— over-limit probe —`, C.dim );
+         await upload( BODY_CAP + 2, 'raw', aStats );
+      }
+
+      // ---- summary: average MB/s per operation ----
+
+      const hAvg = {};
+      aStats.forEach( s => {
+         ( hAvg[ s.op ] = hAvg[ s.op ] || [] ).push( s.mbs );
+      } );
+
+      log( '' );
+      log( `total elapsed ${Math.round( performance.now() - t0 )} ms`, C.info );
+      log( '' );
+
+      Object.keys( hAvg ).sort().forEach( k => {
+         const a   = hAvg[ k ];
+         const avg = a.reduce( ( x, y ) => x + y, 0 ) / a.length;
+         log( `avg ${k.padEnd( 20 )} ${avg.toFixed( 1 ).padStart( 7 )} MB/s   over ${a.length} transfer(s)`,
+              k.indexOf( 'download' ) === 0 ? C.down : C.up );
+      } );
+
+      btnRun.disabled  = false;
+      btnStop.disabled = true;
+   }
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,24 @@
+[
+  { "name": "index",          "url": "/",                              "action": "views/index.html",                         "method": "GET" },
+  { "name": "main",           "url": "/main",                          "action": "controllers/main.prg",                     "method": "GET" },  
+
+  { "name": "users",          "url": "/users",                         "action": "controllers/users.prg",                    "method": "GET" },
+  { "name": "wstest",         "url": "/ws-test",                       "action": "views/wstest.html",                        "method": "GET" },
+  { "name": "httptest",       "url": "/http-test",                     "action": "views/httptest.html",                      "method": "GET" },
+  { "name": "stresstest",     "url": "/stress-test",                   "action": "views/stresstest.html",                    "method": "GET" },
+  { "name": "filetest",       "url": "/file-test",                     "action": "views/filetest.html",                      "method": "GET" },
+  { "name": "serverinfo",     "url": "/server-info",                   "action": "views/serverinfo.html",                    "method": "GET" },
+  { "name": "message",        "url": "/message",                       "action": "controllers/message.prg",                  "method": "GET" },
+  { "name": "yourmodule",     "url": "/your-module",                   "action": "views/yourmodule.html",                    "method": "GET" },
+
+  { "name": "api.ping",       "url": "/api/ping",                      "action": "controllers/api_ping.prg",                 "method": "GET" },
+  { "name": "api.customers",  "url": "/api/customers",                 "action": "controllers/api_customers.prg",            "method": "GET" },
+  { "name": "api.users",      "url": "/api/users",                     "action": "controllers/api_users.prg",                "method": "GET" },
+  { "name": "api.echo",       "url": "/api/echo",                      "action": "controllers/api_echo.prg",                 "method": "POST" },
+  { "name": "api.serverinfo", "url": "/api/server-info",               "action": "controllers/api_serverinfo.prg",           "method": "GET" },
+  { "name": "api.verbs",      "url": "/api/verbs",                     "action": "controllers/api_verbs.prg",                "method": "GET,POST,PUT,DELETE,PATCH,HEAD" },
+  { "name": "api.burst",      "url": "/api/burst",                     "action": "controllers/api_burst.prg",                "method": "GET",  "middleware": "HIX_MwRateLimit" },
+  { "name": "api.download",   "url": "/api/download",                  "action": "controllers/api_download.prg",             "method": "GET" },
+  { "name": "api.upload",     "url": "/api/upload",                    "action": "controllers/api_upload.prg",               "method": "POST" },
+  { "name": "api.message",    "url": "/api/message",                   "action": "controllers/api_message.prg",              "method": "POST", "middleware": "MyMsgGuard" }
+]

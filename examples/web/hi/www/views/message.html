@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	@view 'common/header.html'
+
+   <link href='/public/css/main.css' rel='stylesheet'>
+
+</head>
+
+<body>
+
+	<!-- Navbar -->
+
+	@view 'common/navbar.html'
+
+   <main class="container-fluid mycontainer pb-5 mb-4">
+
+      <h4 class="mt-2 mb-3">
+         <i class="bi bi-chat-dots me-2"></i>Message
+      </h4>
+
+      <!-- Post form -->
+
+      <form id="frm" class="card mb-4" autocomplete="off" onsubmit="return false">
+         <div class="card-body">
+
+            @csrf
+
+            <div class="mb-3">
+               <label for="alias" class="form-label">Alias</label>
+               <input type="text" class="form-control" id="alias" name="alias" maxlength="10" placeholder="Max 10 chars">
+               <div class="invalid-feedback" id="err_alias"></div>
+            </div>
+
+            <div class="mb-3">
+               <label for="message" class="form-label">Message</label>
+               <textarea class="form-control" id="message" name="message" rows="3" maxlength="150" placeholder="Max 150 chars"></textarea>
+               <div class="invalid-feedback" id="err_message"></div>
+               <div class="form-text text-end"><span id="left">150</span> left</div>
+            </div>
+
+            <button id="btnSend" type="button" class="btn btn-dark w-100 py-2" onclick="send()">
+               <i class="bi bi-send me-1"></i><span id="lblSend">Send</span>
+            </button>
+
+            <div id="notice" class="mt-3 d-none"></div>
+
+            <div class="form-text mt-2">
+               <i class="bi bi-info-circle me-1"></i>One message per minute and IP.
+            </div>
+
+         </div>
+      </form>
+
+   </main>
+
+	<!-- Bottom nav -->
+
+   <nav class="navbar navbar-dark bg-dark fixed-bottom p-0">
+      <div class="d-flex w-100" role="group" aria-label="Bottom navigation">
+         <a href="/main" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0">
+            <i class="bi bi-box-arrow-left"></i><span class="btn-lbl">Back</span>
+         </a>
+      </div>
+   </nav>
+
+<script>
+
+   // Send posts to /api/message. The one-per-minute limit lives in the
+   // MyMsgThrottle middleware: a rejected call answers 429 with the
+   // seconds left, and the button counts them down locally.
+
+   const $ = id => document.getElementById( id );
+
+   let timer = null;
+
+   // Hidden field written by @csrf
+
+   const csrfToken = () => {
+      const el = document.querySelector( 'input[name="_csrf"]' );
+      return el ? el.value : '';
+   };
+
+   // Chars left counter
+
+   $( 'message' ).addEventListener( 'input', () => {
+      $( 'left' ).textContent = 150 - $( 'message' ).value.length;
+   } );
+
+   function clearErrors() {
+      [ 'alias', 'message' ].forEach( f => {
+         $( f ).classList.remove( 'is-invalid' );
+         $( 'err_' + f ).textContent = '';
+      } );
+   }
+
+   function showErrors( hErr ) {
+      Object.keys( hErr || {} ).forEach( f => {
+         if ( $( f ) ) {
+            $( f ).classList.add( 'is-invalid' );
+            $( 'err_' + f ).textContent = hErr[ f ];
+         }
+      } );
+   }
+
+   function notice( cls, txt ) {
+      const box = $( 'notice' );
+      box.className = 'mt-3 alert alert-' + cls + ' py-2 mb-0';
+      box.textContent = txt;
+   }
+
+   function cooldown( secs ) {
+
+      const btn = $( 'btnSend' );
+      const lbl = $( 'lblSend' );
+
+      if ( timer ) clearInterval( timer );
+
+      btn.disabled = true;
+
+      const tick = () => {
+         lbl.textContent = 'Wait ' + secs + 's';
+         if ( secs-- <= 0 ) {
+            clearInterval( timer );
+            timer = null;
+            btn.disabled = false;
+            lbl.textContent = 'Send';
+         }
+      };
+
+      tick();
+      timer = setInterval( tick, 1000 );
+   }
+
+   async function send() {
+
+      const btn = $( 'btnSend' );
+      const alias = $( 'alias' ).value.trim();
+      const msg = $( 'message' ).value.trim();
+
+      clearErrors();
+
+      // Client side check first, so an empty form does not burn the minute
+
+      if ( ! alias || ! msg ) {
+         showErrors( { alias: alias ? '' : 'Alias is required',
+                       message: msg ? '' : 'Message is required' } );
+         return;
+      }
+
+      btn.disabled = true;
+
+      try {
+
+         // The body travels as JSON, so the CSRF token emitted by @csrf
+         // goes in the header -- HIX_MwCsrfCheck reads it from there first
+
+         const res = await fetch( '/api/message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json',
+                       'X-CSRF-Token': csrfToken() },
+            body: JSON.stringify( { alias: alias, message: msg } )
+         } );
+
+         const d = await res.json().catch( () => ( {} ) );   // 403 may not carry JSON
+
+         if ( res.status === 422 ) {
+            showErrors( d.errors );
+            notice( 'warning', 'Please fix the fields above' );
+            btn.disabled = false;
+            return;
+         }
+
+         if ( res.status === 403 ) {
+            notice( 'danger', 'Invalid or expired CSRF token -- reload the page' );
+            btn.disabled = false;
+            return;
+         }
+
+         if ( res.status === 429 ) {
+            notice( 'warning', d.error || 'Too many requests' );
+            cooldown( d.wait || 60 );
+            return;
+         }
+
+         if ( ! res.ok || ! d.ok ) {
+            notice( 'danger', d.error || ( 'HTTP ' + res.status ) );
+            btn.disabled = false;
+            return;
+         }
+
+         $( 'message' ).value = '';
+         $( 'left' ).textContent = 150;
+         notice( 'success', 'Message stored (#' + d.id + ' at ' + d.time + ')' );
+
+         cooldown( 60 );
+
+      } catch ( err ) {
+         notice( 'danger', String( err ) );
+         btn.disabled = false;
+      }
+   }
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,112 @@
+ body { 
+   font-family:sans-serif;
+   max-width:600px;
+   margin:60px auto;
+   padding:0 20px
+ }
+ 
+ table { 
+   border-collapse:collapse; 
+   width:100%
+ }
+ 
+ td,th { 
+   border:1px solid #ddd;
+   padding:8px
+ }
+ 
+ th { background:#f4f4f4 }
+ 
+.contenedor { 
+   display: flex; 
+   align-items: center; 
+   gap: 20px; 
+}
+
+.contenedor img { 
+   height: 40px; 
+   width: auto; 
+}
+ 
+.title { font-size: 30px; font-weight: bold; font-family: system-ui; }
+
+.title_logo {
+   height: 30px;
+   margin-right: 5px;
+}
+
+.title_HIX { 
+   font-family: 'Saira Stencil One', sans-serif;      
+   font-size: 1.2rem; 
+   cursor: pointer;
+}
+
+.mycontainer {
+   max-width: 500px;
+}
+
+
+/* --- Grid tiles on /main --------------------------------------------------
+   20% shorter than the py-4 box they replace. The content is fixed at 58px
+   (28px icon + 4px gap + 24px label + 2px borders), so the 106px original
+   drops to ~85px by taking the vertical padding from 1.5rem to .84rem.
+   Bootstrap 5.3 reads it from the variable, no !important needed.
+   ------------------------------------------------------------------------- */
+
+.btn-tile {
+   --bs-btn-padding-y: .84rem;
+}
+
+
+/* --- Bottom nav ----------------------------------------------------------
+   Phone: icon above the label, both always visible.
+   Tablet up (>=576px): icon and label side by side on one line.
+   ------------------------------------------------------------------------- */
+
+.navbar.fixed-bottom .btn .btn-lbl { margin-left: .25rem; }
+
+@media (max-width: 575.98px) {
+
+   .navbar.fixed-bottom .btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .1rem;
+      line-height: 1.1;
+      padding-top: .25rem;
+      padding-bottom: .25rem;
+   }
+
+   .navbar.fixed-bottom .btn i    { font-size: 1.15rem; }
+   .navbar.fixed-bottom .btn .btn-lbl { margin-left: 0; font-size: .65rem; }
+}
+
+/* --- Touch: no sticky highlight --------------------------------------------
+   On a touch screen :hover stays latched on the last element tapped until
+   something else is tapped. Bootstrap paints .btn-dark:hover #424649 over a
+   bg-dark navbar that is #212529, and .btn-outline-dark:hover a solid black
+   fill, so the last button touched keeps reading as "this one is selected"
+   next to its neighbours.
+
+   Where hover is not a real pointer state, pin :hover back to the base
+   colours. :active is left untouched so a press still gives feedback while
+   the finger is down, and :focus-visible keeps the keyboard outline.
+   --------------------------------------------------------------------------- */
+
+@media (hover: none) {
+
+   .btn:hover {
+      color: var(--bs-btn-color);
+      background-color: var(--bs-btn-bg);
+      border-color: var(--bs-btn-border-color);
+   }
+}
+
+/* Grey flash Android paints over the tapped control */
+
+.btn { -webkit-tap-highlight-color: transparent; }
+
+/* Some mobile browsers still paint the ring on tap, not only on keyboard */
+
+.btn:focus:not(:focus-visible) { box-shadow: none; }

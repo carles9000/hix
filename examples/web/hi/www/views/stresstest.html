@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	@view 'common/header.html'
+
+   <link href='/public/css/main.css' rel='stylesheet'>
+
+</head>
+
+<body>
+
+	<!-- Navbar -->
+
+	@view 'common/navbar.html'
+
+   <!-- body has 60px top/bottom margin (main.css): that is the room taken by both fixed navbars -->
+
+   <main class="container-fluid mycontainer d-flex flex-column"
+         style="height:calc(100vh - 120px);height:calc(100dvh - 120px)">
+
+      <div class="d-flex align-items-center justify-content-between mb-2 flex-shrink-0">
+         <h4 class="mb-0"><i class="bi bi-lightning-charge me-2"></i>Stress test</h4>
+      </div>
+
+      <!-- Run parameters -->
+
+      <div class="row g-2 mb-2 flex-shrink-0">
+         <div class="col-4 col-sm-3">
+            <label class="form-label mb-0 small text-muted">Requests</label>
+            <select id="selTotal" class="form-select form-select-sm">
+               <option>50</option>
+               <option selected>200</option>
+               <option>500</option>
+               <option>1000</option>
+            </select>
+         </div>
+         <div class="col-4 col-sm-3">
+            <label class="form-label mb-0 small text-muted">Concurrency</label>
+            <select id="selConc" class="form-select form-select-sm">
+               <option>1</option>
+               <option>10</option>
+               <option selected>25</option>
+               <option>50</option>
+               <option>100</option>
+            </select>
+         </div>
+         <div class="col-4 col-sm-3">
+            <label class="form-label mb-0 small text-muted">Target</label>
+            <select id="selUrl" class="form-select form-select-sm">
+               <option value="/api/burst" selected>/api/burst (rate limited)</option>
+               <option value="/api/ping">/api/ping (no limit)</option>
+            </select>
+         </div>
+      </div>
+
+      <pre id="output" class="bg-dark text-light p-3 rounded flex-grow-1 mb-0"
+           style="min-height:0;overflow:auto;font-size:.85rem">—</pre>
+
+   </main>
+
+	<!-- Bottom nav -->
+
+   <nav class="navbar navbar-dark bg-dark fixed-bottom p-0">
+      <div class="d-flex w-100" role="group" aria-label="Bottom navigation">
+         <a href="/main" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0">
+            <i class="bi bi-box-arrow-left"></i><span class="btn-lbl">Back</span>
+         </a>
+         <button id="btnRun" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="runAll()">
+            <i class="bi bi-play-fill"></i><span class="btn-lbl">Run</span>
+         </button>
+         <button id="btnStop" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="stopRun()" disabled>
+            <i class="bi bi-stop-fill"></i><span class="btn-lbl">Stop</span>
+         </button>
+      </div>
+   </nav>
+
+<script>
+
+   const out = document.getElementById( 'output' );
+
+   // Log palette
+   const C = {
+      info : '#6ea8fe',   // blue   — headers and parameters
+      recv : '#75e08b',   // green  — 2xx / good summary
+      warn : '#fd9843',   // orange — 429 rate limited
+      dim  : '#8a94a6',   // grey   — progress detail
+      err  : '#ea868f'    // red    — 5xx, other errors, network failures
+   };
+
+   const esc = s => String( s ).replace( /&/g, '&amp;' ).replace( /</g, '&lt;' );
+
+   function log( txt, color ) {
+      out.innerHTML += `<span style="color:${color || C.info}">${esc( txt )}</span>\n`;
+      out.scrollTop = out.scrollHeight;
+   }
+
+   let   stopped = false;
+   const pad     = ( v, n ) => String( v ).padStart( n );
+
+   // percentile over a sorted array of latencies
+   function pct( aSorted, p ) {
+      if ( aSorted.length === 0 ) return 0;
+      const i = Math.min( aSorted.length - 1, Math.floor( aSorted.length * p ) );
+      return aSorted[ i ];
+   }
+
+   function stopRun() {
+      stopped = true;
+      log( '\nstopping — waiting for in-flight requests…', C.warn );
+   }
+
+   async function runAll() {
+
+      const btnRun  = document.getElementById( 'btnRun' );
+      const btnStop = document.getElementById( 'btnStop' );
+
+      const nTotal  = parseInt( document.getElementById( 'selTotal' ).value, 10 );
+      const nConc   = parseInt( document.getElementById( 'selConc'  ).value, 10 );
+      const cUrl    = document.getElementById( 'selUrl'   ).value;
+
+      const aLat    = [];          // latency of every completed request
+      const hStatus = {};          // status code -> count
+      let   nDone   = 0;
+      let   nNext   = 0;
+      let   nFirst429 = 0;         // request number of the first 429
+
+      stopped          = false;
+      btnRun.disabled  = true;
+      btnStop.disabled = false;
+      out.innerHTML    = '';
+
+      log( `Target      ${location.origin}${cUrl}`, C.info );
+      log( `Requests    ${nTotal}`, C.info );
+      log( `Concurrency ${nConc} in flight\n`, C.info );
+
+      const t0 = performance.now();
+
+      // One worker takes the next sequence number until the pool is drained
+      async function worker() {
+
+         while ( true ) {
+
+            if ( stopped ) return;
+
+            const n = ++nNext;
+            if ( n > nTotal ) return;
+
+            const sep = cUrl.indexOf( '?' ) === -1 ? '?' : '&';
+            const t1  = performance.now();
+            let   key;
+
+            try {
+               const res = await fetch( `${cUrl}${sep}n=${n}`, { cache: 'no-store' } );
+               key = res.status;
+               if ( key === 429 && nFirst429 === 0 ) nFirst429 = n;
+            } catch ( err ) {
+               key = 'net';
+            }
+
+            aLat.push( performance.now() - t1 );
+            hStatus[ key ] = ( hStatus[ key ] || 0 ) + 1;
+            nDone++;
+
+            // progress line every 10% (never more than 10 lines)
+            const step = Math.max( 1, Math.floor( nTotal / 10 ) );
+            if ( nDone % step === 0 ) {
+               log( `  ${pad( nDone, 5 )}/${nTotal}   ${pad( Math.round( performance.now() - t0 ), 6 )} ms elapsed`, C.dim );
+            }
+         }
+      }
+
+      await Promise.all( Array.from( { length: nConc }, worker ) );
+
+      // ---- summary ----
+
+      const ms     = performance.now() - t0;
+      const sorted = aLat.slice().sort( ( a, b ) => a - b );
+      const sum    = aLat.reduce( ( a, b ) => a + b, 0 );
+
+      log( '' );
+      log( `completed   ${nDone} requests in ${Math.round( ms )} ms`, C.info );
+      log( `throughput  ${( nDone / ( ms / 1000 ) ).toFixed( 1 )} req/s`, C.info );
+      log( '' );
+      log( `latency     min ${Math.round( sorted[ 0 ] || 0 )} ms` +
+           `   avg ${Math.round( sum / ( nDone || 1 ) )} ms` +
+           `   p50 ${Math.round( pct( sorted, .50 ) )} ms` +
+           `   p95 ${Math.round( pct( sorted, .95 ) )} ms` +
+           `   max ${Math.round( sorted[ sorted.length - 1 ] || 0 )} ms`, C.info );
+      log( '' );
+
+      Object.keys( hStatus ).sort().forEach( k => {
+         const n   = hStatus[ k ];
+         const col = k === 'net' ? C.err
+                   : k == 429    ? C.warn
+                   : k >= 500    ? C.err
+                   : k >= 400    ? C.warn
+                   : C.recv;
+         const lbl = k === 'net' ? 'network error' : `HTTP ${k}`;
+         log( `${lbl.padEnd( 14 )} ${pad( n, 5 )}   ${( n * 100 / ( nDone || 1 ) ).toFixed( 1 )}%`, col );
+      } );
+
+      log( '' );
+
+      if ( nFirst429 > 0 ) {
+         log( `rate limit hit at request #${nFirst429} — server answered 429 Too Many Requests`, C.warn );
+         log( `the window is per IP: re-run after it expires to start from a clean counter`, C.dim );
+      } else if ( ( hStatus[ 200 ] || 0 ) === nDone ) {
+         log( `no rate limit hit — every request was served`, C.recv );
+      }
+
+      btnRun.disabled  = false;
+      btnStop.disabled = true;
+   }
+
+</script>
+
+</body>
+
+</html>

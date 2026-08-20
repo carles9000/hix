@@ -1,0 +1,195 @@
+@args aRows := {}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	@view 'common/header.html'
+
+   <link href='/public/css/main.css' rel='stylesheet'>
+
+   <style>
+      /* Source popup — same dark palette as the rest of the test screens */
+      #code       { font-size:.8rem; line-height:1.35; color:#dee2e6; margin:0; white-space:pre; }
+      .c-kw       { color:#6ea8fe; font-weight:600 }
+      .c-str      { color:#75e08b }
+      .c-num      { color:#ffda6a }
+      .c-com      { color:#6c757d; font-style:italic }
+   </style>
+
+</head>
+
+<body>
+
+	<!-- Navbar -->
+
+	@view 'common/navbar.html'
+
+   <main class="container-fluid mycontainer pb-5 mb-4">
+
+      <h4 class="mt-2 mb-3">
+         <i class="bi bi-people me-2"></i>Users
+         <span id="stamp" class="small text-muted ms-2"></span>
+      </h4>
+
+      <div class="table-responsive">
+         <table class="table table-striped table-hover align-middle">
+            <thead>
+               <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">First</th>
+                  <th scope="col">Last</th>
+                  <th scope="col">Age</th>
+               </tr>
+            </thead>
+            <tbody id="rows">
+
+               @for n := 1 to len( aRows )
+                  <tr>
+                     <td>{{ aRows[n][ 'recno'] }}</td>
+                     <td>{{ aRows[n][ 'first'] }}</td>
+                     <td>{{ aRows[n][ 'last'] }}</td>
+                     <td>{{ aRows[n][ 'age'] }}</td>
+                  </tr>
+               @next 
+            
+            </tbody>
+         </table>
+      </div>
+
+   </main>
+
+	<!-- Bottom nav -->
+
+	<!--@ view 'common/bottom_back.html'-->
+   <nav class="navbar navbar-dark bg-dark fixed-bottom p-0">
+      <div class="d-flex w-100" role="group" aria-label="Bottom navigation">
+         <a href="/main" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0">
+            <i class="bi bi-box-arrow-left"></i><span class="btn-lbl">Back</span>
+         </a>
+
+         <button id="btnAjax" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="reload()">
+            <i class="bi bi-arrow-repeat"></i><span class="btn-lbl">Ajax</span>
+         </button>
+
+         <button type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0"
+                 data-bs-toggle="modal" data-bs-target="#modalCode">
+            <i class="bi bi-code-slash"></i><span class="btn-lbl">Code</span>
+         </button>
+      </div>
+   </nav>
+
+   <!-- Source of the controller behind this screen -->
+
+   <div class="modal fade" id="modalCode" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+         <div class="modal-content bg-dark text-light">
+
+            <div class="modal-header border-secondary py-2">
+               <h6 class="modal-title mb-0">
+                  <i class="bi bi-code-slash me-2"></i>controllers/users.prg
+               </h6>
+               <button type="button" class="btn-close btn-close-white"
+                       data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-3" style="overflow-x:auto">
+<pre id="code"></pre>
+            </div>
+
+         </div>
+      </div>
+   </div>
+
+<script>
+
+   // Refresh reloads the whole page; Ajax repaints only the table body
+   // from /api/users, which returns the same 5 random rows as users.prg
+
+   const esc = s => String( s ).replace( /&/g, '&amp;' ).replace( /</g, '&lt;' );
+
+   // Minimal Harbour highlighter. One single pass over the already escaped
+   // source, so the spans it inserts are never re-scanned by the next rule.
+
+   function harbour( src ) {
+      return esc( src ).replace(
+         /('[^']*')|(\/\/[^\n]*)|\b(FUNCTION|PROCEDURE|LOCAL|STATIC|RETURN|USE|SHARED|NEW|EXCLUSIVE|FOR|TO|NEXT|IF|ELSE|ENDIF|DO|WHILE|ENDDO|CASE)\b|\b(\d+)\b/gi,
+         ( m, str, com, kw, num ) =>
+            str ? `<span class="c-str">${str}</span>` :
+            com ? `<span class="c-com">${com}</span>` :
+            kw  ? `<span class="c-kw">${kw}</span>`   :
+                  `<span class="c-num">${num}</span>` );
+   }
+
+   // The view engine strips blank lines from the template, so the snippet
+   // lives here as an array: a blank line is a '' element, not a blank line
+   // in the file, and survives untouched.
+
+   const SRC = [
+      'FUNCTION Main()',
+      '',
+      '   LOCAL aRows := {}',
+      '',
+      "   USE 'data\\customers.dbf' SHARED NEW",
+      '',
+      '   FOR n := 1 TO 10',
+      '',
+      '      GoTo( hb_RandInt( 1, 1000 ) )',
+      '',
+      "      hRow := { 'recno' => recno(), ;",
+      "                'first' => field->first, ;",
+      "                'last'  => field->last, ;",
+      "                'age'   => field->age }",
+      '',
+      '      Aadd( aRows, hRow )',
+      '',
+      '   NEXT',
+      '',
+      "RETURN UView( 'users.html', aRows )"
+   ].join( '\n' );
+
+   document.getElementById( 'code' ).innerHTML = harbour( SRC );
+
+   async function reload() {
+
+      const btn  = document.getElementById( 'btnAjax' );
+      const body = document.getElementById( 'rows' );
+      const tag  = document.getElementById( 'stamp' );
+      const t0   = performance.now();
+
+      btn.disabled = true;
+
+      try {
+
+         const res = await fetch( '/api/users', { cache: 'no-store' } );
+         const d   = await res.json();
+         const ms  = Math.round( performance.now() - t0 );
+
+         if ( ! d || ! d.rows ) {
+            tag.innerHTML = '<span class="text-danger">unexpected payload (HTTP ' + res.status + ')</span>';
+            return;
+         }
+
+         body.innerHTML = d.rows.map( r =>
+            '<tr>' +
+               '<td>' + esc( r.recno ) + '</td>' +
+               '<td>' + esc( String( r.first ).trim() ) + '</td>' +
+               '<td>' + esc( String( r.last  ).trim() ) + '</td>' +
+               '<td>' + esc( r.age ) + '</td>' +
+            '</tr>' ).join( '' );
+
+         //tag.textContent = d.rows.length + ' rows · ' + ms + ' ms';
+         tag.textContent = ms + ' ms';
+
+      } catch ( err ) {
+         tag.innerHTML = '<span class="text-danger">' + esc( String( err ) ) + '</span>';
+      }
+
+      btn.disabled = false;
+   }
+
+</script>
+
+</body>
+
+</html>
