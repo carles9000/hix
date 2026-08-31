@@ -64,7 +64,7 @@ FUNCTION Main()
       'harbour'  => Version(),      ;
       'compiler' => hb_Compiler(),  ;
       'os'       => OS(),           ;
-      'host'     => NetName(),      ;
+      'host'     => hb_GetEnv( 'HOSTNAME', 'localhost' ), ;
       'date'     => DToC( Date() ), ;
       'time'     => Time()          }
 

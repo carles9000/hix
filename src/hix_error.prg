@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_error.prg
   Author.....: Carles Aubia Floresvi (Charly 9000)
   Created....: 2026-04-21
@@ -192,6 +192,9 @@ FUNCTION HIX_ShowError( oErr, oReq )
       IF ValType( oErr ) == "O"
 
          cDesc := hb_defaultValue( oErr:Description, "Internal Error" )
+         IF ! Empty( oErr:Operation ) .AND. !( hb_ValToStr( oErr:Operation ) $ cDesc )
+            cDesc += " (" + hb_ValToStr( oErr:Operation ) + ")"
+         ENDIF
          nCode := hb_defaultValue( oErr:SubCode, 500 )
          
       ELSE

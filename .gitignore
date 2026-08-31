@@ -4,11 +4,30 @@
 **/.log.syncro/*
 **/tmp/*
 
-# Binaries compiled
+# Binaries & Libraries compiled
 *.exe
 *.lib
+*.a
+*.so
+*.dll
+*.dylib
+*.hrb
+app
+hix
+
+# Logs & Traces
+*.log
+.logs/
+**/.logs/
+traces/
+**/traces/
+
+# Test SSL Certificates
+*.crt
+*.key
 
 # MkDocs generated site (published to gh-pages by CI)
 site/
+
 
 

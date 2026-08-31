@@ -44,6 +44,42 @@ https://github.com/carles9000/hix.harbour
 
 - The examples include scripts for building them on: 
 
+   - GCC (Linux)
    - MSVC64 (Windows)  
    - MINGW64 (Windows)  
+
+---
+
+## 🐧 Linux Quick Start & Considerations
+
+### 1. Build the HIX Server Library
+```bash
+./go_lib_linux.sh
+```
+
+### 2. Build and Run Examples
+Each example in `examples/` includes a dedicated `go_linux.sh` script:
+```bash
+cd examples/web/hi
+./go_linux.sh --run
+```
+
+### 3. Unit Test Master
+To build and start the interactive web test runner:
+```bash
+cd tests/unit
+# Generate local SSL test certificates (first time only)
+./make_test_cert.sh
+
+# Run test dashboard (http://localhost:8900/)
+./go_linux.sh --server
+
+# Or run tests in headless CLI mode
+./go_linux.sh --cli
+```
+
+### ⚠️ Important Considerations for Desktop / Domestic Users
+* **Port Selection (`hix.json`):** In Linux, ports `< 1024` (such as default HTTP port `80`) require administrative (`root`/`sudo`) privileges and frequently conflict with pre-installed web servers (Apache, Nginx). It is recommended to use non-privileged ports such as `8080`, `8081`, `8082`, etc.
+* **Execution Permissions:** Ensure build scripts have execution permissions with `chmod +x *.sh`.
+* **Harbour Path:** If Harbour is not installed globally in `/usr/local/bin`, the scripts automatically look in `$HOME/harbour-core` or the `$HB_DIR` environment variable.
 

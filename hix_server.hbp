@@ -15,6 +15,10 @@
 # Create library
 -hblib
 -ohix_server
+-hbx=hix_server.hbx
+
+hbssl.hbc
+hbcurl.hbc
 
 
 # Core (sin dependencias entre ellas)

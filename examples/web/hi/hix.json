@@ -3,10 +3,9 @@
  | Auto-generated. Edit values, keep structure.
  * ---------------------------------------------- */
 {
-  "server":
-  {
+  "server": {
     "host": "localhost",
-    "port": 80,
+    "port": 8081,
     "maxconn": 1024,
     "timeout": 30,
     "name": "Hi",
@@ -21,8 +20,7 @@
     "autostart": true,
     "exec_timeout_ms": 30000
   },
-  "paths":
-  {
+  "paths": {
     "root": "www",
     "log": ".logs",
     "tmp": "tmp",
@@ -30,8 +28,7 @@
     "session": ".sessions",
     "certs": "certs"
   },
-  "app":
-  {
+  "app": {
     "errorsys": "",
     "default_page": "index.html",
     "dispatch_mode": "full",
@@ -40,50 +37,43 @@
     "env": "dev",
     "debug": false
   },
-  "admin":
-  {
+  "admin": {
     "enabled": true,
     "user": "",
     "password": "",
     "secret": ""
   },
-  "detector":
-  {
+  "detector": {
     "workers": 4,
     "queue_size": 256,
     "peek_timeout_ms": 250,
     "peek_bytes": 4096
   },
-  "pool_http":
-  {
+  "pool_http": {
     "workers": 64,
     "queue_size": 256,
     "read_timeout_ms": 2000,
     "keep_alive": true,
     "keep_alive_max": 100
   },
-  "pool_ws":
-  {
+  "pool_ws": {
     "workers": 100,
     "queue_size": 256,
     "ping_interval_s": 30,
     "ping_timeout_s": 10
   },
-  "pool_rest":
-  {
+  "pool_rest": {
     "workers_sse": 20,
     "workers_longpoll": 10,
     "queue_size": 128,
     "stream_timeout_s": 3600
   },
-  "pool_hix":
-  {
+  "pool_hix": {
     "workers": 4,
     "queue_size": 64,
     "read_timeout_ms": 2000
   },
-  "session":
-  {
+  "session": {
     "storage": "memory",
     "prefix": "sess_",
     "crypt": false,
@@ -91,39 +81,33 @@
     "lifetime": 60,
     "gc_days": 3
   },
-  "monitor":
-  {
+  "monitor": {
     "enabled": true,
     "interval_s": 5,
     "alert_pct": 75
   },
-  "log":
-  {
+  "log": {
     "file": "hix.log",
     "level": "info",
     "console": true,
     "max_size_mb": 10,
     "max_files": 0
   },
-  "access_log":
-  {
+  "access_log": {
     "enabled": true,
     "file": "access.log"
   },
-  "firewall":
-  {
+  "firewall": {
     "mode": "blacklist",
     "filter": ""
   },
-  "hixstyle":
-  {
+  "hixstyle": {
     "enabled": true,
     "cache_disk": true,
     "trace": false,
     "cache_ram": false
   },
-  "trace":
-  {
+  "trace": {
     "app": true,
     "server": true,
     "worker_http": false,

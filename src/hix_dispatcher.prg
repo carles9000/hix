@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_dispatcher.prg
   Author.....: Carles Aubia Floresvi (Charly 9000)
   Created....: 2026-04-24
@@ -758,7 +758,7 @@ RETURN NIL
 // Fase 2 (exec): error = runtime -> relanza via HIX_Throw al worker HTTP.
 STATIC FUNCTION _HixRunHrb( oHrb, cPath  )
 
-   LOCAL pHandle, cHtml, oError, oMyErr, bPrevErr
+   LOCAL pHandle, cHtml, oError, oMyErr, bPrevErr, cSym
 
    pHandle  := NIL
    cHtml    := ""
@@ -773,9 +773,16 @@ STATIC FUNCTION _HixRunHrb( oHrb, cPath  )
    
       _d( oError )
       
+      cSym := ""
+      IF ValType( oError:args ) == "A" .AND. Len( oError:args ) > 0
+         cSym := hb_ValToStr( oError:args[ 1 ] )
+      ELSEIF ! Empty( oError:operation )
+         cSym := hb_ValToStr( oError:operation )
+      ENDIF
+
       oMyErr := HIX_NewError( ;
-         oError:description, ;
-         "_HixRunHrb", 500, oError:operation, cPath )
+         oError:description + iif( !Empty( cSym ), ": " + cSym, "" ), ;
+         "_HixRunHrb", 500, cSym, cPath )
          
       _HixCopyErrorLine( oError, oMyErr )
 
@@ -796,7 +803,7 @@ STATIC FUNCTION _HixRunHrb( oHrb, cPath  )
       _d( oError )
 
       oMyErr := HIX_NewError( ;
-         oError:description, ;
+         oError:description + iif( !Empty( oError:operation ), ": " + hb_ValToStr( oError:operation ), "" ), ;
          "_HixRunHrb", 500, oError:operation, cPath )
       _HixCopyErrorLine( oError, oMyErr )
 

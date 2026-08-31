@@ -60,8 +60,8 @@ FUNCTION HIX_TestSSL_Run()
       _CfgTrace( "post-Start" )
       IF s_oSrvSSL != NIL
          IF Empty( _CurlBin() )
-            HixTU_Check( hCtx, .F., "SSL: curl.exe no localizado — tests HTTPS saltados", "curl.exe", "missing" )
-            HixTM_Note( "curl.exe no encontrado: tests HTTPS saltados", "warn" )
+            HixTU_Check( hCtx, .F., "SSL: curl no localizado — tests HTTPS saltados", "curl", "missing" )
+            HixTM_Note( "curl no encontrado: tests HTTPS saltados", "warn" )
          ELSE
             _SslHttpsGet(     hCtx )
             _SslHttpsHeaders( hCtx )
@@ -316,21 +316,24 @@ RETURN
 // ============================================================
 // Helpers curl
 // ============================================================
-// Localiza curl.exe probando, en orden:
-//   1. El bundled del repo (..\bin\curl\curl.exe) — si algun dia se incluye.
-//   2. %SystemRoot%\System32\curl.exe — de serie en Windows 10 1803 (abril
-//      2018) y posteriores; es el caso normal en una maquina actual.
-//   3. Git for Windows, que trae su propio curl.
-//   4. Cualquier curl.exe accesible desde el PATH.
+// Localiza curl / curl.exe probando, en orden:
+//   1. El bundled del repo (../bin/curl/curl)
+//   2. /usr/bin/curl o /usr/local/bin/curl en Linux
+//   3. %SystemRoot%\System32\curl.exe en Windows
+//   4. Git for Windows
+//   5. Cualquier curl / curl.exe accesible desde el PATH.
 // Si ninguno responde, devuelve "" y los tests HTTPS se marcan como saltados.
 STATIC FUNCTION _CurlBin()
    LOCAL cTry, cOut := "", cErr := ""
    LOCAL aTry
+   LOCAL cCmd := iif( "Windows" $ OS(), "curl.exe", "curl" )
 
    IF s_cCurlBin == NIL
       s_cCurlBin := ""
       aTry := { ;
-         hb_DirBase() + ".." + hb_ps() + "bin" + hb_ps() + "curl" + hb_ps() + "curl.exe", ;
+         hb_DirBase() + ".." + hb_ps() + "bin" + hb_ps() + "curl" + hb_ps() + cCmd, ;
+         "/usr/bin/curl", ;
+         "/usr/local/bin/curl", ;
          GetEnv( "SystemRoot" ) + hb_ps() + "System32" + hb_ps() + "curl.exe", ;
          GetEnv( "ProgramFiles" ) + hb_ps() + "Git" + hb_ps() + "mingw64" + hb_ps() + "bin" + hb_ps() + "curl.exe" }
       FOR EACH cTry IN aTry
@@ -339,8 +342,8 @@ STATIC FUNCTION _CurlBin()
             EXIT
          ENDIF
       NEXT
-      IF Empty( s_cCurlBin ) .AND. hb_processRun( "curl.exe --version", , @cOut, @cErr ) == 0
-         s_cCurlBin := "curl.exe"   // disponible en el PATH
+      IF Empty( s_cCurlBin ) .AND. hb_processRun( cCmd + " --version", , @cOut, @cErr ) == 0
+         s_cCurlBin := cCmd   // disponible en el PATH
       ENDIF
       _TLog( "curl bin=" + iif( Empty( s_cCurlBin ), "<no encontrado>", s_cCurlBin ) )
    ENDIF

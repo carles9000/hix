@@ -6,7 +6,7 @@
   "server":
   {
     "host": "localhost",
-    "port": 80,
+    "port": 8082,
     "maxconn": 1024,
     "timeout": 30,
     "name": "HIX",

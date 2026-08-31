@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_server.prg
   Author.....: Carles Aubia Floresvi (Charly 9000)
   Created....: 2026-04-21
@@ -1005,7 +1005,7 @@ STATIC FUNCTION ShowInit( oSrv )
    HIX_Info( @nRow, 'Version HIX'			, 'HIX ' + HIX_VERSION_SERVER + HIX_SUBVERSION_SERVER + ' ' + HIX_DATECOMPILE() )
 	HIX_Info( @nRow, 'Version Harbour'		, VERSION() + ' / ' + HB_BUILDDATE() )
 	HIX_Info( @nRow, 'Version OpenSSL' 	, SSLEAY_VERSION( HB_SSLEAY_VERSION ) )
-	HIX_Info( @nRow, 'Version Curl'    	, Curl_version() )
+	HIX_Info( @nRow, 'Version Curl'    	, If( hb_IsFunction( 'CURL_VERSION' ), &( 'Curl_version()' ), 'N/A' ) )
 	HIX_Info( @nRow, 'Version HaruPdf' 	, HPDF_VERSION_TEXT() )
 	HIX_Info( @nRow, 'Version Compiler'	, HB_COMPILER() )
 	HIX_Info( @nRow, 'RDD List' 			   , cI )
@@ -1063,7 +1063,11 @@ FUNCTION HIX_Navigator()
    ENDIF
 
    l( "Navigator: opening " + cUrl )
+#IFDEF __PLATFORM__WINDOWS
    WAPI_ShellExecute( NIL, "open", cUrl, NIL, NIL, SW_SHOW )
+#ELSE
+   hb_processRun( "xdg-open " + cUrl )
+#ENDIF
 
 RETURN NIL
 
@@ -1266,7 +1270,12 @@ RETURN slProxied
 
 #pragma BEGINDUMP 
 
-#include <Windows.h>
+#if defined(HB_OS_WIN)
+   #include <Windows.h>
+#else
+   #include <string.h>
+   #include <stdio.h>
+#endif
 #include <hbapi.h>
 #include <hbapiitm.h>
 
@@ -1280,11 +1289,19 @@ HB_FUNC( HIX_DATECOMPILE )
       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
    };
 
+#if defined(HB_OS_WIN) && defined(_MSC_VER)
    strncpy_s( szDate, sizeof(szDate), __DATE__, _TRUNCATE );
    strncpy_s( szTime, sizeof(szTime), __TIME__, _TRUNCATE );
 
    sscanf_s( szDate + 7, "%d", &year );
    sscanf_s( szDate + 4, "%d", &day );
+#else
+   hb_strncpy( szDate, __DATE__, sizeof(szDate) - 1 );
+   hb_strncpy( szTime, __TIME__, sizeof(szTime) - 1 );
+
+   sscanf( szDate + 7, "%d", &year );
+   sscanf( szDate + 4, "%d", &day );
+#endif
 
    for( month = 0; month < 12; ++month )
    {
@@ -1293,7 +1310,11 @@ HB_FUNC( HIX_DATECOMPILE )
    }
    month += 1;
 
+#if defined(HB_OS_WIN) && defined(_MSC_VER)
    sscanf_s( szTime, "%d:%d", &hour, &minute );
+#else
+   sscanf( szTime, "%d:%d", &hour, &minute );
+#endif
 
    hb_snprintf( pszVersion, 80, "(r%02d%02d%02d%02d%02d)", year % 100, month, day, hour, minute );
 

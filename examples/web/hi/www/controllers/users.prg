@@ -2,7 +2,7 @@ FUNCTION Main()
 
    LOCAL aRows := {}   
 
-   USE 'data\customers.dbf' SHARED NEW 
+   USE 'data/customers.dbf' SHARED NEW 
    
    FOR n := 1 TO 10
       

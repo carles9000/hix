@@ -40,13 +40,13 @@ FUNCTION Main( ... )
       hb_vfDirMake( hb_DirBase() + "traces" )
    ENDIF
 
-   s_cLogFile  := hb_DirBase() + "traces\hix.log"
-   s_cTestsLog := hb_DirBase() + "traces\tests_run.log"
+   s_cLogFile  := hb_DirBase() + "traces/hix.log"
+   s_cTestsLog := hb_DirBase() + "traces/tests_run.log"
    hb_FileDelete( s_cLogFile )
    hb_FileDelete( s_cTestsLog )
-   hb_FileDelete( hb_DirBase() + "traces\info.txt" )
-   hb_FileDelete( hb_DirBase() + "traces\console.txt" )
-   hb_FileDelete( hb_DirBase() + "traces\activity.log" )
+   hb_FileDelete( hb_DirBase() + "traces/info.txt" )
+   hb_FileDelete( hb_DirBase() + "traces/console.txt" )
+   hb_FileDelete( hb_DirBase() + "traces/activity.log" )
    cSep := "=== RUN " + DToS( Date() ) + " " + Time() + " ===" + hb_eol()
    hb_MemoWrit( s_cTestsLog, cSep )
 

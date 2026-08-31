@@ -21,7 +21,7 @@ FUNCTION Main()
       nLimit := 5
    ENDIF
 
-   USE 'data\customers.dbf' SHARED NEW
+   USE 'data/customers.dbf' SHARED NEW
 
    FOR n := 1 TO nLimit
 

@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_trace.prg
   Author.....: Carles Aubia Floresvi (Charly 9000)
   Created....: 2026-04-21
@@ -51,11 +51,19 @@ STATIC FUNCTION _HixTraceEmit( cText )
       RETURN NIL
    ENDIF
 
+#IFDEF __PLATFORM__WINDOWS
    FOR EACH cLine IN hb_ATokens( cText, CRLF )
       IF ! Empty( cLine )
          WAPI_OutputDebugString( cLine + CRLF )
       ENDIF
    NEXT
+#ELSE
+   FOR EACH cLine IN hb_ATokens( cText, CRLF )
+      IF ! Empty( cLine )
+         TraceLog( cLine )
+      ENDIF
+   NEXT
+#ENDIF
 
 RETURN NIL
 

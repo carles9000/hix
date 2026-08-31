@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_helpers.prg
   Author.....: Carles Aubia Floresvi (Charly 9000)
   Created....: 2026-05-11
@@ -743,3 +743,23 @@ FUNCTION HIX_CloseDbfAreas( lForce )
    END
 
 RETURN .T.
+
+FUNCTION HIX_NetName()
+
+   LOCAL cHost := hb_GetEnv( "HOSTNAME", hb_GetEnv( "COMPUTERNAME", "" ) )
+
+   IF Empty( cHost )
+      TRY
+         cHost := hb_socketGetHostName( hb_socketResolveAddr( "127.0.0.1" ) )
+      CATCH
+      END
+   ENDIF
+
+   IF Empty( cHost )
+      cHost := "localhost"
+   ENDIF
+
+RETURN cHost
+
+FUNCTION NetName()
+RETURN HIX_NetName()

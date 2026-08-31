@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_test_router.prg
   Author.....: Charly 9000
   Created....: 2026-06-04
@@ -456,7 +456,7 @@ STATIC PROCEDURE _TestDispatcherFiles( hCtx )
    cHrb := hb_CompileFromBuf( ;
       "FUNCTION Main()" + hb_eol() + ;
       "RETURN " + Chr(34) + "<p>Hello HRB</p>" + Chr(34) + hb_eol(), ;
-      .T., "-n", "-q2", "-Ic:\harbour\include" )
+      .T., "-n", "-q2" )
    IF ValType( cHrb ) == "C" .AND. ! Empty( cHrb )
       hb_MemoWrit( cHrbFile, cHrb )
    ENDIF

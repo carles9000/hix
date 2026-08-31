@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_prepro.prg
   Author.....: Carles Aubia Floresvi (Charly 9000)
   Created....: 2026-05-10
@@ -93,7 +93,7 @@ THREAD STATIC __hPP
 
 FUNCTION UGetPPRules()
 
-   LOCAL cOs := OS()
+   LOCAL cHBHeader
 
    IF __hPP  == nil
 
@@ -109,13 +109,10 @@ FUNCTION UGetPPRules()
 
    ENDIF
    
-   DO CASE
-
-      CASE "Windows" $ cOs   ; __pp_Path( __hPP, "c:\harbour\include" )
-      CASE "Linux" $ cOs    ; __pp_Path( __hPP, "~/harbour/include" )
-
-   ENDCASE
-
+   cHBHeader := HIX_GetHarbourIncludePath()
+   IF ! Empty( cHBHeader )
+      __pp_Path( __hPP, cHBHeader )
+   ENDIF
 
    __pp_AddRule( __hPP, "#xcommand ? [<explist,...>] => UWrite( '<br>' [,<explist>] )" )
    __pp_AddRule( __hPP, "#xcommand ?? [<explist,...>] => UWrite( [<explist>] )" )
@@ -134,6 +131,45 @@ FUNCTION UGetPPRules()
 
 
    RETU __hPP
+
+// ------------------------------------------------------------- //
+
+FUNCTION HIX_GetHarbourIncludePath()
+
+   LOCAL cPath, aCandidates, cCandidate
+   LOCAL cOs := OS()
+   LOCAL cHome := hb_GetEnv( "HOME" )
+
+   cPath := hb_GetEnv( "HB_INCLUDE" )
+   IF ! Empty( cPath ) .AND. hb_vfDirExists( cPath )
+      RETURN cPath
+   ENDIF
+
+   IF ! Empty( hb_GetEnv( "HB_DIR" ) )
+      cCandidate := hb_GetEnv( "HB_DIR" ) + hb_ps() + "include"
+      IF hb_vfDirExists( cCandidate )
+         RETURN cCandidate
+      ENDIF
+   ENDIF
+
+   IF "Windows" $ cOs
+      aCandidates := { "c:\harbour\include", "c:\hb32\include", "c:\hb64\include" }
+   ELSE
+      aCandidates := { ;
+         cHome + "/harbour-core/include", ;
+         cHome + "/harbour/include", ;
+         "/usr/local/include/harbour", ;
+         "/usr/include/harbour", ;
+         "/usr/include" }
+   ENDIF
+
+   FOR EACH cCandidate IN aCandidates
+      IF ! Empty( cCandidate ) .AND. hb_vfDirExists( cCandidate )
+         RETURN cCandidate
+      ENDIF
+   NEXT
+
+RETURN ""
 
 // ------------------------------------------------------------- //
 
@@ -187,7 +223,6 @@ RETURN snLines
 FUNCTION HIX_CompileFile( cPath )
 
    LOCAL oHrb, oError, cCode, aArgs
-   LOCAL cOs      := OS()
    LOCAL cHBHeader := ''
    LOCAL cHBInclude, cUserFlags
 
@@ -202,13 +237,7 @@ FUNCTION HIX_CompileFile( cPath )
 
    ENDIF
 
-   DO CASE
-
-      CASE "Windows" $ cOs ; cHBHeader := "c:\harbour\include"
-      CASE "Linux" $ cOs   ; cHBHeader := "~/harbour/include"
-
-   ENDCASE
-
+   cHBHeader := HIX_GetHarbourIncludePath()
    cHBInclude := hb_GetEnv( "HB_INCLUDE" )
    cUserFlags := hb_GetEnv( "HB_USER_PRGFLAGS" )
 
