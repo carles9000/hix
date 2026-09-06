@@ -8,8 +8,8 @@
                Mozilla Public License, v. 2.0. (https://mozilla.org/MPL/2.0/).
                Copyright (c) 2026 Carles Aubia Floresví - HIX Server Project
  -----------------------------------------------------------*/
-#DEFINE HIX_VERSION_SERVER                "2.0"
-#DEFINE HIX_SUBVERSION_SERVER             ".05"
+#DEFINE HIX_VERSION_SERVER                "2.1"
+#DEFINE HIX_SUBVERSION_SERVER             ""       // ".01"
 #DEFINE HIX_LOG_MODULE HIX_MOD_SERVER
 #DEFINE SW_SHOW                              5
 
@@ -382,8 +382,6 @@ METHOD Stop() CLASS THixServer
    ENDIF
 
    _LC( "off", "Server Off" )
-
-
 
    IF ::lShowInfo .AND. ValType( ::bPostEnd ) == 'B'
 
@@ -1005,8 +1003,8 @@ STATIC FUNCTION ShowInit( oSrv )
    HIX_Info( @nRow, 'Version HIX'			, 'HIX ' + HIX_VERSION_SERVER + HIX_SUBVERSION_SERVER + ' ' + HIX_DATECOMPILE() )
 	HIX_Info( @nRow, 'Version Harbour'		, VERSION() + ' / ' + HB_BUILDDATE() )
 	HIX_Info( @nRow, 'Version OpenSSL' 	, SSLEAY_VERSION( HB_SSLEAY_VERSION ) )
-	HIX_Info( @nRow, 'Version Curl'    	, Curl_version() )
-	HIX_Info( @nRow, 'Version HaruPdf' 	, HPDF_VERSION_TEXT() )
+	HIX_Info( @nRow, 'Version Curl'    	, HIX_OptFunc( "CURL_VERSION",      "n/a (hbcurl not linked)" ) )
+	HIX_Info( @nRow, 'Version HaruPdf' 	, HIX_OptFunc( "HPDF_VERSION_TEXT", "n/a (hbhpdf not linked)" ) )
 	HIX_Info( @nRow, 'Version Compiler'	, HB_COMPILER() )
 	HIX_Info( @nRow, 'RDD List' 			   , cI )
 	HIX_Info( @nRow, 'RDD Default'        , RddSetDefault() )
@@ -1067,6 +1065,24 @@ FUNCTION HIX_Navigator()
 
 RETURN NIL
 
+
+// ============================================================
+// HIX_OptFunc — call an optional Harbour function by name.
+// Returns cFallback if the function is not linked. Used to keep
+// the boot banner rendering when optional contribs (hbcurl,
+// hbhpdf) are absent.
+// ============================================================
+FUNCTION HIX_OptFunc( cName, cFallback )
+
+   LOCAL xResult
+
+   BEGIN SEQUENCE WITH {|oErr| Break( oErr ) }
+      xResult := Do( cName )
+   RECOVER
+      xResult := cFallback
+   END SEQUENCE
+
+RETURN xResult
 
 FUNCTION HIX_Version() ; RETU HIX_VERSION_SERVER
 FUNCTION HIX_SubVersion() ; RETU HIX_SUBVERSION_SERVER
@@ -1264,36 +1280,41 @@ RETURN slProxied
 
 // --------------------------------------------------------- //
 
-#pragma BEGINDUMP 
+#pragma BEGINDUMP
 
-#include <Windows.h>
+#include <string.h>
+#include <stdio.h>
 #include <hbapi.h>
 #include <hbapiitm.h>
 
+#ifdef _MSC_VER
+#pragma warning( disable : 4996 )
+#endif
+
 HB_FUNC( HIX_DATECOMPILE )
 {
-   char *pszVersion = (char *) hb_xgrab( 80 );
-   char szDate[12] = {0}, szTime[9] = {0};
-   int year, month = 0, day, hour, minute;
-   const char *months[] = {
+   char * pszVersion = ( char * ) hb_xgrab( 80 );
+   char szDate[ 12 ] = { 0 }, szTime[ 9 ] = { 0 };
+   int year = 0, month = 0, day = 0, hour = 0, minute = 0;
+   const char * months[] = {
       "Jan", "Feb", "Mar", "Apr", "May", "Jun",
       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
    };
 
-   strncpy_s( szDate, sizeof(szDate), __DATE__, _TRUNCATE );
-   strncpy_s( szTime, sizeof(szTime), __TIME__, _TRUNCATE );
+   memcpy( szDate, __DATE__, sizeof( szDate ) - 1 );
+   memcpy( szTime, __TIME__, sizeof( szTime ) - 1 );
 
-   sscanf_s( szDate + 7, "%d", &year );
-   sscanf_s( szDate + 4, "%d", &day );
+   sscanf( szDate + 7, "%d", &year );
+   sscanf( szDate + 4, "%d", &day );
 
    for( month = 0; month < 12; ++month )
    {
-      if( strncmp( szDate, months[month], 3 ) == 0 )
+      if( strncmp( szDate, months[ month ], 3 ) == 0 )
          break;
    }
    month += 1;
 
-   sscanf_s( szTime, "%d:%d", &hour, &minute );
+   sscanf( szTime, "%d:%d", &hour, &minute );
 
    hb_snprintf( pszVersion, 80, "(r%02d%02d%02d%02d%02d)", year % 100, month, day, hour, minute );
 

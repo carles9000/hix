@@ -1,3 +1,5 @@
+2.1    Add go_lib_gcc.sh for linux version
+       Solved exit server hang linux
 2.0.05 Change order include path. First HB_INCLUDE if it exist 
 2.0.04 Add app path to show init screen
        Add go_lib_gcc.bat

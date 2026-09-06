@@ -44,6 +44,17 @@ FUNCTION HIX_WorkerHTTP( aJob )
 
    DO WHILE lKeepAlive
 
+      // Bail out immediately on shutdown so hb_threadJoin in
+      // pool:Stop() can return. Without this, a keep-alive worker
+      // keeps servicing polls from the client indefinitely and
+      // never checks the pool's stop flag.
+
+      IF ! HIX_ServerIsRunning()
+
+         EXIT
+
+      ENDIF
+
       nReqs++
 
       IF nReqs >= 100
@@ -131,6 +142,20 @@ STATIC FUNCTION _HixHTTPProcessOne( oIO, cIP, lKeepAlive )
       END
 
    END
+
+   // Drain any unread request body before recycling the keep-alive
+   // connection. Handlers may skip UBody()/UJson() (e.g. they only
+   // care about query params); those unread bytes would become garbage
+   // at the front of the next request on the same socket → 400 Bad
+   // Request from _HixHTTPProcessOne on the following iteration.
+   // ReadBody is idempotent (cached in ::cBody), so this is a no-op if
+   // the handler already consumed it.
+
+   IF oReq:lKeepAlive .AND. ( oReq:cMethod $ "POST,PUT,PATCH" )
+
+      oReq:ReadBody()
+
+   ENDIF
 
    nMs := Int( ( hb_DateTime() - tBefore ) * 86400000 )
    HIX_MetricTiming( nMs, oReq:cPath )

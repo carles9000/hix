@@ -47,9 +47,10 @@ FUNCTION HIX_RoutesLoad()
    s_mtxRoutes  := hb_mutexCreate()
    s_hHandlers  := { => }
 
-   // ping: público (health checks de balanceadores)
+   // ping: público (health checks de balanceadores + herramientas de carga
+   // cross-origin). Manda CORS wildcard y responde a OPTIONS/preflight.
    HIX_RouteAdd( "hix.slow",        '/hix-slow',        {| oReq | ( hb_idleSleep( 3 ), oReq:Respond( { "status" => "ok", "time" => time() } ) ) }, "GET" )
-   HIX_RouteAdd( "hix.ping",        HIX_PATH_PING,     {| oReq | oReq:Respond( { "status" => "ok", "server" => "HIX/" + HIX_Version(), 'now' => hb_TToS( hb_DateTime() ) } ) }, "GET" )
+   HIX_RouteAdd( "hix.ping",        HIX_PATH_PING,     {| oReq | _HixRoutePing( oReq ) }, "GET,OPTIONS" )
    // panel admin: solo si esta habilitado en config (admin.enabled=true)
 
    IF UConfig( "admin", "enabled", .T. )
@@ -1146,6 +1147,30 @@ STATIC FUNCTION _HixCacheDeleteDir( cDir )
    NEXT
 
 RETURN nCount
+
+// ============================================================
+// /hix-ping — health endpoint with baked-in CORS wildcard so
+// browser tools (load testers, dashboards) hosted on any origin
+// can reach it without extra middleware config. Also answers the
+// OPTIONS preflight so custom-header requests work.
+// ============================================================
+
+STATIC FUNCTION _HixRoutePing( oReq )
+
+   LOCAL hHeaders := { ;
+      "Access-Control-Allow-Origin"  => "*", ;
+      "Access-Control-Allow-Methods" => "GET,OPTIONS", ;
+      "Access-Control-Allow-Headers" => "Content-Type,Accept,Authorization" }
+
+   IF oReq:cMethod == "OPTIONS"
+      oReq:Respond( "", 204, NIL, hHeaders )
+   ELSE
+      oReq:Respond( ;
+         { "status" => "ok", "server" => "HIX/" + HIX_Version(), "now" => hb_TToS( hb_DateTime() ) }, ;
+         200, NIL, hHeaders )
+   ENDIF
+
+RETURN NIL
 
 // ============================================================
 // Dispatchers GET/POST para rutas de auth admin

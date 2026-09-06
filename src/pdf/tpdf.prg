@@ -4,6 +4,12 @@
 #include 'harupdf.ch'
 #include 'common.ch'
 
+// Force the linker to pull HPDF_VERSION_TEXT even though nothing calls
+// it directly. Without this REQUEST the boot banner in hix_server.prg
+// falls back to "n/a (hbhpdf not linked)" because hbhpdf.hbx marks
+// HPDF_VERSION_TEXT as DYNAMIC (soft reference) instead of REQUEST.
+REQUEST HPDF_VERSION_TEXT
+
 static cFontDir
 
 CLASS TPdf

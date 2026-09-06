@@ -15,16 +15,16 @@
 
 FUNCTION Main()
 
-   LOCAL oServer := THixServer():New()   
-      
-      
-   // In HIXSTYLE mode, the root folder is protected.
-   // Our application test is located within the /test folder, 
-   // and we need to enable it to be run directly from our 
-   // browser: http://localhost/test/index.html
-   
-      oServer:AllowDir( "test", .F. )  
+   LOCAL oServer := THixServer():New()
 
+      // In HIXSTYLE mode, the root folder is protected.
+      // Our application test is located within the /test folder,
+      // and we need to enable it to be run directly from our
+      // browser: http://localhost/test/index.html
+      
+         oServer:AllowDir( "test", .F. )
+         
+      // ---------------------------------------------------------
 
    oServer:Start()
 

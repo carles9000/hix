@@ -14,11 +14,21 @@
 
 # Create library
 -hblib
--ohix_server
+-olib/${hb_compiler}/hix_server
+
+# Contrib deps — needed at Harbour compile-time to resolve
+# #include "hbssl.ch" / "hbcurl.ch" in hix_io.prg, hix_server.prg,
+# src/curl/ucurl.prg. On Windows it's redundant (INCLUDE env already
+# has c:\harbour\include), on Linux hbmk2 needs the .hbc to locate
+# the contrib include path.
+hbssl.hbc
+hbcurl.hbc
 
 
 # Core (sin dependencias entre ellas)
 src/hix_trace.prg
+src/hix_dbg.prg
+src/hix_wapi_stubs.prg
 src/hix_logger.prg
 src/hix_data_pool.prg
 src/hix_bootlog.prg
@@ -113,6 +123,9 @@ src/dbf/hix_dbf.prg
 
 # Pdf 
 src/pdf/tpdf.prg
+
+# Curl 
+src/curl/ucurl.prg
 
 # Lang
 src/lang/hix_lang.prg

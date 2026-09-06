@@ -24,6 +24,11 @@ STATIC s_nActSeq    := 0
 STATIC s_nTLogCount := 0
 STATIC s_nTLogMax   := 1500
 
+#ifndef __PLATFORM__WINDOWS
+   REQUEST CURL_VERSION
+   REQUEST HPDF_VERSION_TEXT
+#endif
+
 FUNCTION Main( ... )
 
    LOCAL oServer
@@ -40,13 +45,13 @@ FUNCTION Main( ... )
       hb_vfDirMake( hb_DirBase() + "traces" )
    ENDIF
 
-   s_cLogFile  := hb_DirBase() + "traces\hix.log"
-   s_cTestsLog := hb_DirBase() + "traces\tests_run.log"
+   s_cLogFile  := hb_DirBase() + "traces" + hb_ps() + "hix.log"
+   s_cTestsLog := hb_DirBase() + "traces" + hb_ps() + "tests_run.log"
    hb_FileDelete( s_cLogFile )
    hb_FileDelete( s_cTestsLog )
-   hb_FileDelete( hb_DirBase() + "traces\info.txt" )
-   hb_FileDelete( hb_DirBase() + "traces\console.txt" )
-   hb_FileDelete( hb_DirBase() + "traces\activity.log" )
+   hb_FileDelete( hb_DirBase() + "traces" + hb_ps() + "info.txt" )
+   hb_FileDelete( hb_DirBase() + "traces" + hb_ps() + "console.txt" )
+   hb_FileDelete( hb_DirBase() + "traces" + hb_ps() + "activity.log" )
    cSep := "=== RUN " + DToS( Date() ) + " " + Time() + " ===" + hb_eol()
    hb_MemoWrit( s_cTestsLog, cSep )
 
@@ -76,6 +81,7 @@ FUNCTION Main( ... )
    oServer:AddRouteGet( "api_reset",  "/api/reset",    {|| RouteApiReset()   } )
    oServer:AddRouteGet( "api_activity", "/api/activity", {|| RouteApiActivity() } )
    oServer:AddRoutePost( "api_tracedump", "/api/tracedump", {|| RouteApiTraceDump() } )
+   oServer:AddRouteGet( "api_info",    "/api/info",     {|| RouteApiInfo()    } )
 
    oServer:Start( .F. )
 
@@ -138,6 +144,13 @@ STATIC PROCEDURE _RunCli()
          ENDIF
 
          OutStd( cStatus + hb_eol() )
+
+         // Temporary — dump failing assertions per test in CLI mode
+         IF hCtx != NIL .AND. hCtx[ "failed" ] > 0
+            AEval( hCtx[ "results" ], {| hRes | ;
+               iif( hRes[ "status" ] == "pass", NIL, ;
+                    OutStd( "     [FAIL] " + hRes[ "name" ] + " -- " + hb_ValToStr( hRes[ "msg" ] ) + hb_eol() ) ) } )
+         ENDIF
 
       NEXT
 
@@ -238,6 +251,13 @@ FUNCTION RouteApiRun()
          _SseEvent( { "type" => "init", "count" => Len( aToRun ) } )
 
          FOR EACH aTest IN aToRun
+
+            IF ! HIX_ServerIsRunning()
+
+               _TLog( "RouteApiRun ABORT — server stopping" )
+               EXIT
+
+            ENDIF
 
             _SseEvent( { "type" => "running", "group" => aTest[ 1 ], "test" => aTest[ 2 ] } )
 
@@ -393,6 +413,19 @@ FUNCTION RouteApiTestLog()
    NEXT
 
    USendJson( { "file" => s_cTestsLog, "total" => nTotal, "lines" => aResult } )
+
+RETURN NIL
+
+// -------------------------------------------------------
+// GET /api/info — info del binario (compilador, OS, Harbour)
+// -------------------------------------------------------
+FUNCTION RouteApiInfo()
+
+   USendJson( { ;
+      "compiler" => hb_Compiler(), ;
+      "os"       => OS(),          ;
+      "harbour"  => Version()      ;
+      } )
 
 RETURN NIL
 
@@ -665,6 +698,16 @@ RETURN NIL
 FUNCTION HIX_TestPeer_Port()
 RETURN s_nPeerPort
 
+// Public entry point: guarantees the peer server is running (idempotent).
+// Needed by tests that run in --cli mode, where Main() does not
+// reach the _PeerStart line before delegating to _RunCli.
+FUNCTION HIX_TestPeer_Ensure()
+   IF s_oPeer == NIL
+      s_oPeer := _PeerStart( s_nPeerPort )
+      hb_idleSleep( 0.1 )   // give the listen thread a beat
+   ENDIF
+RETURN s_oPeer
+
 STATIC FUNCTION _PeerStart( nPort )
 
    LOCAL oSock
@@ -720,11 +763,12 @@ RETURN
 
 STATIC PROCEDURE _PeerServe( oSock )
 
-   LOCAL cBuf    := Space( 8192 )
+   LOCAL cBuf    := Space( 16384 )
    LOCAL nRead, cLine, cMethod, cPath, cQuery, cBody, cResp, nStatus, nMs, nQ, nSp
    LOCAL cCrLf   := Chr( 13 ) + Chr( 10 )
+   LOCAL cHeadersRaw, cReqBody, hHeaders, nSep, nCL, nExtra, cExtra
 
-   nRead := hb_socketRecv( oSock, @cBuf, 8192, 0, 3000 )
+   nRead := hb_socketRecv( oSock, @cBuf, 16384, 0, 3000 )
 
    IF nRead <= 0 ; hb_socketClose( oSock ) ; RETURN ; ENDIF
 
@@ -750,6 +794,31 @@ STATIC PROCEDURE _PeerServe( oSock )
 
    ENDIF
 
+   // Split headers / body
+   nSep     := At( cCrLf + cCrLf, cBuf )
+   IF nSep > 0
+      cHeadersRaw := Left( cBuf, nSep - 1 )
+      cReqBody    := SubStr( cBuf, nSep + 4 )
+   ELSE
+      cHeadersRaw := cBuf
+      cReqBody    := ""
+   ENDIF
+
+   hHeaders := _PParseHeaders( cHeadersRaw )
+
+   // If Content-Length says more than what we have, pull the rest
+   IF hb_HHasKey( hHeaders, "content-length" )
+      nCL    := Val( hHeaders[ "content-length" ] )
+      nExtra := nCL - Len( cReqBody )
+      DO WHILE nExtra > 0
+         cExtra := Space( nExtra )
+         nRead  := hb_socketRecv( oSock, @cExtra, nExtra, 0, 3000 )
+         IF nRead <= 0 ; EXIT ; ENDIF
+         cReqBody += Left( cExtra, nRead )
+         nExtra   -= nRead
+      ENDDO
+   ENDIF
+
    nStatus := 200
 
    DO CASE
@@ -757,7 +826,12 @@ STATIC PROCEDURE _PeerServe( oSock )
       CASE cPath == "/ping"
          cBody := hb_jsonEncode( { "ok" => .T., "port" => s_nPeerPort } )
       CASE cPath == "/echo"
-         cBody := hb_jsonEncode( { "method" => cMethod, "path" => cPath, "query" => cQuery } )
+         cBody := hb_jsonEncode( { ;
+            "method"  => cMethod, ;
+            "path"    => cPath,   ;
+            "query"   => cQuery,  ;
+            "headers" => hHeaders, ;
+            "body"    => cReqBody } )
       CASE cPath == "/slow"
          nMs := Val( _PQParam( cQuery, "ms", "100" ) )
 
@@ -765,6 +839,35 @@ STATIC PROCEDURE _PeerServe( oSock )
 
          hb_idleSleep( nMs / 1000 )
          cBody := hb_jsonEncode( { "waited" => nMs } )
+      CASE Left( cPath, 8 ) == "/status/"
+         nStatus := Val( SubStr( cPath, 9 ) )
+         IF nStatus < 100 .OR. nStatus > 599 ; nStatus := 200 ; ENDIF
+         cBody := hb_jsonEncode( { "status" => nStatus, "path" => cPath } )
+      CASE Left( cPath, 6 ) == "/file/"
+         // Serve N bytes of deterministic content: 'X' repeated N times.
+         // Clamped at 1 MiB to protect the test peer.
+         nMs := Val( SubStr( cPath, 7 ) )
+         IF nMs < 0        ; nMs := 0        ; ENDIF
+         IF nMs > 1048576  ; nMs := 1048576  ; ENDIF
+         cBody := Replicate( "X", nMs )
+         // Skip default JSON headers below by short-circuiting: build
+         // response inline with content-type octet-stream.
+         cResp  := "HTTP/1.0 " + hb_ntos( nStatus ) + " OK"  + cCrLf
+         cResp  += "Content-Type: application/octet-stream"    + cCrLf
+         cResp  += "Content-Length: " + hb_ntos( Len( cBody ) ) + cCrLf
+         cResp  += "Connection: close" + cCrLf + cCrLf
+         cResp  += cBody
+         hb_socketSend( oSock, cResp, Len( cResp ), 0, 3000 )
+         hb_socketClose( oSock )
+         RETURN
+      CASE cPath == "/upload"
+         // Accept any verb, return size + first 16 + last 16 bytes so
+         // tests can verify byte-for-byte transport.
+         cBody := hb_jsonEncode( { ;
+            "method" => cMethod, ;
+            "size"   => Len( cReqBody ), ;
+            "first"  => Left( cReqBody, 16 ), ;
+            "last"   => Right( cReqBody, 16 ) } )
       OTHERWISE
          nStatus := 404
          cBody   := hb_jsonEncode( { "error" => "not found" } )
@@ -781,6 +884,26 @@ STATIC PROCEDURE _PeerServe( oSock )
    hb_socketClose( oSock )
 
 RETURN
+
+STATIC FUNCTION _PParseHeaders( cRaw )
+
+   LOCAL hRet := { => }
+   LOCAL aLines, cLine, nCol, i
+
+   HB_HCaseMatch( hRet, .F. )
+
+   aLines := hb_ATokens( cRaw, Chr( 13 ) + Chr( 10 ) )
+   FOR i := 2 TO Len( aLines )   // skip request-line
+      cLine := aLines[ i ]
+      IF Empty( cLine ) ; LOOP ; ENDIF
+      nCol := At( ":", cLine )
+      IF nCol > 0
+         hRet[ Lower( AllTrim( Left( cLine, nCol - 1 ) ) ) ] := ;
+            AllTrim( SubStr( cLine, nCol + 1 ) )
+      ENDIF
+   NEXT
+
+RETURN hRet
 
 STATIC FUNCTION _PQParam( cQuery, cKey, cDef )
 
@@ -844,7 +967,7 @@ RETURN { ;
       { "Csrf",         {|| HIX_TestCsrf_Run()        } }, ;
       { "Keys",         {|| HIX_TestKeys_Run()        } }, ;
       { "Permissions",  {|| HIX_TestPermissions_Run() } }, ;
-      { "Pentest",      {|| HIX_TestSecurity_Run()    } }  ;
+      { "Pentest (15sec aprox)",      {|| HIX_TestSecurity_Run()    } }  ;
       } }, ;
       { "Middleware", { ;
       { "MW-Built-In", {|| HIX_TestMw_Run()          } }, ;
@@ -885,5 +1008,8 @@ RETURN { ;
       { "Echo",   {|| HIX_TestEcho_Run()   } }, ;
       { "Abort",  {|| HIX_TestAbort_Run()  } }, ;
       { "Zombie", {|| HIX_TestZombie_Run() } }  ;
+      } }, ;
+      { "Extras", { ;
+      { "UCurl", {|| HIX_TestUCurl_Run() } }  ;
       } }  ;
       }

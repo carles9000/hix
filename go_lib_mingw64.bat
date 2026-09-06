@@ -10,6 +10,8 @@ set lib=%lib%;%hbgcc%\lib;%ccdir%\lib;%ccdir%\x86_64-w64-mingw32\lib;
 set path=%path%;c:\windows\system32;c:\windows;%hbgcc%;%hbdir%;%ccdir%\bin;
 
 
+if not exist lib\mingw64 mkdir lib\mingw64
+
 if exist hix_server.hbx (
    hbmk2 hix_server.hbp  -comp=mingw64
 ) else (

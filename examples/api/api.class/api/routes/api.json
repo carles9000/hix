@@ -1,4 +1,6 @@
 [
+  { "name": "test.page",       "url": "/test",                    "action": "test/index.html",                "method": "GET",    "middleware": "MyWsGuardPublic"                        },
+
   { "name": "health",          "url": "/health",                  "action": "controllers/index@health.prg",   "method": "GET",    "middleware": "MyWsGuardPublic"                        },
   { "name": "time",            "url": "/time",                    "action": "controllers/index@time.prg",     "method": "GET",    "middleware": "MyWsGuardPublic"                        },
 

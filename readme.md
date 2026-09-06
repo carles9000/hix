@@ -46,4 +46,5 @@ https://github.com/carles9000/hix.harbour
 
    - MSVC64 (Windows)  
    - MINGW64 (Windows)  
+   - GCC (Linux)  
 

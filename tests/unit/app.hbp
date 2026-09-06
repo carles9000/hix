@@ -4,7 +4,7 @@
 -inc
 -head=full
 -mt
--ic:\hix.pro\src\include
+-i${hix}/src/include
 -workdir=.hbmk/${hb_compiler}
 
 -hbexe
@@ -73,21 +73,32 @@ src/hix_test_validator.prg
 src/hix_test_zombie.prg
 src/hix_test_security_client.prg
 src/hix_test_security.prg
+src/hix_test_ucurl.prg
 
 # Libs
--L${hix}
+-L${hix}/lib/${hb_compiler}
 -lhix_server
 
-${hix}\hix_server.hbx
-c:\harbour\include\harbour.hbx
+# Contrib deps — needed on Linux to resolve hbssl.ch include AND
+# to pull -lssl / -lcrypto at link time. Guarded {unix} because on
+# Windows the SSL libraries have platform-specific names (already
+# declared below via -llibssl-4-x64 / -llibcrypto-4-x64).
+{unix}hbssl.hbc
 
-# OpensSSL
+# .hbx paths are Windows-absolute; on Linux hbmk2 resolves symbols
+# from the built libraries directly, so no .hbx hint is needed.
+{win}${hix}\hix_server.hbx
+{win}c:\harbour\include\harbour.hbx
+
+# OpenSSL
 -lhbssl
--lhbssls
+{win}-lhbssls
 {msvc64}-llibcrypto-4-x64
 {msvc64}-llibssl-4-x64
 {mingw64}-ldflag=-l:libcrypto-4-x64.dll
 {mingw64}-ldflag=-l:libssl-4-x64.dll
+{unix}-lssl
+{unix}-lcrypto
 
 
 # Curl
@@ -95,6 +106,8 @@ c:\harbour\include\harbour.hbx
 {msvc64}-llibcurl-x64
 {mingw64}-lhbcurl
 {mingw64}-ldflag=-l:libcurl-x64.dll
+{unix}hbcurl.hbc
+
 
 
 # PDF
@@ -102,9 +115,10 @@ c:\harbour\include\harbour.hbx
 {mingw64}-lhbhpdf
 {mingw64}-llibhpdf
 {mingw64}-lpng
+{unix}hbhpdf.hbc
 
-# WAPI_OutputDebugString()
--lhbwin
+# WAPI_OutputDebugString() — Windows-only
+{win}-lhbwin
 -lxhb
 -lhbct
 

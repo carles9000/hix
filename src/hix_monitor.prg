@@ -68,9 +68,7 @@ STATIC FUNCTION _HixMonitorThread( oServer )
 
    DO WHILE slRunning
 
-      hb_idleSleep( nInterval )
-
-      IF ! slRunning ; EXIT ; ENDIF
+      IF ! _SleepInterruptible( nInterval ) ; EXIT ; ENDIF
 
       IF oServer != NIL .AND. ! oServer:lRunning
 
@@ -90,3 +88,16 @@ STATIC FUNCTION _HixMonitorThread( oServer )
    ENDDO
 
 RETURN NIL
+
+// Sleep in 200ms chunks so a Stop() can wake us within one chunk.
+// hb_idleSleep(N) with N>>1 is uninterruptible and blocks the
+// shutdown hb_threadJoin for the full remaining interval.
+STATIC FUNCTION _SleepInterruptible( nSeconds )
+
+   LOCAL nEnd := hb_MilliSeconds() + nSeconds * 1000
+
+   DO WHILE slRunning .AND. hb_MilliSeconds() < nEnd
+      hb_idleSleep( 0.2 )
+   ENDDO
+
+RETURN slRunning

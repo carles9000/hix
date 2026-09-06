@@ -1,5 +1,6 @@
 /* ----------------------------------------------
- | hix.json -- Fenix.WS.Function Server Configuration
+ | hix.json -- HIX Web Server Configuration
+ | Auto-generated. Edit values, keep structure.
  * ---------------------------------------------- */
 {
   "server":

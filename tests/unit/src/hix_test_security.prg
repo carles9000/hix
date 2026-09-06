@@ -110,7 +110,11 @@ STATIC PROCEDURE _SecBootServer( hCtx )
    hCfg[ "server"    ][ "maxconn" ]          := 32
    hCfg[ "server"    ][ "ssl" ]              := .F.
    hCfg[ "server"    ][ "autostart" ]        := .F.
-   hCfg[ "server"    ][ "allowed_hosts" ]    := "127.0.0.1"     // C7 — Host allowlist (G3)
+   // Include "localhost" so browser polls to the main server on :8900
+   // (Host: localhost:8900) don't get rejected while this test runs.
+   // The config is global — modifying it here affects the main server too.
+   // C7 still validates rejection because "evil.example.com" is not listed.
+   hCfg[ "server"    ][ "allowed_hosts" ]    := "127.0.0.1 localhost"     // C7 — Host allowlist (G3)
    hCfg[ "detector"  ][ "workers" ]          := 2
    hCfg[ "detector"  ][ "queue_size" ]       := 16
    hCfg[ "detector"  ][ "peek_timeout_ms" ]  := 200

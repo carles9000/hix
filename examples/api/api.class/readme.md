@@ -10,6 +10,5 @@ set path=%path%;c:\windows\system32;c:\windows;%hbdir%;%hbdir%\bin;%hix%
 
 2.- Copy .\dll\*.dll to server path
 
-3.- Test -> test/index.html
-    Drop the file into the browser once you have the server running.
+3.- Test -> localhost:8083/test    
 

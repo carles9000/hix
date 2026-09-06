@@ -38,6 +38,7 @@ function fmtMs(ms) {
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   loadTests();
+  loadInfo();
   startLogPolling();
   startActivityStream();
 
@@ -58,6 +59,21 @@ function loadTests() {
     .then(r => r.json())
     .then(renderGroups)
     .catch(e => showError('Could not reach /api/tests: ' + e));
+}
+
+function loadInfo() {
+  fetch('/api/info', { cache: 'no-store' })
+    .then(r => r.json())
+    .then(info => {
+      const badge = document.getElementById('nav-os');
+      if (!badge) return;
+      badge.textContent = info.compiler || 'n/a';
+      badge.title       = (info.compiler || '') + '  |  ' + (info.os || '');
+    })
+    .catch(() => {
+      const badge = document.getElementById('nav-os');
+      if (badge) { badge.textContent = 'n/a'; badge.title = 'no /api/info'; }
+    });
 }
 
 // ── Theme (dark / light) ──────────────────────────────────────────

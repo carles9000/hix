@@ -9,6 +9,8 @@ set include=%include%;%hbdir%\include
 set lib=%lib%;%hbdir%\lib
 set path=%path%;c:\windows\system32;c:\windows;%hbmsvc%;%hbdir%
 
+if not exist lib\msvc64 mkdir lib\msvc64
+
 if exist hix_server.hbx (
    hbmk2 hix_server.hbp  -comp=msvc64
 ) else (

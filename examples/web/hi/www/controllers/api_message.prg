@@ -20,7 +20,7 @@
                app.auto_close_dbf is on (hix.json).
  -----------------------------------------------------------*/
 
-#define MSG_TABLE   'data\messages.dbf'
+#define MSG_TABLE   'data/messages.dbf'
 
 FUNCTION Main()
 
