@@ -1,0 +1,43 @@
+description=HIX Web Server
+
+# (${hix} is the project root, exported by go_*.bat / go_gcc.sh.)
+
+incpaths=${hix}/src/include
+
+
+libpaths=${hix}/lib/${hb_compiler}
+
+# HIX lib itself.
+# Windows: normal -l resolution works.
+# Linux: force --whole-archive so middlewares invoked by string name
+# from www/middlewares/*.prg (HIX_MwIsAuth, HIX_MwHasRole, …) get
+# pulled in even though nothing in the .exe references them statically.
+{win}libs=hix_server
+{unix}ldflags=-Wl,--whole-archive,-l:libhix_server.a,--no-whole-archive
+
+# OpenSSL
+libs=hbssl
+{win}libs=hbssls
+{unix}hbcs=hbssl
+{msvc64}libs=libcrypto-4-x64 libssl-4-x64
+{mingw64}ldflags=-l:libcrypto-4-x64.dll -l:libssl-4-x64.dll
+
+# cURL
+{msvc64}libs=hbcurl libcurl-x64
+{mingw64}libs=hbcurl
+{mingw64}ldflags=-l:libcurl-x64.dll
+{unix}libs=hbcurl curl
+
+# HaruPDF
+{msvc64}hbcs=hbhpdf
+{mingw64}libs=hbhpdf libhpdf png
+{unix}hbcs=hbhpdf
+{unix}libs=png
+
+# WAPI_OutputDebugString + xhb + hbct
+{win}libs=hbwin
+libs=xhb hbct
+
+# MSVC-specific runtime (fix libucrt/msvcrt conflict)
+{msvc64}ldflags=/NODEFAULTLIB:libucrt /NODEFAULTLIB:msvcrt
+{msvc64}libs=ucrt
