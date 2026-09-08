@@ -29,6 +29,7 @@ src/hix_test_view_code_err.prg
 src/hix_test_view_cross_hrb.prg
 src/hix_test_view_errors.prg
 src/hix_test_websocket.prg
+src/hix_test_ws_detector.prg
 src/hix_test_wss.prg
 src/hix_test_accept.prg
 src/hix_test_auth_session.prg

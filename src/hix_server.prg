@@ -9,7 +9,7 @@
                Copyright (c) 2026 Carles Aubia Floresví - HIX Server Project
  -----------------------------------------------------------*/
 #DEFINE HIX_VERSION_SERVER                "2.1"
-#DEFINE HIX_SUBVERSION_SERVER             ""       // ".01"
+#DEFINE HIX_SUBVERSION_SERVER             ".01"       // ".01"
 #DEFINE HIX_LOG_MODULE HIX_MOD_SERVER
 #DEFINE SW_SHOW                              5
 

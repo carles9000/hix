@@ -979,6 +979,7 @@ RETURN { ;
       } }, ;
       { "Transport", { ;
       { "WebSocket", {|| HIX_TestWebSocket_Run() } }, ;
+      { "WsDetector", {|| HIX_TestWsDetector_Run() } }, ;
       { "WSS",       {|| HIX_TestWSS_Run()       } }, ;
       { "SSL",       {|| HIX_TestSSL_Run()       } }, ;
       { "LongPoll",  {|| HIX_TestLongPoll_Run()  } }, ;

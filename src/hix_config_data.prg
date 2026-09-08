@@ -68,8 +68,8 @@
 // --------------------------------------------------------------------------
 #DEFINE DEFAULT_DETECTOR_WORKERS   4
 #DEFINE DEFAULT_DETECTOR_QUEUE_SIZE   256
-#DEFINE DEFAULT_DETECTOR_PEEK_TIMEOUT_MS 10
-#DEFINE DEFAULT_DETECTOR_PEEK_BYTES   512
+#DEFINE DEFAULT_DETECTOR_PEEK_TIMEOUT_MS 150
+#DEFINE DEFAULT_DETECTOR_PEEK_BYTES   2048
 
 // --------------------------------------------------------------------------
 // POOL HTTP

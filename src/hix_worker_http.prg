@@ -106,9 +106,11 @@ STATIC FUNCTION _HixHTTPProcessOne( oIO, cIP, lKeepAlive )
 
    ENDIF
 
-   // WSS: WebSocket upgrade en conexión SSL (el peek no actuó)
+   // WebSocket upgrade fallback: el peek no detectó "upgrade: websocket"
+   // (cabecera fuera de los primeros peek_bytes, o RTT > peek_timeout_ms —
+   // típico detrás de Cloudflare/proxies). Aplica tanto a SSL como a plano.
 
-   IF oIO:lUseSSL .AND. Lower( oReq:Header( "upgrade" ) ) == "websocket"
+   IF Lower( oReq:Header( "upgrade" ) ) == "websocket"
 
       lKeepAlive := .F.
       HIX_HandleWSUpgrade( oReq, cIP )
