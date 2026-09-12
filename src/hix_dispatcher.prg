@@ -33,8 +33,8 @@ CLASS THixDispatcher
    METHOD CheckPath( cSpec )   // NIL=bloqueado, string=path fisico resuelto
    METHOD GetACL()             // hash con la configuracion ACL actual
 
-   METHOD ExecutePrg(  cPath )
-   METHOD ExecuteHrb(  cPath )
+   METHOD ExecutePrg(  cPath, oReq, hClass, nTimeoutMs )
+   METHOD ExecuteHrb(  cPath, nTimeoutMs )
    METHOD ExecuteHtml( cPath )
    METHOD ExecuteView( cPath )
    METHOD ExecuteFile( cPath )
@@ -518,10 +518,11 @@ RETURN Self
 // Error de compilacion: responde 500 directamente (no escapa al worker).
 // Error de runtime: propaga via HIX_Throw al worker HTTP.
 // ------------------------------------------------------------
-METHOD ExecutePrg( cPath, oReq, hClass ) CLASS THixDispatcher
+METHOD ExecutePrg( cPath, oReq, hClass, nTimeoutMs ) CLASS THixDispatcher
 
    LOCAL oHrb
    LOCAL oError, cHtml
+   LOCAL nMs := iif( nTimeoutMs == NIL, ::nExecTimeout, nTimeoutMs )
 
    TRY
 
@@ -545,19 +546,20 @@ METHOD ExecutePrg( cPath, oReq, hClass ) CLASS THixDispatcher
    ENDIF
 
 
-   cHtml := _HixExecWithTimeout( oHrb, ::nExecTimeout, cPath, hClass, oReq )
+   cHtml := _HixExecWithTimeout( oHrb, nMs, cPath, hClass, oReq )
 
 RETURN cHtml
 
 // ------------------------------------------------------------
-METHOD ExecuteHrb( cPath ) CLASS THixDispatcher
+METHOD ExecuteHrb( cPath, nTimeoutMs ) CLASS THixDispatcher
 
    LOCAL oHrb
+   LOCAL nMs := iif( nTimeoutMs == NIL, ::nExecTimeout, nTimeoutMs )
 
    l( "ExecuteHrb: " + cPath )
    oHrb := hb_MemoRead( cPath )
 
-RETURN _HixExecWithTimeout( oHrb, ::nExecTimeout, cPath )
+RETURN _HixExecWithTimeout( oHrb, nMs, cPath )
 
 // ------------------------------------------------------------
 METHOD ExecuteHtml( cPath ) CLASS THixDispatcher

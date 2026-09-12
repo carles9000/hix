@@ -76,6 +76,10 @@
          <div class="tab-pane fade show active" id="pane-run" role="tabpanel">
             <!-- 2 tiles on phone, 4 from tablet up -->
             <div id="tiles" class="row row-cols-2 row-cols-md-4 g-2 mb-2"></div>
+            <div id="conn-box"       class="panel p-3 mb-2"></div>
+            <div id="http-box"       class="panel p-3 mb-2"></div>
+            <div id="ws-box"         class="panel p-3 mb-2"></div>
+            <div id="sse-box"        class="panel p-3 mb-2"></div>
             <div id="run-detail"></div>
          </div>
 
@@ -126,6 +130,17 @@
       if ( s >= 3600 )  return [ Math.floor( s / 3600 )  + 'h ' + Math.floor( s % 3600 / 60 )   + 'm', '' ];
       if ( s >= 60 )    return [ Math.floor( s / 60 )    + 'm ' + ( s % 60 )                    + 's', '' ];
       return [ String( s ), 's' ];
+   }
+
+   // Format a duration expressed in milliseconds. Short values stay as ms;
+   // above 10 s we switch to s / m / h so tiles keep readable numbers even
+   // for long-lived streams.
+   function msDur( ms ) {
+      const n = Number( ms ) || 0;
+      if ( n < 1000 )     return [ n,                              'ms' ];
+      if ( n < 60000 )    return [ ( n / 1000    ).toFixed( 1 ), 's'  ];
+      if ( n < 3600000 )  return [ ( n / 60000   ).toFixed( 1 ), 'm'  ];
+      return                     [ ( n / 3600000 ).toFixed( 1 ), 'h'  ];
    }
 
    const tile = ( lbl, val, unit, cls ) => `
@@ -352,8 +367,7 @@
          el( 'head' ).innerHTML =
             `<span class="${d.server.running ? 'text-success' : 'text-danger'}">●</span> ` +
             `${esc( d.server.name )} · ${esc( d.server.host )}:${esc( d.server.port )} · ` +
-            `${esc( d.server.mode )}/${esc( d.server.env )} · ${ms} ms` +
-            ( auto ? ` · <span class="text-info">auto ${AUTO_MS / 1000}s</span>` : '' );
+            `${esc( d.server.mode )}/${esc( d.server.env )} · ${ms} ms`;
 
          // ---- tab 1: Run ----
 
@@ -361,26 +375,59 @@
             tile( 'Uptime',   upV, upU, 'val-info' ) +
             tile( 'Requests', nf( d.traffic.requests ), '' ) +
             tile( 'Memory',   memV, memU, 'val-info' ) +
-            tile( 'Active',   active, 'conn' ) +
-            tile( 'Avg',      d.timing.ms_avg, 'ms' ) +
-            tile( 'Max',      d.timing.ms_max, 'ms',
-                  Number( d.timing.ms_max ) > 1000 ? 'val-warn' : 'val-ok' ) +
-            tile( 'Sent',     outV, outU, 'val-info' ) +
-            tile( 'Max http', lim.http, '· ' + d.traffic.active_http  + ' now',
-                  cap( d.traffic.active_http,  lim.http ) ) +
-            tile( 'Max ws',   lim.ws,   '· ' + d.traffic.active_ws    + ' now',
-                  cap( d.traffic.active_ws,    lim.ws   ) ) +
-            tile( 'Max sse',  lim.sse,  '· ' + d.traffic.active_otros + ' now',
-                  cap( d.traffic.active_otros, lim.sse  ) );
+            tile( 'Sent',     outV, outU, 'val-info' );
 
-         el( 'run-detail' ).innerHTML = panel( 'Incoming — req/s', spark() ) + panel( 'Connections',
-            kv( 'http',      d.traffic.active_http ) +
-            kv( 'websocket', d.traffic.active_ws ) +
-            kv( 'sse / longpoll', d.traffic.active_otros ) +
-            kv( 'saturations', d.traffic.saturated,
-                Number( d.traffic.saturated ) ? 'val-warn' : '' ) +
-            kv( 'bytes in',  bytes( d.traffic.bytes_in ).join( ' ' ) ) +
-            kv( 'bytes out', bytes( d.traffic.bytes_out ).join( ' ' ) ) );
+         const tAvgHttp  = msDur( d.timing.ms_avg );
+         const tMaxHttp  = msDur( d.timing.ms_max );
+         const tAvgSse   = msDur( d.timing_stream.ms_avg );
+         const tMaxSse   = msDur( d.timing_stream.ms_max );
+         const tAvgWs    = msDur( d.timing_ws.ms_avg );
+         const tMaxWs    = msDur( d.timing_ws.ms_max );
+
+         el( 'conn-box' ).innerHTML =
+            `<h6 class="mb-2">Connections / Workers</h6>
+             <div class="row row-cols-3 g-2">
+                ${ tile( 'HTTP', d.traffic.active_http  + '/' + lim.http, '',
+                         cap( d.traffic.active_http,  lim.http ) ) }
+                ${ tile( 'WS',   d.traffic.active_ws    + '/' + lim.ws,   '',
+                         cap( d.traffic.active_ws,    lim.ws   ) ) }
+                ${ tile( 'SSE',  d.traffic.active_otros + '/' + lim.sse,  '',
+                         cap( d.traffic.active_otros, lim.sse  ) ) }
+             </div>`;
+
+         const wsRow = ( lbl, ...tiles ) => `
+            <div class="row g-2 align-items-stretch mb-2">
+               <div class="col-12 col-md-2 d-flex align-items-center">
+                  <div class="lbl" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:#8b949e;">${esc( lbl )}</div>
+               </div>
+               <div class="col-12 col-md-10">
+                  <div class="row row-cols-3 g-2">${ tiles.join( '' ) }</div>
+               </div>
+            </div>`;
+
+         el( 'http-box' ).innerHTML =
+            `<h6 class="mb-2">HTTP</h6>
+             ${ wsRow( 'Request',
+                  tile( 'Total', nf( d.timing.count ), '',               'val-info' ),
+                  tile( 'Avg',   tAvgHttp[ 0 ], tAvgHttp[ 1 ] ),
+                  tile( 'Max',   tMaxHttp[ 0 ], tMaxHttp[ 1 ],
+                        Number( d.timing.ms_max ) > 1000 ? 'val-warn' : 'val-ok' ) ) }`;
+
+         el( 'ws-box' ).innerHTML =
+            `<h6 class="mb-2">WebSockets</h6>
+             ${ wsRow( 'Recv',
+                  tile( 'Total', nf( d.timing_ws.count ), '',            'val-info' ),
+                  tile( 'Avg',   tAvgWs[ 0 ],  tAvgWs[ 1 ] ),
+                  tile( 'Max',   tMaxWs[ 0 ],  tMaxWs[ 1 ] ) ) }`;
+
+         el( 'sse-box' ).innerHTML =
+            `<h6 class="mb-2">SSE</h6>
+             ${ wsRow( 'Stream',
+                  tile( 'Total', nf( d.timing_stream.count ), '',        'val-info' ),
+                  tile( 'Avg',   tAvgSse[ 0 ], tAvgSse[ 1 ] ),
+                  tile( 'Max',   tMaxSse[ 0 ], tMaxSse[ 1 ] ) ) }`;
+
+         el( 'run-detail' ).innerHTML = panel( 'Incoming — req/s', spark() );
 
          // ---- tab 2: Slowest ----
 

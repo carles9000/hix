@@ -33,6 +33,7 @@
 #DEFINE DEFAULT_SERVER_GZIP_MIN_SIZE  2048
 #DEFINE DEFAULT_SERVER_AUTOSTART   .T.
 #DEFINE DEFAULT_SERVER_EXEC_TIMEOUT_MS  30000
+#DEFINE DEFAULT_SERVER_STREAM_EXEC_TIMEOUT_MS  0
 
 // --------------------------------------------------------------------------
 // PATHS
@@ -194,6 +195,7 @@ FUNCTION HIX_InitDefault()
    hCfg[ 'server' ][ 'gzip_min_size' ]    := DEFAULT_SERVER_GZIP_MIN_SIZE
    hCfg[ 'server' ][ 'autostart' ]     := DEFAULT_SERVER_AUTOSTART
    hCfg[ 'server' ][ 'exec_timeout_ms' ]   := DEFAULT_SERVER_EXEC_TIMEOUT_MS
+   hCfg[ 'server' ][ 'stream_exec_timeout_ms' ] := DEFAULT_SERVER_STREAM_EXEC_TIMEOUT_MS
 
 // PATHS
    hCfg[ 'paths' ]         := { => }
@@ -353,6 +355,7 @@ FUNCTION HIX_ValidConfig( hConfig )
    hSec[ 'gzip_min_size' ]  := _GetNumber( hSrc, 'gzip_min_size', hSec[ 'gzip_min_size' ] )
    hSec[ 'autostart' ]   := _GetLogic ( hSrc, 'autostart', hSec[ 'autostart' ] )
    hSec[ 'exec_timeout_ms' ] := _GetNumber( hSrc, 'exec_timeout_ms', hSec[ 'exec_timeout_ms' ] )
+   hSec[ 'stream_exec_timeout_ms' ] := _GetNumber( hSrc, 'stream_exec_timeout_ms', hSec[ 'stream_exec_timeout_ms' ] )
 
 // PATHS
    hSec := hCfg[ 'paths' ]

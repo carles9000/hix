@@ -9,6 +9,8 @@
   { "name": "filetest",       "url": "/file-test",                     "action": "views/filetest.html",                      "method": "GET" },
   { "name": "serverinfo",     "url": "/server-info",                   "action": "views/serverinfo.html",                    "method": "GET" },
   { "name": "message",        "url": "/message",                       "action": "controllers/message.prg",                  "method": "GET" },
+  { "name": "ssetest",        "url": "/sse-test",                      "action": "views/sse-test.html",                      "method": "GET" },
+  { "name": "jobtest",        "url": "/job-test",                      "action": "views/job-test.html",                      "method": "GET" },
   { "name": "yourmodule",     "url": "/your-module",                   "action": "views/yourmodule.html",                    "method": "GET" },
 
   { "name": "api.ping",       "url": "/api/ping",                      "action": "controllers/api_ping.prg",                 "method": "GET" },
@@ -20,5 +22,7 @@
   { "name": "api.burst",      "url": "/api/burst",                     "action": "controllers/api_burst.prg",                "method": "GET",  "middleware": "HIX_MwRateLimit" },
   { "name": "api.download",   "url": "/api/download",                  "action": "controllers/api_download.prg",             "method": "GET" },
   { "name": "api.upload",     "url": "/api/upload",                    "action": "controllers/api_upload.prg",               "method": "POST" },
-  { "name": "api.message",    "url": "/api/message",                   "action": "controllers/api_message.prg",              "method": "POST", "middleware": "MyMsgGuard" }
+  { "name": "api.message",    "url": "/api/message",                   "action": "controllers/api_message.prg",              "method": "POST", "middleware": "MyMsgGuard" },
+  { "name": "api.sse.tick",   "url": "/api/sse/ticker",                "action": "controllers/api_sse_ticker.prg",           "method": "GET", "stream": true },
+  { "name": "api.sse.job",    "url": "/api/sse/job/:nonce",            "action": "controllers/api_sse_job.prg",              "method": "GET", "stream": true }
 ]

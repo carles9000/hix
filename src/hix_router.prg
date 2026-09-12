@@ -96,7 +96,7 @@ RETURN s_hRoutes != NIL
 FUNCTION HIX_LoadRoutes()
 
    LOCAL oCfg, cRoot, cRoutesDir, aFiles, aFile, cFile, cJson, xData
-   LOCAL hRoute, cName, cPattern, cAction, cMethod, cMw, cScope
+   LOCAL hRoute, cName, cPattern, cAction, cMethod, cMw, cScope, lStream
    LOCAL aErrors, nLoaded, nTotal, lDup, cErr
 
    aErrors := {}
@@ -169,6 +169,7 @@ FUNCTION HIX_LoadRoutes()
          cMethod  := _HGet( hRoute, "method",     "*" )
          cMw      := _HGet( hRoute, "middleware", "" )
          cScope   := _HGet( hRoute, "scope",      "" )
+         lStream  := _HGet( hRoute, "stream",     .F. )
 
          nTotal++
 
@@ -195,7 +196,7 @@ FUNCTION HIX_LoadRoutes()
          l( "HIX_LoadRoutes: [ROUTE] " + PadR( cName, 32 ) + PadR( cMethod, 20 ) + cPattern + ;
             iif( Empty( cAction ), "", " -> " + cAction ) )
 
-         IF HIX_RouteAdd( cName, cPattern, cAction, cMethod, cMw, cScope, NIL, .T. )
+         IF HIX_RouteAdd( cName, cPattern, cAction, cMethod, cMw, cScope, NIL, .T., lStream )
 
             nLoaded++
 
@@ -235,8 +236,11 @@ RETURN nLoaded
 // cScope   : string libre pasado al contexto (opcional)
 // uCargo   : dato libre pasado junto con hParams (opcional)
 // lReplace : .T. sobreescribe si ya existe (default: .F. → retorna .F.)
+// lStream  : .T. si la ruta es de streaming (SSE, long chunked, long-poll).
+//            El dispatcher usa server.stream_exec_timeout_ms (default 0)
+//            en vez del exec_timeout_ms global para no matar la conexión.
 // ============================================================
-FUNCTION HIX_RouteAdd( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, lReplace )
+FUNCTION HIX_RouteAdd( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, lReplace, lStream )
 
    LOCAL cRegexp, aVarNames := {}, pCompiled, nScore, cBootCargo
 
@@ -245,6 +249,7 @@ FUNCTION HIX_RouteAdd( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, l
    hb_default( @cScope,   ""   )
    hb_default( @uCargo,   NIL  )
    hb_default( @lReplace, .F.  )
+   hb_default( @lStream,  .F.  )
 
    IF Empty( cName )
 
@@ -320,6 +325,7 @@ FUNCTION HIX_RouteAdd( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, l
       "middleware" => cMw,       ;
       "scope"      => cScope,    ;
       "cargo"      => uCargo,    ;
+      "stream"     => lStream,   ;
       "varnames"   => aVarNames, ;
       "score"      => nScore     ;
       }
@@ -419,6 +425,7 @@ FUNCTION HIX_RouteList()
          "pattern" => hRoute[ "pattern" ],                  ;
          "method"  => hRoute[ "method" ],                   ;
          "scope"   => hRoute[ "scope" ],                    ;
+         "stream"  => hb_HGetDef( hRoute, "stream", .F. ), ;
          "cargo"   => hb_HGetDef( hRoute, "cargo", NIL ) ;
          }
       AAdd( aResult, hItem )
@@ -556,7 +563,10 @@ FUNCTION HIX_RouteDispatch( oReq )
 
             ENDIF
 
-            _HixEvalAction( hRoute[ "action" ], oReq, hParams, cName )
+            _HixEvalAction( hRoute[ "action" ], oReq, hParams, cName, ;
+               iif( hb_HGetDef( hRoute, "stream", .F. ), ;
+                  UConfig( "server", "stream_exec_timeout_ms", 0 ), ;
+                  NIL ) )
             RETURN .T.
          ELSE
             // Acumular métodos permitidos para 405
@@ -882,8 +892,11 @@ STATIC FUNCTION _HixDispatchOnFail( oReq, cOnFail )
 
 RETURN NIL
 
-// Evalúa la action: codeblock, nombre de función (string) o ruta de fichero
-STATIC FUNCTION _HixEvalAction( bAction, oReq, hParams, cRouteName )
+// Evalúa la action: codeblock, nombre de función (string) o ruta de fichero.
+// nTimeoutMs (opcional) sobrescribe el timeout del dispatcher para esta
+// invocación. NIL = usar el default global (::nExecTimeout). Se propaga
+// desde el router solo para rutas marcadas "stream": true.
+STATIC FUNCTION _HixEvalAction( bAction, oReq, hParams, cRouteName, nTimeoutMs )
 
    LOCAL bFunc, cExt, cRoot, cPhysical, xResult, cPath
    LOCAL hClass, cFileName, nAt, cDir, cFileSpec
@@ -965,7 +978,7 @@ STATIC FUNCTION _HixEvalAction( bAction, oReq, hParams, cRouteName )
                CASE cExt == ".html" .OR. cExt == ".htm"
                   USendHtml( s_oRouteDisp:ExecuteHtml( cPhysical ) )
                CASE cExt == ".prg"
-                  xResult := s_oRouteDisp:ExecutePrg( cPhysical, oReq, hClass )
+                  xResult := s_oRouteDisp:ExecutePrg( cPhysical, oReq, hClass, nTimeoutMs )
 
                IF ! oReq:lResponded .AND. ! Empty( xResult )
 
@@ -974,7 +987,7 @@ STATIC FUNCTION _HixEvalAction( bAction, oReq, hParams, cRouteName )
                   ENDIF
 
                CASE cExt == ".hrb"
-                  xResult := s_oRouteDisp:ExecuteHrb( cPhysical )
+                  xResult := s_oRouteDisp:ExecuteHrb( cPhysical, nTimeoutMs )
 
                IF ! oReq:lResponded .AND. ! Empty( xResult )
 

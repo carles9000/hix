@@ -72,7 +72,6 @@ FUNCTION HIX_DetectProtocol( cPeek )
    cLower := Lower( cPeek )
 
    IF HIX_TOKEN_WS_UPGRADE $ cLower  ; RETURN HIX_CONN_WS       ; ENDIF
-   IF HIX_TOKEN_SSE_ACCEPT  $ cLower ; RETURN HIX_CONN_SSE      ; ENDIF
    IF HIX_TOKEN_LONGPOLL    $ cLower ; RETURN HIX_CONN_LONGPOLL ; ENDIF
 
    IF Upper( Left( cPeek, 3 ) ) $ HIX_HTTP_VERBS

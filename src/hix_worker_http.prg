@@ -15,8 +15,9 @@
 FUNCTION HIX_WorkerHTTP( aJob )
 
    LOCAL oIO, cIP
-   LOCAL nReqs      := 0
-   LOCAL lKeepAlive := .T.
+   LOCAL nReqs        := 0
+   LOCAL lKeepAlive   := .T.
+   LOCAL lStreamMode  := .F.   // este worker migró a stream via RespondStart
 
    // Path SSL: el accept loop pasó el socket raw; hacemos el handshake aquí
    // para no bloquear el accept loop durante el apretón de manos TLS.
@@ -63,7 +64,7 @@ FUNCTION HIX_WorkerHTTP( aJob )
 
       ENDIF
 
-      IF ! _HixHTTPProcessOne( oIO, cIP, @lKeepAlive )
+      IF ! _HixHTTPProcessOne( oIO, cIP, @lKeepAlive, @lStreamMode )
 
          EXIT
 
@@ -72,12 +73,19 @@ FUNCTION HIX_WorkerHTTP( aJob )
    ENDDO
 
    oIO:Close()
-   HIX_MetricDec( HIXM_ACTIVE_HTTP )
+
+   // Si RespondStart swappeó el contador (Dec HTTP + Inc OTROS), aquí toca
+   // Dec OTROS. Si no hubo stream, Dec HTTP normal.
+   IF lStreamMode
+      HIX_MetricDec( HIXM_ACTIVE_OTROS )
+   ELSE
+      HIX_MetricDec( HIXM_ACTIVE_HTTP  )
+   ENDIF
 
 RETURN NIL
 
 // ============================================================
-STATIC FUNCTION _HixHTTPProcessOne( oIO, cIP, lKeepAlive )
+STATIC FUNCTION _HixHTTPProcessOne( oIO, cIP, lKeepAlive, lStreamMode )
 
    LOCAL oReq, oError, bHandler
    LOCAL tBefore, nMs
@@ -160,7 +168,13 @@ STATIC FUNCTION _HixHTTPProcessOne( oIO, cIP, lKeepAlive )
    ENDIF
 
    nMs := Int( ( hb_DateTime() - tBefore ) * 86400000 )
-   HIX_MetricTiming( nMs, oReq:cPath )
+   HIX_MetricTiming( nMs, oReq:cPath, oReq:lWasStream )
+
+   // Propagar al worker que este request migró a modo stream, para que
+   // el HIX_MetricDec final apunte al contador correcto (OTROS, no HTTP).
+   IF oReq:lWasStream
+      lStreamMode := .T.
+   ENDIF
 
    HIX_AnomalyRecord( cIP, oReq:nResponseStatus )
 

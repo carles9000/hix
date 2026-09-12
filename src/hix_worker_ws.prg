@@ -172,6 +172,7 @@ FUNCTION HIX_HandleWSUpgrade( oReq, cIP )
 
    ENDIF
 
+   // Timing por-frame se registra dentro de _HixWSFrameLoop.
    _HixWSFrameLoop( oConn, aCb[ 2 ] )
 
    l( _( "WS_DISCONNECTED", cIP ) )
@@ -221,6 +222,7 @@ STATIC FUNCTION _HixWSFrameLoop( oConn, bOnMessage )
    LOCAL cIP        := oConn:cIP
    LOCAL nIdle      := 0
    LOCAL lPingSent  := .F.
+   LOCAL tFrame
 
    ld( "[WS] CONNECT fd=" + hb_NToS( hb_socketGetFD( oIO:hSocket ) ) + " ip=" + cIP )
 
@@ -290,11 +292,15 @@ STATIC FUNCTION _HixWSFrameLoop( oConn, bOnMessage )
             ld( "WS: data " + hb_NToS( Len( cPayload ) ) + "B from " + cIP )
             HIX_Metric( HIXM_BYTES_IN, Len( cPayload ) )
 
-         IF bOnMessage != NIL
+            tFrame := hb_DateTime()
 
-            Eval( bOnMessage, oConn, cPayload, nOpcode )
+            IF bOnMessage != NIL
+
+               Eval( bOnMessage, oConn, cPayload, nOpcode )
 
             ENDIF
+
+            HIX_MetricWsTiming( Int( ( hb_DateTime() - tFrame ) * 86400000 ) )
 
          OTHERWISE
             ld( "WS: unknown opcode " + hb_NToS( nOpcode ) )

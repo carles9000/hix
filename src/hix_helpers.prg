@@ -461,7 +461,8 @@ RETURN NIL
 // STREAMING (USendStream)
 // ------------------------------------------------------------
 
-// Start a Chunked Stream Response
+// Start a Chunked Stream Response -- returns .T. if headers were flushed
+// to the peer, .F. if the socket is already dead or no active request.
 FUNCTION USendStreamStart( cMime, nStatus, hExtra )
 
    LOCAL o := HIX_GetRequest()
@@ -470,39 +471,43 @@ FUNCTION USendStreamStart( cMime, nStatus, hExtra )
    hb_default( @nStatus, 200 )
    hb_default( @hExtra,  { => } )
 
-   IF o != NIL
+   IF o == NIL ; RETURN .F. ; ENDIF
 
-      o:RespondStart( cMime, nStatus, hExtra )
+RETURN o:RespondStart( cMime, nStatus, hExtra )
 
-   ENDIF
-
-RETURN NIL
-
-// Send a Single Chunk of Data
+// Send a Single Chunk of Data -- returns .F. as soon as the peer is gone.
+// Stream handlers MUST check the return so the worker frees itself: without
+// a timeout (stream: true) an ignored .F. leaks the worker forever.
 FUNCTION USendChunk( cData )
 
    LOCAL o := HIX_GetRequest()
 
-   IF o != NIL
+   IF o == NIL ; RETURN .F. ; ENDIF
 
-      o:RespondChunk( cData )
+RETURN o:RespondChunk( cData )
 
-   ENDIF
-
-RETURN NIL
-
-// End the Stream Response
+// End the Stream Response -- returns .T./.F. as with the other stream
+// helpers. A .F. here typically means the peer disconnected before the
+// terminator chunk; the caller can safely ignore it at cleanup time.
 FUNCTION USendStreamEnd()
 
    LOCAL o := HIX_GetRequest()
 
-   IF o != NIL
+   IF o == NIL ; RETURN .F. ; ENDIF
 
-      o:RespondEnd()
+RETURN o:RespondEnd()
 
-   ENDIF
+// Non-destructive peer liveness check for stream handlers.
+// Returns .T. if the peer is still connected, .F. if a FIN/RST has been
+// observed on the socket. SSL sessions currently degrade to .T. (see
+// THixIO:PeerAlive). Use as primary exit in SSE/long-poll loops.
+FUNCTION UPeerAlive()
 
-RETURN NIL
+   LOCAL o := HIX_GetRequest()
+
+   IF o == NIL ; RETURN .F. ; ENDIF
+
+RETURN o:PeerAlive()
 
 // ------------------------------------------------------------
 // UTILITIES AND ENVIRONMENT

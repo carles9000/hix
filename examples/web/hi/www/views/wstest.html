@@ -67,6 +67,25 @@
 
    const sleep = ms => new Promise( r => setTimeout( r, ms ) );
 
+   // Short high-pitched click on each incoming WS frame.
+   let _actx;
+   function tick() {
+      try {
+         _actx = _actx || new ( window.AudioContext || window.webkitAudioContext )();
+         const t = _actx.currentTime;
+         const o = _actx.createOscillator();
+         const g = _actx.createGain();
+         o.type = 'sine';
+         o.frequency.setValueAtTime( 1760, t );   // A6 — click agudo
+         g.gain.setValueAtTime( 0.0001, t );
+         g.gain.exponentialRampToValueAtTime( 0.18, t + 0.005 );
+         g.gain.exponentialRampToValueAtTime( 0.0001, t + 0.08 );
+         o.connect( g ).connect( _actx.destination );
+         o.start( t );
+         o.stop( t + 0.09 );
+      } catch ( e ) {}
+   }
+
    function runAll() {
 
       const btn = document.getElementById( 'btnRun' );
@@ -123,6 +142,7 @@
 
          const rtt = Math.round( performance.now() - aSent[ nRecv ] );
 
+         tick();
          nRecv++;
          log( `#${String( nRecv ).padStart( 2, '0' )} recv     ${rtt} ms   ${e.data}`, C.recv );
 

@@ -9,7 +9,7 @@
                Copyright (c) 2026 Carles Aubia Floresví - HIX Server Project
  -----------------------------------------------------------*/
 #DEFINE HIX_VERSION_SERVER                "2.1"
-#DEFINE HIX_SUBVERSION_SERVER             ".01"       // ".01"
+#DEFINE HIX_SUBVERSION_SERVER             ".04"       
 #DEFINE HIX_LOG_MODULE HIX_MOD_SERVER
 #DEFINE SW_SHOW                              5
 
@@ -66,11 +66,11 @@ CLASS THixServer
    METHOD SetFirewall( cFilter, cMode )
 
    // ---- API de rutas ----
-   METHOD AddRoute( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo )
-   METHOD AddRouteGet(    cName, cPattern, bAction, cMw, cScope, uCargo )
-   METHOD AddRoutePost(   cName, cPattern, bAction, cMw, cScope, uCargo )
-   METHOD AddRoutePut(    cName, cPattern, bAction, cMw, cScope, uCargo )
-   METHOD AddRouteDelete( cName, cPattern, bAction, cMw, cScope, uCargo )
+   METHOD AddRoute( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, lStream )
+   METHOD AddRouteGet(    cName, cPattern, bAction, cMw, cScope, uCargo, lStream )
+   METHOD AddRoutePost(   cName, cPattern, bAction, cMw, cScope, uCargo, lStream )
+   METHOD AddRoutePut(    cName, cPattern, bAction, cMw, cScope, uCargo, lStream )
+   METHOD AddRouteDelete( cName, cPattern, bAction, cMw, cScope, uCargo, lStream )
    METHOD DeleteRoute( cName )
    METHOD AddRouteGroup( cPrefix, cMw, cScope, bBlock )
    METHOD SetRouteHandler( cEvent, bAction )
@@ -736,7 +736,8 @@ METHOD _FlushRouteQueue() CLASS THixServer
       DO CASE
 
          CASE aItem[ 1 ] == "route"
-            HIX_RouteAdd( aItem[ 2 ], aItem[ 3 ], aItem[ 4 ], aItem[ 5 ], aItem[ 6 ], aItem[ 7 ], aItem[ 8 ] )
+            HIX_RouteAdd( aItem[ 2 ], aItem[ 3 ], aItem[ 4 ], aItem[ 5 ], aItem[ 6 ], aItem[ 7 ], aItem[ 8 ], .F., ;
+               iif( Len( aItem ) >= 9, aItem[ 9 ], .F. ) )
          CASE aItem[ 1 ] == "group"
             HIX_RouteGroup( aItem[ 2 ], aItem[ 3 ], aItem[ 4 ], aItem[ 5 ], Self )
 
@@ -751,11 +752,12 @@ RETURN Self
 // ============================================================
 // API de rutas — encolan si el router no está listo, o añaden directamente
 // ============================================================
-METHOD AddRoute( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo ) CLASS THixServer
+METHOD AddRoute( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, lStream ) CLASS THixServer
 
    hb_default( @cMethod, "*" )
    hb_default( @cMw,     ""  )
    hb_default( @cScope,  ""  )
+   hb_default( @lStream, .F. )
 
    IF ValType( bAction ) == "C" .AND. HIX_IsFilePath( bAction )
 
@@ -767,9 +769,9 @@ METHOD AddRoute( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo ) CLASS 
 
    IF HIX_RoutesIsInit()
 
-      HIX_RouteAdd( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo )
+      HIX_RouteAdd( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, .F., lStream )
    ELSE
-      AAdd( ::aRouteQueue, { "route", cName, cPattern, bAction, cMethod, cMw, cScope, uCargo } )
+      AAdd( ::aRouteQueue, { "route", cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, lStream } )
 
    ENDIF
 
@@ -891,17 +893,17 @@ METHOD ShowRoutePermissions() CLASS THixServer
 
 RETURN Self
 
-METHOD AddRouteGet( cName, cPattern, bAction, cMw, cScope, uCargo ) CLASS THixServer
-RETURN ::AddRoute( cName, cPattern, bAction, "GET",    cMw, cScope, uCargo )
+METHOD AddRouteGet( cName, cPattern, bAction, cMw, cScope, uCargo, lStream ) CLASS THixServer
+RETURN ::AddRoute( cName, cPattern, bAction, "GET",    cMw, cScope, uCargo, lStream )
 
-METHOD AddRoutePost( cName, cPattern, bAction, cMw, cScope, uCargo ) CLASS THixServer
-RETURN ::AddRoute( cName, cPattern, bAction, "POST",   cMw, cScope, uCargo )
+METHOD AddRoutePost( cName, cPattern, bAction, cMw, cScope, uCargo, lStream ) CLASS THixServer
+RETURN ::AddRoute( cName, cPattern, bAction, "POST",   cMw, cScope, uCargo, lStream )
 
-METHOD AddRoutePut( cName, cPattern, bAction, cMw, cScope, uCargo ) CLASS THixServer
-RETURN ::AddRoute( cName, cPattern, bAction, "PUT",    cMw, cScope, uCargo )
+METHOD AddRoutePut( cName, cPattern, bAction, cMw, cScope, uCargo, lStream ) CLASS THixServer
+RETURN ::AddRoute( cName, cPattern, bAction, "PUT",    cMw, cScope, uCargo, lStream )
 
-METHOD AddRouteDelete( cName, cPattern, bAction, cMw, cScope, uCargo ) CLASS THixServer
-RETURN ::AddRoute( cName, cPattern, bAction, "DELETE", cMw, cScope, uCargo )
+METHOD AddRouteDelete( cName, cPattern, bAction, cMw, cScope, uCargo, lStream ) CLASS THixServer
+RETURN ::AddRoute( cName, cPattern, bAction, "DELETE", cMw, cScope, uCargo, lStream )
 
 METHOD DeleteRoute( cName ) CLASS THixServer
 

@@ -45,6 +45,8 @@ src/hix_test_firewall.prg
 src/hix_test_flash.prg
 src/hix_test_gzip.prg
 src/hix_test_helpers.prg
+src/hix_test_usendchunk_propagate.prg
+src/hix_test_peer_alive.prg
 src/hix_test_hixstyle_acl.prg
 src/hix_test_hixstyle_harbour_sets.prg
 src/hix_test_ip.prg
@@ -67,6 +69,7 @@ src/hix_test_proxied.prg
 src/hix_test_proxy.prg
 src/hix_test_resource.prg
 src/hix_test_router.prg
+src/hix_test_route_stream.prg
 src/hix_test_session.prg
 src/hix_test_session_file.prg
 src/hix_test_user_hooks.prg

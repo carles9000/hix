@@ -111,13 +111,24 @@ FUNCTION HIX_MetricsReset()
 
 RETURN NIL
 
-FUNCTION HIX_MetricTiming( nMs, cPath )
+FUNCTION HIX_MetricTiming( nMs, cPath, lStream )
 
-   hb_default( @cPath, "" )
+   hb_default( @cPath,   "" )
+   hb_default( @lStream, .F. )
 
    IF soMetrics != NIL
 
-      soMetrics:UpdateTiming( nMs, cPath )
+      soMetrics:UpdateTiming( nMs, cPath, lStream )
+
+   ENDIF
+
+RETURN NIL
+
+FUNCTION HIX_MetricWsTiming( nMs )
+
+   IF soMetrics != NIL
+
+      soMetrics:UpdateWsTiming( nMs )
 
    ENDIF
 
@@ -162,7 +173,8 @@ CLASS THixMetrics
    METHOD Dec( cName )
    METHOD Set( cName, nValue )
    METHOD Get( cName )
-   METHOD UpdateTiming( nMs, cPath )
+   METHOD UpdateTiming( nMs, cPath, lStream )
+   METHOD UpdateWsTiming( nMs )
    METHOD UpdateTimingDyn( nMs, cPath )
    METHOD UpdateTimingStat( nMs, cPath )
    METHOD ToJson()
@@ -191,6 +203,12 @@ METHOD New( nTopN ) CLASS THixMetrics
    ::hCounters[ HIXM_REQ_MS_MAX    ] := 0
    ::hCounters[ HIXM_REQ_MS_AVG    ] := 0
    ::hCounters[ HIXM_REQ_MS_COUNT  ] := 0
+   ::hCounters[ HIXM_STREAM_MS_MAX    ] := 0
+   ::hCounters[ HIXM_STREAM_MS_AVG    ] := 0
+   ::hCounters[ HIXM_STREAM_MS_COUNT  ] := 0
+   ::hCounters[ HIXM_WS_MS_MAX        ] := 0
+   ::hCounters[ HIXM_WS_MS_AVG        ] := 0
+   ::hCounters[ HIXM_WS_MS_COUNT      ] := 0
    ::hCounters[ HIXM_VCACHE_ENTRIES ] := 0
    ::hCounters[ HIXM_VCACHE_BYTES   ] := 0
    ::hCounters[ HIXM_VCACHE_HITS    ] := 0
@@ -252,24 +270,66 @@ METHOD Get( cName ) CLASS THixMetrics
 
 RETURN nVal
 
-METHOD UpdateTiming( nMs, cPath ) CLASS THixMetrics
+METHOD UpdateTiming( nMs, cPath, lStream ) CLASS THixMetrics
 
    LOCAL nCount
 
-   hb_default( @cPath, "" )
+   hb_default( @cPath,   "" )
+   hb_default( @lStream, .F. )
    hb_mutexLock( ::oMutex )
-   nCount := ::hCounters[ HIXM_REQ_MS_COUNT ] + 1
-   ::hCounters[ HIXM_REQ_MS_COUNT ] := nCount
-   ::hCounters[ HIXM_REQ_MS_AVG ]   := Round( ::hCounters[ HIXM_REQ_MS_AVG ] + ;
-      ( nMs - ::hCounters[ HIXM_REQ_MS_AVG ] ) / nCount, 2 )
 
-   IF nMs > ::hCounters[ HIXM_REQ_MS_MAX ]
+   IF lStream
 
-      ::hCounters[ HIXM_REQ_MS_MAX ] := nMs
+      // Bucket paralelo para requests que abrieron RespondStart. Aíslan
+      // la duración de streams (SSE) de la media HTTP normal.
+      nCount := ::hCounters[ HIXM_STREAM_MS_COUNT ] + 1
+      ::hCounters[ HIXM_STREAM_MS_COUNT ] := nCount
+      ::hCounters[ HIXM_STREAM_MS_AVG ]   := Round( ::hCounters[ HIXM_STREAM_MS_AVG ] + ;
+         ( nMs - ::hCounters[ HIXM_STREAM_MS_AVG ] ) / nCount, 2 )
+
+      IF nMs > ::hCounters[ HIXM_STREAM_MS_MAX ]
+
+         ::hCounters[ HIXM_STREAM_MS_MAX ] := nMs
+
+      ENDIF
+
+   ELSE
+
+      nCount := ::hCounters[ HIXM_REQ_MS_COUNT ] + 1
+      ::hCounters[ HIXM_REQ_MS_COUNT ] := nCount
+      ::hCounters[ HIXM_REQ_MS_AVG ]   := Round( ::hCounters[ HIXM_REQ_MS_AVG ] + ;
+         ( nMs - ::hCounters[ HIXM_REQ_MS_AVG ] ) / nCount, 2 )
+
+      IF nMs > ::hCounters[ HIXM_REQ_MS_MAX ]
+
+         ::hCounters[ HIXM_REQ_MS_MAX ] := nMs
+
+      ENDIF
+
+      _HixTopNUpdate( ::aTopDyn, ::nTopN, nMs, cPath )
 
    ENDIF
 
-   _HixTopNUpdate( ::aTopDyn, ::nTopN, nMs, cPath )
+   hb_mutexUnlock( ::oMutex )
+
+RETURN Self
+
+METHOD UpdateWsTiming( nMs ) CLASS THixMetrics
+
+   LOCAL nCount
+
+   hb_mutexLock( ::oMutex )
+   nCount := ::hCounters[ HIXM_WS_MS_COUNT ] + 1
+   ::hCounters[ HIXM_WS_MS_COUNT ] := nCount
+   ::hCounters[ HIXM_WS_MS_AVG ]   := Round( ::hCounters[ HIXM_WS_MS_AVG ] + ;
+      ( nMs - ::hCounters[ HIXM_WS_MS_AVG ] ) / nCount, 2 )
+
+   IF nMs > ::hCounters[ HIXM_WS_MS_MAX ]
+
+      ::hCounters[ HIXM_WS_MS_MAX ] := nMs
+
+   ENDIF
+
    hb_mutexUnlock( ::oMutex )
 
 RETURN Self
@@ -355,6 +415,12 @@ METHOD Reset() CLASS THixMetrics
    ::hCounters[ HIXM_REQ_MS_MAX    ] := 0
    ::hCounters[ HIXM_REQ_MS_AVG    ] := 0
    ::hCounters[ HIXM_REQ_MS_COUNT  ] := 0
+   ::hCounters[ HIXM_STREAM_MS_MAX    ] := 0
+   ::hCounters[ HIXM_STREAM_MS_AVG    ] := 0
+   ::hCounters[ HIXM_STREAM_MS_COUNT  ] := 0
+   ::hCounters[ HIXM_WS_MS_MAX        ] := 0
+   ::hCounters[ HIXM_WS_MS_AVG        ] := 0
+   ::hCounters[ HIXM_WS_MS_COUNT      ] := 0
    ::hCounters[ HIXM_VCACHE_HITS   ] := 0
    ::hCounters[ HIXM_VCACHE_MISSES ] := 0
    ::aTopDyn  := {}

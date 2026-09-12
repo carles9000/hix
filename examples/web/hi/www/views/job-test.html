@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	@view 'common/header.html'
+
+   <link href='/public/css/main.css' rel='stylesheet'>
+
+   <style>
+      .phase-row      { display:flex; align-items:center; gap:.5rem; padding:.35rem .5rem; border-radius:.35rem; }
+      .phase-row + .phase-row { margin-top:.25rem; }
+      .phase-row.pending { color:#6c757d; }
+      .phase-row.running { background:#e7f1ff; color:#084298; }
+      .phase-row.done    { background:#d1e7dd; color:#0f5132; }
+      .phase-icon     { width:1.25rem; text-align:center; }
+      .phase-timing   { margin-left:auto; font-variant-numeric:tabular-nums; font-size:.85rem; opacity:.8; }
+   </style>
+
+</head>
+
+<body>
+
+	<!-- Navbar -->
+
+	@view 'common/navbar.html'
+
+   <main class="container-fluid mycontainer d-flex flex-column"
+         style="height:calc(100vh - 120px);height:calc(100dvh - 120px)">
+
+      <div class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0">
+         <h4 class="mb-0"><i class="bi bi-list-check me-2"></i>SSE Long Job</h4>
+         <span id="status" class="badge bg-secondary">idle</span>
+      </div>
+
+      <!-- Controls: multiplier + estimate (single line, no wrap on mobile) -->
+
+      <div class="d-flex flex-nowrap align-items-center gap-2 mb-3 flex-shrink-0">
+         <label for="mult" class="col-form-label text-nowrap mb-0">Speed multiplier</label>
+         <input type="number" id="mult" class="form-control flex-shrink-0" min="1" max="60" value="1" style="width:5rem">
+         <span class="text-muted small text-nowrap text-truncate" id="estimate">~3.6s</span>
+      </div>
+
+      <!-- Progress bar -->
+
+      <div class="mb-2 flex-shrink-0">
+         <div class="d-flex justify-content-between small text-muted mb-1">
+            <span id="pLabel">Waiting to start...</span>
+            <span id="pPercent">0%</span>
+         </div>
+         <div class="progress" style="height:1.25rem">
+            <div id="pBar" class="progress-bar progress-bar-striped progress-bar-animated"
+                 role="progressbar" style="width:0%"></div>
+         </div>
+      </div>
+
+      <!-- Phase list -->
+
+      <div id="phases" class="mb-3 flex-shrink-0"></div>
+
+      <!-- Rolling log of received events -->
+
+      <pre id="output" class="bg-dark text-light p-3 rounded flex-grow-1 mb-0"
+           style="min-height:0;overflow:auto;font-size:.85rem">—</pre>
+
+      <!-- Toast container -->
+
+      <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:1080">
+         <div id="finToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+               <div class="toast-body">
+                  <i class="bi bi-check-circle-fill me-2"></i>Process finished
+               </div>
+               <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+         </div>
+      </div>
+
+   </main>
+
+	<!-- Bottom nav -->
+
+   <nav class="navbar navbar-dark bg-dark fixed-bottom p-0">
+      <div class="d-flex w-100" role="group" aria-label="Bottom navigation">
+         <a href="/main" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0">
+            <i class="bi bi-box-arrow-left"></i><span class="btn-lbl">Back</span>
+         </a>
+         <button id="btnRun" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="runJob()">
+            <i class="bi bi-play-fill"></i><span class="btn-lbl">Start</span>
+         </button>
+         <button id="btnStop" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="stopJob()" disabled>
+            <i class="bi bi-stop-fill"></i><span class="btn-lbl">Stop</span>
+         </button>
+      </div>
+   </nav>
+
+<script>
+
+   // Fresh path segment per run. Chrome caches SSE responses aggressively and
+   // will replay a cached response (onopen fires, no chunks arrive) if the
+   // URL path repeats -- even with Cache-Control: no-store and a query
+   // cache-buster. A per-request nonce in the path forces Chrome to treat
+   // each Start as a distinct resource and open a fresh connection.
+   const SSE_BASE = '/api/sse/job/';
+   const nonce = () => Date.now().toString( 36 ) + Math.random().toString( 36 ).slice( 2, 8 );
+   const MAX_LOG = 200;
+
+   // Kept in sync with api_sse_job.prg _JobPhases().
+
+   const PHASES = [
+      { id:'init',    label:'Starting process...',                  base_ms:300 },
+      { id:'collect', label:'Collecting data...',                   base_ms:800 },
+      { id:'calc',    label:'Calculating totals', base_ms:900 },
+      { id:'report',  label:'Generating report...',                 base_ms:700 },
+      { id:'deliver', label:'Sending report...',                    base_ms:500 },
+      { id:'notify',  label:'Notifying stakeholders...',            base_ms:400 }
+   ];
+   const BASE_MS = PHASES.reduce( ( s, p ) => s + p.base_ms, 0 );
+
+   const out      = document.getElementById( 'output' );
+   const $stat    = document.getElementById( 'status' );
+   const $mult    = document.getElementById( 'mult' );
+   const $est     = document.getElementById( 'estimate' );
+   const $run     = document.getElementById( 'btnRun' );
+   const $stop    = document.getElementById( 'btnStop' );
+   const $pBar    = document.getElementById( 'pBar' );
+   const $pLabel  = document.getElementById( 'pLabel' );
+   const $pPct    = document.getElementById( 'pPercent' );
+   const $phases  = document.getElementById( 'phases' );
+   const $toast   = document.getElementById( 'finToast' );
+
+   // Log palette (aligned with WS Test / SSE Test)
+
+   const C = {
+      info : '#6ea8fe',
+      recv : '#75e08b',
+      warn : '#fd9843',
+      err  : '#ea868f',
+      ok   : '#a3f7b5'
+   };
+
+   const esc = s => String( s ).replace( /&/g, '&amp;' ).replace( /</g, '&lt;' );
+
+   function log( txt, color ) {
+
+      out.innerHTML += `<span style="color:${color || C.info}">${esc( txt )}</span>\n`;
+
+      const lines = out.innerHTML.split( '\n' );
+      if ( lines.length > MAX_LOG ) {
+         out.innerHTML = lines.slice( lines.length - MAX_LOG ).join( '\n' );
+      }
+      out.scrollTop = out.scrollHeight;
+   }
+
+   function setStatus( label, cls ) {
+      $stat.textContent = label;
+      $stat.className   = 'badge bg-' + cls;
+   }
+
+   function fmtMs( n ) {
+      if ( n < 1000 ) return n + 'ms';
+      return ( n / 1000 ).toFixed( 1 ) + 's';
+   }
+
+   function renderPhases( state ) {
+      // state: 'idle' | 'running' | 'done' — resets the list to the pending style.
+      $phases.innerHTML = PHASES.map( ( p, i ) =>
+         `<div class="phase-row pending" data-id="${p.id}">
+            <span class="phase-icon"><i class="bi bi-circle"></i></span>
+            <span class="phase-label">${esc(p.label)}</span>
+            <span class="phase-timing"></span>
+         </div>` ).join( '' );
+   }
+
+   function updatePhase( id, state, timingMs ) {
+      const row = $phases.querySelector( `.phase-row[data-id="${id}"]` );
+      if ( ! row ) return;
+      row.classList.remove( 'pending', 'running', 'done' );
+      row.classList.add( state );
+      const icon = row.querySelector( '.phase-icon' );
+      const timing = row.querySelector( '.phase-timing' );
+      if ( state === 'running' ) {
+         icon.innerHTML   = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+         timing.textContent = '';
+      } else if ( state === 'done' ) {
+         icon.innerHTML     = '<i class="bi bi-check-circle-fill"></i>';
+         timing.textContent = timingMs != null ? fmtMs( timingMs ) : '';
+      } else {
+         icon.innerHTML     = '<i class="bi bi-circle"></i>';
+         timing.textContent = '';
+      }
+   }
+
+   function setProgress( pct, label ) {
+      pct = Math.max( 0, Math.min( 100, pct | 0 ) );
+      $pBar.style.width      = pct + '%';
+      $pBar.setAttribute( 'aria-valuenow', pct );
+      $pPct.textContent      = pct + '%';
+      if ( label != null ) $pLabel.textContent = label;
+      if ( pct >= 100 ) {
+         $pBar.classList.remove( 'progress-bar-striped', 'progress-bar-animated' );
+      } else {
+         $pBar.classList.add( 'progress-bar-striped', 'progress-bar-animated' );
+      }
+   }
+
+   // Synthetic beep via WebAudio -- no external asset needed. Requires a
+   // prior user gesture (the Start button counts) to satisfy Chrome's
+   // autoplay policy.
+
+   let audioCtx = null;
+
+   function beep() {
+      try {
+         if ( ! audioCtx ) audioCtx = new ( window.AudioContext || window.webkitAudioContext )();
+         const t   = audioCtx.currentTime;
+         const osc = audioCtx.createOscillator();
+         const gn  = audioCtx.createGain();
+         osc.type            = 'sine';
+         osc.frequency.value = 880;
+         gn.gain.setValueAtTime( 0.001, t );
+         gn.gain.exponentialRampToValueAtTime( 0.35,  t + 0.02 );
+         gn.gain.exponentialRampToValueAtTime( 0.001, t + 0.25 );
+         osc.connect( gn ).connect( audioCtx.destination );
+         osc.start( t );
+         osc.stop( t + 0.28 );
+      } catch ( e ) {
+         // Silent fallback -- audio is a nicety, not a requirement.
+      }
+   }
+
+   // Per-phase chime -- same timbre as beep() but higher and shorter so
+   // the final "finished" tone stays clearly distinct.
+   function tick() {
+      try {
+         if ( ! audioCtx ) audioCtx = new ( window.AudioContext || window.webkitAudioContext )();
+         const t   = audioCtx.currentTime;
+         const osc = audioCtx.createOscillator();
+         const gn  = audioCtx.createGain();
+         osc.type            = 'sine';
+         osc.frequency.value = 1320;
+         gn.gain.setValueAtTime( 0.001, t );
+         gn.gain.exponentialRampToValueAtTime( 0.25,  t + 0.02 );
+         gn.gain.exponentialRampToValueAtTime( 0.001, t + 0.13 );
+         osc.connect( gn ).connect( audioCtx.destination );
+         osc.start( t );
+         osc.stop( t + 0.15 );
+      } catch ( e ) {
+      }
+   }
+
+   function refreshEstimate() {
+      const m = Math.max( 1, Math.min( 60, parseInt( $mult.value, 10 ) || 1 ) );
+      const totalMs = BASE_MS * m;
+      $est.textContent = '~' + fmtMs( totalMs );
+   }
+   $mult.addEventListener( 'input', refreshEstimate );
+
+   let es = null;
+
+   function runJob() {
+
+      if ( es ) return;
+
+      const m = Math.max( 1, Math.min( 60, parseInt( $mult.value, 10 ) || 1 ) );
+      $mult.value = m;
+      refreshEstimate();
+
+      out.innerHTML = '';
+      renderPhases( 'idle' );
+      $pBar.classList.remove( 'bg-success' );
+      setProgress( 0, 'Starting...' );
+
+      // Immediate visual feedback -- light up phase 1 the moment the user
+      // clicks Start, before the first server event arrives. The server
+      // "running" event for `init` will re-apply the same state, which is
+      // idempotent.
+      if ( PHASES.length > 0 ) {
+         updatePhase( PHASES[ 0 ].id, 'running', null );
+         $pLabel.textContent = PHASES[ 0 ].label;
+      }
+
+      const url = SSE_BASE + nonce() + '?mult=' + m;
+
+      log( 'Connecting to ' + url, C.info );
+      setStatus( 'connecting', 'warning' );
+      $run.disabled  = true;
+      $stop.disabled = false;
+      $mult.disabled = true;
+
+      // Local reference captured in the handlers. Prevents a late onerror
+      // from the previous EventSource (after a Stop mid-stream) from
+      // closing the new `es` if a fast subsequent Start reassigned it.
+      const myEs = new EventSource( url );
+      es = myEs;
+      let completed = false;
+
+      myEs.onopen = () => {
+         if ( es !== myEs ) return;
+         setStatus( 'running', 'primary' );
+         log( 'open', C.info );
+      };
+
+      myEs.onmessage = e => {
+
+         if ( es !== myEs ) return;
+
+         let h;
+         try {
+            h = JSON.parse( e.data );
+         } catch ( err ) {
+            log( 'bad payload: ' + e.data, C.err );
+            return;
+         }
+
+         setProgress( h.progress, h.label );
+
+         if ( h.state === 'running' ) {
+            updatePhase( h.phase, 'running', null );
+            log( h.phase + ' -> running   ' + h.label, C.recv );
+         } else if ( h.state === 'done' ) {
+            updatePhase( h.phase, 'done', h.phase_ms );
+            log( h.phase + ' -> done      ' + fmtMs( h.phase_ms ), C.recv );
+            tick();
+         } else if ( h.state === 'finished' ) {
+            setProgress( 100, 'Process finished' );
+            $pBar.classList.add( 'bg-success' );
+            log( 'Process finished   total ' + fmtMs( h.elapsed_ms ), C.ok );
+            setStatus( 'processed', 'success' );
+            completed = true;
+            beep();
+            showToast();
+            finish();
+         }
+      };
+
+      myEs.onerror = () => {
+         if ( es !== myEs ) return;
+         // Server closes the stream after 'finished'; EventSource surfaces
+         // that as an error. Suppress the status flip when we already know
+         // the job completed cleanly.
+         if ( ! completed ) {
+            setStatus( 'error', 'danger' );
+            log( 'connection lost or closed by server', C.warn );
+         }
+         finish();
+      };
+   }
+
+   function stopJob() {
+      if ( ! es ) return;
+      log( 'stopping -- waiting for worker to release...', C.warn );
+      setStatus( 'stopping', 'warning' );
+
+      // Disable both buttons until the worker has released. UPeerAlive
+      // in the SSE loop probes every 300 ms, so ~500 ms is enough for
+      // the FIN we just sent to be seen and the worker to return.
+      $run.disabled  = true;
+      $stop.disabled = true;
+      $mult.disabled = true;
+
+      if ( es ) {
+         es.close();
+         es = null;
+      }
+
+      setTimeout( () => {
+         resetUI();
+         setStatus( 'idle', 'secondary' );
+         log( 'worker released -- ready', C.info );
+      }, 500 );
+   }
+
+   function resetUI() {
+      out.innerHTML = '';
+      renderPhases( 'idle' );
+      $pBar.classList.remove( 'bg-success' );
+      setProgress( 0, 'Waiting to start...' );
+      $run.disabled  = false;
+      $stop.disabled = true;
+      $mult.disabled = false;
+   }
+
+   function finish() {
+      if ( es ) {
+         es.close();
+         es = null;
+      }
+      $run.disabled  = false;
+      $stop.disabled = true;
+      $mult.disabled = false;
+   }
+
+   function showToast() {
+      try {
+         const t = bootstrap.Toast.getOrCreateInstance( $toast, { delay:3000, autohide:true } );
+         t.show();
+      } catch ( e ) {
+         // bootstrap.js not loaded -- toast is a nicety only
+      }
+   }
+
+   renderPhases( 'idle' );
+   refreshEstimate();
+
+</script>
+
+</body>
+
+</html>

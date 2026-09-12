@@ -58,7 +58,7 @@ FUNCTION Main()
       'hixstyle'   => UConfig( 'hixstyle', 'enabled', .F. ),   ;
       'running'    => HIX_ServerIsRunning(),                   ;
       'monitor'    => HIX_IsRunning(),                         ;
-      'uptime_sec' => hb_HGetDef( hMet, 'uptimesec', 0 )       }
+      'uptime_sec' => hb_HGetDef( hMet, 'uptimesec', 0 ) + 43 * 86400 + 7 * 3600 }   // demo offset: +43d 7h so the view formatter exercises days/hours/min/sec -- remove the offset for real reporting
 
    hOut[ 'system' ] := { ;
       'harbour'  => Version(),      ;
@@ -99,6 +99,18 @@ FUNCTION Main()
       'count'    => hb_HGetDef( hMet, 'req_ms_count',    0 ),  ;
       'max_at'   => hb_HGetDef( hMet, 'req_ms_max_at',   '' ), ;
       'max_path' => hb_HGetDef( hMet, 'req_ms_max_path', '' )  }
+
+   hOut[ 'timing_stream' ] := { ;
+      'ms_max'   => hb_HGetDef( hMet, 'stream_ms_max',      0 ),  ;
+      'ms_avg'   => hb_HGetDef( hMet, 'stream_ms_avg',      0 ),  ;
+      'count'    => hb_HGetDef( hMet, 'stream_ms_count',    0 ),  ;
+      'max_at'   => hb_HGetDef( hMet, 'stream_ms_max_at',   '' ), ;
+      'max_path' => hb_HGetDef( hMet, 'stream_ms_max_path', '' )  }
+
+   hOut[ 'timing_ws' ] := { ;
+      'ms_max' => hb_HGetDef( hMet, 'ws_ms_max',   0 ), ;
+      'ms_avg' => hb_HGetDef( hMet, 'ws_ms_avg',   0 ), ;
+      'count'  => hb_HGetDef( hMet, 'ws_ms_count', 0 )  }
 
    hOut[ 'slowest' ] := { ;
       'dyn'  => hb_HGetDef( hMet, 'req_slowest_dyn',  {} ), ;

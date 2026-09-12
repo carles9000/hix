@@ -44,6 +44,12 @@ CLASS THixRequest
    // Modo streaming chunked activo
    DATA lStreaming     INIT .F.
 
+   // Marca persistente: este request pasó por RespondStart en algún momento.
+   // Se pone a .T. la primera vez y NO se resetea en RespondEnd, así el worker
+   // HTTP puede excluir su duración del bucket req_ms_avg (que es HTTP no-stream)
+   // y contabilizarla en stream_ms_avg al finalizar.
+   DATA lWasStream     INIT .F.
+
    // Modo proxied: resolver cIP desde X-Forwarded-For / X-Real-IP
    DATA lProxied      INIT .F.
 
@@ -88,6 +94,7 @@ CLASS THixRequest
    METHOD RespondChunk( cData )                       // Envía un trozo de datos
    METHOD RespondEnd()                                // Finaliza streaming (chunk 0\r\n\r\n)
    METHOD RespondStream( cMime, bBlock, nStatus, hExtra ) // RespondStart + bBlock(Self) + RespondEnd
+   METHOD PeerAlive() INLINE iif( ::oIO == NIL, .F., ::oIO:PeerAlive() )
    METHOD Header( cKey, xDef )                // Acceso normalizado a headers
    METHOD QueryParam( cKey, xDef )            // Acceso lazy a query string (URL-decoded)
    METHOD QueryParamsAll()                    // Hash completo de query params (lazy parse)
@@ -409,7 +416,17 @@ METHOD RespondStart( cMime, nStatus, hExtra ) CLASS THixRequest
 
    ENDIF
 
+   // Reclasificar la conexión: el worker HTTP incrementó ACTIVE_HTTP al arrancar,
+   // pero un stream (SSE) debe contarse como ACTIVE_OTROS mientras dura para que
+   // /server-info -> Connections lo muestre bajo "sse / longpoll" y no bajo "http".
+   // Sólo se hace una vez por request (::lWasStream evita doble-swap).
+   IF ! ::lWasStream
+      HIX_MetricDec( HIXM_ACTIVE_HTTP  )
+      HIX_Metric(    HIXM_ACTIVE_OTROS )
+   ENDIF
+
    ::lStreaming := .T.
+   ::lWasStream := .T.
    HIX_AccessLog( ::cIP, ::cMethod, ::cPath, ::cProtocol, nStatus )
 
 RETURN HIX_ResponseStreamStart( ::oIO, cMime, nStatus, ::lKeepAlive, hExtra )

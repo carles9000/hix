@@ -75,6 +75,7 @@ CLASS THixIO
    METHOD Write( cData, nTimeout )
    METHOD WriteChunk( cData )
    METHOD WriteChunkEnd()
+   METHOD PeerAlive()
    METHOD Close()
 
 ENDCLASS
@@ -236,6 +237,36 @@ RETURN ::Write( hb_NumToHex( Len( cData ) ) + HIX_CRLF + cData + HIX_CRLF )
 // ------------------------------------------------------------
 METHOD WriteChunkEnd() CLASS THixIO
 RETURN ::Write( "0" + HIX_CRLF + HIX_CRLF )
+
+// ------------------------------------------------------------
+// PeerAlive — non-destructive peek to detect peer FIN/RST.
+// Returns .T. if peer still connected, .F. if closed.
+// SSL sessions degrade to .T. (TCP peek cannot see decrypted stream).
+// ------------------------------------------------------------
+METHOD PeerAlive() CLASS THixIO
+
+   LOCAL cBuf, nRead
+
+   IF Empty( ::hSocket ) ; RETURN .F. ; ENDIF
+
+   IF ::lUseSSL .AND. ::hSSLSession != NIL ; RETURN .T. ; ENDIF
+
+   cBuf  := Space( 1 )
+   nRead := hb_socketRecv( ::hSocket, @cBuf, 1, HB_SOCKET_MSG_PEEK, 0 )
+
+   DO CASE
+   CASE nRead == 0 ; RETURN .F.
+   CASE nRead  > 0 ; RETURN .T.
+   ENDCASE
+
+RETURN ! _HixIsFatalSocketError( hb_socketGetError() )
+
+STATIC FUNCTION _HixIsFatalSocketError( nErr )
+RETURN nErr == HB_SOCKET_ERR_CONNRESET   .OR. ;
+       nErr == HB_SOCKET_ERR_CONNABORTED .OR. ;
+       nErr == HB_SOCKET_ERR_NOTCONN     .OR. ;
+       nErr == HB_SOCKET_ERR_PIPE        .OR. ;
+       nErr == HB_SOCKET_ERR_SHUTDOWN
 
 // ------------------------------------------------------------
 // Close — drain + cierre limpio

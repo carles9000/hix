@@ -1,8 +1,11 @@
-2.1.01 Fix WebSocket upgrade behind Cloudflare / reverse proxy
-         - Detector defaults: peek_timeout_ms 10->150, peek_bytes 512->2048
-         - Worker HTTP fallback: promote to WS upgrade also on plain TCP
-           (previously restricted to SSL only)
-       Add unit test hix_test_ws_detector (compares old vs new peek_bytes)
+2.1.04 Isolate SSE/WS timing into their own metric buckets and redesign
+       the /server-info panel with per-protocol boxes (see changes/2.1.04.md).
+2.1.03 Reliable peer close detection for long streams via non-destructive
+       recv MSG_PEEK (UPeerAlive helper). See changes/2.1.03.md.
+2.1.02 Streaming send helpers now return peer-alive status and routes gain
+       a "stream" flag with its own exec timeout. See changes/2.1.02.md.
+2.1.01 Fix WebSocket upgrade behind Cloudflare / reverse proxy by bumping
+       detector peek defaults and promoting WS on plain TCP. See changes/2.1.01.md.
 2.1    Add go_lib_gcc.sh for linux version
        Solved exit server hang linux
 2.0.05 Change order include path. First HB_INCLUDE if it exist 

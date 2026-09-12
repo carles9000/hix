@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	@view 'common/header.html'
+
+   <link href='/public/css/main.css' rel='stylesheet'>
+
+</head>
+
+<body>
+
+	<!-- Navbar -->
+
+	@view 'common/navbar.html'
+
+   <!-- body has 60px top/bottom margin (main.css): that is the room taken by both fixed navbars -->
+
+   <main class="container-fluid mycontainer d-flex flex-column"
+         style="height:calc(100vh - 120px);height:calc(100dvh - 120px)">
+
+      <div class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0">
+         <h4 class="mb-0"><i class="bi bi-broadcast me-2"></i>SSE Live Room</h4>
+         <span id="status" class="badge bg-secondary">idle</span>
+      </div>
+
+      <!-- Two tiles: compact user count + wider server time -->
+
+      <div class="row g-3 mb-3 flex-shrink-0">
+         <div class="col-4">
+            <div class="card text-center h-100">
+               <div class="card-body py-3">
+                  <div class="text-muted small text-uppercase">Users</div>
+                  <div id="users" class="display-6 fw-bold">—</div>
+               </div>
+            </div>
+         </div>
+         <div class="col-8">
+            <div class="card text-center h-100">
+               <div class="card-body py-3">
+                  <div class="text-muted small text-uppercase">Server time</div>
+                  <div id="time" class="display-4 fw-bold text-nowrap">—</div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <!-- Rolling log of received events -->
+
+      <pre id="output" class="bg-dark text-light p-3 rounded flex-grow-1 mb-0"
+           style="min-height:0;overflow:auto;font-size:.85rem">—</pre>
+
+   </main>
+
+	<!-- Bottom nav -->
+
+   <nav class="navbar navbar-dark bg-dark fixed-bottom p-0">
+      <div class="d-flex w-100" role="group" aria-label="Bottom navigation">
+         <a href="/main" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0">
+            <i class="bi bi-box-arrow-left"></i><span class="btn-lbl">Back</span>
+         </a>
+         <button id="btnRun" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="runSSE()">
+            <i class="bi bi-play-fill"></i><span class="btn-lbl">Run</span>
+         </button>
+         <button id="btnStop" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="stopSSE()" disabled>
+            <i class="bi bi-stop-fill"></i><span class="btn-lbl">Stop</span>
+         </button>
+      </div>
+   </nav>
+
+<script>
+
+   // Open two tabs against /sse-test to see the counter jump to 2 in real
+   // time. Each tab holds one worker of [pool_rest] -- close tabs to free
+   // them. EventSource reconnects automatically after a drop.
+
+   const SSE_URL = '/api/sse/ticker';
+   const MAX_LOG = 200;
+
+   const out    = document.getElementById( 'output' );
+   const $users = document.getElementById( 'users'  );
+   const $time  = document.getElementById( 'time'   );
+   const $stat  = document.getElementById( 'status' );
+   const $run   = document.getElementById( 'btnRun'  );
+   const $stop  = document.getElementById( 'btnStop' );
+
+   // Log palette (aligned with WS Test)
+
+   const C = {
+      info : '#6ea8fe',   // blue  -- connection info
+      recv : '#75e08b',   // green -- server event
+      warn : '#fd9843',   // orange -- reconnect / stop
+      err  : '#ea868f'    // red   -- error
+   };
+
+   const esc = s => String( s ).replace( /&/g, '&amp;' ).replace( /</g, '&lt;' );
+
+   function log( txt, color ) {
+
+      out.innerHTML += `<span style="color:${color || C.info}">${esc( txt )}</span>\n`;
+
+      // Cap log to MAX_LOG lines so a long session stays responsive
+
+      const lines = out.innerHTML.split( '\n' );
+      if ( lines.length > MAX_LOG ) {
+         out.innerHTML = lines.slice( lines.length - MAX_LOG ).join( '\n' );
+      }
+      out.scrollTop = out.scrollHeight;
+   }
+
+   function setStatus( label, cls ) {
+      $stat.textContent = label;
+      $stat.className   = 'badge bg-' + cls;
+   }
+
+   let es         = null;
+   let reconnects = 0;
+   let lastTick   = 0;
+
+   function runSSE() {
+
+      if ( es ) return;
+
+      out.innerHTML = '';
+      reconnects   = 0;
+      lastTick     = 0;
+
+      log( 'Connecting to ' + SSE_URL, C.info );
+      setStatus( 'connecting', 'warning' );
+      $run.disabled  = true;
+      $stop.disabled = false;
+
+      es = new EventSource( SSE_URL );
+
+      es.onopen = () => {
+         setStatus( 'open', 'success' );
+         log( 'open', C.info );
+      };
+
+      es.onmessage = e => {
+
+         let h;
+
+         try {
+            h = JSON.parse( e.data );
+         } catch ( err ) {
+            log( 'bad payload: ' + e.data, C.err );
+            return;
+         }
+
+         const now = Date.now();
+         const gap = lastTick ? ( ( now - lastTick ) / 1000 ).toFixed( 1 ) : null;
+         lastTick  = now;
+
+         $users.textContent = h.users;
+         $time .textContent = h.time;
+
+         log( 'recv  ' + e.data + ( gap === null ? '' : '   (+' + gap + 's)' ), C.recv );
+      };
+
+      es.onerror = () => {
+         // Fires on network drop and on server restart. Browser retries
+         // automatically until stopSSE() closes the EventSource.
+         if ( ! es ) return;
+         reconnects++;
+         setStatus( 'reconnecting #' + reconnects, 'warning' );
+         log( 'connection lost -- browser will retry (#' + reconnects + ')', C.warn );
+      };
+   }
+
+   function stopSSE() {
+
+      if ( ! es ) return;
+
+      es.close();
+      es = null;
+
+      setStatus( 'stopped', 'secondary' );
+      log( 'stopped by user', C.warn );
+
+      $run.disabled  = false;
+      $stop.disabled = true;
+   }
+
+   // Auto-start on page load -- Run/Stop keeps working for the user
+
+   runSSE();
+
+</script>
+
+</body>
+
+</html>
