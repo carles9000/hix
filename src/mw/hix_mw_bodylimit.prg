@@ -84,6 +84,12 @@ STATIC FUNCTION _HixMwBodyLimitRun( oCtx, nMax )
 
    IF nLen > nMax
 
+      // Drenar el body oversized antes de responder y cerrar keep-alive.
+      // Sin drenar, proxies upstream (Cloudflare Tunnel, nginx) siguen
+      // subiendo bytes al origen que ya respondió → deadlock del fetch
+      // del cliente. Ver hix_request.prg REQ_BODY_TOO_LARGE.
+      oCtx:oReq:oIO:Drain( nLen - Len( oCtx:oReq:cBodyPre ) )
+      oCtx:oReq:lKeepAlive := .F.
       oCtx:oReq:Respond( hb_jsonEncode( { "error" => _( 'ERR_PAYLOAD_TOO_LARGE' ) } ), 413, "json" )
       oCtx:lHandled := .T.
       RETURN .F.

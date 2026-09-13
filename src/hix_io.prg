@@ -72,6 +72,7 @@ CLASS THixIO
    METHOD New( hSocket )
    METHOD Read( nBytes, nTimeout )
    METHOD ReadHeaders( nTimeout )
+   METHOD Drain( nBytes, nTimeout )
    METHOD Write( cData, nTimeout )
    METHOD WriteChunk( cData )
    METHOD WriteChunkEnd()
@@ -87,41 +88,98 @@ METHOD New( hSocket ) CLASS THixIO
 RETURN Self
 
 // ------------------------------------------------------------
-// Read — leer nBytes del socket o sesión SSL
+// Read — leer exactamente nBytes del socket o sesión SSL.
+// TCP entrega el stream fragmentado: un solo recv() devuelve lo que haya
+// en el buffer del kernel en ese instante, no bloquea hasta llenar nBytes.
+// Bucle hasta acumular nBytes o hasta que el peer cierre / haya error /
+// una espera parcial supere nTimeout (stall detector por-recv, mantiene
+// la semántica original del syscall para llamadores existentes).
 // ------------------------------------------------------------
 METHOD Read( nBytes, nTimeout ) CLASS THixIO
 
-   LOCAL cBuf, nRead, lErr := .F.
+   LOCAL cBuf   := ""
+   LOCAL nGot   := 0
+   LOCAL cChunk, nRead, lErr
 
    hb_default( @nTimeout, HIX_DEFAULT_READ_TIMEOUT )
 
-   IF ::lUseSSL .AND. ::hSSLSession != NIL
+   DO WHILE nGot < nBytes
 
-      cBuf := _HixSSLRead( ::hSSLSession, ::hSocket, nBytes, nTimeout, @lErr )
+      IF ::lUseSSL .AND. ::hSSLSession != NIL
 
-      IF lErr
+         lErr   := .F.
+         cChunk := _HixSSLRead( ::hSSLSession, ::hSocket, nBytes - nGot, nTimeout, @lErr )
 
-         ::lConnClosed := .T.
+         IF lErr
+            ::lConnClosed := .T.
+            EXIT
+         ENDIF
+
+         IF cChunk == NIL .OR. Len( cChunk ) == 0
+            EXIT      // timeout sin bytes o peer cerró
+         ENDIF
+
+         cBuf += cChunk
+         nGot += Len( cChunk )
+
+      ELSE
+
+         cChunk := Space( nBytes - nGot )
+         nRead  := hb_socketRecv( ::hSocket, @cChunk, nBytes - nGot, 0, nTimeout )
+
+         IF nRead < 0
+            ::lConnClosed := .T.
+            EXIT      // error o timeout del recv
+         ELSEIF nRead == 0
+            EXIT      // peer cerró limpio
+         ENDIF
+
+         cBuf += Left( cChunk, nRead )
+         nGot += nRead
 
       ENDIF
 
-      RETURN cBuf
+   ENDDO
 
-   ENDIF
+RETURN iif( nGot == 0, NIL, cBuf )
 
-   cBuf  := Space( nBytes )
-   nRead := hb_socketRecv( ::hSocket, @cBuf, nBytes, 0, nTimeout )
+// ------------------------------------------------------------
+// Drain — leer y descartar nBytes en chunks pequeños (64 KB).
+// Se usa cuando la request tiene un body que no vamos a procesar
+// (payload_too_large, ruta rechazada por middleware, etc). Sin drenar,
+// los bytes pendientes en el socket bloquean al proxy upstream
+// (Cloudflare Tunnel, nginx) que sigue subiendo hacia un origen que
+// ya respondió → deadlock del canal.
+// Devuelve los bytes efectivamente drenados. Corta si el peer cierra
+// o se supera nTimeout entre chunks.
+// ------------------------------------------------------------
+METHOD Drain( nBytes, nTimeout ) CLASS THixIO
 
-   IF nRead < 0
+   LOCAL nDrained := 0
+   LOCAL cChunk, nChunk
 
-      ::lConnClosed := .T.
-      RETURN NIL
-   ELSEIF nRead == 0
-      RETURN NIL
+   hb_default( @nTimeout, HIX_DEFAULT_READ_TIMEOUT )
 
-   ENDIF
+   DO WHILE nDrained < nBytes
 
-RETURN Left( cBuf, nRead )
+      nChunk := Min( 65536, nBytes - nDrained )
+      cChunk := ::Read( nChunk, nTimeout )
+
+      IF cChunk == NIL .OR. Len( cChunk ) == 0
+         EXIT
+      ENDIF
+
+      nDrained += Len( cChunk )
+
+      // Si Read devolvió menos del chunk pedido (timeout parcial), salimos
+      // para no quedarnos bombeando si el peer se paró.
+      IF Len( cChunk ) < nChunk
+         EXIT
+      ENDIF
+
+   ENDDO
+
+RETURN nDrained
 
 // ------------------------------------------------------------
 // ReadHeaders — leer hasta CRLFCRLF (headers HTTP completos)

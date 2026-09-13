@@ -311,7 +311,16 @@ METHOD ReadBody() CLASS THixRequest
    IF nLen > HIX_MAX_BODY_SIZE
 
       lw( _( "REQ_BODY_TOO_LARGE", hb_ntos( nLen ) ) )
-      ::cBody := ""
+      // Drenar el body oversized y cerrar keep-alive.
+      // Sin drenar, proxies como Cloudflare Tunnel se quedan bloqueados
+      // subiendo bytes hacia un origen que ya respondió — el fetch del
+      // cliente cuelga esperando la respuesta que el proxy no libera
+      // hasta que la request esté completa. Descartar los bytes restantes
+      // (Content-Length menos los ya pre-leídos con los headers) hace
+      // que la transacción HTTP quede bien formada.
+      ::oIO:Drain( nLen - Len( ::cBodyPre ) )
+      ::lKeepAlive := .F.
+      ::cBody      := ""
       RETURN ::cBody
 
    ENDIF

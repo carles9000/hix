@@ -1,3 +1,6 @@
+2.1.05 Fix large-upload hang over Cloudflare Tunnel: loop socket recv until
+       Content-Length filled, drain oversized bodies before responding
+       (see changes/2.1.05.md).
 2.1.04 Isolate SSE/WS timing into their own metric buckets and redesign
        the /server-info panel with per-protocol boxes (see changes/2.1.04.md).
 2.1.03 Reliable peer close detection for long streams via non-destructive
