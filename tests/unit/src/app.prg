@@ -38,6 +38,12 @@ FUNCTION Main( ... )
    s_mtxRun    := hb_mutexCreate()
    s_mtxAct    := hb_mutexCreate()
 
+   // Tests operan a menudo en hb_DirTemp() (fuera de HIX_AppRoot()).
+   // Registrar para que HIX_Safe* acepte los borrados legítimos de
+   // los propios tests. La blacklist de sistema sigue vigente:
+   // hb_DirTemp() no puede resolver a c:\windows aunque intente.
+   HIX_SafeRegisterDir( hb_DirTemp() )
+
    // traces\ es el directorio unico de diagnostico de los tests: trazas
    // (_TLog), log del runner y logs que generan los propios tests. Si no
    // existe, hb_vfOpen() falla en silencio y se pierde todo el diagnostico.
@@ -82,6 +88,9 @@ FUNCTION Main( ... )
    oServer:AddRouteGet( "api_activity", "/api/activity", {|| RouteApiActivity() } )
    oServer:AddRoutePost( "api_tracedump", "/api/tracedump", {|| RouteApiTraceDump() } )
    oServer:AddRouteGet( "api_info",    "/api/info",     {|| RouteApiInfo()    } )
+   // Verificación asistida por Claude — ejecuta un solo test y devuelve el hCtx.
+   oServer:AddRouteGet( "api_test_one", "/api/test/one",   {|| RouteApiTestOne()   } )
+   oServer:AddRouteGet( "api_test_audit", "/api/test/audit/:id", {|| RouteApiTestAudit() } )
 
    oServer:Start( .F. )
 
@@ -426,6 +435,94 @@ FUNCTION RouteApiInfo()
       "os"       => OS(),          ;
       "harbour"  => Version()      ;
       } )
+
+RETURN NIL
+
+// -------------------------------------------------------
+// GET /api/test/one?name=<TestName>
+// Ejecuta un único test síncrono y devuelve el hCtx en JSON.
+// Uso: para verificación asistida por Claude via curl.
+// -------------------------------------------------------
+FUNCTION RouteApiTestOne()
+
+   LOCAL cName := UGet( "name", "" )
+   LOCAL aGroup, aTest, bBlock := NIL
+   LOCAL hCtx, oErr, oSavedReq
+
+   IF Empty( cName )
+      USendJson( { "error" => "missing 'name' query param" }, 400 )
+      RETURN NIL
+   ENDIF
+
+   FOR EACH aGroup IN _TestGroups()
+      FOR EACH aTest IN aGroup[ 2 ]
+         IF Lower( aTest[ 1 ] ) == Lower( cName )
+            bBlock := aTest[ 2 ]
+            EXIT
+         ENDIF
+      NEXT
+      IF bBlock != NIL ; EXIT ; ENDIF
+   NEXT
+
+   IF bBlock == NIL
+      USendJson( { "error" => "test '" + cName + "' not found" }, 404 )
+      RETURN NIL
+   ENDIF
+
+   // Los tests internos pueden invocar HIX_RouteDispatch() con TMockRequest,
+   // lo que pisa el thread-local del request activo. Guardamos y restauramos.
+   oSavedReq := HIX_GetRequest()
+
+   TRY
+      hCtx := Eval( bBlock )
+   CATCH oErr
+      HIX_SetRequest( oSavedReq )
+      USendJson( { "error" => "exception: " + oErr:description }, 500 )
+      RETURN NIL
+   END
+
+   HIX_SetRequest( oSavedReq )
+   USendJson( hCtx )
+
+RETURN NIL
+
+// -------------------------------------------------------
+// GET /api/test/audit/:id  →  mapea id (p.ej. "a0101") a
+// HIX_TestAudit_A0101_Run() y devuelve hCtx JSON.
+// -------------------------------------------------------
+FUNCTION RouteApiTestAudit()
+
+   LOCAL cId := Lower( UParam( "id", "" ) )
+   LOCAL cFn, hCtx, oErr, oSavedReq
+
+   IF Empty( cId )
+      USendJson( { "error" => "missing id" }, 400 )
+      RETURN NIL
+   ENDIF
+
+   cFn := "HIX_TestAudit_" + Upper( cId ) + "_Run"
+
+   // Los tests de auditoría usan TMockRequest → HIX_RouteDispatch(), lo que
+   // reemplaza el thread-local del request. Sin restaurar, USendJson(hCtx)
+   // escribiría al mock y el cliente HTTP recibe "Empty reply from server".
+   oSavedReq := HIX_GetRequest()
+
+   TRY
+      hCtx := hb_ExecFromArray( cFn, {} )
+   CATCH oErr
+      HIX_SetRequest( oSavedReq )
+      USendJson( { "error" => "audit test '" + cFn + "' failed or not linked: " + oErr:description }, 500 )
+      RETURN NIL
+   END
+
+   HIX_SetRequest( oSavedReq )
+
+   IF hCtx == NIL .OR. ValType( hCtx ) != "H"
+      USendJson( { "error" => "audit test '" + cFn + "' returned non-hash" }, 500 )
+      RETURN NIL
+   ENDIF
+
+   USendJson( hCtx )
 
 RETURN NIL
 
@@ -1015,5 +1112,80 @@ RETURN { ;
       } }, ;
       { "Extras", { ;
       { "UCurl", {|| HIX_TestUCurl_Run() } }  ;
+      } }, ;
+      { "Audit", { ;
+      { "A0101 macro-eval router",     {|| HIX_TestAudit_A0101_Run() } }, ;
+      { "A0102 path traversal decode",  {|| HIX_TestAudit_A0102_Run() } }, ;
+      { "A0103 symlink escape",         {|| HIX_TestAudit_A0103_Run() } }, ;
+      { "A0104 multipart filename",     {|| HIX_TestAudit_A0104_Run() } }, ;
+      { "A0105 header injection",       {|| HIX_TestAudit_A0105_Run() } }, ;
+      { "A0106 status clamp",           {|| HIX_TestAudit_A0106_Run() } }, ;
+      { "A0107 jwt timing",             {|| HIX_TestAudit_A0107_Run() } }, ;
+      { "A0108 token timing",           {|| HIX_TestAudit_A0108_Run() } }, ;
+      { "A0109 jwt alg none",           {|| HIX_TestAudit_A0109_Run() } }, ;
+      { "A0110 jwt claims binding",     {|| HIX_TestAudit_A0110_Run() } }, ;
+      { "A0111 session sid entropy",    {|| HIX_TestAudit_A0111_Run() } }, ;
+      { "A0112 token gen rng",          {|| HIX_TestAudit_A0112_Run() } }, ;
+      { "A0113 xff trust list",         {|| HIX_TestAudit_A0113_Run() } }, ;
+      { "A0114 ratelimit anomaly ip",   {|| HIX_TestAudit_A0114_Run() } }, ;
+      { "A0115 admin panel bypass",     {|| HIX_TestAudit_A0115_Run() } }, ;
+      { "A0116 hardcoded secrets",      {|| HIX_TestAudit_A0116_Run() } }, ;
+      { "A0117 regex redos guard",      {|| HIX_TestAudit_A0117_Run() } }, ;
+      { "A0118 session file hmac",      {|| HIX_TestAudit_A0118_Run() } }, ;
+      { "A0119 session fixation",       {|| HIX_TestAudit_A0119_Run() } }, ;
+      { "A0120 gc toctou",              {|| HIX_TestAudit_A0120_Run() } }, ;
+      { "A0121 xss error page",         {|| HIX_TestAudit_A0121_Run() } }, ;
+      { "A0122 slowloris deadline",     {|| HIX_TestAudit_A0122_Run() } }, ;
+      { "A0123 body size limit",        {|| HIX_TestAudit_A0123_Run() } }, ;
+      { "A0124 json depth guard",       {|| HIX_TestAudit_A0124_Run() } }, ;
+      { "A0125 route regex escape",     {|| HIX_TestAudit_A0125_Run() } }, ;
+      { "A0127 view expr curly guard",  {|| HIX_TestAudit_A0127_Run() } }, ;
+      { "A0128 html encode robust",     {|| HIX_TestAudit_A0128_Run() } }, ;
+      { "A0126 thread join detach",     {|| HIX_TestAudit_A0126_Run() } }, ;
+      { "A0201 server globals mutex",   {|| HIX_TestAudit_A0201_Run() } }, ;
+      { "A0202 pool shutdown timeout",  {|| HIX_TestAudit_A0202_Run() } }, ;
+      { "A0203 ws conn mutex",          {|| HIX_TestAudit_A0203_Run() } }, ;
+      { "A0204 ws callbacks try/catch", {|| HIX_TestAudit_A0204_Run() } }, ;
+      { "A0205 ws mutex lazy race",     {|| HIX_TestAudit_A0205_Run() } }, ;
+      { "A0206 route disp lazy dcl",    {|| HIX_TestAudit_A0206_Run() } }, ;
+      { "A0207 err log seq race",       {|| HIX_TestAudit_A0207_Run() } }, ;
+      { "A0208 logger exception safety",{|| HIX_TestAudit_A0208_Run() } }, ;
+      { "A0209 dbf alias thread aff",   {|| HIX_TestAudit_A0209_Run() } }, ;
+      { "A0210 worker http ctx cleanup",{|| HIX_TestAudit_A0210_Run() } }, ;
+      { "A0211 body bound precount",    {|| HIX_TestAudit_A0211_Run() } }, ;
+      { "A0212 mutex timeout consist",  {|| HIX_TestAudit_A0212_Run() } }, ;
+      { "A0213 io write backoff",       {|| HIX_TestAudit_A0213_Run() } }, ;
+      { "A03101 method substring match",{|| HIX_TestAudit_A03101_Run() } }, ;
+      { "A03102 404 context loss",      {|| HIX_TestAudit_A03102_Run() } }, ;
+      { "A03103-5 router+304 fixes",    {|| HIX_TestAudit_A03103_Run() } }, ;
+      { "A03106 public fallback asymm", {|| HIX_TestAudit_A03106_Run() } }, ;
+      { "A03107 path norm dedup",       {|| HIX_TestAudit_A03107_Run() } }, ;
+      { "A03201 cors wildcard+auth",    {|| HIX_TestAudit_A03201_Run() } }, ;
+      { "A03202 firewall ipv6 scope",   {|| HIX_TestAudit_A03202_Run() } }, ;
+      { "A03203 ratelimit sliding win", {|| HIX_TestAudit_A03203_Run() } }, ;
+      { "A03204 anomaly static race",   {|| HIX_TestAudit_A03204_Run() } }, ;
+      { "A03302 json parseerror masked", {|| HIX_TestAudit_A03302_Run() } }, ;
+      { "A03303 cookie rfc6265 quoted",  {|| HIX_TestAudit_A03303_Run() } }, ;
+      { "A03304 setcookie injection san", {|| HIX_TestAudit_A03304_Run() } }, ;
+      { "A03305 cookie case sensitivity", {|| HIX_TestAudit_A03305_Run() } }, ;
+      { "A03306 urldecode nullbyte",      {|| HIX_TestAudit_A03306_Run() } }, ;
+      { "A03307 validate macro cache",    {|| HIX_TestAudit_A03307_Run() } }, ;
+      { "A03308 replacevars regex escape", {|| HIX_TestAudit_A03308_Run() } }, ;
+      { "A03401 loadconfig cache bypass",  {|| HIX_TestAudit_A03401_Run() } }, ;
+      { "A03402 config corrupt json warn", {|| HIX_TestAudit_A03402_Run() } }, ;
+      { "A03403 admin password hmac",      {|| HIX_TestAudit_A03403_Run() } }, ;
+      { "A03405 loader mutex race",         {|| HIX_TestAudit_A03405_Run() } }, ;
+      { "A03406 loader hrb stale hash",     {|| HIX_TestAudit_A03406_Run() } }, ;
+      { "A03407 loader dep cycle limit",    {|| HIX_TestAudit_A03407_Run() } }, ;
+      { "A03408 pool lock timeout",          {|| HIX_TestAudit_A03408_Run() } }, ;
+      { "A03409 pool max size dos",          {|| HIX_TestAudit_A03409_Run() } }, ;
+      { "A03410 dbf update rlock finally",   {|| HIX_TestAudit_A03410_Run() } }, ;
+      { "A03411 dbf rlock spinlock sleep",   {|| HIX_TestAudit_A03411_Run() } }, ;
+      { "A03501 metrics inc hb_hgetdef",     {|| HIX_TestAudit_A03501_Run() } }, ;
+      { "A03502 constanteq length precheck", {|| HIX_TestAudit_A03502_Run() } }, ;
+      { "A04012 trailing slash route match", {|| HIX_TestAudit_A04012_Run() } }, ;
+      { "A04013 cookie secure flag https",   {|| HIX_TestAudit_A04013_Run() } }, ;
+      { "A04014 constanteq shared helper",   {|| HIX_TestAudit_A04014_Run() } }, ;
+      { "SafeFs root guard",                 {|| HIX_TestSafeFs_Run()      } }  ;
       } }  ;
       }

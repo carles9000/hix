@@ -133,7 +133,7 @@ FUNCTION HIX_BootLogAdd( cKey, cAction, lStatus, cValue, xCargo )
    AAdd( s_hBootLog[ cKey ], { cAction, lStatus, cValue, xCargo } )
    hb_mutexUnlock( _BootLogMutex() )
    
-   // Callback opcional: se invoca fuera del mutex para no bloquear
+   // [A4.10] Callback opcional: se invoca fuera del mutex para no bloquear
    // si el usuario hace operaciones lentas dentro del codeblock.
 
    IF HB_IsBlock( s_bAction )

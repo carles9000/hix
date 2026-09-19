@@ -18,12 +18,6 @@
 // ============================================================
 FUNCTION HIX_AdminCheck( oReq )
 
-   IF UConfig( "app", "env", "dev" ) != "prod"
-
-      RETURN .T.
-
-   ENDIF
-
    IF ! _HixAdminHasCredentials()
 
       oReq:Redirect( HIX_PATH_SETUP )
@@ -78,7 +72,7 @@ FUNCTION HIX_AdminLoginPost( oReq )
    nMinutes     := UConfig( "session", "lifetime", 60 )
 
    IF Lower( cUser ) == Lower( cAdminUser ) .AND. ;
-         Lower( hb_MD5( cPass ) ) == Lower( cAdminPass )
+         Lower( hb_HMAC_SHA256( cPass, cAdminSecret ) ) == Lower( cAdminPass )  // [A3.4.3]
 
       nTs        := _HixNowSecs()
       cSign      := _HixAdminSign( cAdminSecret, nTs )
@@ -157,8 +151,8 @@ FUNCTION HIX_AdminSetupPost( oReq )
 
    hCfg := HIX_GetConfig()
    hCfg[ "admin" ][ "user" ]     := cUser
-   hCfg[ "admin" ][ "password" ] := Lower( hb_MD5( cPass ) )
-   hCfg[ "admin" ][ "secret" ]   := Lower( hb_MD5( hb_TToS( hb_DateTime() ) + cUser + cPass ) )
+   hCfg[ "admin" ][ "secret" ]   := Lower( hb_HMAC_SHA256( hb_TToS( hb_DateTime() ) + cUser, cPass ) )  // [A3.4.3]
+   hCfg[ "admin" ][ "password" ] := Lower( hb_HMAC_SHA256( cPass, hCfg[ "admin" ][ "secret" ] ) )        // [A3.4.3]
    HIX_SaveConfig()
 
    l( "Admin configurado para usuario: " + cUser )
@@ -177,7 +171,7 @@ STATIC FUNCTION _HixNowSecs()
 RETURN ( Date() - hb_SToD( "19700101" ) ) * 86400 + Int( Seconds() )
 
 STATIC FUNCTION _HixAdminSign( cSecret, nTs )
-RETURN Lower( hb_MD5( cSecret + "|" + hb_NToS( nTs ) ) )
+RETURN Lower( hb_HMAC_SHA256( hb_NToS( nTs ), cSecret ) )  // [A3.4.4] HMAC-SHA256; key=secret, msg=ts
 
 STATIC FUNCTION _HixAdminVerify( cCookie, cSecret, nMinutes )
 

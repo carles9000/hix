@@ -376,7 +376,7 @@ return Self
 
 METHOD Save( cFilename ) CLASS TPdf
 
-   FErase( cFilename )
+   HIX_SafeErase( cFilename )
 
    if ValType( ::nPermission ) != 'N'
       ::nPermission := ( HPDF_ENABLE_READ + HPDF_ENABLE_PRINT + HPDF_ENABLE_COPY )

@@ -10,66 +10,28 @@
  -----------------------------------------------------------*/
 FUNCTION HIX_GetClientIP( oReq )
 
-   LOCAL aHeaders := { ;
-      "cf-connecting-ip", ;
-      "x-forwarded-for", ;
-      "x-real-ip", ;
-      "client-ip" ;
-      }
-   LOCAL nI, cValue, aForward, cIp
+   LOCAL cVal
 
-   IF oReq:lProxied
-
-      RETURN oReq:RealIP()
-
+   // Only trust forwarding headers when lProxied=.T. AND the TCP peer is in
+   // the configured trust list. Without this guard any client can inject an
+   // arbitrary IP via X-Forwarded-For / cf-connecting-ip and bypass
+   // rate-limit, anomaly detection, and IP-based access controls (A1.13).
+   IF ! oReq:lProxied .OR. ! HIX_IsTrustedProxy( oReq:cIP )
+      RETURN oReq:cIP
    ENDIF
 
-   FOR nI := 1 TO Len( aHeaders )
+   // TCP peer is a trusted proxy (Cloudflare, Nginx, etc.).
+   // Prefer the Cloudflare header which is set to the real client IP by the
+   // CDN itself and is not forwarded by intermediate hops.
+   cVal := AllTrim( oReq:Header( "cf-connecting-ip", "" ) )
 
-      cValue := AllTrim( oReq:Header( aHeaders[ nI ], "" ) )
+   IF HIX_ValidIP( cVal ) .AND. ! HIX_IsTrustedProxy( cVal )
+      RETURN cVal
+   ENDIF
 
-      IF Empty( cValue )
-
-         LOOP
-
-      ENDIF
-
-      IF aHeaders[ nI ] == "x-forwarded-for"
-
-         // Cadena de proxies: "client, proxy1, proxy2" — primera IP publica
-         aForward := hb_ATokens( cValue, "," )
-
-         FOR EACH cIp IN aForward
-
-            cIp := AllTrim( cIp )
-
-            IF HIX_ValidIP( cIp ) .AND. HIX_IsPublicIP( cIp )
-
-               RETURN cIp
-
-            ENDIF
-
-         NEXT
-
-         // Ninguna publica en la cadena — probar siguiente header
-         LOOP
-
-      ENDIF
-
-      // Headers directos: un solo valor
-      cIp := cValue
-
-      IF HIX_ValidIP( cIp ) .AND. HIX_IsPublicIP( cIp )
-
-         RETURN cIp
-
-      ENDIF
-
-   NEXT
-
-   // Fallback: IP de conexion TCP (puede ser privada en entornos locales)
-
-RETURN oReq:cIP
+   // Delegate to RealIP() which handles RFC 7239 Forwarded:,
+   // X-Forwarded-For and X-Real-IP with the same trust-list check.
+RETURN oReq:RealIP()
 
 // ------------------------------------------------------------
 // Valida formato: IPv4 o IPv6

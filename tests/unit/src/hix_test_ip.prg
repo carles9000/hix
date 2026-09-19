@@ -13,7 +13,30 @@ CLASS TMockReqIP
    DATA lProxied     INIT .F.
    METHOD New( cIP ) INLINE ( ::cIP := hb_defaultValue( cIP, "127.0.0.1" ), Self )
    METHOD Header( cKey, xDef ) INLINE hb_HGetDef( ::hHeaders, Lower( cKey ), hb_defaultValue( xDef, "" ) )
+   METHOD RealIP()
 ENDCLASS
+
+METHOD RealIP() CLASS TMockReqIP
+   LOCAL cFwd, aFwd, cCandidate, cReal
+   IF ! ::lProxied .OR. ! HIX_IsTrustedProxy( ::cIP )
+      RETURN ::cIP
+   ENDIF
+   cFwd := hb_HGetDef( ::hHeaders, "x-forwarded-for", "" )
+   IF ! Empty( cFwd )
+      aFwd := hb_ATokens( cFwd, "," )
+      FOR EACH cCandidate IN aFwd
+         cCandidate := AllTrim( cCandidate )
+         IF ! HIX_IsTrustedProxy( cCandidate )
+            RETURN cCandidate
+         ENDIF
+      NEXT
+      RETURN AllTrim( aFwd[1] )
+   ENDIF
+   cReal := hb_HGetDef( ::hHeaders, "x-real-ip", "" )
+   IF ! Empty( cReal )
+      RETURN AllTrim( cReal )
+   ENDIF
+RETURN ::cIP
 
 FUNCTION HIX_TestIP_Run()
    LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
@@ -82,34 +105,49 @@ RETURN
 STATIC PROCEDURE _IPGetClient( hCtx )
    LOCAL oReq, cIP
 
+   // Trusted peer: CF-Connecting-IP tiene prioridad sobre XFF
+   HIX_ProxyInit( "10.0.0.1" )
    oReq := TMockReqIP():New( "10.0.0.1" )
+   oReq:lProxied := .T.
    oReq:hHeaders[ "cf-connecting-ip" ] := "8.8.8.8"
    oReq:hHeaders[ "x-forwarded-for"  ] := "1.1.1.1"
    cIP := HIX_GetClientIP( oReq )
    HixTU_Check( hCtx, cIP == "8.8.8.8", "IP: CF-Connecting-IP prioritario", "8.8.8.8", cIP )
 
+   // Trusted peer: XFF — primera IP que no es proxy de confianza
    oReq := TMockReqIP():New( "10.0.0.1" )
-   oReq:hHeaders[ "x-forwarded-for" ] := "10.0.0.5, 172.16.1.1, 8.8.8.8"
+   oReq:lProxied := .T.
+   oReq:hHeaders[ "x-forwarded-for" ] := "10.0.0.1, 8.8.8.8"
    cIP := HIX_GetClientIP( oReq )
    HixTU_Check( hCtx, cIP == "8.8.8.8", "IP: XFF primera publica en cadena", "8.8.8.8", cIP )
 
+   // Trusted peer: X-Real-IP cuando no hay XFF
    oReq := TMockReqIP():New( "10.0.0.1" )
+   oReq:lProxied := .T.
    oReq:hHeaders[ "x-real-ip" ] := "1.2.3.4"
    cIP := HIX_GetClientIP( oReq )
    HixTU_Check( hCtx, cIP == "1.2.3.4", "IP: X-Real-IP detectado", "1.2.3.4", cIP )
 
+   // Sin lProxied: siempre retorna TCP IP aunque haya headers
    oReq := TMockReqIP():New( "10.0.0.9" )
+   oReq:hHeaders[ "x-forwarded-for" ] := "8.8.8.8"
    cIP := HIX_GetClientIP( oReq )
    HixTU_Check( hCtx, cIP == "10.0.0.9", "IP: fallback a oReq:cIP", "10.0.0.9", cIP )
 
+   // Trusted peer 127.0.0.1: X-Real-IP cuando no hay XFF
+   HIX_ProxyInit( "127.0.0.1" )
    oReq := TMockReqIP():New( "127.0.0.1" )
-   oReq:hHeaders[ "x-forwarded-for" ] := "10.0.0.1, 192.168.1.1"
-   oReq:hHeaders[ "x-real-ip"       ] := "5.5.5.5"
+   oReq:lProxied := .T.
+   oReq:hHeaders[ "x-real-ip" ] := "5.5.5.5"
    cIP := HIX_GetClientIP( oReq )
    HixTU_Check( hCtx, cIP == "5.5.5.5", "IP: XFF privadas -> X-Real-IP", "5.5.5.5", cIP )
 
+   // Trusted peer 127.0.0.1: XFF AllTrim espacios
    oReq := TMockReqIP():New( "127.0.0.1" )
+   oReq:lProxied := .T.
    oReq:hHeaders[ "x-forwarded-for" ] := "  9.9.9.9  ,  10.0.0.1"
    cIP := HIX_GetClientIP( oReq )
    HixTU_Check( hCtx, cIP == "9.9.9.9", "IP: XFF AllTrim espacios", "9.9.9.9", cIP )
+
+   HIX_ProxyInit( "" )   // reset trust list
 RETURN

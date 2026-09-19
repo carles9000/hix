@@ -154,7 +154,7 @@ STATIC FUNCTION _HixMpParsePart( cPart )
 
    hPart := { => }
    hPart[ "name"     ] := cName
-   hPart[ "filename" ] := cFilename
+   hPart[ "filename" ] := _HixMpSanitizeFilename( cFilename )   // [A1.04]
    hPart[ "mime"     ] := cMime
    hPart[ "data"     ] := cBody
    hPart[ "size"     ] := Len( cBody )
@@ -233,3 +233,45 @@ STATIC FUNCTION _HixMpNextBoundary( cBody, cDelim, nStart )
    ENDIF
 
 RETURN nStart + nRel - 1
+
+// ============================================================
+// [A1.04] _HixMpSanitizeFilename — quedarse SOLO con el basename
+//   del filename declarado por el cliente. Impide traversal por
+//   `../`, `..\`, path absoluto (`C:\...` o `/etc/...`) y
+//   null-byte injection.
+//
+//   Estrategia: eliminar null-byte → normalizar `\` → `/` →
+//   `hb_FNameNameExt` sobre la parte tras el último `/`. Un
+//   filename que quede como `..` o `.` se descarta ("").
+// ============================================================
+STATIC FUNCTION _HixMpSanitizeFilename( cRaw )
+
+   LOCAL cName, nSep
+
+   IF Empty( cRaw ) ; RETURN "" ; ENDIF
+
+   // 1) Strip null-byte — usado para engañar checks de extensión.
+   cName := StrTran( cRaw, Chr( 0 ), "" )
+
+   // 2) Windows separators → POSIX (para que At("/") capture ambos).
+   cName := StrTran( cName, "\", "/" )
+
+   // 3) Quedarse con lo que hay tras el último `/` (basename).
+   nSep := RAt( "/", cName )
+   IF nSep > 0
+      cName := SubStr( cName, nSep + 1 )
+   ENDIF
+
+   cName := AllTrim( cName )
+
+   // 4) `.` y `..` no son nombres válidos — descartar.
+   IF cName == "." .OR. cName == ".."
+      RETURN ""
+   ENDIF
+
+RETURN cName
+
+// Test hook: expone `_HixMpSanitizeFilename` para tests unitarios.
+// La STATIC no es alcanzable desde otras unidades de compilación.
+FUNCTION HIX_MpSanitizeFilename( cRaw )
+RETURN _HixMpSanitizeFilename( cRaw )

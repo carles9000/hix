@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_test_core.prg
   Author.....: Charly 9000
   Created....: 2026-06-04
@@ -142,8 +142,11 @@ STATIC PROCEDURE _CoreProtocolDetect( hCtx )
    HixTU_Check( hCtx, HIX_DetectProtocol( "GET /ws HTTP/1.1" + Chr(13)+Chr(10) + "Upgrade: websocket" ) == HIX_CONN_WS, ;
            "Detect: Upgrade websocket -> WS", HIX_CONN_WS, "" )
 
-   HixTU_Check( hCtx, HIX_DetectProtocol( "GET /ev HTTP/1.1" + Chr(13)+Chr(10) + "Accept: text/event-stream" ) == HIX_CONN_SSE, ;
-           "Detect: text/event-stream -> SSE", HIX_CONN_SSE, "" )
+   // Desde c9158ec (v2.1.03) el detector legacy por Accept-header ya NO
+   // desvía SSE al bus antiguo — todo SSE va por el router. Un request con
+   // Accept: text/event-stream debe reconocerse como HTTP normal.
+   HixTU_Check( hCtx, HIX_DetectProtocol( "GET /ev HTTP/1.1" + Chr(13)+Chr(10) + "Accept: text/event-stream" ) == HIX_CONN_HTTP, ;
+           "Detect: text/event-stream -> HTTP (SSE via router)", HIX_CONN_HTTP, "" )
 
    HixTU_Check( hCtx, HIX_DetectProtocol( "GET /lp HTTP/1.1" + Chr(13)+Chr(10) + "x-hix-longpoll: true" ) == HIX_CONN_LONGPOLL, ;
            "Detect: x-hix-longpoll -> LONGPOLL", HIX_CONN_LONGPOLL, "" )
@@ -181,6 +184,6 @@ STATIC PROCEDURE _CoreJsonRoundTrip( hCtx )
    HixTU_Check( hCtx, HIX_GetConfig( "app", "debug" ),                       "JSON: debug=.T.",    ".T.",         hb_ValToStr( HIX_GetConfig( "app", "debug" ) ) )
    HixTU_Check( hCtx, HIX_GetConfig( "server",   "mode" )  == HIX_MODE_STANDALONE, "JSON: clave ausente -> default", HIX_MODE_STANDALONE, HIX_GetConfig( "server", "mode" ) )
 
-   hb_vfErase( cFile )
+   HIX_SafeErase( cFile )
    HIX_SetConfig( oCfgSave )
 RETURN

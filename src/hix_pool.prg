@@ -64,6 +64,8 @@ CLASS THixPool
    DATA lRunning         INIT .F.
    DATA nWorkersRunning  INIT 0     // workers vivos (decrementado al salir)
    DATA nAlertPct      INIT 75
+   DATA nStopGraceMs   INIT 30000   // grace por worker en Stop() — audit A2.02
+   DATA nDirtyExits    INIT 0       // workers force-quit en el ultimo Stop()
 
    METHOD New( cTipo, bWorkerFunc )
    METHOD Init()
@@ -201,13 +203,23 @@ RETURN Self
 // ------------------------------------------------------------
 // Stop — marca lRunning=.F. y espera que los workers salgan solos.
 // Los workers comprueban lRunning cada 200ms via timeout de subscribe.
+//
+// Audit A2.02 — join con timeout via hb_threadWait(nGraceMs):
+//   - Worker cooperativo termina → hb_threadJoin reap normal.
+//   - Worker colgado → hb_threadQuitRequest + hb_threadDetach + métrica
+//     HIXM_POOL_DIRTY_EXIT. Evita bloqueo indefinido en Stop() cuando
+//     un handler se queda enganchado.
 // ------------------------------------------------------------
 METHOD Stop() CLASS THixPool
 
    LOCAL hThread, i
+   LOCAL nGraceMs  := ::nStopGraceMs
+   LOCAL nGraceSec := nGraceMs / 1000.0   // hb_threadWait usa segundos
+   LOCAL nRet, nDirty := 0
 
    l( "Pool [" + ::cTipo + "] stopping..." )
-   ::lRunning := .F.
+   ::lRunning     := .F.
+   ::nDirtyExits  := 0
    // Wake each worker with NIL so they drain pending jobs (FIFO) and exit cleanly
 
    FOR i := 1 TO ::nWorkers
@@ -218,11 +230,30 @@ METHOD Stop() CLASS THixPool
 
    FOR EACH hThread IN ::aWorkers
 
-      hb_threadJoin( hThread )
+      // hb_threadWait devuelve 0 en timeout, >0 (índice) si el thread terminó
+      nRet := hb_threadWait( hThread, nGraceSec )
+
+      IF nRet == 0
+         // Timeout — worker no cooperó: forzar quit y detach para no leakear
+         hb_threadQuitRequest( hThread )
+         hb_threadDetach( hThread )
+         nDirty++
+         ::nDirtyExits++
+         HIX_Metric( HIXM_POOL_DIRTY_EXIT )
+         lw( "Pool [" + ::cTipo + "] worker dirty exit — thread quit forced" )
+      ELSE
+         // Terminó cooperativamente — reap normal
+         hb_threadJoin( hThread )
+      ENDIF
 
    NEXT
 
-   l( "Pool [" + ::cTipo + "] stopped" )
+   IF nDirty > 0
+      lw( "Pool [" + ::cTipo + "] stopped with " + hb_NToS( nDirty ) + ;
+          " dirty exit(s) of " + hb_NToS( ::nWorkers ) )
+   ELSE
+      l( "Pool [" + ::cTipo + "] stopped cleanly" )
+   ENDIF
 
 RETURN Self
 

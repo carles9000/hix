@@ -72,27 +72,29 @@ STATIC s_mtxAnomaly  := NIL
 // ============================================================
 PROCEDURE HIX_MwAnomalySetup( nThr, nWinSec, nBanSec, aTracked )
 
-   LOCAL i
+   LOCAL i, aNewTracked
 
    IF s_mtxAnomaly == NIL ; s_mtxAnomaly := hb_mutexCreate() ; ENDIF
 
-   IF ValType( nThr    ) == "N" .AND. nThr    > 0 ; s_nThreshold := nThr    ; ENDIF
-   IF ValType( nWinSec ) == "N" .AND. nWinSec > 0 ; s_nWindowSec := nWinSec ; ENDIF
-   IF ValType( nBanSec ) == "N" .AND. nBanSec > 0 ; s_nBanSec    := nBanSec ; ENDIF
-
+   // [A3.2.4] construir lista nueva en LOCAL antes del lock — no bloquear workers
+   // mientras iteramos el array del caller (puede ser largo).
    IF ValType( aTracked ) == "A" .AND. Len( aTracked ) > 0
-      s_aTracked := {}
+      aNewTracked := {}
       FOR i := 1 TO Len( aTracked )
          IF ValType( aTracked[ i ] ) == "N"
-            AAdd( s_aTracked, aTracked[ i ] )
+            AAdd( aNewTracked, aTracked[ i ] )
          ENDIF
       NEXT
    ENDIF
 
-   // Reset counters so Setup always starts from a clean slate.
-   // Prevents phantom records from pre-enable requests that race
-   // between the response flush and this Setup call.
+   // Asignar todos los STATICs bajo un único lock — un worker que lea cualquiera
+   // de ellos verá valores consistentes (no parciales). Antes: s_nThreshold y
+   // compañía se escribían fuera del mutex; s_aTracked tenía race por el reset.
    hb_mutexLock( s_mtxAnomaly )
+   IF ValType( nThr    ) == "N" .AND. nThr    > 0 ; s_nThreshold := nThr       ; ENDIF
+   IF ValType( nWinSec ) == "N" .AND. nWinSec > 0 ; s_nWindowSec := nWinSec    ; ENDIF
+   IF ValType( nBanSec ) == "N" .AND. nBanSec > 0 ; s_nBanSec    := nBanSec    ; ENDIF
+   IF aNewTracked != NIL                           ; s_aTracked   := aNewTracked ; ENDIF
    s_hCounter := { => }
    s_hBans    := { => }
    hb_mutexUnlock( s_mtxAnomaly )
@@ -106,7 +108,7 @@ RETURN
 // ============================================================
 FUNCTION HIX_MwAnomaly( oCtx )
 
-   LOCAL cIP     := oCtx:oReq:cIP
+   LOCAL cIP     := oCtx:oReq:RealIP()
    LOCAL nNow    := _AnomalyNow()
    LOCAL nExpires
    LOCAL nRemain
@@ -150,13 +152,19 @@ PROCEDURE HIX_AnomalyRecord( cIP, nStatus )
 
    IF ! s_lEnabled ; RETURN ; ENDIF
    IF Empty( cIP ) ; RETURN ; ENDIF
-   IF AScan( s_aTracked, {| n | n == nStatus } ) == 0 ; RETURN ; ENDIF
 
    IF s_mtxAnomaly == NIL ; s_mtxAnomaly := hb_mutexCreate() ; ENDIF
 
    nNow := _AnomalyNow()
 
    hb_mutexLock( s_mtxAnomaly )
+
+   // [A3.2.4] AScan dentro del lock — s_aTracked se lee con consistencia garantizada
+   // (antes: lectura de s_aTracked sin lock podía ver array vacío durante Setup)
+   IF AScan( s_aTracked, {| n | n == nStatus } ) == 0
+      hb_mutexUnlock( s_mtxAnomaly )
+      RETURN
+   ENDIF
 
    IF hb_HHasKey( s_hCounter, cIP )
       aEntry := s_hCounter[ cIP ]

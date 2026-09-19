@@ -99,11 +99,22 @@ METHOD Read( nBytes, nTimeout ) CLASS THixIO
 
    LOCAL cBuf   := ""
    LOCAL nGot   := 0
-   LOCAL cChunk, nRead, lErr
+   LOCAL cChunk, nRead, lErr, nStartMs
 
    hb_default( @nTimeout, HIX_DEFAULT_READ_TIMEOUT )
 
+   // Slowloris guard (A1.22): absolute cap on total time reading nBytes.
+   nStartMs := hb_MilliSeconds()
+
    DO WHILE nGot < nBytes
+
+      IF hb_MilliSeconds() - nStartMs > HIX_BODY_DEADLINE_MS
+
+         lw( "Read: body total deadline exceeded (A1.22)" )
+         ::lConnClosed := .T.
+         EXIT
+
+      ENDIF
 
       IF ::lUseSSL .AND. ::hSSLSession != NIL
 
@@ -187,11 +198,23 @@ RETURN nDrained
 METHOD ReadHeaders( nTimeout ) CLASS THixIO
 
    LOCAL cHeaders := ""
-   LOCAL cBuf, nRead
+   LOCAL cBuf, nRead, nStartMs
 
    hb_default( @nTimeout, HIX_DEFAULT_READ_TIMEOUT )
 
+   // Slowloris guard (A1.22): total elapsed budget on top of the per-recv
+   // stall timeout. A slow attacker cannot trickle bytes forever below
+   // nTimeout and hold the worker for the full keep-alive window.
+   nStartMs := hb_MilliSeconds()
+
    DO WHILE Len( cHeaders ) < HIX_MAX_HEADER_SIZE
+
+      IF hb_MilliSeconds() - nStartMs > HIX_HEADERS_DEADLINE_MS
+
+         lw( "ReadHeaders: total deadline exceeded (A1.22)" )
+         EXIT
+
+      ENDIF
 
       IF ::lUseSSL .AND. ::hSSLSession != NIL
 
@@ -262,6 +285,10 @@ METHOD Write( cData, nTimeout ) CLASS THixIO
       IF nResult <= 0
 
          nRetry++
+         // [A2.13] backoff mínimo entre reintentos para evitar busy-wait
+         // consumiendo 100% CPU cuando el socket devuelve EAGAIN antes
+         // de que el timeout de hb_socketSend expire.
+         hb_idleSleep( 0.001 )
          LOOP
 
       ENDIF
@@ -282,13 +309,33 @@ METHOD Write( cData, nTimeout ) CLASS THixIO
 RETURN .T.
 
 // ------------------------------------------------------------
-// WriteChunk — envía un trozo en formato chunked (RFC 7230)
+// WriteChunk — envía un trozo en formato chunked (RFC 7230).
+// [A4.04] Si cData > HIX_CHUNK_SIZE, se fragmenta en chunks de 64KB
+//         para evitar buffers de 1GB en memoria.
 // ------------------------------------------------------------
 METHOD WriteChunk( cData ) CLASS THixIO
 
+   LOCAL nLen, nOff, nSz, cSlice
+
    IF Empty( cData ) ; RETURN .T. ; ENDIF
 
-RETURN ::Write( hb_NumToHex( Len( cData ) ) + HIX_CRLF + cData + HIX_CRLF )
+   nLen := Len( cData )
+
+   IF nLen <= HIX_CHUNK_SIZE
+      RETURN ::Write( hb_NumToHex( nLen ) + HIX_CRLF + cData + HIX_CRLF )
+   ENDIF
+
+   nOff := 1
+   DO WHILE nOff <= nLen
+      nSz    := Min( HIX_CHUNK_SIZE, nLen - nOff + 1 )
+      cSlice := SubStr( cData, nOff, nSz )
+      IF ! ::Write( hb_NumToHex( nSz ) + HIX_CRLF + cSlice + HIX_CRLF )
+         RETURN .F.
+      ENDIF
+      nOff += nSz
+   ENDDO
+
+RETURN .T.
 
 // ------------------------------------------------------------
 // WriteChunkEnd — envía el chunk terminador 0\r\n\r\n

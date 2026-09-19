@@ -69,6 +69,16 @@ FUNCTION HIX_KeysLoadFromAppConfig()
       s_hKeys[ cName ] := hKeys[ cName ]
       nCount++
 
+      // Warn loudly when a key still carries the published default pattern.
+      // Published defaults are predictable — anyone who reads the source can
+      // forge tokens, sessions and CSRF. Replace them in config.json (A1.16).
+      IF ValType( hKeys[ cName ] ) == "C" .AND. "H!x@" $ hKeys[ cName ]
+
+         lw( "SECURITY: key '" + cName + "' uses a published default — " + ;
+             "replace it in config.json > keys before deploying to production" )
+
+      ENDIF
+
    NEXT
 
    l( "HIX_Keys: " + hb_ntos( nCount ) + " key(s) loaded from config.json" )

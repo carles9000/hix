@@ -23,6 +23,8 @@ FUNCTION HIX_ResponseRaw( oIO, xData, cMime, nStatus, lKeepAlive, hExtra )
    hb_default( @lKeepAlive, .F.    )
    hb_default( @hExtra,     { => }   )
 
+   nStatus := _HixHdrStatusClamp( nStatus )   // [A1.06]
+
    cMimeFull  := HIX_MimeExpand( cMime )
 
    cBody      := _HIXSerialize( xData, cMimeFull )
@@ -64,12 +66,16 @@ FUNCTION HIX_ResponseRaw( oIO, xData, cMime, nStatus, lKeepAlive, hExtra )
 
          FOR EACH cVal IN hExtra[ cKey ]
 
-            cRaw += cKey + ": " + cVal + HIX_CRLF
+            IF _HixHdrSanitize( cKey, cVal )       // [A1.05]
+               cRaw += cKey + ": " + cVal + HIX_CRLF
+            ENDIF
 
          NEXT
 
       ELSE
-         cRaw += cKey + ": " + hExtra[ cKey ] + HIX_CRLF
+         IF _HixHdrSanitize( cKey, hExtra[ cKey ] )   // [A1.05]
+            cRaw += cKey + ": " + hExtra[ cKey ] + HIX_CRLF
+         ENDIF
 
       ENDIF
 
@@ -100,6 +106,8 @@ FUNCTION HIX_ResponseStreamStart( oIO, cMime, nStatus, lKeepAlive, hExtra )
    hb_default( @lKeepAlive, .F.    )
    hb_default( @hExtra,     { => }   )
 
+   nStatus := _HixHdrStatusClamp( nStatus )   // [A1.06]
+
    cRaw := "HTTP/1.1 " + hb_NToS( nStatus ) + " " + HIX_StatusText( nStatus )  + HIX_CRLF + ;
       "Content-Type: "       + HIX_MimeExpand( cMime )                     + HIX_CRLF + ;
       "Transfer-Encoding: chunked"                                          + HIX_CRLF + ;
@@ -116,13 +124,17 @@ FUNCTION HIX_ResponseStreamStart( oIO, cMime, nStatus, lKeepAlive, hExtra )
 
          FOR EACH cVal IN hExtra[ cKey ]
 
-            cRaw += cKey + ": " + cVal + HIX_CRLF
+            IF _HixHdrSanitize( cKey, cVal )         // [A1.05]
+               cRaw += cKey + ": " + cVal + HIX_CRLF
+            ENDIF
 
          NEXT
 
       ELSE
 
-         cRaw += cKey + ": " + hExtra[ cKey ] + HIX_CRLF
+         IF _HixHdrSanitize( cKey, hExtra[ cKey ] )   // [A1.05]
+            cRaw += cKey + ": " + hExtra[ cKey ] + HIX_CRLF
+         ENDIF
 
       ENDIF
 
@@ -215,3 +227,91 @@ FUNCTION HIX_MimeExpand( cShort )
    ENDCASE
 
 RETURN cShort
+
+// ============================================================
+// [A1.05] _HixHdrSanitize — filtra cabeceras HTTP contra CRLF
+//   injection y nombres inválidos.
+//
+//   Retorna .T. si (cName, cVal) puede emitirse tal cual, .F.
+//   si debe descartarse. En caso de rechazo emite un warn con
+//   la clave y una versión escapada del valor para diagnóstico.
+//
+//   Reglas:
+//     - Nombre: sólo `[A-Za-z0-9-]`. Cualquier otro carácter
+//       (espacio, `:`, `\r`, `\n`) → skip.
+//     - Nombre vacío → skip.
+//     - Valor: NO contener `\r`, `\n`, `\0`. Cualquier presencia
+//       → skip toda la cabecera (política defensiva: log +
+//       descartar, no `StrTran` silencioso, para dejar rastro
+//       del intento).
+//     - Valor con tipo no-string → skip.
+// ============================================================
+STATIC FUNCTION _HixHdrSanitize( cName, cVal )
+
+   LOCAL nI, cCh
+
+   IF Empty( cName ) .OR. ValType( cName ) != "C"
+      lw( "HDR_INJECT_NAME_INVALID: " + hb_ValToExp( cName ) )
+      RETURN .F.
+   ENDIF
+
+   FOR nI := 1 TO Len( cName )
+      cCh := SubStr( cName, nI, 1 )
+      IF ! ( ( cCh >= "A" .AND. cCh <= "Z" ) .OR. ;
+             ( cCh >= "a" .AND. cCh <= "z" ) .OR. ;
+             ( cCh >= "0" .AND. cCh <= "9" ) .OR. ;
+             cCh == "-" )
+         lw( "HDR_INJECT_NAME_BADCHAR: " + cName )
+         RETURN .F.
+      ENDIF
+   NEXT
+
+   IF ValType( cVal ) != "C"
+      lw( "HDR_INJECT_VAL_TYPE: " + cName + "=" + hb_ValToExp( cVal ) )
+      RETURN .F.
+   ENDIF
+
+   IF Chr( 13 ) $ cVal .OR. Chr( 10 ) $ cVal .OR. Chr( 0 ) $ cVal
+      lw( "HDR_INJECT_VAL_CRLF: " + cName + "=" + ;
+          StrTran( StrTran( StrTran( cVal, Chr( 13 ), "\r" ), Chr( 10 ), "\n" ), Chr( 0 ), "\0" ) )
+      RETURN .F.
+   ENDIF
+
+RETURN .T.
+
+// Test hook: expone `_HixHdrSanitize` para tests unitarios.
+FUNCTION HIX_HdrSanitize( cName, cVal )
+RETURN _HixHdrSanitize( cName, cVal )
+
+// ============================================================
+// [A1.06] _HixHdrStatusClamp — normaliza el status code HTTP.
+//
+//   Rango válido RFC 7231: 100..599. Cualquier valor fuera de
+//   rango, no-numérico o no-entero → 500 (con lw()).
+//
+//   `Int()` primero para tolerar decimales espurios (200.5 → 200
+//   sigue siendo válido; 200.9 → 200, no 201, para no promocionar
+//   accidentalmente el status).
+// ============================================================
+STATIC FUNCTION _HixHdrStatusClamp( nStatus )
+
+   LOCAL nOrig
+
+   IF ValType( nStatus ) != "N"
+      lw( "HTTP_STATUS_TYPE: " + hb_ValToExp( nStatus ) + " -> 500" )
+      RETURN 500
+   ENDIF
+
+   nOrig   := nStatus
+   nStatus := Int( nStatus )
+
+   IF nStatus < 100 .OR. nStatus > 599
+      lw( "HTTP_STATUS_RANGE: " + hb_NToS( nOrig ) + " -> 500" )
+      RETURN 500
+   ENDIF
+
+RETURN nStatus
+
+// Test hook: expone `_HixHdrStatusClamp` para tests unitarios.
+FUNCTION HIX_HdrStatusClamp( nStatus )
+RETURN _HixHdrStatusClamp( nStatus )

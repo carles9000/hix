@@ -33,6 +33,7 @@ CLASS THixRequest
    DATA cBody         INIT NIL    // NIL = no leído aún
    DATA cBodyPre      INIT ""     // bytes del body pre-leídos con los headers
    DATA xJsonBody     INIT NIL    // NIL = no parseado aún
+   DATA lJsonError    INIT .F.   // [A3.3.2] .T. si el último JsonBody fue parse-error
    DATA hFormBody     INIT NIL    // NIL = no parseado aún
    DATA hQueryParams  INIT NIL    // NIL = no parseado aún
    DATA hCookies      INIT NIL    // NIL = no parseado aún
@@ -308,9 +309,14 @@ METHOD ReadBody() CLASS THixRequest
 
    ENDIF
 
-   IF nLen > HIX_MAX_BODY_SIZE
+   // [A2.11] Sumar cBodyPre al bound: los bytes ya leídos con los
+   // headers cuentan hacia el total en memoria. Aunque en la impl
+   // actual Len(cBodyPre) <= 1023 (recv de 1024 en ReadHeaders), el
+   // chequeo defensivo evita bypass si el buffer inicial crece en el
+   // futuro.
+   IF nLen + Len( ::cBodyPre ) > HIX_MAX_BODY_SIZE
 
-      lw( _( "REQ_BODY_TOO_LARGE", hb_ntos( nLen ) ) )
+      lw( _( "REQ_BODY_TOO_LARGE", hb_ntos( nLen + Len( ::cBodyPre ) ) ) )
       // Drenar el body oversized y cerrar keep-alive.
       // Sin drenar, proxies como Cloudflare Tunnel se quedan bloqueados
       // subiendo bytes hacia un origen que ya respondió — el fetch del
@@ -319,6 +325,7 @@ METHOD ReadBody() CLASS THixRequest
       // (Content-Length menos los ya pre-leídos con los headers) hace
       // que la transacción HTTP quede bien formada.
       ::oIO:Drain( nLen - Len( ::cBodyPre ) )
+      ::nReadError := HIX_REQ_ERR_TOOLARGE
       ::lKeepAlive := .F.
       ::cBody      := ""
       RETURN ::cBody
@@ -504,18 +511,77 @@ METHOD JsonBody() CLASS THixRequest
 
    ENDIF
 
+   // A1.24 — pre-scan de profundidad antes de hb_jsonDecode.
+   // Un JSON con miles de `[[[…` puede desbordar la pila del parser recursivo
+   // interno de Harbour. Rechazamos antes de invocarlo.
+   IF _HixJsonDepth( cRaw ) > HIX_MAX_JSON_DEPTH
+
+      lw( "JSON depth exceeded (" + hb_ntos( HIX_MAX_JSON_DEPTH ) + ")" )
+      ::lJsonError := .T.   // [A3.3.2] distingue de body vacío
+      ::xJsonBody  := { => }
+      RETURN ::xJsonBody
+
+   ENDIF
+
    xData := hb_jsonDecode( cRaw )
 
    IF xData == NIL
 
       lw( _( "REQ_JSON_INVALID", Left( cRaw, 80 ) ) )
-      ::xJsonBody := { => }
+      ::lJsonError := .T.   // [A3.3.2] parse error — UJson() retornará NIL
+      ::xJsonBody  := { => }
    ELSE
       ::xJsonBody := xData
 
    ENDIF
 
 RETURN ::xJsonBody
+
+// ------------------------------------------------------------
+// _HixJsonDepth — profundidad máxima de anidamiento de {}/[] en un
+// string JSON. Ignora brackets dentro de strings (comillas dobles con
+// escapes `\`). Uso: guard anti stack-overflow antes de hb_jsonDecode.
+// Puede sobrestimar en JSON sintácticamente inválido — inocuo (mejor
+// rechazar por seguridad que dejar que el parser explote).
+// ------------------------------------------------------------
+STATIC FUNCTION _HixJsonDepth( cData )
+
+   LOCAL nLen  := Len( cData )
+   LOCAL i     := 0
+   LOCAL cCh
+   LOCAL nDepth := 0
+   LOCAL nMax   := 0
+   LOCAL lInStr := .F.
+
+   DO WHILE ++i <= nLen
+
+      cCh := SubStr( cData, i, 1 )
+
+      IF lInStr
+         IF cCh == Chr( 92 )       // backslash — escapa el siguiente
+            i++
+         ELSEIF cCh == '"'
+            lInStr := .F.
+         ENDIF
+      ELSE
+         IF cCh == '"'
+            lInStr := .T.
+         ELSEIF cCh == "{" .OR. cCh == "["
+            nDepth++
+            IF nDepth > nMax ; nMax := nDepth ; ENDIF
+            IF nMax > HIX_MAX_JSON_DEPTH ; EXIT ; ENDIF
+         ELSEIF cCh == "}" .OR. cCh == "]"
+            IF nDepth > 0 ; nDepth-- ; ENDIF
+         ENDIF
+      ENDIF
+
+   ENDDO
+
+RETURN nMax
+
+// Test hook público — expone _HixJsonDepth para audit tests.
+FUNCTION HIX_JsonDepthForTest( cData )
+RETURN _HixJsonDepth( cData )
 
 // ------------------------------------------------------------
 // FormBody — parsea body application/x-www-form-urlencoded.
@@ -617,34 +683,13 @@ RETURN hb_HClone( ::hQueryParams )
 // ------------------------------------------------------------
 METHOD Cookie( cName, xDef ) CLASS THixRequest
 
-   LOCAL cRaw, aPairs, cPair, nEq
+   LOCAL cRaw
 
    hb_default( @xDef, "" )
 
    IF ::hCookies == NIL
-
-      ::hCookies := { => }
-      cRaw := ::Header( "cookie", "" )
-
-      IF ! Empty( cRaw )
-
-         aPairs := hb_ATokens( cRaw, ";" )
-
-         FOR EACH cPair IN aPairs
-
-            cPair := AllTrim( cPair )
-            nEq   := At( "=", cPair )
-
-            IF nEq > 0
-
-               ::hCookies[ AllTrim( Left( cPair, nEq - 1 ) ) ] := AllTrim( SubStr( cPair, nEq + 1 ) )
-
-            ENDIF
-
-         NEXT
-
-      ENDIF
-
+      cRaw       := ::Header( "cookie", "" )
+      ::hCookies := iif( Empty( cRaw ), { => }, _HixParseCookies( cRaw ) )
    ENDIF
 
 RETURN hb_HGetDef( ::hCookies, cName, xDef )
@@ -783,7 +828,9 @@ FUNCTION HIX_UrlDecode( cStr )
 
          IF nHi >= 0 .AND. nLo >= 0
 
-            cResult += Chr( nHi * 16 + nLo )
+            IF nHi * 16 + nLo != 0   // [A3.3.6] strip null-byte (%00)
+               cResult += Chr( nHi * 16 + nLo )
+            ENDIF
             i += 3
          ELSE
             cResult += c
@@ -811,6 +858,72 @@ STATIC FUNCTION _HixHexVal( c )
 
 RETURN -1
 
+// [A3.3.4] Strip characters that break Set-Cookie syntax.
+// lIsName=.T. → also strip "=" (cookie-name may not contain it).
+// Always strips CRLF (header injection) and ";" (attribute injection).
+STATIC FUNCTION _HixSanitizeCookiePart( cStr, lIsName )
+   LOCAL cClean, i, cCh, nCode
+   hb_default( @lIsName, .F. )
+   cClean := ""
+   FOR i := 1 TO Len( cStr )
+      cCh   := SubStr( cStr, i, 1 )
+      nCode := Asc( cCh )
+      IF nCode == 13 .OR. nCode == 10 .OR. cCh == ";"
+         LOOP
+      ENDIF
+      IF lIsName .AND. cCh == "="
+         LOOP
+      ENDIF
+      cClean += cCh
+   NEXT
+RETURN cClean
+
+// [A3.3.3] RFC 6265-compliant cookie parser.
+// Splits on ";" only outside double-quoted values; strips surrounding
+// quotes from the stored value.  Tolerates missing closing quote by
+// resetting quote state on each new pair boundary.
+STATIC FUNCTION _HixParseCookies( cRaw )
+
+   LOCAL hResult := { => }
+   LOCAL nLen    := Len( cRaw )
+   LOCAL i       := 1
+   LOCAL nStart  := 1
+   LOCAL lInQ    := .F.
+   LOCAL cPair, nEq, cName, cVal, cCh
+
+   // RFC 6265 §5.2: cookie names are case-sensitive (unlike HTTP headers).
+   // Explicit .T. documents the decision; default is already case-sensitive.
+   HB_HCaseMatch( hResult, .T. )
+
+   DO WHILE i <= nLen + 1
+
+      cCh := iif( i <= nLen, SubStr( cRaw, i, 1 ), ";" )
+
+      IF cCh == '"'
+         lInQ := ! lInQ
+      ELSEIF cCh == ";" .AND. ! lInQ
+         cPair := AllTrim( SubStr( cRaw, nStart, i - nStart ) )
+         nEq   := At( "=", cPair )
+         IF nEq > 0
+            cName := AllTrim( Left( cPair, nEq - 1 ) )
+            cVal  := AllTrim( SubStr( cPair, nEq + 1 ) )
+            IF Len( cVal ) >= 2 .AND. Left( cVal, 1 ) == '"' .AND. Right( cVal, 1 ) == '"'
+               cVal := SubStr( cVal, 2, Len( cVal ) - 2 )
+            ENDIF
+            IF ! Empty( cName )
+               hResult[ cName ] := cVal
+            ENDIF
+         ENDIF
+         nStart := i + 1
+         lInQ   := .F.
+      ENDIF
+
+      i++
+
+   ENDDO
+
+RETURN hResult
+
 // ============================================================
 // HIX_SetCookie — añade Set-Cookie a hExtraHeaders del request.
 // nMaxAge == 0  → cookie de sesión (sin Max-Age)
@@ -820,11 +933,25 @@ RETURN -1
 FUNCTION HIX_SetCookie( oReq, cName, cVal, nMaxAge )
 
    LOCAL cLine, xExisting, cPrefix, i
+   LOCAL cSafeName, cSafeVal
 
    hb_default( @nMaxAge, 0 )
 
-   cLine   := cName + "=" + cVal + "; Path=/; HttpOnly; SameSite=Lax"
-   cPrefix := cName + "="
+   cSafeName := _HixSanitizeCookiePart( cName, .T. )
+   cSafeVal  := _HixSanitizeCookiePart( cVal,  .F. )
+
+   IF cSafeName != cName .OR. cSafeVal != cVal
+      lw( "HIX_SetCookie: chars eliminados de nombre/valor (inyeccion prevenida)" )
+   ENDIF
+
+   cLine   := cSafeName + "=" + cSafeVal + "; Path=/; HttpOnly; SameSite=Lax"
+   cPrefix := cSafeName + "="
+
+   // [A4.13] Secure flag — obligatorio sobre HTTPS para proteger contra
+   // intercepción en tránsito (session hijacking, cookie theft).
+   IF oReq:IsHttps()
+      cLine += "; Secure"
+   ENDIF
 
    DO CASE
 
@@ -952,3 +1079,4 @@ METHOD Destroy() CLASS THixSessionProxy
    HIX_SessionDestroy( ::oCtx )
 
 RETURN NIL
+

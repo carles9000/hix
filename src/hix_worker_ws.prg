@@ -33,6 +33,7 @@ CLASS THixWsConn
    DATA cIP    INIT ""
    DATA oIO    INIT NIL
    DATA lClosed INIT .F.
+   DATA oMutex  INIT NIL   // audit A2.03 — protege lClosed + oIO
 
    METHOD New( oIO, cIP )
    METHOD Send( cData )
@@ -43,12 +44,16 @@ ENDCLASS
 
 METHOD New( oIO, cIP ) CLASS THixWsConn
 
-   ::oIO  := oIO
-   ::cIP  := cIP
+   ::oIO    := oIO
+   ::cIP    := cIP
+   ::oMutex := hb_mutexCreate()
 
 RETURN Self
 
+// Audit A2.03 — lock-check-write bajo mutex evita race con Close.
 METHOD Send( cData ) CLASS THixWsConn
+
+   hb_mutexLock( ::oMutex )
 
    IF ! ::lClosed
 
@@ -56,9 +61,13 @@ METHOD Send( cData ) CLASS THixWsConn
 
    ENDIF
 
+   hb_mutexUnlock( ::oMutex )
+
 RETURN Self
 
 METHOD SendBinary( cData ) CLASS THixWsConn
+
+   hb_mutexLock( ::oMutex )
 
    IF ! ::lClosed
 
@@ -66,9 +75,13 @@ METHOD SendBinary( cData ) CLASS THixWsConn
 
    ENDIF
 
+   hb_mutexUnlock( ::oMutex )
+
 RETURN Self
 
 METHOD Close() CLASS THixWsConn
+
+   hb_mutexLock( ::oMutex )
 
    IF ! ::lClosed
 
@@ -77,18 +90,24 @@ METHOD Close() CLASS THixWsConn
 
    ENDIF
 
+   hb_mutexUnlock( ::oMutex )
+
 RETURN Self
 
 // ============================================================
 // Registro global de callbacks WS
 // ============================================================
+
+// Audit A2.05 — mutex creado eager al arranque del proceso via
+// INIT PROCEDURE (main thread, antes de cualquier worker). Elimina el
+// lazy init con doble-write race de las versiones anteriores.
+INIT PROCEDURE _HixWsInit()
+
+   shMutexCb := hb_mutexCreate()
+
+RETURN
+
 FUNCTION HIX_WsSetCallbacks( bConnect, bMessage, bClose )
-
-   IF shMutexCb == NIL
-
-      shMutexCb := hb_mutexCreate()
-
-   ENDIF
 
    hb_mutexLock( shMutexCb )
    sbOnConnect := bConnect
@@ -102,17 +121,16 @@ STATIC FUNCTION _HixWsCallbacks()
 
    LOCAL aR
 
-   IF shMutexCb == NIL
-
-      RETURN { NIL, NIL, NIL }
-
-   ENDIF
-
    hb_mutexLock( shMutexCb )
    aR := { sbOnConnect, sbOnMessage, sbOnClose }
    hb_mutexUnlock( shMutexCb )
 
 RETURN aR
+
+// Public wrapper para tests A2.05 — snapshot atomico del estado de
+// callbacks WS. Aisla la STATIC _HixWsCallbacks para pruebas unitarias.
+FUNCTION HIX_WsGetCallbacks()
+RETURN _HixWsCallbacks()
 
 // ============================================================
 // HIX_WorkerWS — entry point desde pool WS (sin SSL / peek detectado)
@@ -166,22 +184,18 @@ FUNCTION HIX_HandleWSUpgrade( oReq, cIP )
 
    l( _( "WS_CONNECTED", cIP ) )
 
-   IF aCb[ 1 ] != NIL
-
-      Eval( aCb[ 1 ], oConn )
-
-   ENDIF
+   // Audit A2.04 — HIX_WsSafeEval envuelve cada callback en TRY/CATCH:
+   // un throw del handler de usuario NO debe abortar el cleanup
+   // (Close + MetricDec). Sin esto, un fallo en bOnConnect deja el
+   // socket colgado y active_ws envenenado.
+   HIX_WsSafeEval( aCb[ 1 ], { oConn }, "bOnConnect", cIP )
 
    // Timing por-frame se registra dentro de _HixWSFrameLoop.
    _HixWSFrameLoop( oConn, aCb[ 2 ] )
 
    l( _( "WS_DISCONNECTED", cIP ) )
 
-   IF aCb[ 3 ] != NIL
-
-      Eval( aCb[ 3 ], oConn )
-
-   ENDIF
+   HIX_WsSafeEval( aCb[ 3 ], { oConn }, "bOnClose", cIP )
 
    oConn:Close()
    HIX_MetricDec( HIXM_ACTIVE_WS )
@@ -294,11 +308,9 @@ STATIC FUNCTION _HixWSFrameLoop( oConn, bOnMessage )
 
             tFrame := hb_DateTime()
 
-            IF bOnMessage != NIL
-
-               Eval( bOnMessage, oConn, cPayload, nOpcode )
-
-            ENDIF
+            // Audit A2.04 — misma protección: un throw del handler NO
+            // debe romper el frame loop ni saltar el cleanup posterior.
+            HIX_WsSafeEval( bOnMessage, { oConn, cPayload, nOpcode }, "bOnMessage", cIP )
 
             HIX_MetricWsTiming( Int( ( hb_DateTime() - tFrame ) * 86400000 ) )
 
@@ -421,3 +433,46 @@ RETURN NIL
 // Public wrapper so unit tests can verify frame byte encoding
 FUNCTION HIX_WsBuildFrame( nOpcode, cPayload )
 RETURN _HixWSBuildFrame( nOpcode, cPayload )
+
+// ============================================================
+// Audit A2.04 — envuelve un callback WS en TRY/CATCH.
+// Un throw del handler de usuario NO debe abortar el cleanup
+// (Close + MetricDec) ni romper el frame loop.
+//   bCb   : codeblock del handler (o NIL — no-op).
+//   aArgs : array de argumentos a pasar al codeblock.
+//   cKind : etiqueta para el log ("bOnConnect"/"bOnMessage"/"bOnClose").
+//   cIP   : IP del peer, para el log.
+// Retorna .T. si el eval terminó limpio; .F. si CATCH atrapó excepción.
+// ============================================================
+FUNCTION HIX_WsSafeEval( bCb, aArgs, cKind, cIP )
+
+   LOCAL oError
+
+   IF bCb == NIL
+
+      RETURN .T.
+
+   ENDIF
+
+   TRY
+
+      DO CASE
+      CASE Len( aArgs ) == 1
+         Eval( bCb, aArgs[ 1 ] )
+      CASE Len( aArgs ) == 2
+         Eval( bCb, aArgs[ 1 ], aArgs[ 2 ] )
+      CASE Len( aArgs ) == 3
+         Eval( bCb, aArgs[ 1 ], aArgs[ 2 ], aArgs[ 3 ] )
+      OTHERWISE
+         Eval( bCb )
+      ENDCASE
+
+   CATCH oError
+
+      le( "WS " + cKind + " error [" + cIP + "]: " + oError:description )
+      HIX_Metric( HIXM_WS_CB_ERRORS )
+      RETURN .F.
+
+   END
+
+RETURN .T.

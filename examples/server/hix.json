@@ -19,7 +19,8 @@
     "gzip": true,
     "gzip_min_size": 2048,
     "autostart": true,
-    "exec_timeout_ms": 30000
+    "exec_timeout_ms": 30000,
+    "stream_exec_timeout_ms": 0
   },
   "paths":
   {

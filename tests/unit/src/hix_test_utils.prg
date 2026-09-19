@@ -96,6 +96,7 @@ CLASS TMockRequest
    DATA nResponseStatus INIT 200
    DATA cRawBody        INIT ""
    DATA oIO             INIT NIL
+   DATA cProtoScheme    INIT ""   // "" | "https" — controla IsHttps() en tests
 
    METHOD New( cPath, cMethod )
    METHOD Respond( xData, nStatus, cMime, hExtra )
@@ -109,6 +110,8 @@ CLASS TMockRequest
    METHOD ReadBody()
    METHOD JsonBody()
    METHOD Redirect( cUrl )
+   METHOD RealIP()    INLINE ::cIP
+   METHOD IsHttps()   INLINE ::cProtoScheme == "https"
 ENDCLASS
 
 METHOD New( cPath, cMethod ) CLASS TMockRequest

@@ -140,6 +140,8 @@ FUNCTION UGetPPRules()
 // Preamble de reglas HIX que se anteponen al codigo del usuario.
 // Unico paso de compilacion (.T.) — el compilador Harbour resuelve
 // hbclass.ch y demas includes sin doble-preprocessing.
+// [A4.11] Si se añaden o eliminan lineas aqui, HIX_PreambleLines()
+// las contara automaticamente — NO hay offset hardcoded.
 
 STATIC FUNCTION _HixPreamble()
 RETURN ;
@@ -156,6 +158,8 @@ RETURN ;
 // ------------------------------------------------------------- //
 // Cuenta las lineas del preamble para compensar el offset de
 // numero de linea que introduce en el codigo compilado.
+// [A4.11] Computo dinamico en el primer uso: la cache STATIC es segura
+// porque _HixPreamble() devuelve una constante de compilacion.
 FUNCTION HIX_PreambleLines()
 
    STATIC snLines := -1
@@ -205,7 +209,7 @@ FUNCTION HIX_CompileFile( cPath )
    DO CASE
 
       CASE "Windows" $ cOs ; cHBHeader := "c:\harbour\include"
-      CASE "Linux" $ cOs   ; cHBHeader := "~/harbour/include"
+      CASE "Linux" $ cOs   ; cHBHeader := hb_GetEnv( "HOME" ) + "/harbour/include"
 
    ENDCASE
 

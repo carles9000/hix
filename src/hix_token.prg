@@ -10,6 +10,9 @@
                Copyright (c) 2026 Carles Aubia Floresví - HIX Server Project
  -----------------------------------------------------------*/
 
+STATIC s_nTokCounter := 0
+STATIC s_mtxTokCtr   := NIL
+
 // ============================================================
 // HIX_TokenSetSecret -- publica el secret al store compartido.
 // ============================================================
@@ -28,22 +31,53 @@ FUNCTION HIX_TokenGetSecret()
 RETURN HIX_KeyGet( "token", "H!x@TOKEN@2026" )
 
 // ============================================================
-// HIX_TokenGenRandom -- alphanumeric random string (nLen chars).
+// HIX_TokenGenRandom -- nLen-char alphanumeric token derived from
+// HMAC-SHA256(timestamp:millis:counter:prng, secret). The output
+// alphabet and length are preserved; the entropy source is replaced
+// with a keyed PRF so the token is unpredictable without the secret
+// even if the message inputs are observable (A1.12).
+// HMAC gives 32 bytes per round; a new round is started every 32
+// output chars so arbitrarily long tokens are supported.
 // ============================================================
 FUNCTION HIX_TokenGenRandom( nLen )
 
-   LOCAL cChars := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-   LOCAL cToken := "", i
+   LOCAL nCount, cMsg, cHmac, cChars
+   LOCAL cResult, nX, nByte, nHi, nLo, nPos
 
    hb_default( @nLen, 16 )
 
-   FOR i := 1 TO nLen
+   IF s_mtxTokCtr == NIL ; s_mtxTokCtr := hb_mutexCreate() ; ENDIF
 
-      cToken += SubStr( cChars, hb_RandomInt( 1, Len( cChars ) ), 1 )
+   hb_mutexLock( s_mtxTokCtr )
+   s_nTokCounter++
+   nCount := s_nTokCounter
+   hb_mutexUnlock( s_mtxTokCtr )
+
+   cMsg := hb_NToS( Int( hb_TToSec( hb_DateTime() ) ) ) + ":" + ;
+           hb_NToS( hb_MilliSeconds()                 ) + ":" + ;
+           hb_NToS( nCount                            ) + ":" + ;
+           hb_NToS( hb_RandomInt( 0, 2147483647 )     )
+
+   cChars  := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+   cResult := ""
+   cHmac   := hb_HMAC_SHA256( cMsg, HIX_TokenGetSecret() )
+
+   FOR nX := 1 TO nLen
+
+      // Refresh HMAC every 32 output chars (HMAC-SHA256 = 32 bytes = 64 hex chars)
+      IF nX > 1 .AND. ( nX - 1 ) % 32 == 0
+         cHmac := hb_HMAC_SHA256( cMsg + ":" + hb_NToS( nX ), HIX_TokenGetSecret() )
+      ENDIF
+
+      nPos  := ( ( nX - 1 ) % 32 ) * 2 + 1
+      nHi   := At( SubStr( cHmac, nPos,     1 ), "0123456789abcdef" ) - 1
+      nLo   := At( SubStr( cHmac, nPos + 1, 1 ), "0123456789abcdef" ) - 1
+      nByte := nHi * 16 + nLo
+      cResult += SubStr( cChars, 1 + ( nByte % 62 ), 1 )
 
    NEXT
 
-RETURN cToken
+RETURN cResult
 
 // ============================================================
 // HIX_TokenMake -- build a signed token.
@@ -86,7 +120,7 @@ FUNCTION HIX_TokenValid( cToken, nLapsus, cSecret )
    cPayload := hb_base64Decode( aParts[ 1 ] )
    cSign    := aParts[ 2 ]
 
-   IF !( cSign == hb_HMAC_SHA256( cPayload, cSecret ) )
+   IF ! _HixTokenConstantEq( cSign, hb_HMAC_SHA256( cPayload, cSecret ) )
 
       RETURN .F.
 
@@ -113,3 +147,15 @@ FUNCTION HIX_TokenValid( cToken, nLapsus, cSecret )
    ENDIF
 
 RETURN .T.
+
+// ---- private helpers ----
+
+// [A4.14] Delegación a HIX_ConstantEq (hix_helpers.prg) — implementación
+// compartida con hix_jwt.prg. La función local queda como alias interno.
+STATIC FUNCTION _HixTokenConstantEq( cA, cB )
+RETURN HIX_ConstantEq( cA, cB )
+
+// Public wrapper — kept for backward-compat and callers (hix_mw_csrf.prg,
+// hix_session.prg). Not part of the public API.
+FUNCTION HIX_TokenConstantEq( cA, cB )
+RETURN HIX_ConstantEq( cA, cB )

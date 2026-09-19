@@ -16,7 +16,8 @@
     })();
   </script>
   <style>
-    body { background: #f0f2f5; }
+    body { background: #f0f2f5; padding-bottom: 44px; }
+    footer { border-top: 1px solid gray; }
     [data-bs-theme="dark"] body { background: #14161a; }
     .navbar-brand { font-family: monospace; font-size: 1.1rem; letter-spacing: 1px; }
     /* Dark track in both themes: it sits right under the dark navbar and keeps
@@ -71,7 +72,8 @@
 </head>
 <body>
 
-<!-- Navbar -->
+<!-- Sticky header: navbar + progress bar -->
+<div id="sticky-header" style="position:sticky;top:0;z-index:1030;border-bottom:1px solid gray;">
 <nav class="navbar navbar-dark bg-dark shadow-sm">
   <div class="container-fluid">
     <span class="navbar-brand d-flex align-items-center">
@@ -81,6 +83,11 @@
       <div class="d-flex flex-column align-items-center lh-1">
         <small class="text-white-50" style="font-size:.6rem;text-transform:uppercase;letter-spacing:.5px">OS</small>
         <span class="badge mt-1 font-monospace" id="nav-os"
+              style="background:#6f42c1;color:#fff" title="—">…</span>
+      </div>
+      <div class="d-flex flex-column align-items-center lh-1">
+        <small class="text-white-50" style="font-size:.6rem;text-transform:uppercase;letter-spacing:.5px">Compiler</small>
+        <span class="badge mt-1 font-monospace" id="nav-compiler"
               style="background:orange;color:black" title="—">…</span>
       </div>
       <div class="d-flex flex-column align-items-center lh-1">
@@ -124,6 +131,7 @@
   <div id="progress-bar" style="width:0%"></div>
   <span id="progress-label"></span>
 </div>
+</div><!-- /sticky-top -->
 
 <!-- Content -->
 <div class="container-fluid py-3">
@@ -245,5 +253,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/app.js"></script>
+
+<footer class="navbar navbar-dark bg-dark py-2" style="position:fixed;bottom:0;left:0;right:0;z-index:1030">
+  <div class="container-fluid justify-content-end">
+    <span class="text-white-50" style="font-size:.75rem">&copy; 2026 - Charly</span>
+  </div>
+</footer>
 </body>
 </html>

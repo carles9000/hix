@@ -11,6 +11,7 @@
                cRole is the ORIGINAL-case rule token (regex pattern preserved).
                cKey/cName/hInput needed for cross-field rules (confirmed).
  -----------------------------------------------------------*/
+#include "hix_logger.ch"
 
 // HIX_ValCheck: evaluates a single rule against uValue.
 // Returns NIL on pass, error hash on fail, skip hash when optional.
@@ -249,7 +250,14 @@ FUNCTION HIX_ValCheck( cRole, uValue, cKey, cName, hInput )
 
       IF ! Empty( cParam )
 
-         IF Empty( hb_regex( cParam, UStr( uValue ) ) )
+         // Guard against ReDoS: reject patterns that are unreasonably long
+         // and cap the input length so catastrophic backtracking is bounded.
+         IF Len( cParam ) > 200
+            lw( "VAL_REGEX: pattern too long (" + hb_NToS( Len( cParam ) ) + " chars) — rejected (A1.17)" )
+            RETURN _ValErr( cKey, _( 'VAL_REGEX', cName ) )
+         ENDIF
+
+         IF Empty( hb_regex( cParam, Left( UStr( uValue ), 2048 ) ) )
 
             RETURN _ValErr( cKey, _( 'VAL_REGEX', cName ) )
 

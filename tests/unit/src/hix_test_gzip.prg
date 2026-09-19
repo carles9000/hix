@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_test_gzip.prg
   Author.....: Charly 9000
   Created....: 2026-06-04
@@ -92,7 +92,7 @@ STATIC PROCEDURE _GzipConfig( hCtx )
    nMin  := HIX_GetConfig( "server", "gzip_min_size" )
    HixTU_Check( hCtx, ! lGzip,          "Gzip: JSON gzip=.F. round-trip",         ".F.",  iif(lGzip,".T.",".F.") )
    HixTU_Check( hCtx, nMin == 4096,     "Gzip: JSON gzip_min_size=4096",          "4096", hb_NToS(nMin) )
-   hb_vfErase( cFile )
+   HIX_SafeErase( cFile )
 
    HIX_SetConfig( oCfgSave )
 RETURN

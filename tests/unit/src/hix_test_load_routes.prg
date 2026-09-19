@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_test_load_routes.prg
   Author.....: Charly 9000
   Created....: 2026-06-04
@@ -45,6 +45,54 @@ STATIC FUNCTION _DispatchPost( cPath, hBody )
    HIX_RouteDispatch( oReq )
 RETURN oReq
 
+// [A1.15] HIX_AdminCheck no longer bypasses in env=dev — admin routes
+// (/hix-routes/*) require valid credentials + signed cookie. These helpers
+// seed test admin credentials and craft a matching HMAC-SHA256 signed cookie so
+// _LrApiAdd/_LrApiDelete/_LrApiReload can drive the admin route management API.
+// Format must match _HixAdminSign: hb_HMAC_SHA256( hb_NToS(nTs), cSecret ) [A3.4.4]
+STATIC FUNCTION _LrAdminCookie()
+   LOCAL nTs := ( Date() - hb_SToD( "19700101" ) ) * 86400 + Int( Seconds() )
+RETURN hb_NToS( nTs ) + ":" + Lower( hb_HMAC_SHA256( hb_NToS( nTs ), "test-secret" ) )
+
+STATIC FUNCTION _DispatchAdmin( cPath, cMethod )
+   LOCAL oReq := TMockRequest():New( cPath, hb_defaultValue( cMethod, "GET" ) )
+   oReq:hHeaders[ "cookie" ] := "hix_admin=" + _LrAdminCookie()
+   HIX_RouteDispatch( oReq )
+RETURN oReq
+
+STATIC FUNCTION _DispatchPostAdmin( cPath, hBody )
+   LOCAL oReq := TMockRequest():New( cPath, "POST" )
+   oReq:cRawBody := hb_jsonEncode( hBody )
+   oReq:hHeaders[ "cookie" ] := "hix_admin=" + _LrAdminCookie()
+   HIX_RouteDispatch( oReq )
+RETURN oReq
+
+STATIC PROCEDURE _LrAdminSetup()
+   LOCAL hCfg := HIX_GetConfig()
+   IF ! hb_HHasKey( hCfg, "admin" )
+      hCfg[ "admin" ] := { => }
+   ENDIF
+   hCfg[ "admin" ][ "user"     ] := "test"
+   hCfg[ "admin" ][ "password" ] := "test"
+   hCfg[ "admin" ][ "secret"   ] := "test-secret"
+   IF ! hb_HHasKey( hCfg, "session" )
+      hCfg[ "session" ] := { => }
+   ENDIF
+   hCfg[ "session" ][ "lifetime" ] := 60
+RETURN
+
+STATIC PROCEDURE _LrAdminTeardown( hOrig )
+   LOCAL hCfg := HIX_GetConfig()
+   hCfg[ "admin"   ] := hOrig[ "admin"   ]
+   hCfg[ "session" ] := hOrig[ "session" ]
+RETURN
+
+STATIC FUNCTION _LrAdminSnapshot()
+   LOCAL hCfg := HIX_GetConfig()
+RETURN { ;
+   "admin"   => iif( hb_HHasKey( hCfg, "admin"   ), hb_HClone( hCfg[ "admin"   ] ), { => } ), ;
+   "session" => iif( hb_HHasKey( hCfg, "session" ), hb_HClone( hCfg[ "session" ] ), { => } ) }
+
 STATIC PROCEDURE _WriteRouteJson( cFilename, aRoutes )
    LOCAL cDir := _RoutesDir()
    IF ! hb_DirExists( cDir ) ; hb_DirCreate( cDir ) ; ENDIF
@@ -53,7 +101,7 @@ RETURN
 
 STATIC PROCEDURE _DeleteRouteJson( cFilename )
    LOCAL cPath := _RoutesDir() + hb_ps() + cFilename
-   IF hb_FileExists( cPath ) ; hb_vfErase( cPath ) ; ENDIF
+   IF hb_FileExists( cPath ) ; HIX_SafeErase( cPath ) ; ENDIF
 RETURN
 
 STATIC PROCEDURE _CleanupRoutesDir()
@@ -61,17 +109,35 @@ STATIC PROCEDURE _CleanupRoutesDir()
    cDir   := _RoutesDir()
    aFiles := hb_vfDirectory( cDir + hb_ps() + "*.json" )
    FOR EACH aFile IN aFiles
-      hb_vfErase( cDir + hb_ps() + aFile[1] )
+      HIX_SafeErase( cDir + hb_ps() + aFile[1] )
    NEXT
-   hb_vfDirRemove( cDir )
+   HIX_SafeDirDelete( cDir )
 RETURN
 
 FUNCTION HIX_TestLoadRoutes_Run()
    LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
    LOCAL cDir
+   LOCAL hSnap
+   LOCAL hAdminOrig
+   // HIX_RoutesLoad() es idempotente: deja el test independiente del orden.
+   // Sin esto, si LoadRoutes se ejecuta sin que un test previo haya inicializado
+   // el router, HIX_RoutesSnapshot() peta con Argument error (s_mtxRoutes NIL).
+   HIX_RoutesLoad()
+   // _LrApiReload dispara _HixSysRouteReload que borra TODAS las rutas
+   // non-hix.* — incluye api_test_one, api_tests, etc. Sin snapshot/restore
+   // el resto de tests del dashboard devuelve 404 al terminar este bloque.
+   hSnap := HIX_RoutesSnapshot()
+   // [A1.15] Guardar config admin/session original para restaurar al final.
+   hAdminOrig := _LrAdminSnapshot()
    cDir := _RoutesDir()
    IF ! hb_DirExists( "www" ) ; hb_DirCreate( "www" ) ; ENDIF
    IF ! hb_DirExists( cDir  ) ; hb_DirCreate( cDir  ) ; ENDIF
+   // [A1.01] Whitelist: registrar acciones-por-nombre usadas por LoadRoutes
+   HIX_RouteRegisterAction( "LrAction1",    {|o| LrAction1( o )    } )
+   HIX_RouteRegisterAction( "LrAction2",    {|o| LrAction2( o )    } )
+   HIX_RouteRegisterAction( "LrReplace",    {|o| LrReplace( o )    } )
+   HIX_RouteRegisterAction( "LrWithVar",    {|o| LrWithVar( o )    } )
+   HIX_RouteRegisterAction( "LrScopeCheck", {|o| LrScopeCheck( o ) } )
    _LrLoadNoDir(       hCtx )
    _LrLoadEmptyFile(   hCtx )
    _LrLoadInvalidJSON( hCtx )
@@ -81,10 +147,15 @@ FUNCTION HIX_TestLoadRoutes_Run()
    _LrLoadScope(       hCtx )
    _LrLoadDuplicates(  hCtx )
    _LrLoadMultiFiles(  hCtx )
+   // [A1.15] Sub-tests de la Route Management API: activar credenciales admin
+   // + cookie firmada para que HIX_AdminCheck acepte los requests mock.
+   _LrAdminSetup()
    _LrApiAdd(          hCtx )
    _LrApiDelete(       hCtx )
    _LrApiReload(       hCtx )
    _CleanupRoutesDir()
+   HIX_RoutesRestore( hSnap )
+   _LrAdminTeardown( hAdminOrig )
 RETURN hCtx
 
 STATIC PROCEDURE _LrLoadNoDir( hCtx )
@@ -251,7 +322,7 @@ RETURN
 STATIC PROCEDURE _LrApiAdd( hCtx )
    LOCAL oReq, hBody, hResp
    hBody := { "name" => "lr10.api_add", "url" => "/lr10/api_add", "action" => "LrAction1", "method" => "GET" }
-   oReq  := _DispatchPost( "/hix-routes/add", hBody )
+   oReq  := _DispatchPostAdmin( "/hix-routes/add", hBody )
    HixTU_Check( hCtx, oReq:nStatus == 200, "LR: ApiAdd nueva -> 200", "200", hb_NToS( oReq:nStatus ) )
    hResp := NIL
    hb_jsonDecode( oReq:cBody, @hResp )
@@ -259,7 +330,7 @@ STATIC PROCEDURE _LrApiAdd( hCtx )
    oReq := _Dispatch( "/lr10/api_add" )
    HixTU_Check( hCtx, oReq:nStatus == 200, "LR: ruta creada accesible", "200", hb_NToS( oReq:nStatus ) )
    hBody := { "name" => "lr10.api_add", "url" => "/lr10/api_add", "action" => "LrAction2", "method" => "GET" }
-   oReq  := _DispatchPost( "/hix-routes/add", hBody )
+   oReq  := _DispatchPostAdmin( "/hix-routes/add", hBody )
    HixTU_Check( hCtx, oReq:nStatus == 409, "LR: ApiAdd dup -> 409", "409", hb_NToS( oReq:nStatus ) )
    hResp := NIL
    hb_jsonDecode( oReq:cBody, @hResp )
@@ -267,10 +338,11 @@ STATIC PROCEDURE _LrApiAdd( hCtx )
    oReq := _Dispatch( "/lr10/api_add" )
    HixTU_Check( hCtx, oReq:cBody == "lr_action_1", "LR: dup no sobreescribe accion", "lr_action_1", oReq:cBody )
    oReq := TMockRequest():New( "/hix-routes/add", "POST" )
+   oReq:hHeaders[ "cookie" ] := "hix_admin=" + _LrAdminCookie()
    oReq:cRawBody := "not_json"
    HIX_RouteDispatch( oReq )
    HixTU_Check( hCtx, oReq:nStatus == 400, "LR: ApiAdd body invalido -> 400", "400", hb_NToS( oReq:nStatus ) )
-   oReq := _DispatchPost( "/hix-routes/add", { "name" => "lr10.api_var", "url" => "/lr10/user/:id", "action" => "LrWithVar", "method" => "GET" } )
+   oReq := _DispatchPostAdmin( "/hix-routes/add", { "name" => "lr10.api_var", "url" => "/lr10/user/:id", "action" => "LrWithVar", "method" => "GET" } )
    HixTU_Check( hCtx, oReq:nStatus == 200, "LR: ApiAdd ruta :var -> 200", "200", hb_NToS( oReq:nStatus ) )
    oReq := _Dispatch( "/lr10/user/99" )
    HixTU_Check( hCtx, oReq:cBody == "99", "LR: ApiAdd ruta :var dispatch id=99", "99", oReq:cBody )
@@ -281,18 +353,19 @@ STATIC PROCEDURE _LrApiDelete( hCtx )
    HIX_RouteAdd( "lr11.to_del", "/lr11/to_del", {|oR| oR:Respond( "alive" ) }, "GET" )
    oReq := _Dispatch( "/lr11/to_del" )
    HixTU_Check( hCtx, oReq:nStatus == 200, "LR: ApiDel ruta existe antes", "200", hb_NToS( oReq:nStatus ) )
-   oReq := _DispatchPost( "/hix-routes/delete", { "name" => "lr11.to_del" } )
+   oReq := _DispatchPostAdmin( "/hix-routes/delete", { "name" => "lr11.to_del" } )
    HixTU_Check( hCtx, oReq:nStatus == 200, "LR: ApiDel eliminar existente -> 200", "200", hb_NToS( oReq:nStatus ) )
    hResp := NIL
    hb_jsonDecode( oReq:cBody, @hResp )
    HixTU_Check( hCtx, ValType( hResp ) == "H" .AND. hb_HGetDef( hResp, "ok", .F. ), "LR: ApiDel {ok:true}", "true", hb_ValToStr( hb_HGetDef( hResp, "ok", .F. ) ) )
    oReq := _Dispatch( "/lr11/to_del" )
    HixTU_Check( hCtx, oReq:nStatus == 404, "LR: ApiDel ruta eliminada -> 404", "404", hb_NToS( oReq:nStatus ) )
-   oReq := _DispatchPost( "/hix-routes/delete", { "name" => "lr11.nonexistent" } )
+   oReq := _DispatchPostAdmin( "/hix-routes/delete", { "name" => "lr11.nonexistent" } )
    HixTU_Check( hCtx, oReq:nStatus == 200, "LR: ApiDel inexistente -> 200 idempotente", "200", hb_NToS( oReq:nStatus ) )
-   oReq := _DispatchPost( "/hix-routes/delete", { "x" => "y" } )
+   oReq := _DispatchPostAdmin( "/hix-routes/delete", { "x" => "y" } )
    HixTU_Check( hCtx, oReq:nStatus == 400, "LR: ApiDel sin name -> 400", "400", hb_NToS( oReq:nStatus ) )
    oReq := TMockRequest():New( "/hix-routes/delete", "POST" )
+   oReq:hHeaders[ "cookie" ] := "hix_admin=" + _LrAdminCookie()
    oReq:cRawBody := "bad"
    HIX_RouteDispatch( oReq )
    HixTU_Check( hCtx, oReq:nStatus == 400, "LR: ApiDel body invalido -> 400", "400", hb_NToS( oReq:nStatus ) )
@@ -303,7 +376,7 @@ STATIC PROCEDURE _LrApiReload( hCtx )
    _WriteRouteJson( "s12_reload.json", { ;
       { "name" => "lr12.from_reload", "url" => "/lr12/reload_check", "action" => "LrAction1", "method" => "GET" }  ;
    } )
-   oReq := _Dispatch( "/hix-routes/reload", "GET" )
+   oReq := _DispatchAdmin( "/hix-routes/reload", "GET" )
    HixTU_Check( hCtx, oReq:nStatus == 200, "LR: ApiReload GET -> 200", "200", hb_NToS( oReq:nStatus ) )
    hResp := NIL
    hb_jsonDecode( oReq:cBody, @hResp )

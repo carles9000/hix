@@ -63,9 +63,9 @@ STATIC PROCEDURE _CleanTmpRoot( cRoot )
       IF aEntry[1] != "." .AND. aEntry[1] != ".."
          IF "D" $ aEntry[5]
             _CleanTmpRoot( cRoot + aEntry[1] + hb_ps() )
-            DirRemove( cRoot + aEntry[1] )
+            HIX_SafeDirDelete( cRoot + aEntry[1] )
          ELSE
-            FErase( cRoot + aEntry[1] )
+            HIX_SafeErase( cRoot + aEntry[1] )
          ENDIF
       ENDIF
    NEXT
@@ -87,7 +87,7 @@ FUNCTION HIX_TestHixstyleAcl_Run()
    _GetAclShape(       hCtx )
 
    _CleanTmpRoot( cRoot )
-   DirRemove( cRoot )
+   HIX_SafeDirDelete( cRoot )
 
    //	DEBUG: dump failures to traces/info.txt for triage
    _DumpFailures( hCtx )

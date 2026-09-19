@@ -62,7 +62,7 @@ FUNCTION HIX_DbgReset()
    ENDIF
 
    hb_mutexLock( s_hMtx )
-   hb_vfErase( s_cFile )
+   HIX_SafeErase( s_cFile )
    hb_mutexUnlock( s_hMtx )
 
 RETURN NIL

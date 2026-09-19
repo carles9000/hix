@@ -11,6 +11,8 @@
   { "name": "message",        "url": "/message",                       "action": "controllers/message.prg",                  "method": "GET" },
   { "name": "ssetest",        "url": "/sse-test",                      "action": "views/sse-test.html",                      "method": "GET" },
   { "name": "jobtest",        "url": "/job-test",                      "action": "views/job-test.html",                      "method": "GET" },
+  { "name": "blog.index",     "url": "/blog",                          "action": "controllers/blog_index.prg",               "method": "GET" },
+  { "name": "blog.article",   "url": "/blog/article",                  "action": "controllers/blog_article.prg",             "method": "GET" },
   { "name": "yourmodule",     "url": "/your-module",                   "action": "views/yourmodule.html",                    "method": "GET" },
 
   { "name": "api.ping",       "url": "/api/ping",                      "action": "controllers/api_ping.prg",                 "method": "GET" },

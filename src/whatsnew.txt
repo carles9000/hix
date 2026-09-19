@@ -1,3 +1,12 @@
+2.2    Audit Edition: lib purity (zero HIX_Test* in production build),
+       black-box test rewrites, global config isolation fix, sticky
+       test dashboard header + OS badge + fixed footer (see changes/2.2.md).
+2.1.07 Full audit closure of lib_hix: 86/87 findings executed, 1 n/a.
+       Security, concurrency, bug and fragility fixes across the stack;
+       test suite 2092/2092 green (see changes/2.1.07.md).
+2.1.06 Audit fixes A4.03-A4.09: router hash lookup O(1), WriteChunk
+       fragmentation, directive-depth cap, view cache by mtime+MD5,
+       transpile/sanitize/slug hardening (see changes/2.1.06.md).
 2.1.05 Fix large-upload hang over Cloudflare Tunnel: loop socket recv until
        Content-Length filled, drain oversized bodies before responding
        (see changes/2.1.05.md).

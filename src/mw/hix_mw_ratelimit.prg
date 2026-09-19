@@ -107,36 +107,53 @@ RETURN {| oCtx | _HixMwRateLimitRun( oCtx, nMax, nWindowSecs ) }
 
 STATIC FUNCTION _HixMwRateLimitRun( oCtx, nMax, nWindowSecs )
 
-   LOCAL cIP, nNow, aEntry, nCount, nStart, lAllow
+   // [A3.2.3] sliding window counter — evita burst en el boundary.
+   // Data: { nCurCount, nWinStart, nPrevCount }
+   // Estimación: prevCount * ((window - elapsed) / window) + curCount
+   LOCAL cIP, nNow, aEntry, nCount, nStart, nPrevCount, lAllow
+   LOCAL nPrevWeight, nEstimated
 
-   cIP  := oCtx:oReq:cIP
+   cIP  := oCtx:oReq:RealIP()
    nNow := Int( hb_TToSec( hb_DateTime() ) )
 
    hb_mutexLock( s_mtxRate )
 
    IF hb_HHasKey( s_hRateData, cIP )
 
-      aEntry := s_hRateData[ cIP ]
-      nCount := aEntry[ 1 ]
-      nStart := aEntry[ 2 ]
+      aEntry     := s_hRateData[ cIP ]
+      nCount     := aEntry[ 1 ]
+      nStart     := aEntry[ 2 ]
+      nPrevCount := iif( Len( aEntry ) >= 3, aEntry[ 3 ], 0 )
 
       IF ( nNow - nStart ) >= nWindowSecs
 
+         // Inicio de nueva ventana — la actual pasa a ser "previa"
+         IF ( nNow - nStart ) >= 2 * nWindowSecs
+            nPrevCount := 0   // ventana previa ya expiró
+         ELSE
+            nPrevCount := nCount
+         ENDIF
          nCount := 1
          nStart := nNow
+
       ELSE
          nCount++
 
       ENDIF
 
    ELSE
-      nCount := 1
-      nStart := nNow
+      nCount     := 1
+      nStart     := nNow
+      nPrevCount := 0
 
    ENDIF
 
-   s_hRateData[ cIP ] := { nCount, nStart }
-   lAllow := ( nCount <= nMax )
+   // Peso de la ventana anterior proporcional al tiempo restante
+   nPrevWeight := ( nWindowSecs - ( nNow - nStart ) ) * 1.0 / nWindowSecs
+   nEstimated  := Int( nPrevCount * nPrevWeight ) + nCount
+
+   s_hRateData[ cIP ] := { nCount, nStart, nPrevCount }
+   lAllow := ( nEstimated <= nMax )
 
    hb_mutexUnlock( s_mtxRate )
 
@@ -160,3 +177,10 @@ FUNCTION HIX_MwRateLimitConfig()
 RETURN { ;
    "max"      => s_nRateMax,   ;
    "window_s" => s_nRateWindow }
+
+// [A3.2.3] función pura de la fórmula sliding window — expuesta para tests
+// nPrev=contador ventana anterior, nCur=contador ventana actual,
+// nElapsed=segundos transcurridos en ventana actual, nWindow=tamaño ventana
+FUNCTION HIX_RateLimitEstimate( nPrev, nCur, nElapsed, nWindow )
+   LOCAL nPrevWeight := ( nWindow - nElapsed ) * 1.0 / nWindow
+RETURN Int( nPrev * nPrevWeight ) + nCur

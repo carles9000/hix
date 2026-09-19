@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_test_echo.prg
   Author.....: Charly 9000
   Created....: 2026-06-04
@@ -75,9 +75,9 @@ STATIC PROCEDURE _EchoDispatcher( hCtx )
    HixTU_Check( hCtx, cResult == "<p>1</p><p>2</p><p>3</p>", "Echo+Disp: multi-echo", "<p>1</p><p>2</p><p>3</p>", cResult )
 
    // Cleanup
-   FErase( cRoot + "only_echo.prg" )
-   FErase( cRoot + "only_return.prg" )
-   FErase( cRoot + "both.prg" )
-   FErase( cRoot + "multi.prg" )
-   hb_DirDelete( cRoot )
+   HIX_SafeErase( cRoot + "only_echo.prg" )
+   HIX_SafeErase( cRoot + "only_return.prg" )
+   HIX_SafeErase( cRoot + "both.prg" )
+   HIX_SafeErase( cRoot + "multi.prg" )
+   HIX_SafeDirDelete( cRoot )
 RETURN

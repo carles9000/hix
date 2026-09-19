@@ -213,21 +213,16 @@ METHOD New( nTopN ) CLASS THixMetrics
    ::hCounters[ HIXM_VCACHE_BYTES   ] := 0
    ::hCounters[ HIXM_VCACHE_HITS    ] := 0
    ::hCounters[ HIXM_VCACHE_MISSES  ] := 0
+   ::hCounters[ HIXM_POOL_DIRTY_EXIT ] := 0
+   ::hCounters[ HIXM_WS_CB_ERRORS   ] := 0
 
 RETURN Self
 
 METHOD Inc( cName, nValue ) CLASS THixMetrics
 
    hb_mutexLock( ::oMutex )
-
-   IF hb_HHasKey( ::hCounters, cName )
-
-      ::hCounters[ cName ] += nValue
-   ELSE
-      ::hCounters[ cName ] := nValue
-
-   ENDIF
-
+   // [A3.5.1] hb_HGetDef elimina la doble lookup HHasKey+asignacion
+   ::hCounters[ cName ] := hb_HGetDef( ::hCounters, cName, 0 ) + nValue
    hb_mutexUnlock( ::oMutex )
 
 RETURN Self

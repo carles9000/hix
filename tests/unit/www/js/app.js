@@ -65,14 +65,21 @@ function loadInfo() {
   fetch('/api/info', { cache: 'no-store' })
     .then(r => r.json())
     .then(info => {
-      const badge = document.getElementById('nav-os');
-      if (!badge) return;
-      badge.textContent = info.compiler || 'n/a';
-      badge.title       = (info.compiler || '') + '  |  ' + (info.os || '');
+      const bOs  = document.getElementById('nav-os');
+      const bCmp = document.getElementById('nav-compiler');
+      const raw  = (info.os || '').toLowerCase();
+      const osLabel = raw.includes('windows') ? 'Windows'
+                    : raw.includes('linux')   ? 'Linux'
+                    : raw.includes('mac')     ? 'macOS'
+                    : (info.os || 'n/a');
+      if (bOs)  { bOs.textContent  = osLabel;            bOs.title  = info.os || ''; }
+      if (bCmp) { bCmp.textContent = info.compiler || 'n/a'; bCmp.title = info.compiler || ''; }
     })
     .catch(() => {
-      const badge = document.getElementById('nav-os');
-      if (badge) { badge.textContent = 'n/a'; badge.title = 'no /api/info'; }
+      const bOs  = document.getElementById('nav-os');
+      const bCmp = document.getElementById('nav-compiler');
+      if (bOs)  { bOs.textContent  = 'n/a'; bOs.title  = 'no /api/info'; }
+      if (bCmp) { bCmp.textContent = 'n/a'; bCmp.title = 'no /api/info'; }
     });
 }
 
@@ -106,9 +113,10 @@ function renderGroups(groups) {
   const container = document.getElementById('groups');
   container.innerHTML = '';
   groups.forEach(g => {
+    const isAudit = g.name === 'Audit';
     const col = document.createElement('div');
-    col.className = 'col-12 col-md-6 col-xl-4';
-    col.innerHTML = groupCard(g);
+    col.className = isAudit ? 'col-12' : 'col-12 col-md-6 col-xl-4';
+    col.innerHTML = groupCard(g, isAudit);
     container.appendChild(col);
 
     const gid        = safeId(g.name);
@@ -121,9 +129,10 @@ function renderGroups(groups) {
   });
 }
 
-function groupCard(g) {
-  const gid  = safeId(g.name);
-  const rows = g.tests.map(t => testRow(t)).join('');
+function groupCard(g, wideTest = false) {
+  const gid      = safeId(g.name);
+  const rows     = g.tests.map(t => testRow(t, wideTest)).join('');
+  const testThStyle = wideTest ? 'style="min-width:320px;white-space:nowrap"' : '';
   return `
     <div class="card shadow-sm">
       <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-2">
@@ -149,7 +158,7 @@ function groupCard(g) {
           <table class="table table-sm table-hover mb-0">
             <thead>
               <tr>
-                <th class="ps-3">Test</th>
+                <th class="ps-3" ${testThStyle}>Test</th>
                 <th class="text-center" style="width:48px">Tot</th>
                 <th class="text-center" style="width:48px">OK</th>
                 <th class="text-center" style="width:48px">KO</th>

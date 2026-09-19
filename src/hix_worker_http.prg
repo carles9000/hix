@@ -11,6 +11,7 @@
 
 #DEFINE HIX_LOG_MODULE HIX_MOD_WORKER_HTTP
 #INCLUDE "hix_logger.ch"
+#include "hix_const.ch"
 
 FUNCTION HIX_WorkerHTTP( aJob )
 
@@ -104,6 +105,20 @@ STATIC FUNCTION _HixHTTPProcessOne( oIO, cIP, lKeepAlive, lStreamMode )
 
    ENDIF
 
+   // A1.23 — Rechazar Content-Length > HIX_MAX_BODY_SIZE antes de que el
+   // handler intente leer el body. Emitimos 413 y cerramos keep-alive; el
+   // cliente ya envió (o va a enviar) los bytes, pero no los procesamos.
+   // [A2.11] Sumar cBodyPre al total: los bytes ya leídos con los headers
+   // también cuentan hacia el límite.
+   IF oReq:ContentLength() + Len( oReq:cBodyPre ) > HIX_MAX_BODY_SIZE
+
+      lw( "413 Payload Too Large: Content-Length=" + hb_ntos( oReq:ContentLength() ) + " prebuf=" + hb_ntos( Len( oReq:cBodyPre ) ) + " path=" + oReq:cPath )
+      HIX_ResponseRaw( oIO, hb_jsonEncode( { "error" => "Payload Too Large" } ), "json", 413, .F. )
+      lKeepAlive := .F.
+      RETURN .F.
+
+   ENDIF
+
    lKeepAlive := oReq:lKeepAlive
 
    IF ! _HixHostAllowed( oReq:Header( "host", "" ) )
@@ -128,58 +143,73 @@ STATIC FUNCTION _HixHTTPProcessOne( oIO, cIP, lKeepAlive, lStreamMode )
 
    tBefore := hb_DateTime()
 
-   TRY
+   // [A2.09] TRY/FINALLY externo para garantizar cleanup del contexto TLS
+   // (s_oCurrentCtx y s_oRequest) por cualquier ruta de salida — incluido
+   // el drain body, métricas y anomaly recorder posteriores al handler.
+   // Sin esto, keep-alive reciclaba el hilo con el context del request
+   // anterior → helpers Ux*/HIX_GetContext devolvían datos stale.
 
-      HIX_RouteDispatch( oReq )
-   CATCH oError
-      le( "Handler error [" + oReq:cPath + "]: " + oError:Description + ' (' + oError:operation + ')'  )
-      HIX_Metric( HIXM_ERRORS )
-      bHandler := HIX_GetErrorHandler()
+   TRY
 
       TRY
 
-         IF bHandler != NIL
+         HIX_RouteDispatch( oReq )
+      CATCH oError
+         le( "Handler error [" + oReq:cPath + "]: " + oError:Description + ' (' + oError:operation + ')'  )
+         HIX_Metric( HIXM_ERRORS )
+         bHandler := HIX_GetErrorHandler()
 
-            Eval( bHandler, oError, oReq )
-         ELSE
-            HIX_ShowError( oError, oReq )
+         TRY
 
-         ENDIF
+            IF bHandler != NIL
 
-      CATCH
-         oReq:Respond( { "error" => _( 'ERR_INTERNAL_SERVER_ERROR' ) }, 500 )
+               Eval( bHandler, oError, oReq )
+            ELSE
+               HIX_ShowError( oError, oReq )
+
+            ENDIF
+
+         CATCH
+            oReq:Respond( { "error" => _( 'ERR_INTERNAL_SERVER_ERROR' ) }, 500 )
+
+         END
 
       END
 
+      // Drain any unread request body before recycling the keep-alive
+      // connection. Handlers may skip UBody()/UJson() (e.g. they only
+      // care about query params); those unread bytes would become garbage
+      // at the front of the next request on the same socket → 400 Bad
+      // Request from _HixHTTPProcessOne on the following iteration.
+      // ReadBody is idempotent (cached in ::cBody), so this is a no-op if
+      // the handler already consumed it.
+
+      // [A3.1.1] usar == en lugar de $ — el operador $ comprueba substring,
+      // no membership: "T" $ "POST,PUT,PATCH" → .T. (falso positivo).
+      IF oReq:lKeepAlive .AND. ;
+         ( oReq:cMethod == "POST" .OR. oReq:cMethod == "PUT" .OR. oReq:cMethod == "PATCH" )
+
+         oReq:ReadBody()
+
+      ENDIF
+
+      nMs := Int( ( hb_DateTime() - tBefore ) * 86400000 )
+      HIX_MetricTiming( nMs, oReq:cPath, oReq:lWasStream )
+
+      // Propagar al worker que este request migró a modo stream, para que
+      // el HIX_MetricDec final apunte al contador correcto (OTROS, no HTTP).
+      IF oReq:lWasStream
+         lStreamMode := .T.
+      ENDIF
+
+      HIX_AnomalyRecord( cIP, oReq:nResponseStatus )
+
+      lKeepAlive := oReq:lKeepAlive
+
+   FINALLY
+      HIX_SetContext( NIL )
+      HIX_SetRequest( NIL )
    END
-
-   // Drain any unread request body before recycling the keep-alive
-   // connection. Handlers may skip UBody()/UJson() (e.g. they only
-   // care about query params); those unread bytes would become garbage
-   // at the front of the next request on the same socket → 400 Bad
-   // Request from _HixHTTPProcessOne on the following iteration.
-   // ReadBody is idempotent (cached in ::cBody), so this is a no-op if
-   // the handler already consumed it.
-
-   IF oReq:lKeepAlive .AND. ( oReq:cMethod $ "POST,PUT,PATCH" )
-
-      oReq:ReadBody()
-
-   ENDIF
-
-   nMs := Int( ( hb_DateTime() - tBefore ) * 86400000 )
-   HIX_MetricTiming( nMs, oReq:cPath, oReq:lWasStream )
-
-   // Propagar al worker que este request migró a modo stream, para que
-   // el HIX_MetricDec final apunte al contador correcto (OTROS, no HTTP).
-   IF oReq:lWasStream
-      lStreamMode := .T.
-   ENDIF
-
-   HIX_AnomalyRecord( cIP, oReq:nResponseStatus )
-
-   lKeepAlive := oReq:lKeepAlive
-   HIX_SetContext( NIL )
 
 RETURN .T.
 

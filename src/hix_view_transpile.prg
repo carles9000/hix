@@ -387,7 +387,7 @@ METHOD ReplaceVars( cExpr, lIsHrb ) CLASS Hix_Transpile
 
       IF hb_At( Lower( cVarName ), cLower ) > 0
 
-         cExpr := hb_RegExReplace( "(?i)\b" + cVarName + "\b", cExpr, '__oPar:' + cVarName )
+         cExpr := hb_RegExReplace( "(?i)\b" + _HixRegExEscape( cVarName ) + "\b", cExpr, '__oPar:' + cVarName )
 
       ENDIF
 
@@ -401,7 +401,7 @@ METHOD ReplaceVars( cExpr, lIsHrb ) CLASS Hix_Transpile
 
       IF hb_At( Lower( cVarName ), cLower ) > 0
 
-         cExpr := hb_RegExReplace( "(?i)\b" + cVarName + "\b", cExpr, '__oPar:' + cVarName )
+         cExpr := hb_RegExReplace( "(?i)\b" + _HixRegExEscape( cVarName ) + "\b", cExpr, '__oPar:' + cVarName )
 
       ENDIF
 
@@ -436,10 +436,25 @@ METHOD TranspileValidExpression( cExpr, aLine ) CLASS Hix_Transpile
 
    ENDIF
 
+   // A1.27 — El operador `&()` de Harbour parsea y **evalúa** la expresión
+   // externa. Si `cExpr` contiene `}` no balanceado, escapa el wrapper
+   // `{|| … }` y el parser puede acabar evaluando algo distinto de una
+   // definición de codeblock (potencialmente con side effects).
+   // `hb_macroBlock()` toma el string directamente como cuerpo de bloque,
+   // sin la fase de "evaluar como expresión externa". Además rechazamos
+   // curly braces no balanceados en `cExpr` para no permitir escape del
+   // wrapper.
+   IF ! _HixExprCurlyBalanced( cExpr )
+      oErrView := HIX_ErrorView( NIL, 9002, ;
+         "Unbalanced curly braces in expression", nLine, UHtmlEncode( cExpr ), "hix_view_transpile" )
+      oErrView:cargo[ "aCode" ] := ::aRawSource
+      HIX_Throw( oErrView )
+   ENDIF
+
    TRY
 
 // Valida sintaxis, no chequea existencia en runtime
-      bCode  := &( '{|| ' + cExpr + '}' )
+      bCode  := hb_macroBlock( '{|| ' + cExpr + '}' )
       lValid := .T.
       ::hExpression_Cached[ cExpr ] := .T.
 
@@ -698,8 +713,7 @@ METHOD BuildPRG() CLASS Hix_Transpile
       ENDIF
 
       ::_t( '>> Transpile:BuildPrg() Error 9006' )
-
-      ::_t( ::cTranspiledPRG )
+      // [A4.07] No logear cTranspiledPRG — filtraria el codigo fuente generado al log
 
       oErrorView := HIX_ErrorView( oError, 9006, NIL, NIL, NIL, "hix_view_transpile" )
 
@@ -1246,6 +1260,64 @@ METHOD _t( ... ) CLASS Hix_Transpile
    ENDIF
 
 RETURN NIL
+
+// [A3.3.8] Escapa metacaracteres PCRE en cStr para uso seguro en patrones regex.
+// Sin esto, interpolar un valor de usuario en "(?i)\b" + cValue + "\b" puede
+// romper el patrón si cValue contiene '.', '(', '[', etc.
+STATIC FUNCTION _HixRegExEscape( cStr )
+   LOCAL cResult := ""
+   LOCAL i, cCh
+   LOCAL cMeta := "\.^$*+?{}[]|()"
+   FOR i := 1 TO Len( cStr )
+      cCh := SubStr( cStr, i, 1 )
+      IF cCh $ cMeta
+         cResult += "\" + cCh
+      ELSE
+         cResult += cCh
+      ENDIF
+   NEXT
+RETURN cResult
+
+FUNCTION HIX_RegExEscape( cStr )
+RETURN _HixRegExEscape( cStr )
+
+// -------------------------------------------------------------
+// A1.27 — Comprueba que `{` y `}` estén balanceados en la expresión.
+// Ignora contenido dentro de strings (comillas simples/dobles). Se
+// usa para prevenir escape del wrapper `{|| … }` al validar expresiones
+// de vistas. Cualquier `}` que cierre por debajo de 0 significa que
+// el usuario está intentando romper la envoltura del codeblock.
+// -------------------------------------------------------------
+STATIC FUNCTION _HixExprCurlyBalanced( cExpr )
+
+   LOCAL nLen  := Len( cExpr )
+   LOCAL i     := 0
+   LOCAL cCh
+   LOCAL nDepth := 0
+   LOCAL cInStr := ""
+
+   DO WHILE ++i <= nLen
+
+      cCh := SubStr( cExpr, i, 1 )
+
+      IF ! Empty( cInStr )
+         IF cCh == cInStr ; cInStr := "" ; ENDIF
+      ELSEIF cCh == '"' .OR. cCh == "'"
+         cInStr := cCh
+      ELSEIF cCh == "{"
+         nDepth++
+      ELSEIF cCh == "}"
+         nDepth--
+         IF nDepth < 0 ; RETURN .F. ; ENDIF
+      ENDIF
+
+   ENDDO
+
+RETURN nDepth == 0
+
+// Test hook público
+FUNCTION HIX_ExprCurlyBalancedForTest( cExpr )
+RETURN _HixExprCurlyBalanced( cExpr )
 
 // -------------------------------------------------------------
 

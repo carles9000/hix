@@ -88,7 +88,11 @@ STATIC FUNCTION _HixMwBodyLimitRun( oCtx, nMax )
       // Sin drenar, proxies upstream (Cloudflare Tunnel, nginx) siguen
       // subiendo bytes al origen que ya respondió → deadlock del fetch
       // del cliente. Ver hix_request.prg REQ_BODY_TOO_LARGE.
-      oCtx:oReq:oIO:Drain( nLen - Len( oCtx:oReq:cBodyPre ) )
+      // Guard: oIO puede ser NIL en tests con mocks o en requests
+      // degradados por cierre temprano — sin él no hay canal que drenar.
+      IF ValType( oCtx:oReq:oIO ) == "O"
+         oCtx:oReq:oIO:Drain( nLen - Len( oCtx:oReq:cBodyPre ) )
+      ENDIF
       oCtx:oReq:lKeepAlive := .F.
       oCtx:oReq:Respond( hb_jsonEncode( { "error" => _( 'ERR_PAYLOAD_TOO_LARGE' ) } ), 413, "json" )
       oCtx:lHandled := .T.

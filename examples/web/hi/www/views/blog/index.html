@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Blog · HIX Example</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/public/css/blog.css">
+</head>
+<body>
+  <!-- HEADER -->
+  <header>
+    <div class="container header-flex">
+      <a href="/blog" class="logo">
+        <i class="fas fa-pen-fancy"></i>
+        <span>Blog<span style="font-weight: 400; color: #3b82f6;">.hix</span></span>
+      </a>
+      <nav>
+        <ul>
+          <li><a href="/blog"><i class="fas fa-home"></i> Home</a></li>
+          <li><a href="/blog/article"><i class="fas fa-newspaper"></i> Article</a></li>
+          <li><a href="/main"><i class="fas fa-th-large"></i> Back to HIX</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- HERO -->
+    <section class="hero">
+      <h1>Only Ideas...</h1>
+      <p>An example of a modern blog with the essentials: photos, titles, comments, and a clean style.</p>
+      <small>{{ dtoc(date()) + ' ' + time() }}</small>
+    </section>
+
+    <!-- FEATURED POST -->
+    <article class="featured-post">
+      <div class="featured-grid">
+        <div class="featured-image"></div>
+        <div class="featured-content">
+          <span class="tag">Featured</span>
+          <h2>The art of simplifying: less is more with HIX</h2>
+          <p>Discover how to create powerful applications built only with <b>HIX</b>, the web server for <b>Harbour</b>.</p>
+          <div class="meta">
+            <span><i class="fas fa-calendar-alt"></i> Sep 16, 2026</span>
+            <span><i class="fas fa-clock"></i> 5 min read</span>
+          </div>
+          <a href="/blog/article" class="read-more">Read article <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </article>
+
+    <!-- POSTS GRID -->
+    <div class="posts-grid">
+      <!-- Post 1 -->
+      <article class="post-card">
+        <div class="post-img" style="background-image: url('/public/images/blog/photo-1498050108023-c5249f4df085.jpg');"></div>
+        <div class="post-content">
+          <div class="post-category">Technology</div>
+          <h3>HIX: A Fresh Look</h3>
+          <p>Use a genuine web server adapted for Harbour together with the most popular web languages.</p>
+          <div class="post-meta">
+            <span><i class="fas fa-calendar-alt"></i> Apr 10, 2026</span>
+            <span><i class="fas fa-comment"></i> 8</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Post 2 -->
+      <article class="post-card">
+        <div class="post-img" style="background-image: url('/public/images/blog/photo-1522542550221-31fd19575a2d.jpg');"></div>
+        <div class="post-content">
+          <div class="post-category">Design</div>
+          <h3>Web Page Design</h3>
+          <p>The entire visual side uses standard languages: HTML/CSS/JavaScript. Design the most spectacular screens for your apps.</p>
+          <div class="post-meta">
+            <span><i class="fas fa-calendar-alt"></i> Apr 7, 2026</span>
+            <span><i class="fas fa-comment"></i> 12</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Post 3 -->
+      <article class="post-card">
+        <div class="post-img" style="background-image: url('/public/images/blog/photo-1501504905252-473c47e087f8.jpg');"></div>
+        <div class="post-content">
+          <div class="post-category">Productivity</div>
+          <h3>Reclaim Your Space and Focus</h3>
+          <p>Simple strategies for working in a connected world using your beloved <b>Harbour</b>.</p>
+          <div class="post-meta">
+            <span><i class="fas fa-calendar-alt"></i> Sep 3, 2026</span>
+            <span><i class="fas fa-comment"></i> 5</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- COMMENTS -->
+    <section class="comments-section">
+      <h2><i class="fas fa-comments"></i> Comments (3)</h2>
+
+      <div class="comment">
+        <div class="comment-avatar"></div>
+        <div class="comment-body">
+          <div class="comment-header">
+            <strong>Laura Mendez</strong>
+            <span class="comment-date">2 hours ago</span>
+          </div>
+          <p class="comment-text">I love the minimalist style and how easy the content is to read. Great job! The featured photo is very inspiring.</p>
+          <a href="#" class="comment-reply"><i class="fas fa-reply"></i> Reply</a>
+        </div>
+      </div>
+
+      <div class="comment">
+        <div class="comment-avatar male"></div>
+        <div class="comment-body">
+          <div class="comment-header">
+            <strong>Charly Brown</strong>
+            <span class="comment-date">5 hours ago</span>
+          </div>
+          <p class="comment-text">Could you share more about the fonts you used? The Inter typeface gives it a very professional touch. Thanks for the contribution.</p>
+          <a href="#" class="comment-reply"><i class="fas fa-reply"></i> Reply</a>
+        </div>
+      </div>
+
+      <div class="comment">
+        <div class="comment-avatar other"></div>
+        <div class="comment-body">
+          <div class="comment-header">
+            <strong>Andrew P.</strong>
+            <span class="comment-date">Yesterday</span>
+          </div>
+          <p class="comment-text">The rounded corners and soft shadows make everything look very current. Congratulations on the design!</p>
+          <a href="#" class="comment-reply"><i class="fas fa-reply"></i> Reply</a>
+        </div>
+      </div>
+
+      <div class="comment-form">
+        <h3>Leave a comment</h3>
+        <form onsubmit="event.preventDefault(); alert('Comment sent (simulation). Thank you!');">
+          <div class="form-group">
+            <input type="text" placeholder="Your name" required>
+            <input type="email" placeholder="Your email address" required>
+          </div>
+          <div class="form-group">
+            <textarea placeholder="Write your comment..." required></textarea>
+          </div>
+          <button type="submit" class="btn-submit">
+            <i class="fas fa-paper-plane"></i> Post comment
+          </button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <p>© 2026 HIX Modern Blog — Made with <i class="fas fa-heart"> HIX</i> for lovers of simple design.</p>
+    </div>
+  </footer>
+</body>
+</html>

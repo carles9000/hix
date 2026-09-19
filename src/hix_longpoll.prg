@@ -125,7 +125,9 @@ FUNCTION _HixLpWait( cChannel, nTimeoutSec )
    hb_mutexUnlock( s_hBusMutex )
 
    hb_mutexLock( hMx )
-   lGot := hb_mutexSubscribe( hMx, nTimeoutSec, @xData )
+   // [A2.12] pasar por HIX_TimeoutSec — floor de 1ms evita subscribe
+   // bloqueante si el caller manda 0 segundos.
+   lGot := hb_mutexSubscribe( hMx, HIX_TimeoutSec( nTimeoutSec * 1000 ), @xData )
    hb_mutexUnlock( hMx )
 
    hb_mutexLock( s_hBusMutex )

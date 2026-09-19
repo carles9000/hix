@@ -29,10 +29,10 @@ export PATH="$HB_ROOT/bin/linux/gcc:$PATH"
 export hix="$(cd ../.. && pwd)"
 
 # Harbour runtime compiler (hb_compileFromBuf / dispatcher .prg
-# handlers) looks up includes via the INCLUDE env var. Point it at
+# handlers) looks up standard headers via $HB_INCLUDE. Point it at
 # the Harbour core headers so tests that emit temporary .prg files
 # with #include "hbclass.ch" etc. compile at runtime.
-export INCLUDE="$HB_ROOT/include${INCLUDE:+:$INCLUDE}"
+export HB_INCLUDE="$HB_ROOT/include${HB_INCLUDE:+:$HB_INCLUDE}"
 
 if [ ! -f "$hix/lib/gcc/libhix_server.a" ]; then
     echo "ERROR: $hix/lib/gcc/libhix_server.a not found. Run ../../go_lib_gcc.sh first." >&2

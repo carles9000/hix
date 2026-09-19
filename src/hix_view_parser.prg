@@ -755,7 +755,7 @@ METHOD CheckSymbols() CLASS HIX_Parser
 
                IF !empty( cDefault )
 
-                  lAccept := ::ValidateMacroExpr( cDefault,  aRow[ 1 ], aLocalErrors )
+                  lAccept := ::ValidateMacroExpr( cDefault,  aRow[ 1 ], @aLocalErrors )
 
                ENDIF
 
@@ -811,7 +811,7 @@ METHOD CheckSymbols() CLASS HIX_Parser
 
                IF !empty( cDefault )
 
-                  lAccept := ::ValidateMacroExpr( cDefault,  aRow[ 1 ], aLocalErrors )
+                  lAccept := ::ValidateMacroExpr( cDefault,  aRow[ 1 ], @aLocalErrors )
 
                ENDIF
 
@@ -1122,12 +1122,28 @@ METHOD CheckBlockStack() CLASS HIX_Parser
 
             // --- Aperturas: push al stack ---
          CASE Left( cToken, 3 ) == "@IF"
+            // [A4.05] depth-limit anti-DoS
+            IF Len( aStack ) >= HIX_MAX_DIRECTIVE_DEPTH
+               AAdd( aErrors, { aRow[ 1 ], "ERROR", ;
+                  "Directive nesting exceeds max depth (" + hb_NToS( HIX_MAX_DIRECTIVE_DEPTH ) + ")", cToken } )
+               EXIT
+            ENDIF
             AAdd( aStack, { "@IF", aRow[ 1 ] } )
 
          CASE Left( cToken, 8 ) == "@FOREACH"
+            IF Len( aStack ) >= HIX_MAX_DIRECTIVE_DEPTH
+               AAdd( aErrors, { aRow[ 1 ], "ERROR", ;
+                  "Directive nesting exceeds max depth (" + hb_NToS( HIX_MAX_DIRECTIVE_DEPTH ) + ")", cToken } )
+               EXIT
+            ENDIF
             AAdd( aStack, { "@FOREACH", aRow[ 1 ] } )
 
          CASE Left( cToken, 4 ) == "@FOR" .AND. Left( cToken, 8 ) != "@FOREACH"
+            IF Len( aStack ) >= HIX_MAX_DIRECTIVE_DEPTH
+               AAdd( aErrors, { aRow[ 1 ], "ERROR", ;
+                  "Directive nesting exceeds max depth (" + hb_NToS( HIX_MAX_DIRECTIVE_DEPTH ) + ")", cToken } )
+               EXIT
+            ENDIF
             AAdd( aStack, { "@FOR", aRow[ 1 ] } )
 
          CASE Left( cToken, 4 ) == "@PRG" .AND. cToken != "@ENDPRG" .AND. ;
@@ -1506,6 +1522,10 @@ RETURN aLocalErrors
 // Ejemplo:
 // oParser:ValidateMacroExpr( "Upper(cVar)", 10, @aErrors )
 // ============================================================
+// [A3.3.7] Note: &() uses Harbour's process-level macro cache for successful
+// compilations. Two calls with the same cExpr string will return the same
+// syntactic result — acceptable because validation is SYNTAX-only, not semantic.
+// Failed compilations are NOT cached; each invalid call re-throws.
 METHOD ValidateMacroExpr( cExpr, nLine, aErrors ) CLASS HIX_Parser
 
    LOCAL bCode, oErr

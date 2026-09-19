@@ -24,6 +24,14 @@ STATIC s_aModules  := {}
 // linea que introduce el preamble de _HixPreamble() al compilar.
 STATIC s_hUserFuncs := { => }
 
+// [A3.4.5] Mutex unico que protege s_aModules y s_hUserFuncs.
+// Creado single-threaded en INIT PROCEDURE antes de cualquier worker.
+STATIC s_mtxLoader := NIL
+
+INIT PROCEDURE _HixLoaderInit()
+   s_mtxLoader := hb_mutexCreate()
+RETURN
+
 // ============================================================
 // HIX_Loaders — compiles and loads all .prg files in a directory.
 // Returns the number of files successfully loaded.
@@ -44,9 +52,12 @@ FUNCTION HIX_Loaders()
    LOCAL aError   := {}
    LOCAL nPendent, nIteracio, lExit, lError, nOk, nKo, nModulesKo, oError
    LOCAL cErrText
+   // [A3.4.5] Trabajar con arrays locales; swap atomico al final para
+   // que workers concurrentes vean siempre un estado coherente.
+   LOCAL aWork     := {}
+   LOCAL hNewFuncs := { => }
 
    aFiles := Directory( cDir + "*.prg" )
-   s_aModules := {}
 
    // Compile if is necesary prg files
 
@@ -68,18 +79,21 @@ FUNCTION HIX_Loaders()
 
          IF ! HIX_LoaderCompile( cDir, cFile, @hItem )
 
-            Aadd( s_aModules, hItem  )
+            Aadd( aWork, hItem  )
 
          ENDIF
 
       ELSE
          // Si HRB es mas viejo que prg -> compilamos
+         // [A3.4.6] Si mtime dice "fresco", verificar tambien hash del PRG
+         //          para detectar backups con mtime artificialmente reciente.
 
-         IF dtos( aInfo[ 1 ][ F_DATE ] ) + aInfo[ 1 ][ F_TIME ] < dtos( aItem[ F_DATE ] ) + aItem[ F_TIME ]
+         IF dtos( aInfo[ 1 ][ F_DATE ] ) + aInfo[ 1 ][ F_TIME ] < dtos( aItem[ F_DATE ] ) + aItem[ F_TIME ] .OR. ;
+               ! _HixLoaderHashOk( cDir, cFile )
 
             IF  ! HIX_LoaderCompile( cDir, cFile, @hItem  )
 
-               Aadd( s_aModules, hItem  )
+               Aadd( aWork, hItem  )
 
             ENDIF
 
@@ -107,13 +121,19 @@ FUNCTION HIX_Loaders()
          'oError' => NIL, ;
          'error' => .F. }
 
-      Aadd( s_aModules, hItem )
+      Aadd( aWork, hItem )
 
    NEXT
 
-   nLenModules   := len( s_aModules )
+   nLenModules   := len( aWork )
 
-   IF len( s_aModules ) == 0
+   IF len( aWork ) == 0
+
+      // [A3.4.5] Swap atomico incluso para el caso vacio
+      hb_mutexLock( s_mtxLoader )
+      s_aModules   := aWork
+      s_hUserFuncs := hNewFuncs
+      hb_mutexUnlock( s_mtxLoader )
 
       RETU .T.
 
@@ -133,28 +153,36 @@ FUNCTION HIX_Loaders()
       nKo      := 0
       nModulesKo := 0
 
+      // [A3.4.7] Limite de seguridad: en una cadena lineal de N modulos se
+      // necesitan como mucho N iteraciones. Si se supera, hay ciclo irresolvable.
+      IF nIteracio > nLenModules + 1
+         lw( "HIX_Loaders: dep circular detectada tras " + hb_NToS( nIteracio ) + " iteraciones — abortando" )
+         EXIT
+      ENDIF
+
       FOR n := 1 TO nLenModules
 
-         IF ! s_aModules[ n ][ 'loaded' ] .AND. ! s_aModules[ n ][ 'process' ]
+         IF ! aWork[ n ][ 'loaded' ] .AND. ! aWork[ n ][ 'process' ]
 
             lError := .F.
 
             try
 
-               s_aModules[ n ][ 'pSym' ]  := hb_hrbLoad( 0x2, s_aModules[ n ][ 'oHrb' ] )
+               aWork[ n ][ 'pSym' ]  := hb_hrbLoad( 0x2, aWork[ n ][ 'oHrb' ] )
 
-               s_aModules[ n ][ 'loaded' ]  := .T.
-               s_aModules[ n ][ 'error' ]  := .F.
-               s_aModules[ n ][ 'msg' ]   := ''
+               aWork[ n ][ 'loaded' ]  := .T.
+               aWork[ n ][ 'error' ]  := .F.
+               aWork[ n ][ 'msg' ]   := ''
 
-               _HixRegisterUserFuncs( s_aModules[ n ][ 'pSym' ] )
+               // [A3.4.5] Recoger en hash local (thread-local, sin lock)
+               _HixCollectUserFuncs( aWork[ n ][ 'pSym' ], hNewFuncs )
 
             catch oError
 
-               s_aModules[ n ][ 'error' ]  := .T.
-               s_aModules[ n ][ 'msg' ]   := oError:description
-               s_aModules[ n ][ 'loaded' ] := .F.
-               s_aModules[ n ][ 'oError' ] := oError
+               aWork[ n ][ 'error' ]  := .T.
+               aWork[ n ][ 'msg' ]   := oError:description
+               aWork[ n ][ 'loaded' ] := .F.
+               aWork[ n ][ 'oError' ] := oError
 
                lError := .T.
 
@@ -170,6 +198,20 @@ FUNCTION HIX_Loaders()
       nPendent    := nModulesKo
 
    END
+
+   // [A3.4.7] Diagnosticar modulos que quedaron sin cargar (posible ciclo)
+   FOR n := 1 TO nLenModules
+      IF ! aWork[ n ][ 'loaded' ] .AND. ! aWork[ n ][ 'process' ] .AND. Empty( aWork[ n ][ 'oError' ] )
+         lw( "HIX_Loaders: posible dep circular en: " + aWork[ n ][ 'file' ] )
+      ENDIF
+   NEXT
+
+   // [A3.4.5] Swap atomico: los workers HTTP ven siempre un estado coherente.
+   // El lock solo dura la doble asignacion, no la carga/compilacion.
+   hb_mutexLock( s_mtxLoader )
+   s_aModules   := aWork
+   s_hUserFuncs := hNewFuncs
+   hb_mutexUnlock( s_mtxLoader )
 
    // TEST Show Proccess...
 
@@ -206,23 +248,41 @@ RETURN nOk == nLenModules
 
 // -------------------------------------------- //
 
-FUNCTION HIX_GetLoaders() ; RETURN s_aModules
+// [A3.4.5] Devuelve snapshot inmutable (copia shallow) bajo lock breve.
+// El llamador recibe su propia copia y no puede corromper s_aModules.
+FUNCTION HIX_GetLoaders()
+
+   LOCAL aSnap
+
+   hb_mutexLock( s_mtxLoader )
+   aSnap := AClone( s_aModules )
+   hb_mutexUnlock( s_mtxLoader )
+
+RETURN aSnap
 
 // -------------------------------------------- //
 
 // Devuelve .T. si cName corresponde a una funcion publica definida en
 // alguno de los HRBs cargados dinamicamente por el loader. Case-insensitive.
+// [A3.4.5] Lock de lectura para s_hUserFuncs (workers HTTP lo llaman concurrentemente).
 FUNCTION HIX_LoaderIsUserFunc( cName )
+
+   LOCAL lRes
 
    IF cName == NIL ; RETURN .F. ; ENDIF
 
-RETURN hb_HHasKey( s_hUserFuncs, Upper( AllTrim( cName ) ) )
+   hb_mutexLock( s_mtxLoader )
+   lRes := hb_HHasKey( s_hUserFuncs, Upper( AllTrim( cName ) ) )
+   hb_mutexUnlock( s_mtxLoader )
+
+RETURN lRes
 
 // -------------------------------------------- //
 
-// Registra en s_hUserFuncs todas las funciones publicas del HRB para
-// que HIX_Trace_Out pueda compensar el offset de linea del preamble.
-STATIC FUNCTION _HixRegisterUserFuncs( pHrb )
+// [A3.4.5] Rellena hFuncs (hash local caller-owned) con las funciones publicas
+// del HRB. Se llama desde HIX_Loaders() antes del swap atomico — no necesita
+// lock porque hFuncs es local al hilo que ejecuta HIX_Loaders().
+STATIC FUNCTION _HixCollectUserFuncs( pHrb, hFuncs )
 
    LOCAL aFuncs, cFunc
 
@@ -237,10 +297,29 @@ STATIC FUNCTION _HixRegisterUserFuncs( pHrb )
    IF ! HB_ISARRAY( aFuncs ) ; RETURN NIL ; ENDIF
 
    FOR EACH cFunc IN aFuncs
-      s_hUserFuncs[ Upper( cFunc ) ] := .T.
+      hFuncs[ Upper( cFunc ) ] := .T.
    NEXT
 
 RETURN NIL
+
+// -------------------------------------------- //
+
+// [A3.4.6] Verifica que el hash guardado en .hrb.md5 coincide con el PRG actual.
+// Devuelve .F. si no existe el sidecar o si el PRG ha cambiado.
+STATIC FUNCTION _HixLoaderHashOk( cDir, cFile )
+
+   LOCAL cFileNoExt := HB_FNameExtSet( cFile )
+   LOCAL cMd5File   := cDir + cFileNoExt + '.hrb.md5'
+   LOCAL cSaved, cNow
+
+   IF ! File( cMd5File )
+      RETURN .F.   // no hay sidecar -> conservative: recompilar
+   ENDIF
+
+   cSaved := AllTrim( hb_MemoRead( cMd5File ) )
+   cNow   := hb_MD5( hb_MemoRead( cDir + cFile ) )
+
+RETURN cSaved == cNow
 
 // -------------------------------------------- //
 
@@ -287,6 +366,8 @@ STATIC FUNCTION HIX_LoaderCompile( cDir, cFile, hItem )
    cFileNoExt := HB_FNameExtSet( cFile )
 
    hb_memowrit( cDir + cFileNoExt + '.hrb', oHrb )
+   // [A3.4.6] Guardar hash del PRG para invalidacion futura por contenido
+   hb_memowrit( cDir + cFileNoExt + '.hrb.md5', hb_MD5( hb_MemoRead( cDir + cFile ) ) )
 
    RETU .T.
 

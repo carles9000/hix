@@ -120,7 +120,7 @@ STATIC PROCEDURE _DispatcherHonoursNTimeout( hCtx )
 
    HIX_SetConfig( oCfgSave )
    IF hb_FileExists( cPrgPath ) ; hb_FileDelete( cPrgPath ) ; ENDIF
-   IF hb_DirExists( hb_StrShrink( cTmpDir, 1 ) ) ; hb_DirDelete( hb_StrShrink( cTmpDir, 1 ) ) ; ENDIF
+   IF hb_DirExists( hb_StrShrink( cTmpDir, 1 ) ) ; HIX_SafeDirDelete( hb_StrShrink( cTmpDir, 1 ) ) ; ENDIF
 RETURN
 
 // -----------------------------------------------------------
@@ -167,7 +167,7 @@ STATIC PROCEDURE _DispatcherZeroTimeoutBypasses( hCtx )
 
    HIX_SetConfig( oCfgSave )
    IF hb_FileExists( cPrgPath ) ; hb_FileDelete( cPrgPath ) ; ENDIF
-   IF hb_DirExists( hb_StrShrink( cTmpDir, 1 ) ) ; hb_DirDelete( hb_StrShrink( cTmpDir, 1 ) ) ; ENDIF
+   IF hb_DirExists( hb_StrShrink( cTmpDir, 1 ) ) ; HIX_SafeDirDelete( hb_StrShrink( cTmpDir, 1 ) ) ; ENDIF
 RETURN
 
 // -----------------------------------------------------------

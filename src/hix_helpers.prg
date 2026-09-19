@@ -175,8 +175,16 @@ RETURN iif( o != NIL, o:ReadBody(), "" )
 FUNCTION UJson()
 
    LOCAL o := HIX_GetRequest()
+   LOCAL x
 
-RETURN iif( o != NIL, o:JsonBody(), NIL )
+   IF o == NIL ; RETURN NIL ; ENDIF
+
+   x := o:JsonBody()
+
+   // [A3.3.2] retornar NIL si fue un parse-error — body vacío sigue siendo {=>}
+   IF o:lJsonError ; RETURN NIL ; ENDIF
+
+RETURN x
 
 FUNCTION UContentType()
 
@@ -602,6 +610,16 @@ FUNCTION USession( cKey, xDef )
 
 RETURN HIX_Session( cKey, xDef )
 
+// USessionRotate() — rotate SID after login to prevent session fixation (A1.19).
+// Call after a successful authentication before USession():Save().
+FUNCTION USessionRotate()
+
+   LOCAL oCtx := UContext()
+
+   IF oCtx != NIL ; HIX_SessionRotate( oCtx ) ; ENDIF
+
+RETURN NIL
+
 // UJwt()        -> full JWT payload hash
 // UJwt(cKey)    -> claim value, NIL if not found
 // UJwt(cKey, x) -> claim value, x as default
@@ -748,3 +766,74 @@ FUNCTION HIX_CloseDbfAreas( lForce )
    END
 
 RETURN .T.
+
+// -----------------------------------------------------------
+// [A2.12] HIX_TimeoutSec — convierte ms a segundos (double) con
+// floor de 1 ms para hb_mutexSubscribe. Evita que un timeout=0
+// se interprete como "bloqueante indefinido" (subscribe con
+// timeout NIL o <=0 espera hasta la señal, sin timeout real).
+// Uso: hb_mutexSubscribe( hMx, HIX_TimeoutSec( nMs ) ).
+// -----------------------------------------------------------
+FUNCTION HIX_TimeoutSec( nMs )
+
+   IF nMs == NIL .OR. nMs <= 0
+
+      RETURN 0.001
+
+   ENDIF
+
+RETURN nMs / 1000.0
+
+// -----------------------------------------------------------
+// [A3.1.7] HIX_PathNormalize — normalización canónica de path HTTP.
+// Backslash→slash, colapsa dobles barras, garantiza / inicial.
+// Usada en router (antes del match) y dispatcher (antes del
+// traversal-check) para que ambas vean el mismo path.
+// -----------------------------------------------------------
+FUNCTION HIX_PathNormalize( cPath )
+
+   IF ValType( cPath ) != "C"
+      RETURN "/"
+   ENDIF
+
+   cPath := StrTran( cPath, "\", "/" )
+
+   DO WHILE "//" $ cPath
+      cPath := StrTran( cPath, "//", "/" )
+   ENDDO
+
+   IF Empty( cPath ) .OR. Left( cPath, 1 ) != "/"
+      cPath := "/" + cPath
+   ENDIF
+
+RETURN cPath
+
+// --------------------------------------------------------------- //
+// [A4.14] HIX_ConstantEq — comparación de strings en tiempo constante.
+// Shared helper extraído de hix_jwt.prg (_HixConstantEq) y
+// hix_token.prg (_HixTokenConstantEq), que eran copias idénticas.
+// Itera toda la longitud sin cortocircuito para evitar timing oracle
+// en firmas HMAC (A1.07, A1.08). Early-exit si longitudes difieren
+// (A3.5.2) — firmas de distinto largo no son válidas por definición.
+// --------------------------------------------------------------- //
+FUNCTION HIX_ConstantEq( cA, cB )
+
+   LOCAL nLen, nDiff, nX
+
+   IF Len( cA ) != Len( cB )
+      RETURN .F.
+   ENDIF
+
+   nLen  := Len( cA )
+   nDiff := 0
+
+   FOR nX := 1 TO nLen
+
+      nDiff := hb_BitOr( nDiff, ;
+         hb_BitXor( Asc( SubStr( cA, nX, 1 ) ), ;
+                    Asc( SubStr( cB, nX, 1 ) ) ) )
+
+   NEXT
+
+RETURN nDiff == 0
+

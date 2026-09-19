@@ -49,10 +49,15 @@ STATIC s_cCorsHeaders := "Content-Type,Authorization,X-Requested-With"
 PROCEDURE HIX_MwCorsSetup( cOrigin, cMethods, cHeaders )
 
    IF ValType( cOrigin  ) == "C" .AND. ! Empty( cOrigin  ) ; s_cCorsOrigin  := cOrigin  ; ENDIF
-
    IF ValType( cMethods ) == "C" .AND. ! Empty( cMethods ) ; s_cCorsMethods := cMethods ; ENDIF
-
    IF ValType( cHeaders ) == "C" .AND. ! Empty( cHeaders ) ; s_cCorsHeaders := cHeaders ; ENDIF
+
+   // [A3.2.1] origin=* + Authorization es inválido por CORS spec: los navegadores
+   // bloquean credenciales cuando el origen es wildcard — la petición falla.
+   IF s_cCorsOrigin == "*" .AND. "AUTHORIZATION" $ Upper( s_cCorsHeaders )
+      lw( "CORS: origin=* con Authorization en Allow-Headers viola CORS spec " + ;
+          "(browsers bloqueara credenciales). Usar origen explicito o quitar Authorization." )
+   ENDIF
 
 RETURN
 
@@ -90,3 +95,7 @@ RETURN { ;
    "origin"  => s_cCorsOrigin,  ;
    "methods" => s_cCorsMethods, ;
    "headers" => s_cCorsHeaders  }
+
+// [A3.2.1] retorna .T. si la configuración actual tiene el conflicto wildcard+Auth
+FUNCTION HIX_MwCorsWildcardAuthConflict()
+RETURN s_cCorsOrigin == "*" .AND. "AUTHORIZATION" $ Upper( s_cCorsHeaders )

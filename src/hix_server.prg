@@ -2,14 +2,13 @@
   File ......: hix_server.prg
   Author.....: Carles Aubia Floresvi (Charly 9000)
   Created....: 2026-04-21
-  Description: THixServer — TCP accept loop, three worker pools
-               (HTTP/WS/Others) and server lifecycle.
+  Description: THixServer - Harbour Web Server
   License....: This Source Code Form is subject to the terms of the
                Mozilla Public License, v. 2.0. (https://mozilla.org/MPL/2.0/).
                Copyright (c) 2026 Carles Aubia Floresví - HIX Server Project
  -----------------------------------------------------------*/
-#DEFINE HIX_VERSION_SERVER                "2.1"
-#DEFINE HIX_SUBVERSION_SERVER             ".05"       
+#DEFINE HIX_VERSION_SERVER                "2.2"
+#DEFINE HIX_SUBVERSION_SERVER             ""       
 #DEFINE HIX_LOG_MODULE HIX_MOD_SERVER
 #DEFINE SW_SHOW                              5
 
@@ -26,6 +25,14 @@ STATIC slProxied       := .F.
 STATIC snServerCount   := 0   // # instancias New() — la 1a posee globales, el resto no
 STATIC sbLifecycle     := NIL // hook global {|cState, cLabel| ...} — nil = deshabilitado
 STATIC slDormantHixstyle := .F. // www/config.json existe pero hixstyle.enabled=false
+
+// A2.01 — mutex de proceso que sincroniza el acceso a las 4 STATIC de lifecycle.
+// Creado single-threaded en INIT PROCEDURE (antes de main → antes de spawn de workers).
+STATIC shServerMutex := NIL
+
+INIT PROCEDURE _HixServerBoot()
+   shServerMutex := hb_mutexCreate()
+RETURN
 
 
 CLASS THixServer
@@ -172,7 +179,7 @@ METHOD Start( lModal ) CLASS THixServer
    
    hb_default( @lModal, .t. )
 
-   slStopRequested := .F.
+   _HixServerSetStopRequested( .F. )
 
    _LC( "start", "Init server..." )
 
@@ -347,7 +354,7 @@ METHOD Stop() CLASS THixServer
 
    IF ::lOwnsGlobals
 
-      slStopRequested := .T.
+      _HixServerSetStopRequested( .T. )
 
    ENDIF
 
@@ -422,7 +429,7 @@ METHOD _Init() CLASS THixServer
 
    ENDIF
 
-   slProxied := UConfig( "server", "mode", HIX_MODE_STANDALONE ) == HIX_MODE_PROXIED
+   _HixServerSetProxied( UConfig( "server", "mode", HIX_MODE_STANDALONE ) == HIX_MODE_PROXIED )
 
    IF ::lOwnsGlobals
 
@@ -619,7 +626,9 @@ METHOD _AcceptLoop() CLASS THixServer
 
    DO WHILE ::lRunning
 
-      hConn := hb_socketAccept( ::hSocket, @aAddr, 1000 )
+      // A2.01 — accept con timeout corto (100 ms) para que la señal de
+      // stop propague en < 200 ms tras HIX_ServerRequestStop().
+      hConn := hb_socketAccept( ::hSocket, @aAddr, 100 )
 
       IF Empty( hConn )
 
@@ -629,7 +638,7 @@ METHOD _AcceptLoop() CLASS THixServer
 
          ENDIF
 
-         IF slStopRequested
+         IF _HixServerStopRequested()
 
             EXIT
 
@@ -1185,8 +1194,9 @@ RETURN hb_LeftEq( cPath, "/hix-" )
 STATIC FUNCTION _HixCheckDormantHixstyle()
 
    LOCAL cRoot, cCfg
+   LOCAL lDormant := .F.
 
-   slDormantHixstyle := .F.
+   _HixServerSetDormantHixstyle( .F. )
 
    IF UConfig( "hixstyle", "enabled", .F. )
 
@@ -1199,14 +1209,15 @@ STATIC FUNCTION _HixCheckDormantHixstyle()
 
    IF hb_FileExists( cCfg )
 
-      slDormantHixstyle := .T.
+      lDormant := .T.
+      _HixServerSetDormantHixstyle( .T. )
       lw( _( "HIXSTYLE_DORMANT_WARN", cCfg ) )
       HIX_BootLogAdd( "server", "hixstyle", .F., "dormant", ;
          _( "HIXSTYLE_DORMANT_LOG" ) )
 
    ENDIF
 
-RETURN slDormantHixstyle
+RETURN lDormant
 
 // ============================================================
 // HIX_HixstyleDormant -- .T. si el arranque detecto www/config.json
@@ -1214,7 +1225,7 @@ RETURN slDormantHixstyle
 // pintar un hint amistoso en 403 (solo en app.env=dev).
 // ============================================================
 FUNCTION HIX_HixstyleDormant()
-RETURN slDormantHixstyle
+RETURN _HixServerDormantHixstyle()
 
 static function HIX_Info( nRow, cCode, cValue, nCol )
 
@@ -1233,7 +1244,7 @@ retu nil
 
 FUNCTION HIX_ServerRequestStop()
 
-   slStopRequested := .T.
+   _HixServerSetStopRequested( .T. )
 
 RETURN NIL
 
@@ -1242,17 +1253,21 @@ RETURN NIL
 // Se aplica a todos los servers del proceso (principal + sub-servers).
 FUNCTION HIX_SetLifecycleHook( bBlock )
 
-   sbLifecycle := bBlock
+   _HixServerSetLifecycle( bBlock )
 
 RETURN NIL
 
 STATIC PROCEDURE _LC( cState, cLabel )
 
-   IF sbLifecycle != NIL
+   LOCAL bHook := _HixServerLifecycle()
+
+   // Eval FUERA del lock — evita deadlock si el hook llama a HIX_ServerIsRunning
+   // u otro getter que también toma shServerMutex.
+   IF bHook != NIL
 
       TRY
 
-         Eval( sbLifecycle, cState, cLabel )
+         Eval( bHook, cState, cLabel )
       CATCH
 
       END
@@ -1275,10 +1290,99 @@ STATIC FUNCTION _FmtElapsed( nT0 )
 RETURN LTrim( Str( nMs / 1000, 0, 1 ) ) + "s"
 
 FUNCTION HIX_ServerIsRunning()
-RETURN ! slStopRequested
+RETURN ! _HixServerStopRequested()
 
 FUNCTION HIX_IsProxied()
-RETURN slProxied
+RETURN _HixServerProxied()
+
+// ============================================================
+// A2.01 — Getters/setters sincronizados de STATIC lifecycle.
+// Todos toman shServerMutex antes de leer/escribir. El getter de
+// sbLifecycle devuelve el codeblock (o NIL); el caller evalua fuera
+// del lock para evitar deadlock por reentrada.
+// ============================================================
+STATIC FUNCTION _HixServerStopRequested()
+   LOCAL lVal
+   hb_mutexLock( shServerMutex )
+   lVal := slStopRequested
+   hb_mutexUnlock( shServerMutex )
+RETURN lVal
+
+STATIC PROCEDURE _HixServerSetStopRequested( lVal )
+   hb_mutexLock( shServerMutex )
+   slStopRequested := lVal
+   hb_mutexUnlock( shServerMutex )
+RETURN
+
+STATIC FUNCTION _HixServerProxied()
+   LOCAL lVal
+   hb_mutexLock( shServerMutex )
+   lVal := slProxied
+   hb_mutexUnlock( shServerMutex )
+RETURN lVal
+
+STATIC PROCEDURE _HixServerSetProxied( lVal )
+   hb_mutexLock( shServerMutex )
+   slProxied := lVal
+   hb_mutexUnlock( shServerMutex )
+RETURN
+
+STATIC FUNCTION _HixServerLifecycle()
+   LOCAL bHook
+   hb_mutexLock( shServerMutex )
+   bHook := sbLifecycle
+   hb_mutexUnlock( shServerMutex )
+RETURN bHook
+
+STATIC PROCEDURE _HixServerSetLifecycle( bHook )
+   hb_mutexLock( shServerMutex )
+   sbLifecycle := bHook
+   hb_mutexUnlock( shServerMutex )
+RETURN
+
+STATIC FUNCTION _HixServerDormantHixstyle()
+   LOCAL lVal
+   hb_mutexLock( shServerMutex )
+   lVal := slDormantHixstyle
+   hb_mutexUnlock( shServerMutex )
+RETURN lVal
+
+STATIC PROCEDURE _HixServerSetDormantHixstyle( lVal )
+   hb_mutexLock( shServerMutex )
+   slDormantHixstyle := lVal
+   hb_mutexUnlock( shServerMutex )
+RETURN
+
+// ============================================================
+// Test hooks A2.01 — wrappers publicos para invocar los helpers
+// STATIC desde tests unitarios (no forman parte del API publico).
+// ============================================================
+FUNCTION HIX_ServerStopRequestedForTest()
+RETURN _HixServerStopRequested()
+
+FUNCTION HIX_ServerProxiedForTest()
+RETURN _HixServerProxied()
+
+FUNCTION HIX_ServerDormantHixstyleForTest()
+RETURN _HixServerDormantHixstyle()
+
+FUNCTION HIX_ServerSetDormantHixstyleForTest( lVal )
+   _HixServerSetDormantHixstyle( lVal )
+RETURN NIL
+
+FUNCTION HIX_ServerLifecycleForTest()
+RETURN _HixServerLifecycle()
+
+FUNCTION HIX_ServerMutexReadyForTest()
+RETURN shServerMutex != NIL
+
+FUNCTION HIX_ServerRequestStopClearForTest()
+   _HixServerSetStopRequested( .F. )
+RETURN NIL
+
+FUNCTION HIX_LifecycleEmitForTest( cState, cLabel )
+   _LC( cState, cLabel )
+RETURN NIL
 
 // --------------------------------------------------------- //
 

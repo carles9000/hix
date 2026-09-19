@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_test_router.prg
   Author.....: Charly 9000
   Created....: 2026-06-04
@@ -73,6 +73,10 @@ RETURN NIL
 
 FUNCTION HIX_TestRouter_Run()
    LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+   LOCAL hSnap
+   // Snapshot/restore para que el test sea idempotente: sin esto la segunda
+   // ejecución falla porque HIX_RouteAdd("t1.basic",...) ya existe → .F.
+   hSnap := HIX_RoutesSnapshot()
    HIX_MetricsInit()
    HIX_ZombieInit()
    s_oServer := THixServer():New()
@@ -89,6 +93,7 @@ FUNCTION HIX_TestRouter_Run()
    _TestRouteGroup(      hCtx )
    _TestDispatcherFiles( hCtx )
    HIX_MetricsClose()
+   HIX_RoutesRestore( hSnap )
 RETURN hCtx
 
 STATIC PROCEDURE _TestRouteAdd( hCtx )
@@ -250,6 +255,8 @@ STATIC PROCEDURE _TestDispatchBasic( hCtx )
    oReq := _Dispatch( "/t5/created", "POST" )
    HixTU_Check( hCtx, oReq:nStatus == 201, "Dispatch: status 201 personalizado", "201", hb_NToS( oReq:nStatus ) )
 
+   // [A1.01] Las acciones-por-nombre requieren registro explícito (whitelist).
+   HIX_RouteRegisterAction( "T5StrHandler", {|o| T5StrHandler( o ) } )
    HIX_RouteAdd( "t5.strfn", "/t5/strfn", "T5StrHandler", "GET" )
    oReq := _Dispatch( "/t5/strfn" )
    HixTU_Check( hCtx, oReq:nStatus == 200,          "Dispatch: action string -> llama funcion",     "200",       hb_NToS( oReq:nStatus ) )
@@ -526,8 +533,8 @@ STATIC PROCEDURE _TestDispatcherFiles( hCtx )
    Eval( bAction, oReq )
    HixTU_Check( hCtx, oReq:nStatus == 200, "ACL AllowDir: ruta nombrada bypasa whitelist -> 200", "200", hb_NToS( oReq:nStatus ) )
 
-   FErase( cPrgFile )
-   FErase( cHrbFile )
-   FErase( cJpgFile )
-   hb_DirDelete( hb_StrShrink( cRoot, 1 ) )
+   HIX_SafeErase( cPrgFile )
+   HIX_SafeErase( cHrbFile )
+   HIX_SafeErase( cJpgFile )
+   HIX_SafeDirDelete( hb_StrShrink( cRoot, 1 ) )
 RETURN

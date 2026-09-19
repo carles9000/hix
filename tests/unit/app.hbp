@@ -79,6 +79,10 @@ src/hix_test_security_client.prg
 src/hix_test_security.prg
 src/hix_test_ucurl.prg
 
+# Audit remediation tests (docs/auditoria/2026-09-13_*.md)
+src/hix_test_audit.prg
+src/hix_test_safe_fs.prg
+
 # Libs
 -L${hix}/lib/${hb_compiler}
 -lhix_server

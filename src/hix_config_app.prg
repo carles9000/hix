@@ -110,14 +110,27 @@ FUNCTION HIX_ConfigAppDefaults()
 
    hDef[ "dbf" ]  := { "rddname" => "DBFCDX" }
 
+   // Generate a unique random key per slot so every fresh installation
+   // gets secrets that cannot be predicted from the source (A1.16).
+   // _HixGenRandKey() uses timestamp+millis+PRNG → HMAC-SHA256, giving
+   // 256-bit unpredictability even before first request is served.
    hDef[ "keys" ] := { ;
-      "csrf"     => "H!x@CSRF@2026",    ;
-      "jwt"      => "H!x@JWT@2026",     ;
-      "session"  => "H!x@SESSION@2026", ;
-      "token"    => "H!x@TOKEN@2026",   ;
-      "resource" => "H!x@RES@2026"      }
+      "csrf"     => _HixGenRandKey(), ;
+      "jwt"      => _HixGenRandKey(), ;
+      "session"  => _HixGenRandKey(), ;
+      "token"    => _HixGenRandKey(), ;
+      "resource" => _HixGenRandKey()  }
 
 RETURN hDef
+
+// Generates a 64-char hex key from entropy sources available at startup.
+STATIC FUNCTION _HixGenRandKey()
+
+   LOCAL cMsg := hb_NToS( Int( hb_TToSec( hb_DateTime() ) ) ) + ":" + ;
+                 hb_NToS( hb_MilliSeconds()                  ) + ":" + ;
+                 hb_NToS( hb_RandomInt( 0, 2147483647 )      )
+
+RETURN hb_HMAC_SHA256( cMsg, "hix-key-init" )
 
 // ============================================================
 // HIX_ConfigAppReset -- overwrites the in-memory config with hDef.

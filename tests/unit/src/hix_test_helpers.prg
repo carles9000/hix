@@ -18,6 +18,7 @@ CLASS TMockReq
    DATA cBody           INIT ""
    DATA hFormBody       INIT NIL
    DATA hJsonBody       INIT NIL
+   DATA lJsonError      INIT .F.   // [A3.3.2] compatible con UJson()
    DATA lResponded      INIT .F.
    DATA nStatus         INIT 0
    DATA cBodyResp       INIT ""
