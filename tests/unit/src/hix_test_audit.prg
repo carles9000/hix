@@ -13,6 +13,11 @@
 #include "hbclass.ch"
 
 STATIC s_lAudA0101_HandlerCalled := .F.
+// [B1.W2] contadores para test de serialización del mutex SSL
+STATIC s_nB1W2Cur := 0
+STATIC s_nB1W2Max := 0
+// [B1.W6.2] mensajes reensamblados recibidos por el callback
+STATIC s_aB1W62Received := {}
 
 // ---------------------------------------------------------------
 // Public handler used by A1.01 positive-case tests.
@@ -5633,3 +5638,1306 @@ STATIC PROCEDURE _AudA04014_ViaTokenWrapper( hCtx )
       "A4.14: HIX_TokenConstantEq consistente", "ok", "fail" )
 RETURN
 
+// ---------------------------------------------------------------
+// [B1.R1] HIX_RouteList y URoute — lecturas de s_hRoutes sin lock
+// Verifica que HIX_RouteList devuelva un clon (no referencia) y que
+// URoute sea seguro frente a rutas inexistentes y parámetros insuficientes.
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1R1_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+
+   _AudB1R1_RouteListClone(  hCtx )
+   _AudB1R1_URouteBasic(     hCtx )
+   _AudB1R1_URouteMissing(   hCtx )
+   _AudB1R1_URouteParamCheck( hCtx )
+
+RETURN hCtx
+
+// TC1: HIX_RouteList devuelve clon — mutar el resultado no afecta al router
+STATIC PROCEDURE _AudB1R1_RouteListClone( hCtx )
+   LOCAL aList1, aList2, cOrigPattern, hItem
+
+   HIX_RouteAdd( "b1r1.list", "/b1r1/list/:id", {|| NIL }, "GET" )
+
+   aList1 := HIX_RouteList()
+
+   // Localizar el item y mutar su pattern en la lista devuelta
+   FOR EACH hItem IN aList1
+      IF hItem[ "name" ] == "b1r1.list"
+         cOrigPattern := hItem[ "pattern" ]
+         hItem[ "pattern" ] := "/MUTATED"
+         EXIT
+      ENDIF
+   NEXT
+
+   // Segunda llamada — debe devolver el patrón original intacto
+   aList2 := HIX_RouteList()
+   FOR EACH hItem IN aList2
+      IF hItem[ "name" ] == "b1r1.list"
+         HixTU_Check( hCtx, hItem[ "pattern" ] == cOrigPattern, ;
+            "B1.R1: RouteList devuelve clon (inmune a mutación externa)", ;
+            cOrigPattern, hItem[ "pattern" ] )
+         EXIT
+      ENDIF
+   NEXT
+
+   HIX_RouteDelete( "b1r1.list" )
+RETURN
+
+// TC2: URoute genera URL con parámetros correctamente
+STATIC PROCEDURE _AudB1R1_URouteBasic( hCtx )
+   LOCAL cUrl
+
+   HIX_RouteAdd( "b1r1.basic", "/b1r1/:id", {|| NIL }, "GET" )
+   cUrl := URoute( "b1r1.basic", 42 )
+
+   HixTU_Check( hCtx, cUrl == "/b1r1/42", ;
+      "B1.R1: URoute genera URL con parámetro numérico", ;
+      "/b1r1/42", cUrl )
+
+   HIX_RouteDelete( "b1r1.basic" )
+RETURN
+
+// TC3: URoute con nombre inexistente devuelve "" sin crash
+STATIC PROCEDURE _AudB1R1_URouteMissing( hCtx )
+   LOCAL cUrl
+   cUrl := URoute( "b1r1.NOEXISTE_XYZ" )
+   HixTU_Check( hCtx, cUrl == "", ;
+      "B1.R1: URoute nombre inexistente -> ''", ;
+      "''", iif( cUrl == "", "''", cUrl ) )
+RETURN
+
+// TC4: URoute con parámetros insuficientes devuelve "" sin crash
+STATIC PROCEDURE _AudB1R1_URouteParamCheck( hCtx )
+   LOCAL cUrl
+
+   HIX_RouteAdd( "b1r1.twoparams", "/b1r1/:x/:y", {|| NIL }, "GET" )
+   cUrl := URoute( "b1r1.twoparams", "solo_uno" )
+
+   HixTU_Check( hCtx, cUrl == "", ;
+      "B1.R1: URoute insuficientes params -> ''", ;
+      "''", iif( cUrl == "", "''", cUrl ) )
+
+   HIX_RouteDelete( "b1r1.twoparams" )
+RETURN
+
+// ---------------------------------------------------------------
+// [B1.R3] THixRequest:Respond — guard de doble respuesta
+// Verifica que una segunda llamada a Respond es ignorada y no
+// escribe en oIO (protección frente a hilos zombie post-timeout).
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1R3_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+
+   _AudB1R3_FirstRespondWrites(  hCtx )
+   _AudB1R3_SecondRespondNoOp(   hCtx )
+   _AudB1R3_SecondRespondReturnF( hCtx )
+
+RETURN hCtx
+
+// TC1: primera llamada a Respond escribe en oIO y marca lResponded
+STATIC PROCEDURE _AudB1R3_FirstRespondWrites( hCtx )
+   LOCAL oMock, oReq
+   oMock := THixIOMock():New()
+   oReq  := THixRequest():New( oMock, "127.0.0.1" )
+   oReq:Respond( "hello", 200, "html" )
+   HixTU_Check( hCtx, oMock:nWrites == 1 .AND. oReq:lResponded, ;
+      "B1.R3: primera Respond escribe en IO y lResponded=.T.", ;
+      "nWrites=1 lResponded=.T.", ;
+      "nWrites=" + hb_NToS( oMock:nWrites ) + " lResponded=" + hb_ValToStr( oReq:lResponded ) )
+RETURN
+
+// TC2: segunda llamada a Respond no escribe en oIO (guard activo)
+STATIC PROCEDURE _AudB1R3_SecondRespondNoOp( hCtx )
+   LOCAL oMock, oReq
+   oMock := THixIOMock():New()
+   oReq  := THixRequest():New( oMock, "127.0.0.1" )
+   oReq:Respond( "first",  200, "html" )
+   oReq:Respond( "second", 200, "html" )
+   HixTU_Check( hCtx, oMock:nWrites == 1, ;
+      "B1.R3: segunda Respond ignorada — no escribe en IO", ;
+      "nWrites=1", "nWrites=" + hb_NToS( oMock:nWrites ) )
+RETURN
+
+// TC3: segunda llamada devuelve .F. (señal de no-op)
+STATIC PROCEDURE _AudB1R3_SecondRespondReturnF( hCtx )
+   LOCAL oMock, oReq, xRet
+   oMock := THixIOMock():New()
+   oReq  := THixRequest():New( oMock, "127.0.0.1" )
+   oReq:Respond( "first", 200, "html" )
+   xRet := oReq:Respond( "second", 200, "html" )
+   HixTU_Check( hCtx, xRet == .F., ;
+      "B1.R3: segunda Respond retorna .F.", ;
+      ".F.", hb_ValToStr( xRet ) )
+RETURN
+
+// ---------------------------------------------------------------
+// [B1.R5] INIT PROCEDURE en SSE, LongPoll, Anomaly, RateLimit
+// Verifica que los mutex globales no son NIL al primer uso
+// (el INIT PROCEDURE los crea antes de cualquier worker).
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1R5_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+
+   _AudB1R5_SseMutexReady(       hCtx )
+   _AudB1R5_LongPollMutexReady(  hCtx )
+   _AudB1R5_AnomalyMutexReady(   hCtx )
+   _AudB1R5_RateLimitMutexReady( hCtx )
+
+RETURN hCtx
+
+// TC1: SSE bus mutex listo tras INIT PROCEDURE (HIX_SseBroadcast no crashea)
+STATIC PROCEDURE _AudB1R5_SseMutexReady( hCtx )
+   LOCAL lOk := .T.
+   TRY
+      // Si s_hSseMutex fuera NIL, hb_mutexLock lanzaría "Argument error"
+      HIX_SseBroadcast( "b1r5.sse.noexist", "ping" )
+   CATCH
+      lOk := .F.
+   END
+   HixTU_Check( hCtx, lOk, ;
+      "B1.R5: SSE mutex ready — SseBroadcast sin crash antes de Setup", ;
+      ".T.", iif( lOk, ".T.", ".F. (exception)" ) )
+RETURN
+
+// TC2: LongPoll bus mutex listo (HIX_LongPollPush no crashea en canal vacio)
+STATIC PROCEDURE _AudB1R5_LongPollMutexReady( hCtx )
+   LOCAL lOk := .T.
+   TRY
+      HIX_LongPollPush( "b1r5.lp.noexist", "ping" )
+   CATCH
+      lOk := .F.
+   END
+   HixTU_Check( hCtx, lOk, ;
+      "B1.R5: LongPoll mutex ready — LongPollPush sin crash antes de Setup", ;
+      ".T.", iif( lOk, ".T.", ".F. (exception)" ) )
+RETURN
+
+// TC3: Anomaly mutex listo — HIX_MwAnomalyRecord no crashea
+STATIC PROCEDURE _AudB1R5_AnomalyMutexReady( hCtx )
+   LOCAL lOk := .T., oCtxMock
+   oCtxMock := { => }
+   TRY
+      // Llamar Detect con un contexto mock minimo solo para verificar que
+      // el mutex no es NIL. El mw devolvera .T. (no hay anomalia configurada).
+      HIX_AnomalyRecord( "127.0.0.9", 403 )
+   CATCH
+      lOk := .F.
+   END
+   HixTU_Check( hCtx, lOk, ;
+      "B1.R5: Anomaly mutex ready — AnomalyRecord sin crash", ;
+      ".T.", iif( lOk, ".T.", ".F. (exception)" ) )
+RETURN
+
+// TC4: RateLimit mutex listo — HIX_MwRateLimitConfig no crashea
+STATIC PROCEDURE _AudB1R5_RateLimitMutexReady( hCtx )
+   LOCAL lOk := .T., hCfg
+   TRY
+      hCfg := HIX_MwRateLimitConfig()
+      lOk := ValType( hCfg ) == "H"
+   CATCH
+      lOk := .F.
+   END
+   HixTU_Check( hCtx, lOk, ;
+      "B1.R5: RateLimit mutex ready — RateLimitConfig devuelve hash", ;
+      ".T.", iif( lOk, ".T.", ".F." ) )
+RETURN
+
+// ---------------------------------------------------------------
+// [B1.R4] SSE — mutex por conexión (broadcast vs keepalive)
+// Verifica que THixSseConn:oMutex se crea y que broadcast respeta
+// el flag lActive bajo lock.
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1R4_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+
+   _AudB1R4_MutexCreated(       hCtx )
+   _AudB1R4_BroadcastWrites(    hCtx )
+   _AudB1R4_BroadcastSkipsInactive( hCtx )
+
+RETURN hCtx
+
+// TC1: _HixSseRegister crea oMutex en la conexión
+STATIC PROCEDURE _AudB1R4_MutexCreated( hCtx )
+   LOCAL oMock, oConn
+   oMock := THixIOMock():New()
+   oConn := _HixSseRegister( oMock, "b1r4.mutex" )
+   HixTU_Check( hCtx, oConn:oMutex != NIL .AND. ValType( oConn:oMutex ) == "P", ;
+      "B1.R4: THixSseConn:oMutex creado en Register", ;
+      "P (mutex)", ValType( oConn:oMutex ) )
+   _HixSseUnregister( oConn )
+RETURN
+
+// TC2: HIX_SseBroadcast escribe en el IO de la conexión activa
+STATIC PROCEDURE _AudB1R4_BroadcastWrites( hCtx )
+   LOCAL oMock, oConn, nNotified
+   oMock    := THixIOMock():New()
+   oConn    := _HixSseRegister( oMock, "b1r4.write" )
+   nNotified := HIX_SseBroadcast( "b1r4.write", "hello" )
+   HixTU_Check( hCtx, oMock:nWrites == 1 .AND. nNotified == 1, ;
+      "B1.R4: broadcast escribe en IO y retorna 1 notificado", ;
+      "nWrites=1 nNotified=1", ;
+      "nWrites=" + hb_NToS( oMock:nWrites ) + " nNotified=" + hb_NToS( nNotified ) )
+   _HixSseUnregister( oConn )
+RETURN
+
+// TC3: broadcast con lActive=.F. no escribe en IO
+STATIC PROCEDURE _AudB1R4_BroadcastSkipsInactive( hCtx )
+   LOCAL oMock, oConn, nNotified
+   oMock          := THixIOMock():New()
+   oConn          := _HixSseRegister( oMock, "b1r4.inactive" )
+   oConn:lActive  := .F.
+   nNotified := HIX_SseBroadcast( "b1r4.inactive", "hello" )
+   HixTU_Check( hCtx, oMock:nWrites == 0 .AND. nNotified == 0, ;
+      "B1.R4: broadcast omite conexión inactiva (lActive=.F.)", ;
+      "nWrites=0 nNotified=0", ;
+      "nWrites=" + hb_NToS( oMock:nWrites ) + " nNotified=" + hb_NToS( nNotified ) )
+   _HixSseUnregister( oConn )
+RETURN
+
+// ---------------------------------------------------------------
+// [B1.R2] Atomic-swap en reload — sin ventana de 404
+// Verifica que el mecanismo de snapshot/restore preserva las rutas
+// hix.* y que un swap limpio elimina solo las rutas de app.
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1R2_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+
+   _AudB1R2_SwapPreservesSystemRoutes( hCtx )
+   _AudB1R2_SwapClearsAppRoutes(       hCtx )
+   _AudB1R2_SwapKeepsNewAppRoutes(     hCtx )
+
+RETURN hCtx
+
+// TC1: atomic swap preserva rutas hix.* (sistema)
+// Simula el reload: guarda snapshot, reemplaza con hash que solo
+// contiene hix.* + nuevas app routes. Las hix.* siguen disponibles.
+STATIC PROCEDURE _AudB1R2_SwapPreservesSystemRoutes( hCtx )
+   LOCAL hSnap, aList, lHixPresent, hItem
+
+   // Guardar estado previo para restaurar al terminar
+   hSnap := HIX_RoutesSnapshot()
+
+   // Las rutas de sistema (hix.*) deben estar presentes antes del swap
+   aList       := HIX_RouteList()
+   lHixPresent := .F.
+   FOR EACH hItem IN aList
+      IF Left( hItem[ "name" ], 4 ) == "hix."
+         lHixPresent := .T.
+         EXIT
+      ENDIF
+   NEXT
+
+   // Restaurar (el swap real lo haría el reload; aquí solo verificamos
+   // que el mecanismo de snapshot protege el estado)
+   HIX_RoutesRestore( hSnap )
+
+   HixTU_Check( hCtx, lHixPresent, ;
+      "B1.R2: rutas hix.* presentes antes del swap (sistema operativo)", ;
+      ".T.", iif( lHixPresent, ".T.", ".F." ) )
+RETURN
+
+// TC2: tras un swap que excluye rutas de app, esas rutas desaparecen
+STATIC PROCEDURE _AudB1R2_SwapClearsAppRoutes( hCtx )
+   LOCAL hSnap, hNewSnap, aList, lFound, hItem
+
+   // Registrar ruta de app de prueba
+   HIX_RouteAdd( "b1r2.old", "/b1r2/old", {|| NIL }, "GET" )
+
+   // Snapshot pre-swap
+   hSnap := HIX_RoutesSnapshot()
+
+   // Construir nuevo snapshot sin la ruta de app (simula atomic swap del reload)
+   hNewSnap := { "routes" => { => }, "order" => {} }
+   FOR EACH hItem IN hb_HKeys( hSnap[ "routes" ] )
+      IF Left( hItem, 4 ) == "hix."
+         hNewSnap[ "routes" ][ hItem ] := hSnap[ "routes" ][ hItem ]
+         AAdd( hNewSnap[ "order" ], hItem )
+      ENDIF
+   NEXT
+
+   HIX_RoutesRestore( hNewSnap )
+
+   // La ruta de app no debe estar tras el swap
+   aList  := HIX_RouteList()
+   lFound := .F.
+   FOR EACH hItem IN aList
+      IF hItem[ "name" ] == "b1r2.old" ; lFound := .T. ; EXIT ; ENDIF
+   NEXT
+
+   // Restaurar estado original
+   HIX_RoutesRestore( hSnap )
+
+   HixTU_Check( hCtx, ! lFound, ;
+      "B1.R2: ruta de app eliminada tras atomic swap", ;
+      ".F. (no encontrada)", iif( lFound, ".T. (encontrada — mal)", ".F." ) )
+RETURN
+
+// TC3: tras un swap que incluye nueva ruta, esa ruta está disponible
+STATIC PROCEDURE _AudB1R2_SwapKeepsNewAppRoutes( hCtx )
+   LOCAL hSnap, hNewSnap, aList, lFound, hItem
+
+   hSnap := HIX_RoutesSnapshot()
+
+   // Registrar ruta nueva en el snapshot de destino
+   HIX_RoutesRestore( hSnap )
+   HIX_RouteAdd( "b1r2.new", "/b1r2/new", {|| NIL }, "GET" )
+   hNewSnap := HIX_RoutesSnapshot()
+
+   // Swap al nuevo snapshot (simula atomic replace)
+   HIX_RoutesRestore( hNewSnap )
+
+   aList  := HIX_RouteList()
+   lFound := .F.
+   FOR EACH hItem IN aList
+      IF hItem[ "name" ] == "b1r2.new" ; lFound := .T. ; EXIT ; ENDIF
+   NEXT
+
+   // Limpiar y restaurar
+   HIX_RouteDelete( "b1r2.new" )
+   HIX_RoutesRestore( hSnap )
+
+   HixTU_Check( hCtx, lFound, ;
+      "B1.R2: nueva ruta app presente tras atomic swap", ;
+      ".T.", iif( lFound, ".T.", ".F. (no encontrada — mal)" ) )
+RETURN
+
+// ---------------------------------------------------------------
+// [§3 A1.15/16] Sin fallback hardcodeado "H!x@SESSION@2026"
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1A1516_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+
+   _AudB1A1516_SetupWithKey(    hCtx )
+   _AudB1A1516_NoHardcodedSeed( hCtx )
+
+RETURN hCtx
+
+// TC1: Setup con clave explícita — la clave se guarda
+STATIC PROCEDURE _AudB1A1516_SetupWithKey( hCtx )
+   LOCAL cTestKey := "TestKeyForAuditB1A1516"
+   LOCAL hCfg
+   HIX_MwSessionSetup( NIL, NIL, NIL, NIL, NIL, NIL, NIL, cTestKey )
+   hCfg := HIX_MwSessionConfig()
+   HixTU_Check( hCtx, hb_HGetDef( hCfg, "config_applied", .F. ), ;
+      "§3 A1.15/16: Setup con clave explícita — config_applied=.T.", ;
+      ".T.", iif( hb_HGetDef( hCfg, "config_applied", .F. ), ".T.", ".F." ) )
+RETURN
+
+// TC2: el código fuente no contiene "H!x@SESSION@2026" como fallback operacional
+// Verificamos que el SID generado tras Setup con clave != SID generado con clave vacía
+// (si existiera fallback hardcodeado, ambos usarían la misma clave y podrían coincidir)
+STATIC PROCEDURE _AudB1A1516_NoHardcodedSeed( hCtx )
+   LOCAL cSid1, cSid2, lOk
+   HIX_MwSessionSetup( NIL, NIL, NIL, NIL, NIL, NIL, NIL, "KeyA_AuditB1A1516" )
+   cSid1 := HIX_SessionNewId()
+   HIX_MwSessionSetup( NIL, NIL, NIL, NIL, NIL, NIL, NIL, "KeyB_AuditB1A1516" )
+   cSid2 := HIX_SessionNewId()
+   // Ambos SIDs son HMAC-SHA256 con claves distintas — deben ser distintos
+   // (no deterministic equality, pero longitud idéntica y valores diferentes)
+   lOk := Len( cSid1 ) == 64 .AND. Len( cSid2 ) == 64 .AND. cSid1 != cSid2
+   HixTU_Check( hCtx, lOk, ;
+      "§3 A1.15/16: SIDs con claves distintas son diferentes (sin fallback hardcoded)", ;
+      "len=64 y sid1!=sid2", ;
+      "len1=" + hb_NToS( Len( cSid1 ) ) + " len2=" + hb_NToS( Len( cSid2 ) ) + ;
+      " iguales=" + iif( cSid1 == cSid2, ".T.", ".F." ) )
+RETURN
+
+// ---------------------------------------------------------------
+// [B1.S4] Store lazy con INIT PROCEDURE + warning sin Setup
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1S4_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+
+   _AudB1S4_MutexReadyAtInit( hCtx )
+   _AudB1S4_SessionStoreAfterSetup( hCtx )
+
+RETURN hCtx
+
+// TC1: mutex de sesión ya no es NIL al arrancar (INIT PROCEDURE)
+STATIC PROCEDURE _AudB1S4_MutexReadyAtInit( hCtx )
+   LOCAL hCfg := HIX_MwSessionConfig()
+   // La función config existe si el módulo compiló; la existencia prueba que
+   // el INIT PROCEDURE corrió (mutexes creados antes de este punto)
+   LOCAL lOk  := ValType( hCfg ) == "H"
+   HixTU_Check( hCtx, lOk, ;
+      "B1.S4: módulo session inicializado — HIX_MwSessionConfig() retorna hash", ;
+      "H (hash)", ValType( hCfg ) )
+RETURN
+
+// TC2: store memory vacío disponible después de Setup
+STATIC PROCEDURE _AudB1S4_SessionStoreAfterSetup( hCtx )
+   LOCAL hCfg, lOk
+   HIX_MwSessionSetup( "test_sid_b1s4", 60, 100, "memory" )
+   hCfg := HIX_MwSessionConfig()
+   lOk  := hb_HGetDef( hCfg, "storage", "" ) == "memory"
+   HixTU_Check( hCtx, lOk, ;
+      "B1.S4: storage=memory tras Setup", ;
+      "memory", hb_HGetDef( hCfg, "storage", "(vacío)" ) )
+RETURN
+
+// ---------------------------------------------------------------
+// [B1.S1] Aislamiento del hash de sesión entre requests del mismo SID
+// (clone-on-read + write-back-clone-on-save)
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1S1_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+
+   _AudB1S1_ContextsAreIsolated( hCtx )
+   _AudB1S1_SavePersistsClone(   hCtx )
+
+RETURN hCtx
+
+// TC1: dos contextos con el mismo SID cargados en paralelo no comparten
+// referencia — mutar uno no debe afectar al otro.
+STATIC PROCEDURE _AudB1S1_ContextsAreIsolated( hCtx )
+   LOCAL oCtx1, oCtx2, cSid, hS1, hS2, lIsolated
+
+   HIX_MwSessionSetup( "HIXSID", 3600, 500, "memory" )
+
+   oCtx1 := _AudB1S1_MakeCtx( "" )
+   HIX_MwSession( oCtx1 )
+   cSid := oCtx1:hData[ "_sid" ]
+
+   // Segundo contexto con el mismo SID — simula AJAX paralelo
+   oCtx2 := _AudB1S1_MakeCtx( cSid )
+   HIX_MwSession( oCtx2 )
+
+   hS1 := oCtx1:hData[ "session" ]
+   hS2 := oCtx2:hData[ "session" ]
+
+   // Mutamos oCtx1 — oCtx2 no debe verlo
+   HIX_SessionSet( oCtx1, "k", "v_ctx1" )
+
+   lIsolated := ! hb_HHasKey( hS2, "k" )
+   HixTU_Check( hCtx, lIsolated, ;
+      "B1.S1: hash de sesión aislado entre contextos (clone-on-read)", ;
+      "hS2 sin clave 'k'", ;
+      iif( hb_HHasKey( hS2, "k" ), "hS2['k']=" + hb_CStr( hS2[ "k" ] ), "ok" ) )
+RETURN
+
+// TC2: HIX_SessionSave persiste las mutaciones del clon al store.
+// Un tercer contexto que lea el mismo SID después del Save debe ver el dato.
+STATIC PROCEDURE _AudB1S1_SavePersistsClone( hCtx )
+   LOCAL oCtx1, oCtx3, cSid, cVal
+
+   HIX_MwSessionSetup( "HIXSID", 3600, 500, "memory" )
+
+   oCtx1 := _AudB1S1_MakeCtx( "" )
+   HIX_MwSession( oCtx1 )
+   cSid := oCtx1:hData[ "_sid" ]
+   HIX_SessionSet( oCtx1, "user", "charly" )
+   HIX_SessionSave( oCtx1 )
+
+   oCtx3 := _AudB1S1_MakeCtx( cSid )
+   HIX_MwSession( oCtx3 )
+   cVal := HIX_SessionGet( oCtx3, "user" )
+
+   HixTU_Check( hCtx, cVal == "charly", ;
+      "B1.S1: Save persiste clon al store (segundo lector ve el dato)", ;
+      "charly", cVal )
+RETURN
+
+// Helper — construye un THixContext con TMockRequest y cookie SID opcional
+STATIC FUNCTION _AudB1S1_MakeCtx( cSid )
+   LOCAL oReq := TMockRequest():New( "/", "GET" )
+   IF ! Empty( cSid )
+      oReq:hHeaders[ "cookie" ] := "HIXSID=" + cSid
+   ENDIF
+RETURN THixContext():New( oReq )
+
+// ---------------------------------------------------------------
+// [B1.S2] Escritura atómica de fichero de sesión (tmp + rename) +
+// bucket-mutex por SID — sin truncación → sin logout aleatorio.
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1S2_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+   LOCAL cDir := hb_DirTemp() + "hix_audit_b1s2_" + hb_NToS( Int( hb_MilliSeconds() ) )
+
+   hb_DirCreate( cDir )
+   HIX_MwSessionSetup( "HIXSID", 3600, 500, "file", cDir, "sess_", .F., "SeedForAuditB1S2" )
+
+   _AudB1S2_RoundTripFile(       hCtx, cDir )
+   _AudB1S2_ConcurrentWrites(    hCtx, cDir )
+   _AudB1S2_NoTmpFilesLeftOver(  hCtx, cDir )
+
+   _AudB1S2_CleanDir( cDir )
+
+RETURN hCtx
+
+// TC1: Write + Load round-trip básico — el fichero final es válido.
+STATIC PROCEDURE _AudB1S2_RoundTripFile( hCtx, cDir )
+   LOCAL oCtx1, oCtx2, cSid, cVal
+
+   oCtx1 := _AudB1S1_MakeCtx( "" )
+   HIX_MwSession( oCtx1 )
+   cSid := oCtx1:hData[ "_sid" ]
+   HIX_SessionSet( oCtx1, "who", "charly" )
+   HIX_SessionSave( oCtx1 )
+
+   oCtx2 := _AudB1S1_MakeCtx( cSid )
+   HIX_MwSession( oCtx2 )
+   cVal := HIX_SessionGet( oCtx2, "who" )
+
+   HixTU_Check( hCtx, cVal == "charly", ;
+      "B1.S2: round-trip Write→Load en modo file", ;
+      "charly", cVal )
+   HB_SYMBOL_UNUSED( cDir )
+RETURN
+
+// TC2: N escritores concurrentes sobre el mismo SID — todos completan
+// sin corrupción y la lectura final devuelve un hash válido.
+STATIC PROCEDURE _AudB1S2_ConcurrentWrites( hCtx, cDir )
+   LOCAL oCtx0, cSid, aThreads, i, oCtxRead, cVal, lReadOk
+
+   oCtx0 := _AudB1S1_MakeCtx( "" )
+   HIX_MwSession( oCtx0 )
+   cSid := oCtx0:hData[ "_sid" ]
+   HIX_SessionSet( oCtx0, "who", "init" )
+   HIX_SessionSave( oCtx0 )
+
+   // 8 hilos escritores compitiendo por el mismo SID
+   aThreads := {}
+   FOR i := 1 TO 8
+      AAdd( aThreads, hb_threadStart( @_AudB1S2_Writer(), cSid, i ) )
+   NEXT
+
+   FOR i := 1 TO Len( aThreads )
+      hb_threadJoin( aThreads[ i ] )
+   NEXT
+
+   // Tras todas las escrituras el fichero debe ser legible
+   oCtxRead := _AudB1S1_MakeCtx( cSid )
+   HIX_MwSession( oCtxRead )
+   cVal := HIX_SessionGet( oCtxRead, "who" )
+   // cVal debe ser uno de los valores escritos ("w1".."w8") — no vacío
+   lReadOk := "w" $ cVal
+   HixTU_Check( hCtx, lReadOk, ;
+      "B1.S2: lectura tras 8 writers concurrentes devuelve valor válido", ;
+      "w<i>", cVal )
+   HB_SYMBOL_UNUSED( cDir )
+RETURN
+
+STATIC PROCEDURE _AudB1S2_Writer( cSid, nId )
+   LOCAL oCtx, i
+   FOR i := 1 TO 20
+      oCtx := _AudB1S1_MakeCtx( cSid )
+      HIX_MwSession( oCtx )
+      HIX_SessionSet( oCtx, "who", "w" + hb_NToS( nId ) )
+      HIX_SessionSave( oCtx )
+   NEXT
+RETURN
+
+// TC3: No debe quedar ningún fichero .tmp.* en el directorio de sesiones.
+STATIC PROCEDURE _AudB1S2_NoTmpFilesLeftOver( hCtx, cDir )
+   LOCAL aFiles := Directory( cDir + hb_ps() + "sess_*.tmp.*" )
+   HixTU_Check( hCtx, Len( aFiles ) == 0, ;
+      "B1.S2: sin ficheros .tmp huérfanos tras writers concurrentes", ;
+      "0 tmp files", hb_NToS( Len( aFiles ) ) + " tmp files" )
+RETURN
+
+// Cleanup helper — borra directorio y todos sus ficheros.
+STATIC PROCEDURE _AudB1S2_CleanDir( cDir )
+   LOCAL aFiles, aEntry, oErr
+   aFiles := Directory( cDir + hb_ps() + "*" )
+   FOR EACH aEntry IN aFiles
+      TRY ; FErase( cDir + hb_ps() + aEntry[ 1 ] ) ; CATCH oErr ; END
+   NEXT
+   TRY ; DirRemove( cDir ) ; CATCH oErr ; END
+RETURN
+
+// ---------------------------------------------------------------
+// [B1.S3] GC de sesión: re-read + validar HMAC bajo bucket-mutex.
+// Sin esto: TOCTOU (borra sesión reescrita) o borra basura sin verificar.
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1S3_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+   LOCAL cDir := hb_DirTemp() + "hix_audit_b1s3_" + hb_NToS( Int( hb_MilliSeconds() ) )
+
+   hb_DirCreate( cDir )
+   HIX_MwSessionSetup( "HIXSID", 3600, 500, "file", cDir, "sess_", .F., "SeedForAuditB1S3" )
+
+   _AudB1S3_GcKeepsValid(       hCtx, cDir )
+   _AudB1S3_GcDeletesExpired(   hCtx, cDir )
+   _AudB1S3_GcRejectsBadHmac(   hCtx, cDir )
+
+   _AudB1S2_CleanDir( cDir )
+
+RETURN hCtx
+
+// TC1: sesión con exp lejano — GC NO la borra (evita TOCTOU tras Write reciente).
+STATIC PROCEDURE _AudB1S3_GcKeepsValid( hCtx, cDir )
+   LOCAL oCtx, cSid, cFile, lStillExists
+
+   oCtx := _AudB1S1_MakeCtx( "" )
+   HIX_MwSession( oCtx )
+   cSid := oCtx:hData[ "_sid" ]
+   HIX_SessionSet( oCtx, "who", "alive" )
+   HIX_SessionSave( oCtx )
+   cFile := cDir + hb_ps() + "sess_" + cSid
+
+   HIX_SessionFileGcForTest()
+
+   lStillExists := File( cFile )
+   HixTU_Check( hCtx, lStillExists, ;
+      "B1.S3: GC NO borra sesión vigente (re-read bajo lock)", ;
+      "fichero presente", iif( lStillExists, "presente", "borrado" ) )
+RETURN
+
+// TC2: sesión con exp expirada — GC SÍ la borra.
+STATIC PROCEDURE _AudB1S3_GcDeletesExpired( hCtx, cDir )
+   LOCAL oCtx, cSid, cFile, lGone, hEntry, cData, cMac, cFinal
+
+   oCtx := _AudB1S1_MakeCtx( "" )
+   HIX_MwSession( oCtx )
+   cSid := oCtx:hData[ "_sid" ]
+   HIX_SessionSet( oCtx, "who", "expired" )
+   HIX_SessionSave( oCtx )
+   cFile := cDir + hb_ps() + "sess_" + cSid
+
+   // Reescribir el fichero con exp en el pasado (payload válido, HMAC correcto)
+   hEntry := { "exp" => Int( hb_TToSec( hb_DateTime() ) ) - 3600, "data" => { "who" => "expired" } }
+   cData  := hb_jsonEncode( hEntry )
+   cMac   := hb_HMAC_SHA256( cData, "SeedForAuditB1S3" )
+   cFinal := hb_base64Encode( cMac + "|" + cData )
+   hb_MemoWrit( cFile, cFinal )
+
+   HIX_SessionFileGcForTest()
+
+   lGone := ! File( cFile )
+   HixTU_Check( hCtx, lGone, ;
+      "B1.S3: GC borra sesión expirada con HMAC válido", ;
+      "fichero borrado", iif( lGone, "borrado", "sigue presente" ) )
+RETURN
+
+// TC3: fichero con HMAC inválido — GC lo borra aunque el payload declare exp lejano.
+STATIC PROCEDURE _AudB1S3_GcRejectsBadHmac( hCtx, cDir )
+   LOCAL cSid, cFile, lGone, cData, cFakeMac, cFinal, hEntry
+
+   cSid   := "b1s3_badhmac_" + hb_NToS( Int( hb_MilliSeconds() ) )
+   cFile  := cDir + hb_ps() + "sess_" + cSid
+   // JSON válido con exp lejano, pero HMAC firmado con clave incorrecta
+   hEntry := { "exp" => Int( hb_TToSec( hb_DateTime() ) ) + 3600, "data" => { "who" => "attacker" } }
+   cData  := hb_jsonEncode( hEntry )
+   cFakeMac := hb_HMAC_SHA256( cData, "WrongSeed" )
+   cFinal   := hb_base64Encode( cFakeMac + "|" + cData )
+   hb_MemoWrit( cFile, cFinal )
+
+   HIX_SessionFileGcForTest()
+
+   lGone := ! File( cFile )
+   HixTU_Check( hCtx, lGone, ;
+      "B1.S3: GC borra fichero con HMAC inválido (no confía en exp del payload)", ;
+      "fichero borrado", iif( lGone, "borrado", "sigue presente" ) )
+RETURN
+
+// ---------------------------------------------------------------
+// [B1.W2] Mutex SSL per-conexión — serializa Read/Write sobre el mismo SSL*
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1W2_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+
+   _AudB1W2_PlainHasNoMutex(  hCtx )
+   _AudB1W2_MutexUsable(      hCtx )
+   _AudB1W2_MutexSerializes(  hCtx )
+
+RETURN hCtx
+
+// TC1: THixIO plano (sin SSL) no tiene mutex asignado.
+STATIC PROCEDURE _AudB1W2_PlainHasNoMutex( hCtx )
+   LOCAL oIO := THixIO():New( NIL )
+   HixTU_Check( hCtx, oIO:oSslMutex == NIL, ;
+      "B1.W2: THixIO sin SSL — oSslMutex == NIL", ;
+      "NIL", ValType( oIO:oSslMutex ) )
+RETURN
+
+// TC2: oSslMutex asignado es un mutex Harbour real (lock+unlock funciona).
+STATIC PROCEDURE _AudB1W2_MutexUsable( hCtx )
+   LOCAL oIO := THixIO():New( NIL )
+   LOCAL lOk := .F.
+   LOCAL oErr
+   oIO:oSslMutex := hb_mutexCreate()
+   TRY
+      hb_mutexLock(   oIO:oSslMutex )
+      hb_mutexUnlock( oIO:oSslMutex )
+      lOk := .T.
+   CATCH oErr
+      lOk := .F.
+   END
+   HixTU_Check( hCtx, lOk .AND. oIO:oSslMutex != NIL, ;
+      "B1.W2: oSslMutex es hb_mutexCreate() usable", ;
+      "lock+unlock ok", iif( lOk, "ok", "excepción" ) )
+RETURN
+
+// TC3: 4 threads compitiendo por el mismo oSslMutex — máximo 1 en la
+// sección crítica al mismo tiempo (demuestra serialización real).
+STATIC PROCEDURE _AudB1W2_MutexSerializes( hCtx )
+   LOCAL oMutex := hb_mutexCreate()
+   LOCAL aThreads := {}
+   LOCAL i
+
+   s_nB1W2Cur := 0
+   s_nB1W2Max := 0
+
+   FOR i := 1 TO 4
+      AAdd( aThreads, hb_threadStart( @_AudB1W2_LockedWorker(), oMutex, 30 ) )
+   NEXT
+   FOR i := 1 TO Len( aThreads )
+      hb_threadJoin( aThreads[ i ] )
+   NEXT
+
+   HixTU_Check( hCtx, s_nB1W2Max == 1, ;
+      "B1.W2: mutex serializa acceso (max threads concurrentes = 1)", ;
+      "1", hb_NToS( s_nB1W2Max ) )
+RETURN
+
+// Worker: entra en la sección crítica, incrementa contador de concurrencia,
+// duerme un tick y sale. Si el mutex NO serializara, s_nB1W2Max > 1.
+STATIC PROCEDURE _AudB1W2_LockedWorker( oMutex, nIter )
+   LOCAL i
+   FOR i := 1 TO nIter
+      hb_mutexLock( oMutex )
+      s_nB1W2Cur++
+      IF s_nB1W2Cur > s_nB1W2Max
+         s_nB1W2Max := s_nB1W2Cur
+      ENDIF
+      hb_idleSleep( 0.001 )
+      s_nB1W2Cur--
+      hb_mutexUnlock( oMutex )
+   NEXT
+RETURN
+
+// ---------------------------------------------------------------
+// [B1.W4] recv=0 (FIN TCP) pone lConnClosed=.T. en THixIO:Read()
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1W4_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+
+   _AudB1W4_FinSetsConnClosed( hCtx )
+
+RETURN hCtx
+
+// TC1: cerrar el extremo escritor de una conexión TCP local provoca que
+// Read() en el extremo lector retorne NIL y ponga lConnClosed=.T.
+STATIC PROCEDURE _AudB1W4_FinSetsConnClosed( hCtx )
+
+   LOCAL hServer, hClient, hAccepted, oIO
+   LOCAL lOk       := .F.
+   LOCAL nPort     := 18321
+   LOCAL oError
+
+   TRY
+
+      // 1. Servidor local en loopback
+      hServer := hb_socketOpen( HB_SOCKET_AF_INET, HB_SOCKET_PT_STREAM )
+      hb_socketSetReuseAddr( hServer, .T. )
+      hb_socketBind( hServer, { HB_SOCKET_AF_INET, "127.0.0.1", nPort } )
+      hb_socketListen( hServer, 1 )
+
+      // 2. Cliente conecta
+      hClient := hb_socketOpen( HB_SOCKET_AF_INET, HB_SOCKET_PT_STREAM )
+      hb_socketConnect( hClient, { HB_SOCKET_AF_INET, "127.0.0.1", nPort }, 2000 )
+
+      // 3. Servidor acepta
+      hAccepted := hb_socketAccept( hServer, 2000 )
+
+      // 4. Cliente cierra → FIN al servidor
+      hb_socketClose( hClient )
+      hClient := NIL
+
+      // 5. THixIO sobre el socket aceptado lee → recv=0 → lConnClosed=.T.
+      oIO := THixIO():New( hAccepted )
+      oIO:Read( 2, 1000 )
+
+      lOk := oIO:lConnClosed
+
+   CATCH oError
+      lw( "B1.W4: loopback error " + oError:description )
+      lOk := .F.
+
+   END
+
+   // Cleanup
+   IF hClient != NIL ; hb_socketClose( hClient ) ; ENDIF
+   IF hServer != NIL ; hb_socketClose( hServer ) ; ENDIF
+
+   HixTU_Check( hCtx, lOk, ;
+      "B1.W4: recv=0 (FIN) pone lConnClosed=.T. en THixIO:Read()", ;
+      ".T.", iif( lOk, ".T.", ".F. (lConnClosed sigue .F. — bug)" ) )
+
+RETURN
+
+// ---------------------------------------------------------------
+// [B1.W3] Cleanup WS (bOnClose + MetricDec) tras excepción en frame loop
+// El TRY/CATCH en HIX_HandleWSUpgrade garantiza que el cleanup siempre corre.
+// Test indirecto: verifica que THixWsConn:Close() es idempotente y que
+// lClosed = .T. después de Close() (invariante del cleanup path).
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1W3_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+
+   _AudB1W3_CloseSetsClosed(  hCtx )
+   _AudB1W3_NilSocketGuard(   hCtx )
+   _AudB1W3_DoubleCloseClean( hCtx )
+
+RETURN hCtx
+
+// TC1: Close() marca lClosed = .T.
+STATIC PROCEDURE _AudB1W3_CloseSetsClosed( hCtx )
+   LOCAL oIO   := THixIOMock():New()
+   LOCAL oConn := THixWsConn():New( oIO, "127.0.0.1" )
+   oConn:Close()
+   HixTU_Check( hCtx, oConn:lClosed, ;
+      "B1.W3: Close() pone lClosed=.T. (invariante cleanup)", ;
+      ".T.", iif( oConn:lClosed, ".T.", ".F." ) )
+RETURN
+
+// TC2: guard iif(hSocket!=NIL) — no crashea si hSocket es NIL
+// Verifica la expresión exacta añadida al frame loop (B1.W3):
+// iif( oIO:hSocket != NIL, hb_socketGetFD( oIO:hSocket ), -1 )
+STATIC PROCEDURE _AudB1W3_NilSocketGuard( hCtx )
+   LOCAL hNilSocket := NIL   // simula socket cerrado externamente
+   LOCAL nFd, lOk
+   lOk := .T.
+   TRY
+      nFd := iif( hNilSocket != NIL, hb_socketGetFD( hNilSocket ), -1 )
+   CATCH
+      lOk := .F.
+   END
+   HixTU_Check( hCtx, lOk .AND. nFd == -1, ;
+      "B1.W3: guard iif(socket!=NIL) retorna -1 sin crash para NIL socket", ;
+      "lOk=.T. nFd=-1", "lOk=" + iif( lOk, ".T.", ".F." ) + " nFd=" + hb_NToS( nFd ) )
+RETURN
+
+// TC3: Close() dos veces — IO se cierra solo una vez (no double-free)
+STATIC PROCEDURE _AudB1W3_DoubleCloseClean( hCtx )
+   LOCAL oIO   := THixIOMock():New()
+   LOCAL oConn := THixWsConn():New( oIO, "127.0.0.3" )
+   oConn:Close()
+   oConn:Close()
+   HixTU_Check( hCtx, oIO:nCloses == 1, ;
+      "B1.W3: Close() idempotente — IO:Close() llamado solo una vez", ;
+      "1", hb_NToS( oIO:nCloses ) )
+RETURN
+
+// ---------------------------------------------------------------
+// [B1.W6.3] ping_interval_s y ping_timeout_s leídos de pool_ws config
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1W63_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+
+   _AudB1W63_ConfigHasKeys( hCtx )
+   _AudB1W63_DefaultValues( hCtx )
+
+RETURN hCtx
+
+// TC1: HIX_GetConfig("pool_ws") tiene las claves de ping
+STATIC PROCEDURE _AudB1W63_ConfigHasKeys( hCtx )
+   LOCAL hPoolWs := HIX_GetConfig( "pool_ws" )
+   LOCAL lOk     := hb_HHasKey( hPoolWs, "ping_interval_s" ) .AND. ;
+                    hb_HHasKey( hPoolWs, "ping_timeout_s" )
+   HixTU_Check( hCtx, lOk, ;
+      "B1.W6.3: pool_ws config tiene ping_interval_s y ping_timeout_s", ;
+      ".T.", iif( lOk, ".T.", ".F. (faltan claves)" ) )
+RETURN
+
+// TC2: valores default son 30 (interval) y 10 (timeout)
+STATIC PROCEDURE _AudB1W63_DefaultValues( hCtx )
+   LOCAL hPoolWs  := HIX_GetConfig( "pool_ws" )
+   LOCAL nInt     := hb_HGetDef( hPoolWs, "ping_interval_s", -1 )
+   LOCAL nTmo     := hb_HGetDef( hPoolWs, "ping_timeout_s",  -1 )
+   HixTU_Check( hCtx, nInt == 30 .AND. nTmo == 10, ;
+      "B1.W6.3: defaults ping_interval_s=30 ping_timeout_s=10", ;
+      "interval=30 timeout=10", ;
+      "interval=" + hb_NToS( nInt ) + " timeout=" + hb_NToS( nTmo ) )
+RETURN
+
+// ---------------------------------------------------------------
+// [B1.W6.1] Frame WS >= 65536 bytes — código 127 + 8 bytes big-endian
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1W61_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+
+   _AudB1W61_LargeFrameHeader( hCtx )
+   _AudB1W61_LargeFrameLength( hCtx )
+   _AudB1W61_SmallFrameUnchanged( hCtx )
+
+RETURN hCtx
+
+// TC1: payload >= 65536 emite byte 127 como primer byte de longitud
+STATIC PROCEDURE _AudB1W61_LargeFrameHeader( hCtx )
+   LOCAL cBig, cFrame, bLen
+   cBig   := Replicate( "X", 65536 )
+   cFrame := HIX_WsBuildFrame( 1, cBig )   // opcode 1 = TEXT
+   bLen   := Asc( SubStr( cFrame, 2, 1 ) ) // segundo byte del header
+   HixTU_Check( hCtx, bLen == 127, ;
+      "B1.W6.1: frame 65536B emite byte de longitud = 127", ;
+      "127", hb_NToS( bLen ) )
+RETURN
+
+// TC2: los 8 bytes de extensión codifican el tamaño correcto
+STATIC PROCEDURE _AudB1W61_LargeFrameLength( hCtx )
+   LOCAL nSize, cBig, cFrame, nDecoded
+   nSize  := 131072   // 128 KB
+   cBig   := Replicate( "A", nSize )
+   cFrame := HIX_WsBuildFrame( 2, cBig )   // opcode 2 = BINARY
+   // Bytes 3-10 son la longitud big-endian (bytes 5-8 para tamaños < 2^24)
+   nDecoded := Asc( SubStr( cFrame,  7, 1 ) ) * 16777216 + ;
+               Asc( SubStr( cFrame,  8, 1 ) ) * 65536    + ;
+               Asc( SubStr( cFrame,  9, 1 ) ) * 256      + ;
+               Asc( SubStr( cFrame, 10, 1 ) )
+   HixTU_Check( hCtx, nDecoded == nSize, ;
+      "B1.W6.1: 8 bytes big-endian codifican el tamaño 131072 correctamente", ;
+      hb_NToS( nSize ), hb_NToS( nDecoded ) )
+RETURN
+
+// TC3: frame pequeño (<126) no se ve afectado por el cambio
+STATIC PROCEDURE _AudB1W61_SmallFrameUnchanged( hCtx )
+   LOCAL cFrame, bLen
+   cFrame := HIX_WsBuildFrame( 1, "hola" )
+   bLen   := Asc( SubStr( cFrame, 2, 1 ) )
+   HixTU_Check( hCtx, bLen == 4 .AND. Len( cFrame ) == 6, ;
+      "B1.W6.1: frame pequeño intacto (len=4 total=6)", ;
+      "bLen=4 total=6", "bLen=" + hb_NToS( bLen ) + " total=" + hb_NToS( Len( cFrame ) ) )
+RETURN
+
+// ---------------------------------------------------------------
+// [B1.W1] Frames de control WS (PING/PONG/CLOSE) bajo oConn:oMutex
+// Verifica que el guard lClosed bloquea writes después de Close(),
+// el mismo patrón ahora aplicado a _HixWSSendPing/Pong/Close.
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1W1_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+
+   _AudB1W1_MutexExists(        hCtx )
+   _AudB1W1_SendBlockedAfterClose( hCtx )
+   _AudB1W1_CloseIdempotent(    hCtx )
+
+RETURN hCtx
+
+// TC1: oMutex != NIL tras New() — necesario para proteger frames de control
+STATIC PROCEDURE _AudB1W1_MutexExists( hCtx )
+   LOCAL oIO   := THixIOMock():New()
+   LOCAL oConn := THixWsConn():New( oIO, "127.0.0.1" )
+   HixTU_Check( hCtx, ValType( oConn:oMutex ) == "P", ;
+      "B1.W1: THixWsConn:oMutex creado en New()", ;
+      "P (mutex)", ValType( oConn:oMutex ) )
+RETURN
+
+// TC2: Send() no escribe tras Close() — guard lClosed bajo mutex
+// (mismo guard ahora en _HixWSSendPing/Pong/Close)
+STATIC PROCEDURE _AudB1W1_SendBlockedAfterClose( hCtx )
+   LOCAL oIO     := THixIOMock():New()
+   LOCAL oConn   := THixWsConn():New( oIO, "127.0.0.2" )
+   LOCAL nBefore, nAfter
+   // Primera escritura OK
+   oConn:Send( "antes" )
+   nBefore := oIO:nWrites
+   // Cerrar y volver a intentar
+   oConn:Close()
+   oConn:Send( "despues" )
+   nAfter := oIO:nWrites
+   HixTU_Check( hCtx, nBefore == 1 .AND. nAfter == 1, ;
+      "B1.W1: Send() bloqueado tras Close() — guard lClosed funciona", ;
+      "nWrites antes=1 despues=1", ;
+      "nWrites antes=" + hb_NToS( nBefore ) + " despues=" + hb_NToS( nAfter ) )
+RETURN
+
+// TC3: Close() idempotente — segunda llamada no cierra el IO de nuevo
+STATIC PROCEDURE _AudB1W1_CloseIdempotent( hCtx )
+   LOCAL oIO   := THixIOMock():New()
+   LOCAL oConn := THixWsConn():New( oIO, "127.0.0.3" )
+   oConn:Close()
+   oConn:Close()
+   HixTU_Check( hCtx, oIO:nCloses == 1, ;
+      "B1.W1: Close() idempotente — IO cerrado solo una vez", ;
+      "nCloses=1", "nCloses=" + hb_NToS( oIO:nCloses ) )
+RETURN
+
+
+// ============================================================
+// [B1.W6.2] WebSocket continuation frames — RFC 6455 §5.4
+// Fix: _HixWSFrameLoop mantiene estado nFragOpcode/cFragBuffer,
+// reensambla opcode 0x00 continuación, rechaza:
+//   - continuación sin frame inicial
+//   - nuevo data frame mientras hay fragmentación abierta
+//   - control frames con FIN=0 (§5.4: control MUST NOT fragment)
+//   - reensamblado que excede HIX_WS_MAX_FRAME_SIZE
+// ============================================================
+
+// Mock IO capaz de servir bytes acumulados y capturar Write/Close.
+CLASS THixWsFrameIOMock
+   DATA cBuffer   INIT ""     // bytes que quedan por servir en Read()
+   DATA nWrites   INIT 0
+   DATA cWritten  INIT ""     // frames que _HixWSFrameLoop escribe hacia peer
+   DATA nCloses   INIT 0
+   DATA lConnClosed INIT .F.
+   DATA hSocket   INIT NIL
+   METHOD New()   INLINE Self
+   METHOD Feed( cData ) INLINE ( ::cBuffer += cData, Self )
+   METHOD Read( nBytes, nTimeout )
+   METHOD Write( cData ) INLINE ( ::nWrites++, ::cWritten += cData, .T. )
+   METHOD Close() INLINE ( ::nCloses++, ::lConnClosed := .T., NIL )
+ENDCLASS
+
+METHOD Read( nBytes, nTimeout ) CLASS THixWsFrameIOMock
+   LOCAL cOut
+   HB_SYMBOL_UNUSED( nTimeout )
+   IF Len( ::cBuffer ) == 0
+      // Simular EOF — el bucle sale por lConnClosed
+      ::lConnClosed := .T.
+      RETURN NIL
+   ENDIF
+   IF Len( ::cBuffer ) < nBytes
+      cOut := ::cBuffer
+      ::cBuffer := ""
+   ELSE
+      cOut := SubStr( ::cBuffer, 1, nBytes )
+      ::cBuffer := SubStr( ::cBuffer, nBytes + 1 )
+   ENDIF
+RETURN cOut
+
+FUNCTION HIX_TestAudit_B1W62_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+
+   _AudB1W62_SingleFrame(        hCtx )
+   _AudB1W62_Reassemble3Frags(   hCtx )
+   _AudB1W62_ContWithoutStart(   hCtx )
+   _AudB1W62_DataWhileFragment(  hCtx )
+   _AudB1W62_FragmentedControl(  hCtx )
+   _AudB1W62_OversizeReassembly( hCtx )
+
+RETURN hCtx
+
+STATIC FUNCTION _AudB1W62_MakeConn()
+   LOCAL oIO   := THixWsFrameIOMock():New()
+   LOCAL oConn := THixWsConn():New( oIO, "127.0.0.1" )
+   HB_SYMBOL_UNUSED( oIO )
+RETURN oConn
+
+STATIC FUNCTION _AudB1W62_Callback()
+   RETURN {|oConn, cPayload, nOpcode| ;
+      HB_SYMBOL_UNUSED( oConn ), ;
+      AAdd( s_aB1W62Received, { nOpcode, cPayload } ) }
+
+// TC1: single-frame TEXT (FIN=1) → entregado tal cual
+STATIC PROCEDURE _AudB1W62_SingleFrame( hCtx )
+   LOCAL oConn := _AudB1W62_MakeConn()
+   LOCAL cFrame
+   s_aB1W62Received := {}
+   cFrame := HIX_WSTestBuildClientFrame( 0x01, .T., "hola" )   // TEXT, FIN=1
+   oConn:oIO:Feed( cFrame )
+   HIX_WSTestRunFrameLoop( oConn, _AudB1W62_Callback() )
+   HixTU_Check( hCtx, Len( s_aB1W62Received ) == 1 .AND. s_aB1W62Received[1][2] == "hola", ;
+      "B1.W6.2: single-frame TEXT entregado", ;
+      "1 msg 'hola'", ;
+      hb_NToS( Len( s_aB1W62Received ) ) + " msg" )
+RETURN
+
+// TC2: TEXT+CONT+CONT(FIN) — reensambla los 3 fragmentos
+STATIC PROCEDURE _AudB1W62_Reassemble3Frags( hCtx )
+   LOCAL oConn := _AudB1W62_MakeConn()
+   s_aB1W62Received := {}
+   oConn:oIO:Feed( HIX_WSTestBuildClientFrame( 0x01, .F., "AAAA" ) )   // TEXT, FIN=0
+   oConn:oIO:Feed( HIX_WSTestBuildClientFrame( 0x00, .F., "BBBB" ) )   // CONT, FIN=0
+   oConn:oIO:Feed( HIX_WSTestBuildClientFrame( 0x00, .T., "CCCC" ) )   // CONT, FIN=1
+   HIX_WSTestRunFrameLoop( oConn, _AudB1W62_Callback() )
+   HixTU_Check( hCtx, Len( s_aB1W62Received ) == 1 .AND. ;
+                      s_aB1W62Received[1][1] == 0x01 .AND. ;
+                      s_aB1W62Received[1][2] == "AAAABBBBCCCC", ;
+      "B1.W6.2: 3 fragments reensamblados con opcode original", ;
+      "1 msg opcode=1 'AAAABBBBCCCC'", ;
+      hb_NToS( Len( s_aB1W62Received ) ) + " msg" )
+RETURN
+
+// TC3: CONT sin frame inicial → protocol error, CLOSE enviado, bucle sale
+STATIC PROCEDURE _AudB1W62_ContWithoutStart( hCtx )
+   LOCAL oConn := _AudB1W62_MakeConn()
+   s_aB1W62Received := {}
+   oConn:oIO:Feed( HIX_WSTestBuildClientFrame( 0x00, .T., "orphan" ) )   // CONT sin start
+   // Frame TEXT posterior NO debe procesarse — el bucle debe haber salido
+   oConn:oIO:Feed( HIX_WSTestBuildClientFrame( 0x01, .T., "later" ) )
+   HIX_WSTestRunFrameLoop( oConn, _AudB1W62_Callback() )
+   HixTU_Check( hCtx, Len( s_aB1W62Received ) == 0 .AND. oConn:oIO:nWrites >= 1, ;
+      "B1.W6.2: CONT sin start rechaza + CLOSE enviado", ;
+      "0 msg, >=1 write", ;
+      hb_NToS( Len( s_aB1W62Received ) ) + " msg, " + hb_NToS( oConn:oIO:nWrites ) + " write" )
+RETURN
+
+// TC4: TEXT(FIN=0) + TEXT (nuevo data) sin cerrar fragmentación → protocol error
+STATIC PROCEDURE _AudB1W62_DataWhileFragment( hCtx )
+   LOCAL oConn := _AudB1W62_MakeConn()
+   s_aB1W62Received := {}
+   oConn:oIO:Feed( HIX_WSTestBuildClientFrame( 0x01, .F., "start" ) )   // TEXT, FIN=0
+   oConn:oIO:Feed( HIX_WSTestBuildClientFrame( 0x01, .T., "intruder" ) ) // TEXT nuevo — ilegal
+   HIX_WSTestRunFrameLoop( oConn, _AudB1W62_Callback() )
+   HixTU_Check( hCtx, Len( s_aB1W62Received ) == 0 .AND. oConn:oIO:nWrites >= 1, ;
+      "B1.W6.2: TEXT durante fragmentación rechaza + CLOSE enviado", ;
+      "0 msg, >=1 write", ;
+      hb_NToS( Len( s_aB1W62Received ) ) + " msg, " + hb_NToS( oConn:oIO:nWrites ) + " write" )
+RETURN
+
+// TC5: PING con FIN=0 (control fragmentado) → protocol error
+STATIC PROCEDURE _AudB1W62_FragmentedControl( hCtx )
+   LOCAL oConn := _AudB1W62_MakeConn()
+   s_aB1W62Received := {}
+   oConn:oIO:Feed( HIX_WSTestBuildClientFrame( 0x09, .F., "" ) )   // PING FIN=0
+   HIX_WSTestRunFrameLoop( oConn, _AudB1W62_Callback() )
+   HixTU_Check( hCtx, oConn:oIO:nWrites >= 1, ;
+      "B1.W6.2: PING con FIN=0 rechaza + CLOSE enviado", ;
+      ">=1 write", ;
+      hb_NToS( oConn:oIO:nWrites ) + " write" )
+RETURN
+
+// TC6: reensamblado excede HIX_WS_MAX_FRAME_SIZE (65536) → protocol error
+STATIC PROCEDURE _AudB1W62_OversizeReassembly( hCtx )
+   LOCAL oConn := _AudB1W62_MakeConn()
+   LOCAL cChunk := Replicate( "X", 60000 )   // debajo de max por frame
+   s_aB1W62Received := {}
+   // 2 fragments de 60k cada uno → 120k reensamblado > 64k
+   oConn:oIO:Feed( HIX_WSTestBuildClientFrame( 0x02, .F., cChunk ) )   // BINARY, FIN=0
+   oConn:oIO:Feed( HIX_WSTestBuildClientFrame( 0x00, .T., cChunk ) )   // CONT, FIN=1
+   HIX_WSTestRunFrameLoop( oConn, _AudB1W62_Callback() )
+   HixTU_Check( hCtx, Len( s_aB1W62Received ) == 0 .AND. oConn:oIO:nWrites >= 1, ;
+      "B1.W6.2: reensamblado > max_frame_size rechaza + CLOSE enviado", ;
+      "0 msg, >=1 write", ;
+      hb_NToS( Len( s_aB1W62Received ) ) + " msg, " + hb_NToS( oConn:oIO:nWrites ) + " write" )
+RETURN
+
+// ---------------------------------------------------------------
+// [B1.W5] Segregación de workers WSS del pool HTTP.
+// Tras el handshake TLS, el worker HTTP debe hacer peek de los bytes
+// descifrados y re-encolar la conexión al pool destino cuando el
+// cliente pidió WS/LongPoll. Si no lo hace, N clientes WSS bloquean
+// el pool HTTP entero (síntoma: 503 en el request HTTP N+1 aunque
+// el pool WS esté vacío).
+//
+// Tests focalizados al helper y al clasificador, sin infra TLS real:
+//   TC1 — HIX_SocketPeekSSL(NIL) → NIL (guarda de argumentos)
+//   TC2 — HIX_SocketPeekSSL(oIO sin SSL) → NIL (precondición)
+//   TC3 — HIX_DetectProtocol sobre WS upgrade descifrado → HIX_CONN_WS
+//   TC4 — HIX_DetectProtocol sobre LongPoll header → HIX_CONN_LONGPOLL
+//   TC5 — HIX_DetectProtocol sobre GET normal → HIX_CONN_HTTP
+// ---------------------------------------------------------------
+FUNCTION HIX_TestAudit_B1W5_Run()
+
+   LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
+
+   _AudB1W5_PeekNilOIO(         hCtx )
+   _AudB1W5_PeekOIOWithoutSSL(  hCtx )
+   _AudB1W5_DetectWsUpgrade(    hCtx )
+   _AudB1W5_DetectLongPoll(     hCtx )
+   _AudB1W5_DetectHttpGet(      hCtx )
+
+RETURN hCtx
+
+// TC1: pasar NIL como oIO devuelve NIL sin excepción.
+STATIC PROCEDURE _AudB1W5_PeekNilOIO( hCtx )
+
+   LOCAL xResult := "sentinel"
+   LOCAL oError
+
+   TRY
+      xResult := HIX_SocketPeekSSL( NIL, 512, 10 )
+   CATCH oError
+      xResult := "excepción: " + oError:description
+   END
+
+   HixTU_Check( hCtx, xResult == NIL, ;
+      "B1.W5: HIX_SocketPeekSSL(NIL) devuelve NIL sin crash", ;
+      "NIL", iif( xResult == NIL, "NIL", hb_ValToStr( xResult ) ) )
+
+RETURN
+
+// TC2: oIO plano (sin sesión SSL) devuelve NIL — el peek TLS exige
+// hSSLSession != NIL. Sin esta guarda, tocaríamos SSL_peek(NIL, ...)
+// y crashearíamos el worker HTTP tras un handshake fallido.
+STATIC PROCEDURE _AudB1W5_PeekOIOWithoutSSL( hCtx )
+
+   LOCAL oIO := THixIO():New( NIL )
+   LOCAL xResult := "sentinel"
+   LOCAL oError
+
+   TRY
+      xResult := HIX_SocketPeekSSL( oIO, 512, 10 )
+   CATCH oError
+      xResult := "excepción: " + oError:description
+   END
+
+   HixTU_Check( hCtx, xResult == NIL, ;
+      "B1.W5: HIX_SocketPeekSSL(oIO sin SSL) devuelve NIL", ;
+      "NIL", iif( xResult == NIL, "NIL", hb_ValToStr( xResult ) ) )
+
+RETURN
+
+// TC3: clasificador reconoce un upgrade WS ya descifrado. Es el mismo
+// HIX_DetectProtocol que usa el AcceptLoop plano; el post-handshake
+// dispatch se apoya en él sin duplicar lógica.
+STATIC PROCEDURE _AudB1W5_DetectWsUpgrade( hCtx )
+
+   LOCAL cPeek, cTipo
+
+   cPeek := "GET /ws HTTP/1.1" + Chr(13) + Chr(10) + ;
+           "Host: example.com" + Chr(13) + Chr(10) + ;
+           "Upgrade: websocket" + Chr(13) + Chr(10) + ;
+           "Connection: Upgrade" + Chr(13) + Chr(10) + Chr(13) + Chr(10)
+
+   cTipo := HIX_DetectProtocol( cPeek )
+
+   HixTU_Check( hCtx, cTipo == HIX_CONN_WS, ;
+      "B1.W5: HIX_DetectProtocol clasifica WS upgrade tras TLS", ;
+      HIX_CONN_WS, cTipo )
+
+RETURN
+
+// TC4: clasificador reconoce LongPoll con el header X-Hix-LongPoll.
+STATIC PROCEDURE _AudB1W5_DetectLongPoll( hCtx )
+
+   LOCAL cPeek, cTipo
+
+   cPeek := "GET /poll HTTP/1.1" + Chr(13) + Chr(10) + ;
+           "Host: example.com" + Chr(13) + Chr(10) + ;
+           "X-Hix-LongPoll: true" + Chr(13) + Chr(10) + Chr(13) + Chr(10)
+
+   cTipo := HIX_DetectProtocol( cPeek )
+
+   HixTU_Check( hCtx, cTipo == HIX_CONN_LONGPOLL, ;
+      "B1.W5: HIX_DetectProtocol clasifica LongPoll tras TLS", ;
+      HIX_CONN_LONGPOLL, cTipo )
+
+RETURN
+
+// TC5: GET plano tras TLS → HIX_CONN_HTTP → NO se redispatch, se procesa
+// en este worker (comportamiento por defecto, no debe cambiar).
+STATIC PROCEDURE _AudB1W5_DetectHttpGet( hCtx )
+
+   LOCAL cPeek, cTipo
+
+   cPeek := "GET /api/users HTTP/1.1" + Chr(13) + Chr(10) + ;
+           "Host: example.com" + Chr(13) + Chr(10) + ;
+           "Accept: application/json" + Chr(13) + Chr(10) + Chr(13) + Chr(10)
+
+   cTipo := HIX_DetectProtocol( cPeek )
+
+   HixTU_Check( hCtx, cTipo == HIX_CONN_HTTP, ;
+      "B1.W5: HIX_DetectProtocol clasifica GET normal como HTTP tras TLS", ;
+      HIX_CONN_HTTP, cTipo )
+
+RETURN

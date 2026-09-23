@@ -55,6 +55,12 @@ STATIC s_nRateWindow := 60
 STATIC s_hRateData   := NIL
 STATIC s_mtxRate     := NIL
 
+// INIT PROCEDURE — inicializa mutex antes de cualquier worker (B1.R5).
+INIT PROCEDURE _HixRateLimitGlobalInit()
+   s_mtxRate   := hb_mutexCreate()
+   s_hRateData := { => }
+RETURN
+
 // ============================================================
 // HIX_MwRateLimitSetup — set global max requests and window.
 // Call before oSrv:Start().
@@ -65,12 +71,7 @@ PROCEDURE HIX_MwRateLimitSetup( nMax, nWindowSecs )
 
    IF ValType( nWindowSecs ) == "N" .AND. nWindowSecs > 0 ; s_nRateWindow := nWindowSecs ; ENDIF
 
-   IF s_mtxRate == NIL
-
-      s_mtxRate := hb_mutexCreate()
-
-   ENDIF
-
+   // mutex ya inicializado por INIT PROCEDURE _HixRateLimitGlobalInit (B1.R5)
    s_hRateData := { => }
 
 RETURN
@@ -80,12 +81,7 @@ RETURN
 // ============================================================
 FUNCTION HIX_MwRateLimit( oCtx )
 
-   IF s_hRateData == NIL
-
-      s_hRateData := { => }
-      s_mtxRate   := hb_mutexCreate()
-
-   ENDIF
+   IF s_hRateData == NIL ; s_hRateData := { => } ; ENDIF   // fallback si no hubo Setup
 
 RETURN _HixMwRateLimitRun( oCtx, s_nRateMax, s_nRateWindow )
 
@@ -94,12 +90,7 @@ RETURN _HixMwRateLimitRun( oCtx, s_nRateMax, s_nRateWindow )
 // ============================================================
 FUNCTION HIX_MwRateLimitFactory( nMax, nWindowSecs )
 
-   IF s_hRateData == NIL
-
-      s_hRateData := { => }
-      s_mtxRate   := hb_mutexCreate()
-
-   ENDIF
+   IF s_hRateData == NIL ; s_hRateData := { => } ; ENDIF   // fallback si no hubo Setup
 
 RETURN {| oCtx | _HixMwRateLimitRun( oCtx, nMax, nWindowSecs ) }
 

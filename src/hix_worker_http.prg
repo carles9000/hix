@@ -15,7 +15,7 @@
 
 FUNCTION HIX_WorkerHTTP( aJob )
 
-   LOCAL oIO, cIP
+   LOCAL oIO, cIP, oSrv, cPeek, cTipo
    LOCAL nReqs        := 0
    LOCAL lKeepAlive   := .T.
    LOCAL lStreamMode  := .F.   // este worker migró a stream via RespondStart
@@ -27,12 +27,61 @@ FUNCTION HIX_WorkerHTTP( aJob )
 
       cIP := aJob[ 2 ]
       oIO := aJob[ 3 ]:CreateIO( aJob[ 1 ] )
+      oSrv := iif( Len( aJob ) >= 4, aJob[ 4 ], NIL )
 
       IF oIO:hSSLSession == NIL
 
          ld( "SSL handshake failed from " + cIP )
          oIO:Close()
          RETURN NIL
+
+      ENDIF
+
+      // [B1.W5] Post-handshake redispatch: en modo SSL el accept loop NO
+      // puede clasificar el protocolo (bytes cifrados) y despacha todo al
+      // pool HTTP. Aquí, ya con la sesión TLS establecida, hacemos peek de
+      // los bytes descifrados y re-encolamos al pool destino si el cliente
+      // pidió WS/LongPoll. Sin esto, N clientes WSS saturan el pool HTTP y
+      // dejan al usuario configurando pool_ws.workers en balde bajo TLS.
+      IF oSrv != NIL
+
+         cPeek := HIX_SocketPeekSSL( oIO, HIX_DEFAULT_PEEK_BYTES, HIX_DEFAULT_PEEK_MS )
+
+         IF cPeek != NIL
+
+            cTipo := HIX_DetectProtocol( cPeek )
+
+            DO CASE
+
+               CASE cTipo == HIX_CONN_WS
+
+                  IF oSrv:oPoolWS:Dispatch( { oIO, cIP } )
+
+                     RETURN NIL   // el pool WS es dueño de oIO ahora
+
+                  ENDIF
+
+                  lw( "SSL redispatch: pool WS full — 503 to " + cIP )
+                  HIX_ResponseRaw( oIO, '{"error":"Service Unavailable"}', "json", 503, .F. )
+                  oIO:Close()
+                  RETURN NIL
+
+               CASE cTipo == HIX_CONN_LONGPOLL
+
+                  IF oSrv:oPoolOtros:Dispatch( { oIO, cIP, cTipo } )
+
+                     RETURN NIL
+
+                  ENDIF
+
+                  lw( "SSL redispatch: pool Otros full — 503 to " + cIP )
+                  HIX_ResponseRaw( oIO, '{"error":"Service Unavailable"}', "json", 503, .F. )
+                  oIO:Close()
+                  RETURN NIL
+
+            ENDCASE
+
+         ENDIF
 
       ENDIF
 

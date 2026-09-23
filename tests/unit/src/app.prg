@@ -433,7 +433,8 @@ FUNCTION RouteApiInfo()
    USendJson( { ;
       "compiler" => hb_Compiler(), ;
       "os"       => OS(),          ;
-      "harbour"  => Version()      ;
+      "harbour"  => Version(),     ;
+      "version"  => HIX_Version()  ;
       } )
 
 RETURN NIL
@@ -1186,6 +1187,24 @@ RETURN { ;
       { "A04012 trailing slash route match", {|| HIX_TestAudit_A04012_Run() } }, ;
       { "A04013 cookie secure flag https",   {|| HIX_TestAudit_A04013_Run() } }, ;
       { "A04014 constanteq shared helper",   {|| HIX_TestAudit_A04014_Run() } }, ;
-      { "SafeFs root guard",                 {|| HIX_TestSafeFs_Run()      } }  ;
+      { "SafeFs root guard",                 {|| HIX_TestSafeFs_Run()      } }, ;
+      { "B1R1 routes read no lock",          {|| HIX_TestAudit_B1R1_Run()  } }, ;
+      { "B1R2 reload atomic swap no 404",   {|| HIX_TestAudit_B1R2_Run()  } }, ;
+      { "B1R3 respond double call guard",   {|| HIX_TestAudit_B1R3_Run()  } }, ;
+      { "B1R4 sse conn mutex broadcast",    {|| HIX_TestAudit_B1R4_Run()  } }, ;
+      { "B1R5 init procedure lazy mutex",   {|| HIX_TestAudit_B1R5_Run()  } }, ;
+      { "B1W1 ws ctrl frames conn mutex",   {|| HIX_TestAudit_B1W1_Run()  } }, ;
+      { "B1W61 ws large frame ext len",     {|| HIX_TestAudit_B1W61_Run() } }, ;
+      { "B1W63 ws ping config from pool",   {|| HIX_TestAudit_B1W63_Run() } }, ;
+      { "B1W3 ws cleanup on frame loop exc", {|| HIX_TestAudit_B1W3_Run()  } }, ;
+      { "B1W4 ws fin sets lconnclosed",      {|| HIX_TestAudit_B1W4_Run()  } }, ;
+      { "B1S4 session store init procedure", {|| HIX_TestAudit_B1S4_Run()  } }, ;
+      { "B1S1 session hash isolated per ctx",{|| HIX_TestAudit_B1S1_Run()  } }, ;
+      { "B1S2 session file atomic write",    {|| HIX_TestAudit_B1S2_Run()  } }, ;
+      { "B1S3 session gc hmac recheck",      {|| HIX_TestAudit_B1S3_Run()  } }, ;
+      { "B1W2 ssl mutex per conn serialize", {|| HIX_TestAudit_B1W2_Run()  } }, ;
+      { "B1W62 ws continuation reassembly",  {|| HIX_TestAudit_B1W62_Run() } }, ;
+      { "B1W5 wss pool segregation",         {|| HIX_TestAudit_B1W5_Run()  } }, ;
+      { "B1A1516 session no hardcoded key",  {|| HIX_TestAudit_B1A1516_Run() } }  ;
       } }  ;
       }

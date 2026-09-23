@@ -363,6 +363,14 @@ METHOD Respond( xData, nStatus, cMime, hExtra ) CLASS THixRequest
 
    LOCAL hMerged, cValType, xTmp
 
+   // B1.R3: guard contra doble respuesta. Un hilo zombie (timeout + detach)
+   // que llame Respond tarde encontraría lResponded=.T. y no escribiría una
+   // segunda respuesta sobre una conexión keep-alive reutilizada.
+   IF ::lResponded
+      lw( "THixRequest:Respond doble — ignorado (B1.R3)" )
+      RETURN .F.
+   ENDIF
+
    hb_default( @nStatus, 200  )
    hb_default( @hExtra,  { => } )
    // hb_default( @cMime,  UGetMime() )  // Charly hem de implementar el mime

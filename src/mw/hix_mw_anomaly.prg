@@ -65,6 +65,11 @@ STATIC s_hCounter    := {=>}       // hCounter[ cIP ] = { count, window_start_ts
 STATIC s_hBans       := {=>}       // hBans[ cIP ] = expires_ts
 STATIC s_mtxAnomaly  := NIL
 
+// INIT PROCEDURE — inicializa mutex antes de cualquier worker (B1.R5).
+INIT PROCEDURE _HixAnomalyGlobalInit()
+   s_mtxAnomaly := hb_mutexCreate()
+RETURN
+
 // ============================================================
 // HIX_MwAnomalySetup — configure global parameters.
 // All args optional (NIL keeps current value).
@@ -74,7 +79,7 @@ PROCEDURE HIX_MwAnomalySetup( nThr, nWinSec, nBanSec, aTracked )
 
    LOCAL i, aNewTracked
 
-   IF s_mtxAnomaly == NIL ; s_mtxAnomaly := hb_mutexCreate() ; ENDIF
+   // mutex ya inicializado por INIT PROCEDURE _HixAnomalyGlobalInit (B1.R5)
 
    // [A3.2.4] construir lista nueva en LOCAL antes del lock — no bloquear workers
    // mientras iteramos el array del caller (puede ser largo).
@@ -114,7 +119,7 @@ FUNCTION HIX_MwAnomaly( oCtx )
    LOCAL nRemain
 
    IF ! s_lEnabled ; RETURN .T. ; ENDIF
-   IF s_mtxAnomaly == NIL ; s_mtxAnomaly := hb_mutexCreate() ; ENDIF
+   // mutex ya inicializado por INIT PROCEDURE _HixAnomalyGlobalInit (B1.R5)
 
    hb_mutexLock( s_mtxAnomaly )
 
@@ -153,7 +158,7 @@ PROCEDURE HIX_AnomalyRecord( cIP, nStatus )
    IF ! s_lEnabled ; RETURN ; ENDIF
    IF Empty( cIP ) ; RETURN ; ENDIF
 
-   IF s_mtxAnomaly == NIL ; s_mtxAnomaly := hb_mutexCreate() ; ENDIF
+   // mutex ya inicializado por INIT PROCEDURE _HixAnomalyGlobalInit (B1.R5)
 
    nNow := _AnomalyNow()
 
@@ -198,7 +203,7 @@ FUNCTION HIX_AnomalyStats()
 
    LOCAL hStats
 
-   IF s_mtxAnomaly == NIL ; s_mtxAnomaly := hb_mutexCreate() ; ENDIF
+   // mutex ya inicializado por INIT PROCEDURE _HixAnomalyGlobalInit (B1.R5)
 
    hb_mutexLock( s_mtxAnomaly )
    hStats := { ;

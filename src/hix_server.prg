@@ -8,7 +8,7 @@
                Copyright (c) 2026 Carles Aubia Floresví - HIX Server Project
  -----------------------------------------------------------*/
 #DEFINE HIX_VERSION_SERVER                "2.2"
-#DEFINE HIX_SUBVERSION_SERVER             ""       
+#DEFINE HIX_SUBVERSION_SERVER             ".01"       
 #DEFINE HIX_LOG_MODULE HIX_MOD_SERVER
 #DEFINE SW_SHOW                              5
 
@@ -662,8 +662,10 @@ METHOD _AcceptLoop() CLASS THixServer
 
       IF lSSL
 
-         // SSL: handshake en el worker para no bloquear el accept loop
-         lOk := ::oPoolHTTP:Dispatch( { hConn, cIP, ::oSrvSocket } )
+         // SSL: handshake en el worker para no bloquear el accept loop.
+         // [B1.W5] pasamos Self para que el worker HTTP pueda re-despachar
+         // a oPoolWS / oPoolOtros tras clasificar el protocolo post-TLS.
+         lOk := ::oPoolHTTP:Dispatch( { hConn, cIP, ::oSrvSocket, Self } )
 
          IF ! lOk
 

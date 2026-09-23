@@ -74,12 +74,16 @@ function loadInfo() {
                     : (info.os || 'n/a');
       if (bOs)  { bOs.textContent  = osLabel;            bOs.title  = info.os || ''; }
       if (bCmp) { bCmp.textContent = info.compiler || 'n/a'; bCmp.title = info.compiler || ''; }
+      const bVer = document.getElementById('nav-hix-version');
+      if (bVer) { bVer.textContent = info.version ? 'v' + info.version : 'n/a'; }
     })
     .catch(() => {
       const bOs  = document.getElementById('nav-os');
       const bCmp = document.getElementById('nav-compiler');
-      if (bOs)  { bOs.textContent  = 'n/a'; bOs.title  = 'no /api/info'; }
-      if (bCmp) { bCmp.textContent = 'n/a'; bCmp.title = 'no /api/info'; }
+      const bVerE = document.getElementById('nav-hix-version');
+      if (bOs)   { bOs.textContent   = 'n/a'; bOs.title   = 'no /api/info'; }
+      if (bCmp)  { bCmp.textContent  = 'n/a'; bCmp.title  = 'no /api/info'; }
+      if (bVerE) { bVerE.textContent = 'n/a'; }
     });
 }
 

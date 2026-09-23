@@ -516,7 +516,7 @@ FUNCTION HIX_RouteList()
    ENDIF
 
    hb_mutexLock( s_mtxRoutes )
-   hRoutes := s_hRoutes
+   hRoutes := hb_HClone( s_hRoutes )
    hb_mutexUnlock( s_mtxRoutes )
 
    FOR EACH cName IN hb_HKeys( hRoutes )
@@ -773,19 +773,21 @@ FUNCTION URoute( cName, ... )
 
    NEXT
 
+   hb_mutexLock( s_mtxRoutes )
    IF s_hRoutes == NIL .OR. ! hb_HHasKey( s_hRoutes, cName )
-
+      hb_mutexUnlock( s_mtxRoutes )
       lw( "URoute: ruta '" + cName + "' no encontrada" )
       RETURN ""
-
    ENDIF
+   hRoute := hb_HClone( s_hRoutes[ cName ] )
+   hb_mutexUnlock( s_mtxRoutes )
 
-   cUrl := s_hRoutes[ cName ][ "pattern" ]
+   cUrl := hRoute[ "pattern" ]
 
-   IF Len( aArgs ) < Len( s_hRoutes[ cName ][ "varnames" ] )
+   IF Len( aArgs ) < Len( hRoute[ "varnames" ] )
 
       lw( "URoute: ruta '" + cName + "' requiere " + ;
-         hb_NToS( Len( s_hRoutes[ cName ][ "varnames" ] ) ) + " parámetro(s)" )
+         hb_NToS( Len( hRoute[ "varnames" ] ) ) + " parámetro(s)" )
       RETURN ""
 
    ENDIF
@@ -1542,42 +1544,118 @@ STATIC FUNCTION _HixSysRouteDelete( oReq )
 
 RETURN NIL
 
-// GET /hix-routes/reload — borra rutas de aplicación y recarga routes/*.json.
+// GET /hix-routes/reload — recarga routes/*.json sin ventana de 404.
+// Patrón atomic-swap: construye el nuevo mapa de rutas fuera del lock
+// (I/O + compilación de regexp), luego sustituye s_hRoutes en una sola
+// operación atómica bajo lock. Las peticiones concurrentes ven siempre
+// un mapa completo — nunca el estado intermedio "sin rutas de app".
 STATIC FUNCTION _HixSysRouteReload( oReq )
 
-   LOCAL nLoaded, cName, aDeleted
+   LOCAL nLoaded := 0, nDeleted := 0
+   LOCAL cName, hNewRoutes, hRoute, aVarNames
+   LOCAL cRoutesDir, aFiles, aFile, cFile, cJson, xData
+   LOCAL cPattern, cMethod, cAction, cMw, cScope, lStream
+   LOCAL cRegexp, pCompiled, nScore
 
-   // Recoger nombres de rutas de aplicacion (sin hix.*)
+   // --- Fase 1: construir nuevo mapa de rutas (sin lock, puede hacer I/O) ---
+
+   // Copiar rutas de sistema (hix.*) bajo lock breve
+   hNewRoutes := { => }
    hb_mutexLock( s_mtxRoutes )
-   aDeleted := {}
-
    FOR EACH cName IN hb_HKeys( s_hRoutes )
-
-      IF !( Left( cName, 4 ) == "hix." )
-
-         AAdd( aDeleted, cName )
-
+      IF Left( cName, 4 ) == "hix."
+         hNewRoutes[ cName ] := s_hRoutes[ cName ]
+      ELSE
+         nDeleted++
       ENDIF
-
    NEXT
-
-   // Borrar en el hash original (no reemplazar el puntero) y sincronizar order array
-
-   FOR EACH cName IN aDeleted
-
-      hb_HDel( s_hRoutes, cName )
-      _HixOrderRemove( cName )
-
-   NEXT
-
    hb_mutexUnlock( s_mtxRoutes )
 
-   nLoaded := HIX_LoadRoutes()
+   // Cargar rutas de aplicacion desde JSON en hNewRoutes (sin lock)
+   cRoutesDir := UConfig( "paths", "root", "www" ) + hb_ps() + "routes"
+
+   IF hb_vfDirExists( cRoutesDir )
+
+      aFiles := hb_vfDirectory( cRoutesDir + hb_ps() + "*.json" )
+
+      FOR EACH aFile IN aFiles
+
+         cFile := cRoutesDir + hb_ps() + aFile[ 1 ]
+         cJson := hb_MemoRead( cFile )
+
+         IF Empty( cJson ) ; LOOP ; ENDIF
+
+         xData := NIL
+         hb_jsonDecode( cJson, @xData )
+         IF ValType( xData ) != "A" ; LOOP ; ENDIF
+
+         FOR EACH hRoute IN xData
+
+            IF ValType( hRoute ) != "H" ; LOOP ; ENDIF
+            HB_HCaseMatch( hRoute, .F. )
+
+            cName    := hb_HGetDef( hRoute, "name",       "" )
+            cPattern := hb_HGetDef( hRoute, "url",        "" )
+            IF Empty( cPattern )
+               cPattern := hb_HGetDef( hRoute, "pattern", "" )
+            ENDIF
+            cAction  := hb_HGetDef( hRoute, "action",     "" )
+            cMethod  := Upper( hb_HGetDef( hRoute, "method",     "*" ) )
+            cMw      := hb_HGetDef( hRoute, "middleware", "" )
+            cScope   := hb_HGetDef( hRoute, "scope",      "" )
+            lStream  := hb_HGetDef( hRoute, "stream",     .F. )
+
+            IF Empty( cName ) .OR. Empty( cPattern ) ; LOOP ; ENDIF
+            IF Left( Lower( cName ), 4 ) == "hix."   ; LOOP ; ENDIF
+
+            IF cMethod == "*"
+               cMethod := "GET,POST,PUT,DELETE,OPTIONS"
+            ELSEIF ! "OPTIONS" $ cMethod
+               cMethod += ",OPTIONS"
+            ENDIF
+
+            IF Left( cPattern, 1 ) != "/" ; cPattern := "/" + cPattern ; ENDIF
+
+            cRegexp   := _HixPatternToRegexp( cPattern, @aVarNames )
+            pCompiled := hb_regexComp( "^" + cRegexp + "$" )
+            IF pCompiled == NIL ; LOOP ; ENDIF
+
+            nScore := _HixRouteScore( cPattern )
+
+            hNewRoutes[ cName ] := { ;
+               "pattern"    => cPattern,  ;
+               "regexp"     => pCompiled, ;
+               "action"     => cAction,   ;
+               "method"     => cMethod,   ;
+               "middleware" => cMw,       ;
+               "scope"      => cScope,    ;
+               "cargo"      => NIL,       ;
+               "stream"     => lStream,   ;
+               "varnames"   => aVarNames, ;
+               "score"      => nScore     ;
+               }
+
+            nLoaded++
+
+         NEXT
+
+      NEXT
+
+   ENDIF
+
+   // --- Fase 2: swap atómico bajo lock (sin I/O, operación rápida) ---
+   hb_mutexLock( s_mtxRoutes )
+   s_hRoutes     := hNewRoutes
+   s_aRouteOrder := {}
+   FOR EACH cName IN hb_HKeys( s_hRoutes )
+      _HixOrderInsert( cName, s_hRoutes[ cName ][ "score" ] )
+   NEXT
+   hb_mutexUnlock( s_mtxRoutes )
 
    oReq:Respond( { ;
-      "ok"            => .T.,           ;
-      "total_deleted" => Len( aDeleted ), ;
-      "total_loaded"  => nLoaded         ;
+      "ok"            => .T.,     ;
+      "total_deleted" => nDeleted, ;
+      "total_loaded"  => nLoaded   ;
       } )
 
 RETURN NIL
@@ -1589,12 +1667,17 @@ STATIC FUNCTION _HixSysRouteList( oReq, lAll )
    LOCAL cHtml := '', cLine, aNames, cName, hRoute
    LOCAL cAction, cMethod, cMw, cTitle
    LOCAL cEol := Chr( 10 )
+   LOCAL hSnapshot
 
    hb_default( @lAll, .F. )
 
+   hb_mutexLock( s_mtxRoutes )
+   hSnapshot := hb_HClone( s_hRoutes )
+   hb_mutexUnlock( s_mtxRoutes )
+
    aNames := {}
 
-   FOR EACH cName IN hb_HKeys( s_hRoutes )
+   FOR EACH cName IN hb_HKeys( hSnapshot )
 
       IF lAll .OR. !( Left( cName, 4 ) == "hix." )
 
@@ -1613,7 +1696,7 @@ STATIC FUNCTION _HixSysRouteList( oReq, lAll )
 
    FOR EACH cName IN aNames
 
-      hRoute  := s_hRoutes[ cName ]
+      hRoute  := hSnapshot[ cName ]
       cMethod := hb_HGetDef( hRoute, "method",     "*"  )
       cAction := hb_HGetDef( hRoute, "action",     ""   )
       cMw     := hb_HGetDef( hRoute, "middleware", ""   )

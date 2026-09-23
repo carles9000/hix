@@ -54,6 +54,10 @@ METHOD CreateIO( hSocket ) CLASS THixSocket
    IF ::lUseSSL .AND. ::hSSLCtx != NIL
 
       oIO:hSSLSession := _HixSSLAccept( ::hSSLCtx, hSocket )
+      // [B1.W2] mutex per-conn: OpenSSL's SSL* NO es thread-safe. Un reader
+      // WSS + un broadcaster escribiendo simultáneamente sobre el mismo SSL*
+      // corrompen el estado y provocan crashes / errores TLS opacos.
+      oIO:oSslMutex := hb_mutexCreate()
 
    ENDIF
 
@@ -68,6 +72,8 @@ CLASS THixIO
    DATA lUseSSL     INIT .F.
    DATA hSSLSession INIT NIL
    DATA lConnClosed INIT .F.
+   // [B1.W2] mutex por conexión SSL — serializa Read/Write/Close sobre el SSL*
+   DATA oSslMutex   INIT NIL
 
    METHOD New( hSocket )
    METHOD Read( nBytes, nTimeout )
@@ -119,7 +125,13 @@ METHOD Read( nBytes, nTimeout ) CLASS THixIO
       IF ::lUseSSL .AND. ::hSSLSession != NIL
 
          lErr   := .F.
-         cChunk := _HixSSLRead( ::hSSLSession, ::hSocket, nBytes - nGot, nTimeout, @lErr )
+         // [B1.W2] Lock SSL* — se libera entre iteraciones para dar hueco
+         // a escritores (broadcast). nTimeout típico WS = 1000ms.
+         hb_mutexLock( ::oSslMutex )
+         BEGIN SEQUENCE WITH {| oE | Break( oE ) }
+            cChunk := _HixSSLRead( ::hSSLSession, ::hSocket, nBytes - nGot, nTimeout, @lErr )
+         END SEQUENCE
+         hb_mutexUnlock( ::oSslMutex )
 
          IF lErr
             ::lConnClosed := .T.
@@ -142,7 +154,8 @@ METHOD Read( nBytes, nTimeout ) CLASS THixIO
             ::lConnClosed := .T.
             EXIT      // error o timeout del recv
          ELSEIF nRead == 0
-            EXIT      // peer cerró limpio
+            ::lConnClosed := .T.   // [B1.W4] FIN: peer cerró limpio
+            EXIT
          ENDIF
 
          cBuf += Left( cChunk, nRead )
@@ -218,7 +231,12 @@ METHOD ReadHeaders( nTimeout ) CLASS THixIO
 
       IF ::lUseSSL .AND. ::hSSLSession != NIL
 
-         cBuf := _HixSSLRead( ::hSSLSession, ::hSocket, 1024, nTimeout )
+         // [B1.W2] Lock SSL*
+         hb_mutexLock( ::oSslMutex )
+         BEGIN SEQUENCE WITH {| oE | Break( oE ) }
+            cBuf := _HixSSLRead( ::hSSLSession, ::hSocket, 1024, nTimeout )
+         END SEQUENCE
+         hb_mutexUnlock( ::oSslMutex )
 
          IF cBuf == NIL
 
@@ -257,7 +275,7 @@ RETURN NIL
 // ------------------------------------------------------------
 METHOD Write( cData, nTimeout ) CLASS THixIO
 
-   LOCAL nTotal, nSent, nResult, nRetry
+   LOCAL nTotal, nSent, nResult, nRetry, lWrOk
 
    hb_default( @nTimeout, HIX_DEFAULT_READ_TIMEOUT )
 
@@ -269,7 +287,15 @@ METHOD Write( cData, nTimeout ) CLASS THixIO
 
    IF ::lUseSSL .AND. ::hSSLSession != NIL
 
-      RETURN _HixSSLWrite( ::hSSLSession, ::hSocket, cData )
+      // [B1.W2] Lock SSL* durante todo _HixSSLWrite. SSL_write con
+      // MODE_ENABLE_PARTIAL_WRITE devuelve pronto por chunk; el lock cubre
+      // toda la escritura de este frame para no partirlo entre threads.
+      hb_mutexLock( ::oSslMutex )
+      BEGIN SEQUENCE WITH {| oE | Break( oE ) }
+         lWrOk := _HixSSLWrite( ::hSSLSession, ::hSocket, cData )
+      END SEQUENCE
+      hb_mutexUnlock( ::oSslMutex )
+      RETURN lWrOk
 
    ENDIF
 
@@ -382,8 +408,16 @@ METHOD Close() CLASS THixIO
 
    IF ::lUseSSL .AND. ::hSSLSession != NIL
 
+      // [B1.W2] Lock SSL* durante shutdown para no colisionar con Read/Write
+      // en curso de otro thread (broadcaster).
+      IF ::oSslMutex != NIL
+         hb_mutexLock( ::oSslMutex )
+      ENDIF
       _HixSSLFree( ::hSSLSession )
       ::hSSLSession := NIL
+      IF ::oSslMutex != NIL
+         hb_mutexUnlock( ::oSslMutex )
+      ENDIF
 
    ENDIF
 
@@ -403,6 +437,82 @@ METHOD Close() CLASS THixIO
 
 RETURN NIL
 
+
+// ============================================================
+// HIX_SocketPeekSSL — peek no destructivo de bytes descifrados.
+// [B1.W5] Usado por el worker HTTP tras el handshake TLS para clasificar
+// el protocolo real (HTTP/WS/LongPoll) y decidir si re-despachar la
+// conexión a oPoolWS/oPoolOtros, liberando el slot del pool HTTP.
+// SSL_peek es equivalente a MSG_PEEK pero opera sobre el stream ya
+// descifrado. Devuelve NIL si no hay bytes en nTimeoutMs o si el peer
+// cerró antes de enviar la primera petición.
+// ============================================================
+FUNCTION HIX_SocketPeekSSL( oIO, nBytes, nTimeoutMs )
+
+   LOCAL cBuf, nRead, nErr, nStart, nWait
+
+   hb_default( @nBytes,     HIX_DEFAULT_PEEK_BYTES   )
+   hb_default( @nTimeoutMs, HIX_DEFAULT_PEEK_TIMEOUT )
+
+   IF oIO == NIL .OR. oIO:hSSLSession == NIL .OR. Empty( oIO:hSocket )
+
+      RETURN NIL
+
+   ENDIF
+
+   cBuf   := Space( nBytes )
+   nStart := hb_MilliSeconds()
+
+   DO WHILE .T.
+
+      // [B1.W2] lock SSL* — SSL_peek toca el mismo estado que SSL_read
+      hb_mutexLock( oIO:oSslMutex )
+      BEGIN SEQUENCE WITH {| oE | Break( oE ) }
+         nRead := SSL_peek( oIO:hSSLSession, @cBuf, nBytes )
+      END SEQUENCE
+      hb_mutexUnlock( oIO:oSslMutex )
+
+      IF HB_ISNUMERIC( nRead ) .AND. nRead > 0
+
+         RETURN Left( cBuf, nRead )
+
+      ENDIF
+
+      // 0 o error: consultamos SSL_get_error para saber si esperar más
+      nErr := SSL_get_error( oIO:hSSLSession, iif( HB_ISNUMERIC( nRead ), nRead, 0 ) )
+
+      IF nErr == HB_SSL_ERROR_WANT_READ .OR. nErr == HB_SSL_ERROR_NONE
+
+         nWait := nTimeoutMs - ( hb_MilliSeconds() - nStart )
+
+         IF nWait <= 0
+
+            RETURN NIL
+
+         ENDIF
+
+         // Esperamos a que lleguen bytes crudos al socket; SSL_peek
+         // volverá a intentar descifrar en la próxima iteración.
+         IF hb_socketSelectRead( oIO:hSocket, Min( nWait, 100 ) ) <= 0
+
+            IF hb_MilliSeconds() - nStart >= nTimeoutMs
+
+               RETURN NIL
+
+            ENDIF
+
+         ENDIF
+
+         LOOP
+
+      ENDIF
+
+      // Cualquier otro error TLS: no hay peek disponible
+      RETURN NIL
+
+   ENDDO
+
+RETURN NIL
 
 // ============================================================
 // SSL — implementación real via hbssl

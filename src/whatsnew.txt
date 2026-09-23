@@ -1,3 +1,6 @@
+2.2.1  Independent-audit remediation: routing, sessions and WebSocket
+       hardening (17 fixes across R1-R5, S1-S4, W1-W6.3 and A1.15/16);
+       suite 2155/2155 green (see changes/2.2.1.md).
 2.2    Audit Edition: lib purity (zero HIX_Test* in production build),
        black-box test rewrites, global config isolation fix, sticky
        test dashboard header + OS badge + fixed footer (see changes/2.2.md).

@@ -39,7 +39,7 @@
                      color: var(--bs-link-color); cursor: pointer; font-size: .85rem; }
     .test-name-btn:hover { text-decoration: underline; }
     .spinner-xs { width: 12px; height: 12px; border-width: 2px; }
-    pre.console { background: #1a1a2e; color: #a8ff78; border-radius: 0 0 8px 8px;
+    pre.console { background: #0d1117; color: #a8ff78; border-radius: 0 0 8px 8px;
                   padding: 1rem; font-size: .75rem; height: 260px; overflow-y: auto;
                   margin: 0; white-space: pre-wrap; word-break: break-all; }
     pre.output  { background: #1e1e1e; color: #d4d4d4; border-radius: 6px;
@@ -47,7 +47,7 @@
     .detail-panel { background: #0d1117; height: 260px; overflow-y: auto;
                     font-family: monospace; font-size: .75rem; padding: .75rem 1rem;
                     border-radius: 0 0 8px 8px; }
-    .activity-panel { background: #0b1220; height: 260px; overflow-y: auto;
+    .activity-panel { background: #0d1117; height: 260px; overflow-y: auto;
                       font-family: monospace; font-size: .75rem; padding: .5rem .75rem;
                       border-radius: 0 0 8px 8px; }
     .al           { display: block; white-space: pre; padding: 1px 0; }
@@ -80,6 +80,10 @@
       <img src="/img/logo240.png"
            alt="HIX" class="me-2" style="height:40px;width:auto">HIX Test Master</span>
     <div class="d-flex align-items-center gap-3">
+      <div class="d-flex flex-column align-items-center lh-1">
+        <small class="text-white-50" style="font-size:.6rem;text-transform:uppercase;letter-spacing:.5px">HIX</small>
+        <span class="badge mt-1 font-monospace bg-secondary" id="nav-hix-version" title="—">…</span>
+      </div>
       <div class="d-flex flex-column align-items-center lh-1">
         <small class="text-white-50" style="font-size:.6rem;text-transform:uppercase;letter-spacing:.5px">OS</small>
         <span class="badge mt-1 font-monospace" id="nav-os"
