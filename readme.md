@@ -50,6 +50,8 @@ The result is a **Harbour server ready for production**: robust, secure, and val
 
 ### ✏️ Notes 
 
+- To run the MySQL examples, please read the help entry at 
+https://carles9000.github.io/hix/wdo/mysql/installation/
 
 - HIX is completely incompatible with the current version because everything 
 has been refactored. If you wish to download it, you can find it in this repository 
