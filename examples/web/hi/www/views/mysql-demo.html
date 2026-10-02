@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+   @view 'common/header.html'
+
+   <link href='/public/css/main.css' rel='stylesheet'>
+
+   <style>
+      .mini-row       { display:grid; grid-template-columns:repeat(3, 1fr); gap:.4rem; }
+      @media (max-width: 420px) { .mini-row { gap:.3rem; } }
+      .mini-card      { position:relative; height:9.5rem; background:#fff;
+                        border:1px solid #dee2e6; border-radius:.5rem; padding:.8rem .6rem;
+                        text-align:center; display:flex; flex-direction:column;
+                        justify-content:space-between; overflow:hidden;
+                        transition:transform .15s, box-shadow .15s; cursor:default; }
+      .mini-rerun     { background:transparent; border:0; padding:.15rem .4rem;
+                        font-size:.72rem; color:#0d6efd; border-radius:.2rem;
+                        cursor:pointer; opacity:.75; transition:opacity .15s, background .15s; }
+      .mini-rerun:hover { opacity:1; background:#e7f1ff; }
+      .mini-card > *  { flex-shrink:0; }
+      .mini-body      { flex-grow:1; display:flex; flex-direction:column;
+                        justify-content:center; align-items:center; min-height:0; }
+      .mini-card.done { cursor:pointer; }
+      .mini-card.done:hover { transform:translateY(-2px); box-shadow:0 .35rem .9rem rgba(0,0,0,.08); }
+      .mini-card.ok      { border-left:4px solid #198754; }
+      .mini-card.ko      { border-left:4px solid #dc3545; }
+      .mini-card.running { border-left:4px solid #0d6efd; }
+      .mini-card.pending { border-left:4px solid #adb5bd; opacity:.7; }
+      .mini-label        { font-size:.78rem; color:#6a737d; text-transform:uppercase;
+                           letter-spacing:.04em; margin-bottom:.3rem; }
+      .mini-title        { font-weight:600; font-size:1.05rem; margin-bottom:.5rem; }
+      .mini-ms           { font-size:1.6rem; font-weight:700; font-variant-numeric:tabular-nums;
+                           line-height:1; color:#212529; }
+      .mini-ms-unit      { font-size:.85rem; font-weight:500; color:#6a737d; margin-left:.15rem; }
+      .mini-ms.fast      { color:#0f5132; }
+      .mini-ms.slow      { color:#664d03; }
+      .mini-sub          { font-size:.72rem; color:#6a737d; margin-top:.35rem; }
+      .mini-rows         { font-size:.72rem; color:#495057; margin-top:.15rem; }
+
+      @media (max-width: 480px) {
+         .mini-card    { height:8.5rem; padding:.5rem .3rem; }
+         .mini-label   { font-size:.66rem; margin-bottom:.2rem; }
+         .mini-ms      { font-size:1.25rem; }
+         .mini-ms-unit { font-size:.7rem; }
+         .mini-rows    { font-size:.66rem; }
+         .mini-sub     { font-size:.66rem; }
+      }
+
+      .ds-wrap        { background:#f6f8fa; border:1px solid #e1e4e8; border-radius:.5rem;
+                        padding:.5rem .7rem .55rem; }
+      .ds-head        { display:flex; justify-content:space-between; align-items:baseline;
+                        margin-bottom:.3rem; }
+      .ds-head .ds-ttl { font-weight:600; font-size:.82rem; color:#24292e; }
+      .ds-head .ds-note{ font-size:.72rem; color:#6a737d; }
+      .ds-table        { width:100%; font-size:.8rem; border-collapse:collapse; margin:0; }
+      .ds-table th     { font-size:.68rem; color:#6a737d; text-transform:uppercase;
+                         letter-spacing:.03em; font-weight:600; text-align:left;
+                         padding:.2rem .5rem; border-bottom:1px solid #e1e4e8; }
+      .ds-table th.num { text-align:right; }
+      .ds-table td     { padding:.18rem .5rem; border-bottom:1px solid #eef0f2; }
+      .ds-table tr:last-child td { border-bottom:0; }
+      .ds-table td.nm  { font-family:monospace; color:#24292e; }
+      .ds-table td.vl  { text-align:right; font-variant-numeric:tabular-nums;
+                         font-weight:600; color:#212529; }
+      .ds-table td.un  { color:#6a737d; font-size:.7rem; width:3rem; }
+      .mini-click-hint   { font-size:.68rem; color:#0d6efd; margin-top:.3rem; opacity:0;
+                           transition:opacity .15s; }
+      .mini-card.done:hover .mini-click-hint { opacity:1; }
+
+      .metric            { background:#f6f8fa; border:1px solid #e1e4e8; border-radius:.4rem;
+                           padding:.3rem .6rem; min-width:9rem; }
+      .metric-lbl        { font-size:.68rem; color:#6a737d; text-transform:uppercase; letter-spacing:.03em; }
+      .metric-val        { font-size:1.1rem; font-weight:600; font-variant-numeric:tabular-nums; }
+
+      /* Totals strip respects the fixed bottom navbar */
+      #totals            { margin-bottom:.5rem; }
+
+      @media (max-width: 480px) {
+         /* On mobile let main grow naturally and reserve space for the fixed navbar */
+         .mycontainer-mysql { height:auto !important; min-height:0 !important;
+                              padding-bottom:5rem !important; }
+         #totals            { gap:.3rem !important; }
+         .metric            { min-width:0; flex:1 1 0; padding:.25rem .3rem;
+                              text-align:center; }
+         .metric-lbl        { font-size:.6rem; letter-spacing:.02em; white-space:nowrap;
+                              overflow:hidden; text-overflow:ellipsis; }
+         .metric-val        { font-size:.9rem; }
+      }
+
+      /* Modal content styles */
+      .md-desc           { font-size:.9rem; color:#495057; margin-bottom:.5rem; }
+      .md-volume         { font-size:.76rem; color:#6a737d; text-transform:uppercase;
+                           letter-spacing:.03em; margin-bottom:.6rem; }
+      .md-volume::before { content:'volume: '; font-weight:600; color:#495057; }
+      .md-sql            { font-family:monospace; font-size:.82rem; background:#0d1117; color:#c9d1d9;
+                           padding:.6rem .8rem; border-radius:.3rem; word-break:break-all; }
+      .md-rows           { margin-top:.8rem; font-family:monospace; font-size:.8rem;
+                           max-height:22rem; overflow:auto; border:1px solid #e1e4e8; border-radius:.3rem; }
+      .md-rows table     { border-collapse:collapse; width:100%; margin:0; }
+      .md-rows th        { background:#f6f8fa; position:sticky; top:0; }
+      .md-rows th, .md-rows td { border:1px solid #e1e4e8; padding:.2rem .5rem; text-align:left; white-space:nowrap; }
+   </style>
+
+</head>
+
+<body>
+
+   <!-- Navbar -->
+
+   @view 'common/navbar.html'
+
+   <main class="container-fluid mycontainer d-flex flex-column mycontainer-mysql"
+         style="height:calc(100vh - 120px);height:calc(100dvh - 120px)">
+
+      <div class="d-flex align-items-center justify-content-between mb-2 flex-shrink-0">
+         <h4 class="mb-0"><i class="bi bi-lightning-charge me-2"></i>MySQL Showcase</h4>
+         <span id="status" class="badge bg-secondary">idle</span>
+      </div>
+
+      <!-- Dataset summary -->
+
+      <div class="ds-wrap mb-2 flex-shrink-0">
+         <div class="ds-head">
+            <span class="ds-ttl">Dataset: <code>employees</code> sample DB</span>
+         </div>
+         <table class="ds-table">
+            <thead>
+               <tr><th>Table</th><th class="num">Rows</th><th></th></tr>
+            </thead>
+            <tbody>
+               <tr><td class="nm">salaries</td>   <td class="vl">2,844,047</td><td class="un">rows</td></tr>
+               <tr><td class="nm">titles</td>     <td class="vl">443,308</td>  <td class="un">rows</td></tr>
+               <tr><td class="nm">dept_emp</td>   <td class="vl">331,603</td>  <td class="un">rows</td></tr>
+               <tr><td class="nm">employees</td>  <td class="vl">300,024</td>  <td class="un">rows</td></tr>
+               <tr><td class="nm">departments</td><td class="vl">9</td>        <td class="un">rows</td></tr>
+            </tbody>
+         </table>
+         <div class="ds-note mt-2 text-center">
+            Each run picks fresh random inputs &middot; click a card for details
+         </div>
+      </div>
+
+      <!-- Mini cards row -->
+
+      <div id="miniRow" class="mini-row mb-3 flex-shrink-0"></div>
+
+      <!-- Totals strip -->
+
+      <div id="totals" class="d-flex gap-2 mb-2 flex-shrink-0" style="display:none !important">
+         <div class="metric"><div class="metric-lbl">Total time</div><div class="metric-val" id="tTotal">&mdash;</div></div>
+         <div class="metric"><div class="metric-lbl">Queries</div><div class="metric-val" id="tCount">&mdash;</div></div>
+         <div class="metric"><div class="metric-lbl">Rows returned</div><div class="metric-val" id="tRows">&mdash;</div></div>
+      </div>
+
+      <div class="flex-grow-1"></div>
+
+   </main>
+
+   <!-- Modal: pool diagnostic -->
+
+   <div class="modal fade" id="diagModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+         <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+               <h5 class="modal-title">
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>MySQL pool unavailable
+               </h5>
+               <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="diagBody"></div>
+            <div class="modal-footer py-1">
+               <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <!-- Modal: query details -->
+
+   <div class="modal fade" id="qModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h5 class="modal-title" id="qmTitle">Query</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="qmBody"></div>
+            <div class="modal-footer py-1">
+               <small class="text-muted me-auto" id="qmFooter"></small>
+               <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <!-- Bottom nav -->
+
+   <nav class="navbar navbar-dark bg-dark fixed-bottom p-0">
+      <div class="d-flex w-100" role="group" aria-label="Bottom navigation">
+         <a href="/main#mysql" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0">
+            <i class="bi bi-box-arrow-left"></i><span class="btn-lbl">Back</span>
+         </a>
+         <button id="btnRun" type="button" class="btn btn-dark rounded-0 py-2 w-50 flex-grow-0 flex-shrink-0" onclick="runDemo()">
+            <i class="bi bi-play-fill"></i><span class="btn-lbl">Run Showcase</span>
+         </button>
+         <button id="btnClear" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="clearResults()">
+            <i class="bi bi-eraser"></i><span class="btn-lbl">Clear</span>
+         </button>
+      </div>
+   </nav>
+
+<script>
+
+   const Q_COUNT = 6;
+
+   const $status  = document.getElementById('status');
+   const $miniRow = document.getElementById('miniRow');
+   const $totals  = document.getElementById('totals');
+   const $tTotal  = document.getElementById('tTotal');
+   const $tCount  = document.getElementById('tCount');
+   const $tRows   = document.getElementById('tRows');
+   const $btnRun  = document.getElementById('btnRun');
+   const $btnClear= document.getElementById('btnClear');
+   const $qmTitle = document.getElementById('qmTitle');
+   const $qmBody  = document.getElementById('qmBody');
+   const $qmFooter= document.getElementById('qmFooter');
+   const qModal   = new bootstrap.Modal(document.getElementById('qModal'));
+   const $diagBody= document.getElementById('diagBody');
+   const diagModal= new bootstrap.Modal(document.getElementById('diagModal'));
+
+   function showDiag(d) {
+      if (!d) { diagModal.hide(); return; }
+      const cfg = d.config || {};
+      const stats = d.pool_stats;
+      const probeOk = !!d.probe_ok;
+      const poolReg = !!d.pool_registered;
+
+      let hyp;
+      if (!poolReg && !probeOk) {
+         hyp = { cls: 'danger', title: 'Pool was never registered at startup',
+                 hint: 'HIX_InitPoolsFromConfig failed to levant the pool. The direct ' +
+                       'probe with the same config also failed — the server cannot reach MySQL. ' +
+                       'Fix the probe error first and restart.' };
+      } else if (!poolReg && probeOk) {
+         hyp = { cls: 'warning', title: 'Pool missing but credentials work',
+                 hint: 'Config.json likely has no "databases.mysql" section, or the server ' +
+                       'started before it was added. Restart the server.' };
+      } else if (poolReg && stats && stats.closed) {
+         hyp = { cls: 'warning', title: 'Pool is in closed state',
+                 hint: 'HIX_EndPoolsFromConfig ran, or the server is shutting down. Restart.' };
+      } else if (poolReg && stats && stats.busy >= stats.size && !probeOk) {
+         hyp = { cls: 'warning', title: 'All connections busy and reconnect fails',
+                 hint: 'Pool is saturated AND the probe cannot open a fresh connection. ' +
+                       'MySQL may be refusing new connections — check "max_connections".' };
+      } else if (poolReg && !probeOk) {
+         hyp = { cls: 'danger', title: 'Pool registered but connections fail now',
+                 hint: 'The pool was built OK but subsequent connects fail. MySQL likely ' +
+                       'stopped, or credentials/network changed since boot.' };
+      } else {
+         hyp = { cls: 'info', title: 'Unexpected state',
+                 hint: 'Pool reports healthy and probe succeeded — Acquire may have timed out. ' +
+                       'Increase "pool_size" or "timeout_ms".' };
+      }
+
+      const check = (ok, label) =>
+         '<li class="list-group-item d-flex justify-content-between align-items-center py-1 px-2">' +
+         esc(label) +
+         '<span class="badge bg-' + (ok ? 'success' : 'danger') + '">' + (ok ? 'OK' : 'FAIL') + '</span>' +
+         '</li>';
+
+      const checklist =
+         '<ul class="list-group list-group-flush small mb-3">' +
+            check(poolReg, 'Pool "mysql" registered at startup') +
+            check(stats && !stats.closed, 'Pool is open (not shutting down)') +
+            check(stats && stats.free > 0, 'At least one free slot') +
+            check(probeOk, 'Direct probe (fresh connection) succeeds') +
+         '</ul>';
+
+      const cfgRow = (k, v) =>
+         '<tr><td class="text-muted" style="width:10rem"><code>' + esc(k) + '</code></td>' +
+         '<td><code>' + esc(v == null ? '' : v) + '</code></td></tr>';
+
+      const cfgTable =
+         '<table class="table table-sm table-borderless mb-3"><tbody>' +
+            cfgRow('host',      cfg.host) +
+            cfgRow('port',      cfg.port) +
+            cfgRow('user',      cfg.user) +
+            cfgRow('db',        cfg.db) +
+            cfgRow('pool_size', cfg.pool_size) +
+            cfgRow('dll',       cfg.dll) +
+         '</tbody></table>';
+
+      const statsLine = stats
+         ? '<p class="small mb-2"><strong>Pool stats:</strong> size=' + stats.size +
+           ' · busy=' + stats.busy + ' · free=' + stats.free +
+           ' · closed=' + (stats.closed ? 'yes' : 'no') + '</p>'
+         : '<p class="small mb-2 text-muted"><em>Pool not registered — no stats.</em></p>';
+
+      const probeBlock = probeOk
+         ? '<div class="alert alert-success py-2 px-3 small mb-3"><i class="bi bi-check-circle me-1"></i>' +
+           'Direct connection probe <strong>succeeded</strong> with the config above.</div>'
+         : '<div class="alert alert-danger py-2 px-3 small mb-3"><i class="bi bi-x-circle me-1"></i>' +
+           '<strong>Direct probe failed:</strong> <code>' + esc(d.probe_error || '(no message)') + '</code>' +
+           (d.probe_dll ? '<br><strong>DLL resolved:</strong> <code>' + esc(d.probe_dll) +
+                          '</code> <span class="text-muted">[' + esc(d.probe_dll_source) + ']</span>' : '') +
+           '</div>';
+
+      const causes =
+         '<details class="small mt-2"><summary class="text-primary" style="cursor:pointer">' +
+         'Common fixes</summary>' +
+         '<ul class="mb-0 ps-3 mt-2">' +
+            '<li>MySQL service is not running — start it (<code>net start mysql</code> / <code>systemctl start mysqld</code>).</li>' +
+            '<li>User does not exist or wrong password — <code>CREATE USER \'' + esc(cfg.user) +
+                '\'@\'localhost\' IDENTIFIED BY \'…\'; GRANT ALL ON ' + esc(cfg.db) + '.* TO \'' +
+                esc(cfg.user) + '\'@\'localhost\';</code></li>' +
+            '<li>Database <code>' + esc(cfg.db) + '</code> not imported — load the datacharmer/test_db dump.</li>' +
+            '<li><code>libmysql.dll</code> missing from PATH / exe folder (Windows), ' +
+                'or <code>libmysqlclient.so</code> missing (Linux).</li>' +
+            '<li>Port <code>' + esc(cfg.port) + '</code> blocked by firewall or MySQL bound only to a socket.</li>' +
+         '</ul></details>';
+
+      $diagBody.innerHTML =
+         '<div class="alert alert-' + hyp.cls + ' py-2 px-3 small mb-3">' +
+            '<strong>' + esc(hyp.title) + '</strong><br>' + esc(hyp.hint) +
+         '</div>' +
+         '<h6 class="mb-2">Checklist</h6>' + checklist +
+         '<h6 class="mb-2">Config in use <small class="text-muted">(password hidden)</small></h6>' +
+         cfgTable +
+         statsLine +
+         probeBlock +
+         causes;
+
+      diagModal.show();
+   }
+
+   // Cache of results per query id -> response hash
+   const results = {};
+   let isRunning = false;
+
+   const esc = s => String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+   // Bold any numeric volume token: 300,024 | ~3.3M | ~15k-30k | 2,844,047 | ~5-18 | 7 ...
+   const highlightVolume = s => esc(s)
+      .replace(/(~?\d[\d,.]*[kKmMbB]?(?:-\d+[kKmMbB]?)?)/g, '<strong>$1</strong>');
+
+   function setStatus(label, cls) {
+      $status.textContent = label;
+      $status.className   = 'badge bg-' + cls;
+   }
+
+   function msClass(ms) {
+      if (ms < 10)  return 'fast';
+      if (ms < 100) return '';
+      return 'slow';
+   }
+
+   function miniHtml(idx, state, body) {
+      return (
+         '<div class="mini-card ' + state + '" id="mini-' + idx + '" data-idx="' + idx + '">' +
+            '<div class="mini-label">Query ' + idx + '</div>' +
+            '<div class="mini-body">' + body + '</div>' +
+            '<div class="mini-click-hint">&nbsp;</div>' +
+         '</div>'
+      );
+   }
+
+   function pendingBody() {
+      return '<div class="mini-title text-muted">—</div>' +
+             '<div class="mini-sub">queued</div>';
+   }
+
+   function runningBody() {
+      return '<div class="mini-title"><span class="spinner-border spinner-border-sm" style="width:1.3rem;height:1.3rem;border-width:.22rem"></span></div>' +
+             '<div class="mini-sub">running...</div>';
+   }
+
+   function doneBody(q) {
+      const cls = msClass(q.ms | 0);
+      return '<div class="mini-ms ' + cls + '">' + (q.ms | 0) +
+                '<span class="mini-ms-unit">ms</span></div>' +
+             '<div class="mini-rows">' + (q.row_count | 0).toLocaleString('en-US') + ' row(s)</div>';
+   }
+
+   function doneHint() {
+      return '<button type="button" class="mini-rerun" title="Re-run this query">' +
+             '<i class="bi bi-arrow-clockwise me-1"></i>re-run</button>';
+   }
+
+   function errorBody(msg) {
+      const short = String(msg).length > 40 ? String(msg).slice(0, 37) + '...' : msg;
+      return '<div class="mini-title text-danger"><i class="bi bi-x-circle"></i></div>' +
+             '<div class="mini-sub text-danger" title="' + esc(msg) + '">' + esc(short) + '</div>';
+   }
+
+   function renderRowsTable(rows) {
+      if (!Array.isArray(rows) || rows.length === 0) {
+         return '<div class="text-muted small mt-2"><em>no rows returned</em></div>';
+      }
+      const cols = Object.keys(rows[0]);
+      let html = '<div class="md-rows"><table><thead><tr>';
+      cols.forEach(c => html += '<th>' + esc(c) + '</th>');
+      html += '</tr></thead><tbody>';
+      rows.forEach(r => {
+         html += '<tr>';
+         cols.forEach(c => html += '<td>' + esc(r[c]) + '</td>');
+         html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+      return html;
+   }
+
+   function openModal(idx) {
+      const q = results[idx];
+      if (!q) return;
+      $qmTitle.textContent = q.label || ('Query ' + idx);
+      $qmFooter.innerHTML = '<strong class="text-dark">' +
+         (q.row_count | 0).toLocaleString('en-US') + ' row(s)</strong> · ' +
+         (q.ms | 0) + ' ms';
+      if (q.ok) {
+         $qmBody.innerHTML =
+            '<div class="md-desc">' + esc(q.desc) + '</div>' +
+            '<div class="md-volume">' + highlightVolume(q.volume) + '</div>' +
+            '<div class="md-sql">' + esc(q.sql) + '</div>' +
+            renderRowsTable(q.rows);
+      } else {
+         $qmBody.innerHTML =
+            '<div class="md-desc">' + esc(q.desc || '') + '</div>' +
+            '<div class="md-sql">' + esc(q.sql || '(sql unavailable)') + '</div>' +
+            '<div class="alert alert-danger mt-3 mb-0"><i class="bi bi-x-circle me-1"></i>' +
+            esc(q.error || 'unknown error') + '</div>';
+      }
+      qModal.show();
+   }
+
+   function wireCard(idx) {
+      const el = document.getElementById('mini-' + idx);
+      if (!el) return;
+      el.onclick = () => {
+         if (!el.classList.contains('done')) return;
+         openModal(idx);
+      };
+      const btn = el.querySelector('.mini-rerun');
+      if (btn) {
+         btn.onclick = (ev) => {
+            ev.stopPropagation();
+            if (isRunning) return;
+            rerunOne(idx);
+         };
+      }
+   }
+
+   function wireClicks() {
+      for (let i = 1; i <= Q_COUNT; i++) wireCard(i);
+   }
+
+   function clearResults() {
+      $miniRow.innerHTML = '';
+      $totals.style.display = 'none';
+      for (const k of Object.keys(results)) delete results[k];
+      setStatus('idle', 'secondary');
+   }
+
+   async function runOne(idx) {
+      // Flip to running
+      const el = document.getElementById('mini-' + idx);
+      el.className = 'mini-card running';
+      el.innerHTML = '<div class="mini-label">Query ' + idx + '</div>' +
+                     '<div class="mini-body">' + runningBody() + '</div>' +
+                     '<div class="mini-click-hint">&nbsp;</div>';
+      el.onclick = null;
+
+      let resp, h;
+      try {
+         resp = await fetch('/api/mysql-demo', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ q: idx })
+         });
+         h = await resp.json();
+      } catch (e) {
+         h = { ok: false, q: idx, error: 'Network error: ' + e.message, ms: 0, row_count: 0 };
+      }
+
+      // Pool unavailable → surface the diagnostic modal once per batch
+      if (h && h.diag && !window.__diagShown) {
+         window.__diagShown = true;
+         window.__lastDiag  = h.diag;
+         showDiag(h.diag);
+      }
+
+      results[idx] = h;
+
+      const state = h.ok ? 'ok done' : 'ko done';
+      const body  = h.ok ? doneBody(h) : errorBody(h.error || 'error');
+      el.className = 'mini-card ' + state;
+      el.innerHTML = '<div class="mini-label">Query ' + idx + '</div>' +
+                     '<div class="mini-body">' + body + '</div>' +
+                     doneHint();
+      el.dataset.idx = idx;
+      wireCard(idx);
+
+      return h;
+   }
+
+   async function rerunOne(idx) {
+      if (isRunning) return;
+      isRunning = true;
+      window.__diagShown = false;
+      $btnRun.disabled   = true;
+      $btnClear.disabled = true;
+      setStatus('running', 'warning');
+      const nT0 = performance.now();
+      const h = await runOne(idx);
+      const dt = Math.round(performance.now() - nT0);
+      setStatus(h && h.ok ? 'ok' : 'error', h && h.ok ? 'success' : 'danger');
+      // Refresh totals using full cache
+      const okCount   = Object.values(results).filter(q => q && q.ok).length;
+      const totalRows = Object.values(results).reduce((a, q) => a + ((q && q.row_count) | 0), 0);
+      $tCount.textContent = okCount + ' / ' + Q_COUNT;
+      $tRows.textContent  = totalRows.toLocaleString('en-US');
+      $tTotal.textContent = dt + ' ms (last)';
+      isRunning = false;
+      $btnRun.disabled   = false;
+      $btnClear.disabled = false;
+   }
+
+   async function runDemo() {
+
+      if (isRunning) return;
+      isRunning = true;
+      window.__diagShown = false;
+      $btnRun.disabled   = true;
+      $btnClear.disabled = true;
+      setStatus('running', 'warning');
+      $totals.style.display = 'none';
+      for (const k of Object.keys(results)) delete results[k];
+
+      // Lay out 5 pending cards
+      let html = '';
+      for (let i = 1; i <= Q_COUNT; i++) html += miniHtml(i, 'pending', pendingBody());
+      $miniRow.innerHTML = html;
+
+      const nT0 = performance.now();
+      const run = [];
+      for (let i = 1; i <= Q_COUNT; i++) {
+         run.push(await runOne(i));
+      }
+      const totalMs = Math.round(performance.now() - nT0);
+
+      const okCount   = run.filter(q => q && q.ok).length;
+      const totalRows = run.reduce((a, q) => a + ((q && q.row_count) | 0), 0);
+
+      setStatus(okCount === Q_COUNT ? 'ok' : 'partial',
+                okCount === Q_COUNT ? 'success' : 'warning');
+
+      $tTotal.textContent = totalMs + ' ms';
+      $tCount.textContent = okCount + ' / ' + Q_COUNT;
+      $tRows.textContent  = totalRows.toLocaleString('en-US');
+      $totals.style.display = 'flex';
+
+      wireClicks();
+
+      isRunning = false;
+      $btnRun.disabled   = false;
+      $btnClear.disabled = false;
+   }
+
+</script>
+
+</body>
+</html>

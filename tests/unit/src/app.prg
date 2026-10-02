@@ -65,7 +65,7 @@ FUNCTION Main( ... )
 
    IF cArg == "--cli"
 
-      _RunCli()
+      _RunCli( iif( PCount() > 1, hb_PValue( 2 ), "" ) )
       RETURN NIL
 
    ENDIF
@@ -111,24 +111,37 @@ RETURN NIL
 // -------------------------------------------------------
 // CLI mode: run all tests, print summary, set ErrorLevel
 // -------------------------------------------------------
-STATIC PROCEDURE _RunCli()
+STATIC PROCEDURE _RunCli( cFilter )
 
    LOCAL aGroups := _TestGroups()
    LOCAL aGroup, aTest, hCtx, oErr
    LOCAL nTotal := 0, nPass := 0, nFail := 0
-   LOCAL cStatus
+   LOCAL nRun := 0
+   LOCAL cStatus, cKey, cFilterUp
+   LOCAL lAll
+
+   hb_default( @cFilter, "" )
+   lAll      := Empty( cFilter ) .OR. cFilter == "*"
+   cFilterUp := Upper( cFilter )
 
    HIX_LoggerInit( s_cLogFile, HIX_LOG_INFO, .T. )
    HIX_MetricsInit()
 
-   OutStd( "HIX Test Master — CLI mode" + hb_eol() )
+   OutStd( "HIX Test Master — CLI mode" + iif( lAll, "", " [filter=" + cFilter + "]" ) + hb_eol() )
    OutStd( Replicate( "-", 50 ) + hb_eol() )
 
    FOR EACH aGroup IN aGroups
 
       FOR EACH aTest IN aGroup[ 2 ]
 
-         OutStd( "  " + aGroup[ 1 ] + "/" + aTest[ 1 ] + " ... " )
+         cKey := aGroup[ 1 ] + "/" + aTest[ 1 ]
+
+         IF ! lAll .AND. ! ( cFilterUp $ Upper( cKey ) )
+            LOOP
+         ENDIF
+
+         nRun++
+         OutStd( "  " + cKey + " ... " )
          hCtx := NIL
 
          TRY
@@ -164,6 +177,14 @@ STATIC PROCEDURE _RunCli()
       NEXT
 
    NEXT
+
+   IF ! lAll .AND. nRun == 0
+      OutStd( Replicate( "-", 50 ) + hb_eol() )
+      OutStd( "No tests matched filter: " + cFilter + hb_eol() )
+      OutStd( "End test..." + hb_eol() )
+      ErrorLevel( 2 )
+      RETURN
+   ENDIF
 
    OutStd( Replicate( "-", 50 ) + hb_eol() )
    OutStd( hb_ntos( nTotal ) + " total | " + hb_ntos( nPass ) + " passed | " + hb_ntos( nFail ) + " failed" + hb_eol() )

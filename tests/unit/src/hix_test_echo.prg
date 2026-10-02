@@ -32,7 +32,7 @@ STATIC PROCEDURE _EchoBuffer( hCtx )
    HIX_EchoClear()
    HixTU_Check( hCtx, HIX_EchoGet() == "", "Echo: Clear limpia", "", HIX_EchoGet() )
    HIX_Echo( "<p>A</p>", "<p>B</p>" )
-   HixTU_Check( hCtx, HIX_EchoGet() == "<p>A</p><p>B</p>", "Echo: multi-param", "<p>A</p><p>B</p>", HIX_EchoGet() )
+   HixTU_Check( hCtx, HIX_EchoGet() == "<p>A</p> <p>B</p>", "Echo: multi-param (space-separated)", "<p>A</p> <p>B</p>", HIX_EchoGet() )
 RETURN
 
 STATIC PROCEDURE _EchoTipos( hCtx )

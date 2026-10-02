@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+   @view 'common/header.html'
+
+   <link href='/public/css/main.css' rel='stylesheet'>
+
+   <style>
+      .step-row       { display:flex; align-items:flex-start; gap:.5rem; padding:.5rem .6rem; border-radius:.35rem; margin-bottom:.35rem; }
+      .step-row.ok    { background:#d1e7dd; color:#0f5132; }
+      .step-row.ko    { background:#f8d7da; color:#842029; }
+      .step-row.hdr   { background:#e2e3e5; color:#41464b; font-weight:600; }
+      .step-icon      { width:1.25rem; text-align:center; flex-shrink:0; }
+      .step-body      { flex-grow:1; min-width:0; }
+      .step-sql       { font-family:monospace; font-size:.82rem; opacity:.85; word-break:break-all; margin-top:.15rem; }
+      .step-info      { font-size:.85rem; margin-top:.2rem; }
+      .step-timing    { margin-left:auto; font-variant-numeric:tabular-nums; font-size:.8rem; opacity:.75; flex-shrink:0; }
+      .step-rows      { margin-top:.35rem; font-family:monospace; font-size:.78rem; background:#ffffffaa; border-radius:.25rem; padding:.25rem .4rem; max-height:12rem; overflow:auto; }
+      .step-rows table{ border-collapse:collapse; }
+      .step-rows th, .step-rows td { border:1px solid #ccc; padding:.1rem .4rem; text-align:left; }
+   </style>
+
+</head>
+
+<body>
+
+   <!-- Navbar -->
+
+   @view 'common/navbar.html'
+
+   <main class="container-fluid mycontainer d-flex flex-column"
+         style="height:calc(100vh - 120px);height:calc(100dvh - 120px)">
+
+      <div class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0">
+         <h4 class="mb-0"><i class="bi bi-database me-2"></i>MySQL Test</h4>
+         <span id="status" class="badge bg-secondary">idle</span>
+      </div>
+
+      <!-- Summary line (test type, timing, result) -->
+
+      <div id="summary" class="alert alert-secondary py-2 px-3 mb-2 flex-shrink-0 small">
+         Pick <strong>Test A</strong> (plain CRUD) or <strong>Test B</strong>
+         (CRUD inside BeginTrans / Commit). Each step is reported in order.
+      </div>
+
+      <!-- Step list -->
+
+      <div id="steps" class="flex-grow-1 mb-0" style="overflow:auto; min-height:0;"></div>
+
+   </main>
+
+   <!-- Modal: pool diagnostic -->
+
+   <div class="modal fade" id="diagModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+         <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+               <h5 class="modal-title">
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>MySQL pool unavailable
+               </h5>
+               <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="diagBody"></div>
+            <div class="modal-footer py-1">
+               <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <!-- Bottom nav -->
+
+   <nav class="navbar navbar-dark bg-dark fixed-bottom p-0">
+      <div class="d-flex w-100" role="group" aria-label="Bottom navigation">
+         <a href="/main#mysql" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0">
+            <i class="bi bi-box-arrow-left"></i><span class="btn-lbl">Back</span>
+         </a>
+         <button id="btnA" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="runTest('A')">
+            <i class="bi bi-play-fill"></i><span class="btn-lbl">Test A</span>
+         </button>
+         <button id="btnB" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="runTest('B')">
+            <i class="bi bi-shield-fill-check"></i><span class="btn-lbl">Test B</span>
+         </button>
+      </div>
+   </nav>
+
+<script>
+
+   const $status  = document.getElementById('status');
+   const $summary = document.getElementById('summary');
+   const $steps   = document.getElementById('steps');
+   const $btnA    = document.getElementById('btnA');
+   const $btnB    = document.getElementById('btnB');
+   const $diagBody= document.getElementById('diagBody');
+   const diagModal= new bootstrap.Modal(document.getElementById('diagModal'));
+
+   const esc = s => String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+   function setStatus(label, cls) {
+      $status.textContent = label;
+      $status.className   = 'badge bg-' + cls;
+   }
+
+   function setSummary(cls, html) {
+      $summary.className = 'alert alert-' + cls + ' py-2 px-3 mb-2 flex-shrink-0 small';
+      $summary.innerHTML = html;
+   }
+
+   function showDiag(d) {
+      if (!d) { diagModal.hide(); return; }
+      const cfg = d.config || {};
+      const stats = d.pool_stats;
+      const probeOk = !!d.probe_ok;
+      const poolReg = !!d.pool_registered;
+
+      // Build hypothesis
+      let hyp;
+      if (!poolReg && !probeOk) {
+         hyp = { cls: 'danger', title: 'Pool was never registered at startup',
+                 hint: 'HIX_InitPoolsFromConfig failed to levant the pool. The direct ' +
+                       'probe with the same config also failed — the server cannot reach MySQL ' +
+                       'with these credentials. Fix the probe error first and restart.' };
+      } else if (!poolReg && probeOk) {
+         hyp = { cls: 'warning', title: 'Pool missing but credentials work',
+                 hint: 'Config.json likely has no "databases.mysql" section, or the server ' +
+                       'started before it was added. Restart the server.' };
+      } else if (poolReg && stats && stats.closed) {
+         hyp = { cls: 'warning', title: 'Pool is in closed state',
+                 hint: 'HIX_EndPoolsFromConfig ran, or the server is shutting down. ' +
+                       'Restart the server.' };
+      } else if (poolReg && stats && stats.busy >= stats.size && !probeOk) {
+         hyp = { cls: 'warning', title: 'All connections busy and reconnect fails',
+                 hint: 'Pool is saturated AND the probe cannot open a fresh connection. ' +
+                       'MySQL may be down or refusing new connections. Check "max_connections".' };
+      } else if (poolReg && !probeOk) {
+         hyp = { cls: 'danger', title: 'Pool registered but connections fail now',
+                 hint: 'The pool was built OK but subsequent connect attempts fail. ' +
+                       'MySQL likely stopped, or credentials/network changed since boot.' };
+      } else {
+         hyp = { cls: 'info', title: 'Unexpected state',
+                 hint: 'Pool reports healthy and probe succeeded — Acquire may have timed out. ' +
+                       'Increase "pool_size" or "timeout_ms".' };
+      }
+
+      // Checklist (shows OK/KO per common failure point)
+      const check = (ok, label) =>
+         '<li class="list-group-item d-flex justify-content-between align-items-center py-1 px-2">' +
+         esc(label) +
+         '<span class="badge bg-' + (ok ? 'success' : 'danger') + '">' + (ok ? 'OK' : 'FAIL') + '</span>' +
+         '</li>';
+
+      const checklist =
+         '<ul class="list-group list-group-flush small mb-3">' +
+            check(poolReg, 'Pool "mysql" registered at startup') +
+            check(stats && !stats.closed, 'Pool is open (not shutting down)') +
+            check(stats && stats.free > 0, 'At least one free slot') +
+            check(probeOk, 'Direct probe (fresh connection) succeeds') +
+         '</ul>';
+
+      // Config table (never shows pwd)
+      const cfgRow = (k, v) =>
+         '<tr><td class="text-muted" style="width:10rem"><code>' + esc(k) + '</code></td>' +
+         '<td><code>' + esc(v == null ? '' : v) + '</code></td></tr>';
+
+      const cfgTable =
+         '<table class="table table-sm table-borderless mb-3"><tbody>' +
+            cfgRow('host',      cfg.host) +
+            cfgRow('port',      cfg.port) +
+            cfgRow('user',      cfg.user) +
+            cfgRow('db',        cfg.db) +
+            cfgRow('pool_size', cfg.pool_size) +
+            cfgRow('dll',       cfg.dll) +
+         '</tbody></table>';
+
+      // Pool stats line (if registered)
+      const statsLine = stats
+         ? '<p class="small mb-2"><strong>Pool stats:</strong> size=' + stats.size +
+           ' · busy=' + stats.busy + ' · free=' + stats.free +
+           ' · closed=' + (stats.closed ? 'yes' : 'no') + '</p>'
+         : '<p class="small mb-2 text-muted"><em>Pool not registered — no stats.</em></p>';
+
+      // Probe error (verbatim WDO message)
+      const probeBlock = probeOk
+         ? '<div class="alert alert-success py-2 px-3 small mb-3"><i class="bi bi-check-circle me-1"></i>' +
+           'Direct connection probe <strong>succeeded</strong> with the config above.</div>'
+         : '<div class="alert alert-danger py-2 px-3 small mb-3"><i class="bi bi-x-circle me-1"></i>' +
+           '<strong>Direct probe failed:</strong> <code>' + esc(d.probe_error || '(no message)') + '</code>' +
+           (d.probe_dll ? '<br><strong>DLL resolved:</strong> <code>' + esc(d.probe_dll) +
+                          '</code> <span class="text-muted">[' + esc(d.probe_dll_source) + ']</span>' : '') +
+           '</div>';
+
+      // Common-cause checklist
+      const causes =
+         '<details class="small mt-2"><summary class="text-primary" style="cursor:pointer">' +
+         'Common fixes</summary>' +
+         '<ul class="mb-0 ps-3 mt-2">' +
+            '<li>MySQL service is not running — start it (<code>net start mysql</code> / <code>systemctl start mysqld</code>).</li>' +
+            '<li>User does not exist or wrong password — <code>CREATE USER \'' + esc(cfg.user) +
+                '\'@\'localhost\' IDENTIFIED BY \'…\'; GRANT ALL ON ' + esc(cfg.db) + '.* TO \'' +
+                esc(cfg.user) + '\'@\'localhost\';</code></li>' +
+            '<li>Database <code>' + esc(cfg.db) + '</code> not imported — load the datacharmer/test_db dump.</li>' +
+            '<li><code>libmysql.dll</code> missing from PATH / exe folder (Windows), ' +
+                'or <code>libmysqlclient.so</code> missing (Linux).</li>' +
+            '<li>Port <code>' + esc(cfg.port) + '</code> blocked by firewall or MySQL binding only to a socket.</li>' +
+         '</ul></details>';
+
+      $diagBody.innerHTML =
+         '<div class="alert alert-' + hyp.cls + ' py-2 px-3 small mb-3">' +
+            '<strong>' + esc(hyp.title) + '</strong><br>' + esc(hyp.hint) +
+         '</div>' +
+         '<h6 class="mb-2">Checklist</h6>' + checklist +
+         '<h6 class="mb-2">Config in use <small class="text-muted">(password hidden)</small></h6>' +
+         cfgTable +
+         statsLine +
+         probeBlock +
+         causes;
+
+      diagModal.show();
+   }
+
+   function renderRowsTable(rows) {
+      if (!Array.isArray(rows) || rows.length === 0) return '';
+      const cols = Object.keys(rows[0]);
+      let html = '<div class="step-rows"><table><thead><tr>';
+      cols.forEach(c => html += '<th>' + esc(c) + '</th>');
+      html += '</tr></thead><tbody>';
+      rows.forEach(r => {
+         html += '<tr>';
+         cols.forEach(c => html += '<td>' + esc(r[c]) + '</td>');
+         html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+      return html;
+   }
+
+   function renderStep(s, idx) {
+      const cls = s.ok ? 'ok' : 'ko';
+      const icon = s.ok ? 'bi-check-circle-fill' : 'bi-x-circle-fill';
+      let body = '<div class="step-sql">' + esc(s.sql) + '</div>' +
+                 '<div class="step-info">' + esc(s.info) + '</div>';
+      if (s.rows && s.rows.length) {
+         body += renderRowsTable(s.rows);
+      }
+      return (
+         '<div class="step-row ' + cls + '">' +
+            '<span class="step-icon"><i class="bi ' + icon + '"></i></span>' +
+            '<div class="step-body">' +
+               '<strong>' + (idx + 1) + '. ' + esc(s.step) + '</strong>' +
+               body +
+            '</div>' +
+            '<span class="step-timing">' + (s.ms | 0) + 'ms</span>' +
+         '</div>'
+      );
+   }
+
+   async function runTest(which) {
+
+      $btnA.disabled = true;
+      $btnB.disabled = true;
+      setStatus('running', 'warning');
+      setSummary('info',
+         '<i class="bi bi-hourglass-split me-1"></i>Running Test ' + which + '...');
+      $steps.innerHTML =
+         '<div class="step-row hdr">' +
+         '<span class="step-icon"><span class="spinner-border spinner-border-sm"></span></span>' +
+         '<div class="step-body">Submitting...</div></div>';
+
+      let resp, h;
+      try {
+         resp = await fetch('/api/mysql-test', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ test: which })
+         });
+         h = await resp.json();
+      } catch (e) {
+         setStatus('error', 'danger');
+         setSummary('danger',
+            '<i class="bi bi-exclamation-triangle-fill me-1"></i>' +
+            'Network error: ' + esc(e.message));
+         $steps.innerHTML = '';
+         $btnA.disabled = false;
+         $btnB.disabled = false;
+         return;
+      }
+
+      if (!resp.ok || h.ok === false && !Array.isArray(h.steps)) {
+         setStatus('error', 'danger');
+         const diagBtn = h.diag
+            ? ' <button type="button" class="btn btn-sm btn-outline-danger ms-2" ' +
+              'onclick="showDiag(window.__lastDiag)"><i class="bi bi-info-circle me-1"></i>Details</button>'
+            : '';
+         setSummary('danger',
+            '<i class="bi bi-exclamation-triangle-fill me-1"></i>' +
+            'Server rejected: ' + esc(h.error || resp.statusText) + diagBtn);
+         $steps.innerHTML = '';
+         if (h.diag) {
+            window.__lastDiag = h.diag;
+            showDiag(h.diag);
+         }
+         $btnA.disabled = false;
+         $btnB.disabled = false;
+         return;
+      }
+
+      const okCount = h.steps.filter(s => s.ok).length;
+      setStatus(h.ok ? 'ok' : 'failed', h.ok ? 'success' : 'danger');
+      setSummary(h.ok ? 'success' : 'danger',
+         '<i class="bi ' + (h.ok ? 'bi-check2-circle' : 'bi-x-octagon') + ' me-1"></i>' +
+         '<strong>Test ' + esc(h.test) + '</strong> ' +
+         (h.trans ? '(with transaction) ' : '(autocommit) ') +
+         '&mdash; ' + okCount + '/' + h.steps.length + ' steps OK, ' +
+         'took ' + (h.took_ms | 0) + 'ms');
+
+      $steps.innerHTML = h.steps.map(renderStep).join('');
+
+      $btnA.disabled = false;
+      $btnB.disabled = false;
+   }
+
+</script>
+
+</body>
+</html>

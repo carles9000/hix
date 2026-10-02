@@ -22,5 +22,20 @@
     "session": "H!x@SESSION@2026",
     "token": "H!x@TOKEN@2026",
     "resource": "H!x@RES@2026"
+  },
+  "databases":
+  {
+    "mysql":
+    {
+      "driver":     "mariadb",
+      "host":       "127.0.0.1",
+      "user":       "harbour",
+      "pwd":        "hb1234",
+      "db":         "employees",
+      "port":       3306,
+      "pool_size":  32,
+      "timeout_ms": 5000,
+      "ping":       true
+    }
   }
 }

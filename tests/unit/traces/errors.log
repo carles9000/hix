@@ -1,0 +1,360 @@
+=== Error #2 — 09/30/26 14:15:03 ===
+Subsystem  : App
+SubCode    : 500
+Severity   : 2
+Description: fallo interno
+Operation  : Proceso
+File       : src\hix_test_error.prg:0
+
+=== Error #3 — 09/30/26 14:15:03 ===
+Subsystem  : LogTest
+SubCode    : 1
+Severity   : 2
+Description: error para log
+Operation  : TestLog
+File       : src\hix_test_error.prg:0
+
+=== Error #4 — 09/30/26 14:15:03 ===
+Subsystem  : BASE
+SubCode    : 1132
+Severity   : 2
+Description: Bound error
+Operation  : array access
+File       : :0
+
+=== Error #1 — 09/30/26 14:21:19 ===
+Subsystem  : App
+SubCode    : 500
+Severity   : 2
+Description: fallo interno
+Operation  : Proceso
+File       : src\hix_test_error.prg:0
+
+=== Error #2 — 09/30/26 14:21:19 ===
+Subsystem  : LogTest
+SubCode    : 1
+Severity   : 2
+Description: error para log
+Operation  : TestLog
+File       : src\hix_test_error.prg:0
+
+=== Error #3 — 09/30/26 14:21:19 ===
+Subsystem  : BASE
+SubCode    : 1132
+Severity   : 2
+Description: Bound error
+Operation  : array access
+File       : :0
+
+=== Error #2 — 09/30/26 14:39:26 ===
+Subsystem  : App
+SubCode    : 500
+Severity   : 2
+Description: fallo interno
+Operation  : Proceso
+File       : src\hix_test_error.prg:0
+
+=== Error #3 — 09/30/26 14:39:26 ===
+Subsystem  : LogTest
+SubCode    : 1
+Severity   : 2
+Description: error para log
+Operation  : TestLog
+File       : src\hix_test_error.prg:0
+
+=== Error #4 — 09/30/26 14:39:26 ===
+Subsystem  : BASE
+SubCode    : 1132
+Severity   : 2
+Description: Bound error
+Operation  : array access
+File       : :0
+
+=== Error #1 — 09/30/26 14:41:39 ===
+Subsystem  : App
+SubCode    : 500
+Severity   : 2
+Description: fallo interno
+Operation  : Proceso
+File       : src\hix_test_error.prg:0
+
+=== Error #2 — 09/30/26 14:41:39 ===
+Subsystem  : LogTest
+SubCode    : 1
+Severity   : 2
+Description: error para log
+Operation  : TestLog
+File       : src\hix_test_error.prg:0
+
+=== Error #3 — 09/30/26 14:41:39 ===
+Subsystem  : BASE
+SubCode    : 1132
+Severity   : 2
+Description: Bound error
+Operation  : array access
+File       : :0
+
+=== Error #1 — 09/30/26 14:42:31 ===
+Subsystem  : App
+SubCode    : 500
+Severity   : 2
+Description: fallo interno
+Operation  : Proceso
+File       : src\hix_test_error.prg:0
+
+=== Error #2 — 09/30/26 14:42:31 ===
+Subsystem  : LogTest
+SubCode    : 1
+Severity   : 2
+Description: error para log
+Operation  : TestLog
+File       : src\hix_test_error.prg:0
+
+=== Error #3 — 09/30/26 14:42:31 ===
+Subsystem  : BASE
+SubCode    : 1132
+Severity   : 2
+Description: Bound error
+Operation  : array access
+File       : :0
+
+=== Error #1 — 09/30/26 14:53:49 ===
+Subsystem  : App
+SubCode    : 500
+Severity   : 2
+Description: fallo interno
+Operation  : Proceso
+File       : src\hix_test_error.prg:0
+
+=== Error #2 — 09/30/26 14:53:49 ===
+Subsystem  : LogTest
+SubCode    : 1
+Severity   : 2
+Description: error para log
+Operation  : TestLog
+File       : src\hix_test_error.prg:0
+
+=== Error #3 — 09/30/26 14:53:49 ===
+Subsystem  : BASE
+SubCode    : 1132
+Severity   : 2
+Description: Bound error
+Operation  : array access
+File       : :0
+
+=== Error #1 — 09/30/26 14:57:05 ===
+Subsystem  : App
+SubCode    : 500
+Severity   : 2
+Description: fallo interno
+Operation  : Proceso
+File       : src\hix_test_error.prg:0
+
+=== Error #2 — 09/30/26 14:57:05 ===
+Subsystem  : LogTest
+SubCode    : 1
+Severity   : 2
+Description: error para log
+Operation  : TestLog
+File       : src\hix_test_error.prg:0
+
+=== Error #3 — 09/30/26 14:57:05 ===
+Subsystem  : BASE
+SubCode    : 1132
+Severity   : 2
+Description: Bound error
+Operation  : array access
+File       : :0
+
+=== Error #1 — 09/30/26 14:57:48 ===
+Subsystem  : App
+SubCode    : 500
+Severity   : 2
+Description: fallo interno
+Operation  : Proceso
+File       : src\hix_test_error.prg:0
+
+=== Error #2 — 09/30/26 14:57:48 ===
+Subsystem  : LogTest
+SubCode    : 1
+Severity   : 2
+Description: error para log
+Operation  : TestLog
+File       : src\hix_test_error.prg:0
+
+=== Error #3 — 09/30/26 14:57:48 ===
+Subsystem  : BASE
+SubCode    : 1132
+Severity   : 2
+Description: Bound error
+Operation  : array access
+File       : :0
+
+=== Error #1 — 09/30/26 15:03:26 ===
+Subsystem  : App
+SubCode    : 500
+Severity   : 2
+Description: fallo interno
+Operation  : Proceso
+File       : src\hix_test_error.prg:0
+
+=== Error #2 — 09/30/26 15:03:26 ===
+Subsystem  : LogTest
+SubCode    : 1
+Severity   : 2
+Description: error para log
+Operation  : TestLog
+File       : src\hix_test_error.prg:0
+
+=== Error #3 — 09/30/26 15:03:26 ===
+Subsystem  : BASE
+SubCode    : 1132
+Severity   : 2
+Description: Bound error
+Operation  : array access
+File       : :0
+
+=== Error #1 — 09/30/26 15:04:09 ===
+Subsystem  : App
+SubCode    : 500
+Severity   : 2
+Description: fallo interno
+Operation  : Proceso
+File       : src\hix_test_error.prg:0
+
+=== Error #2 — 09/30/26 15:04:09 ===
+Subsystem  : LogTest
+SubCode    : 1
+Severity   : 2
+Description: error para log
+Operation  : TestLog
+File       : src\hix_test_error.prg:0
+
+=== Error #3 — 09/30/26 15:04:09 ===
+Subsystem  : BASE
+SubCode    : 1132
+Severity   : 2
+Description: Bound error
+Operation  : array access
+File       : :0
+
+=== Error #2 — 10/02/26 18:01:35 ===
+Subsystem  : App
+SubCode    : 500
+Severity   : 2
+Description: fallo interno
+Operation  : Proceso
+File       : src\hix_test_error.prg:0
+
+=== Error #3 — 10/02/26 18:01:35 ===
+Subsystem  : LogTest
+SubCode    : 1
+Severity   : 2
+Description: error para log
+Operation  : TestLog
+File       : src\hix_test_error.prg:0
+
+=== Error #4 — 10/02/26 18:01:35 ===
+Subsystem  : BASE
+SubCode    : 1132
+Severity   : 2
+Description: Bound error
+Operation  : array access
+File       : :0
+
+=== Error #2 — 10/02/26 18:06:37 ===
+Subsystem  : App
+SubCode    : 500
+Severity   : 2
+Description: fallo interno
+Operation  : Proceso
+File       : src\hix_test_error.prg:0
+
+=== Error #3 — 10/02/26 18:06:37 ===
+Subsystem  : LogTest
+SubCode    : 1
+Severity   : 2
+Description: error para log
+Operation  : TestLog
+File       : src\hix_test_error.prg:0
+
+=== Error #4 — 10/02/26 18:06:37 ===
+Subsystem  : BASE
+SubCode    : 1132
+Severity   : 2
+Description: Bound error
+Operation  : array access
+File       : :0
+
+=== Error #1001 — 10/02/26 18:06:58 ===
+Subsystem  : App
+SubCode    : 500
+Severity   : 2
+Description: fallo interno
+Operation  : Proceso
+File       : src\hix_test_error.prg:0
+
+=== Error #1002 — 10/02/26 18:06:58 ===
+Subsystem  : LogTest
+SubCode    : 1
+Severity   : 2
+Description: error para log
+Operation  : TestLog
+File       : src\hix_test_error.prg:0
+
+=== Error #1003 — 10/02/26 18:06:58 ===
+Subsystem  : BASE
+SubCode    : 1132
+Severity   : 2
+Description: Bound error
+Operation  : array access
+File       : :0
+
+=== Error #1004 — 10/02/26 18:07:02 ===
+Subsystem  : App
+SubCode    : 500
+Severity   : 2
+Description: fallo interno
+Operation  : Proceso
+File       : src\hix_test_error.prg:0
+
+=== Error #1005 — 10/02/26 18:07:02 ===
+Subsystem  : LogTest
+SubCode    : 1
+Severity   : 2
+Description: error para log
+Operation  : TestLog
+File       : src\hix_test_error.prg:0
+
+=== Error #1006 — 10/02/26 18:07:02 ===
+Subsystem  : BASE
+SubCode    : 1132
+Severity   : 2
+Description: Bound error
+Operation  : array access
+File       : :0
+
+=== Error #1007 — 10/02/26 18:07:05 ===
+Subsystem  : App
+SubCode    : 500
+Severity   : 2
+Description: fallo interno
+Operation  : Proceso
+File       : src\hix_test_error.prg:0
+
+=== Error #1008 — 10/02/26 18:07:05 ===
+Subsystem  : LogTest
+SubCode    : 1
+Severity   : 2
+Description: error para log
+Operation  : TestLog
+File       : src\hix_test_error.prg:0
+
+=== Error #1009 — 10/02/26 18:07:05 ===
+Subsystem  : BASE
+SubCode    : 1132
+Severity   : 2
+Description: Bound error
+Operation  : array access
+File       : :0
+

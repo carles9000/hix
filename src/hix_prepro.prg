@@ -117,8 +117,8 @@ FUNCTION UGetPPRules()
    ENDCASE
 
 
-   __pp_AddRule( __hPP, "#xcommand ? [<explist,...>] => UWrite( '<br>' [,<explist>] )" )
-   __pp_AddRule( __hPP, "#xcommand ?? [<explist,...>] => UWrite( [<explist>] )" )
+   __pp_AddRule( __hPP, "#xcommand ? [<explist,...>] => UEcho( '<br>' [,<explist>] )" )
+   __pp_AddRule( __hPP, "#xcommand ?? [<explist,...>] => UEcho( [<explist>] )" )
 
    __pp_AddRule( __hPP, "#xcommand TRY  => BEGIN SEQUENCE WITH {| oErr | Break( oErr ) }" )
    __pp_AddRule( __hPP, "#xcommand CATCH [<!oErr!>] => RECOVER [USING <oErr>] <-oErr->" )

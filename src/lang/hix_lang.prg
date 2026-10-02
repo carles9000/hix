@@ -192,4 +192,30 @@ FUNCTION HIX_InitLang()    // English is default value
    hLang[ 'DBF_ERR_CDX_NOT_FOUND' ] := "Cdx doesn't exist: {1}"
    hLang[ 'DBF_ERR_LOCK'          ] := "Lock error"
 
+   // ---- WDO / MySQL ----
+   hLang[ 'WDO_LOG_POOL_INIT_FAIL'      ] := "WDO_Pool[{1}] Init: connection #{2} failed to open{3}"
+   hLang[ 'WDO_LOG_ACQUIRE_TIMEOUT'     ] := "WDO_Pool[{1}] Acquire timeout after {2}ms"
+   hLang[ 'WDO_LOG_PING_RECONNECT'      ] := "WDO_Pool[{1}] ping failed -- reconnecting"
+   hLang[ 'WDO_LOG_GET_NO_POOL'         ] := "WDO_Get: no pool registered for driver '{1}'"
+   hLang[ 'WDO_LOG_RELEASE_RECLAIM'     ] := "WDO_ReleaseAllThread: reclaiming {1} leaked connection(s) from thread {2}"
+   hLang[ 'WDO_LOG_MYSQL_POOL_INIT'     ] := "WDO_InitPoolMySql: opened {1}/{2} connections to {3}@{4}:{5}/{6}"
+   hLang[ 'WDO_LOG_MYSQL_POOL_INIT_FAIL' ] := "WDO_InitPoolMySql: no connections could be opened -- pool disabled"
+   hLang[ 'WDO_LOG_MYSQL_POOL_END'      ] := "WDO_EndPoolMySql: closing pool (size={1}, busy={2})"
+   hLang[ 'WDO_LOG_POOLS_INIT'          ] := "HIX_InitPoolsFromConfig: {1}/{2} pool(s) started OK"
+   hLang[ 'WDO_LOG_POOLS_INIT_NONE'     ] := "HIX_InitPoolsFromConfig: no 'databases' section in config.json"
+   hLang[ 'WDO_LOG_POOLS_INIT_BAD_ENTRY' ] := "HIX_InitPoolsFromConfig: entry '{1}' is not a hash -- skipped"
+   hLang[ 'WDO_LOG_POOLS_INIT_NO_DRIVER' ] := "HIX_InitPoolsFromConfig: entry '{1}' has no 'driver' -- skipped"
+   hLang[ 'WDO_LOG_POOLS_END'           ] := "HIX_EndPoolsFromConfig: closed {1} pool(s)"
+   hLang[ 'WDO_ERR_DRIVER_UNKNOWN'      ] := "Unknown driver '{1}' for pool '{2}' -- skipped"
+   hLang[ 'WDO_WARN_BERROR_NOT_FOUND'   ] := "bError function '{1}' not statically linked -- pool will run without handler"
+   hLang[ 'WDO_ERR_LIB_TYPE'            ] := "Error: Library type: {1}"
+   hLang[ 'WDO_ERR_LIB_NOT_FOUND'       ] := "File not found: {1}"
+   hLang[ 'WDO_ERR_LIB_WRONG'           ] := "Error: MySQL library wrong: {1}"
+   hLang[ 'WDO_ERR_INIT_FAIL'           ] := "hMySql = 0 (MySQL library failed to initialize)"
+   hLang[ 'WDO_ERR_CONNECT'             ] := "Connection = (Failed connection) {1}"
+   hLang[ 'WDO_WARN_NEW_IN_REQUEST'     ] := ;
+      'WDO_MySql:New called inside HTTP request handler. ' + ;
+      'Use WDO_Get("MYSQL") + oConn:Close() to avoid TCP port exhaustion. ' + ;
+      'See docs/mysql/pool_vs_open.md.'
+
 RETURN hLang

@@ -492,6 +492,7 @@ METHOD BuildPRG() CLASS Hix_Transpile
    LOCAL oErrorView, nLine
    LOCAL z, nStartLineBlock
    LOCAL aPair
+   LOCAL nP
 
    aLines := {}
 
@@ -500,6 +501,9 @@ METHOD BuildPRG() CLASS Hix_Transpile
    ::ToMap( 0, "FUNCTION Hix_Template" )
 
    AAdd( aBodyParts, "   LOCAL __cOut := ''" + hb_eol() )
+   ::ToMap( 0 )
+
+   AAdd( aBodyParts, "   LOCAL __cRet := ''" + hb_eol() )
    ::ToMap( 0 )
 
    AAdd( aBodyParts, "   PRIVATE __oPar := oPar" + hb_eol() )
@@ -584,6 +588,7 @@ METHOD BuildPRG() CLASS Hix_Transpile
       ::_t( '>> Compile block @prg ' + ltrim( str( i ) ) )
 
       cBlock := "static function __block" + AllTrim( Str( i ) ) + "( __oPar )" + chr( 10 )
+      cBlock += _HixViewPrgPreamble()
       cBlock += ::ReplaceVars( ::aPrgBlocks[ i ][ 2 ], .T. )
 
       TRY
@@ -616,8 +621,13 @@ METHOD BuildPRG() CLASS Hix_Transpile
 
          aLines := hb_atokens( cBlock, Chr( 10 ) )
 
-// Primera linea eliminarem: "static function __blockxxx"
+// Primera linea + preamble runtime → limpiar del listado de codigo del error
          aLines[ 1 ] := ''
+         FOR nP := 1 TO _HixViewPrgPreambleLines()
+            IF ( 1 + nP ) <= Len( aLines )
+               aLines[ 1 + nP ] := ''
+            ENDIF
+         NEXT
 
 
          oErrorView := HIX_ErrorView( oError, 9005, NIL, NIL, NIL, "hix_view_transpile" )
@@ -663,6 +673,11 @@ METHOD BuildPRG() CLASS Hix_Transpile
       ::ToMap( nStartLineBlock, "function __block" + AllTrim( Str( i ) ) + "()" )
 
       nStartLineBlock++
+
+      AAdd( aBodyParts, _HixViewPrgPreamble() )
+      FOR nP := 1 TO _HixViewPrgPreambleLines()
+         ::ToMap( 0, "<preamble>" )
+      NEXT
 
       aCode := hb_atokens( ::ReplaceVars( ::aPrgBlocks[ i ][ 2 ], .T. ), Chr( 10 ) )
 
@@ -856,7 +871,9 @@ METHOD ProcHrb( aLine, aBodyParts ) CLASS Hix_Transpile
          AAdd( aBodyParts, "   NEXT" + hb_eol() )
 
       CASE cFirst == "@prg"
-         AAdd( aBodyParts, "   __cOut += UStr( __" + cRest + "() )" + hb_eol() )
+         AAdd( aBodyParts, "   UEchoBlockClear()" + hb_eol() )
+         AAdd( aBodyParts, "   __cRet := UStr( __" + cRest + "() )" + hb_eol() )
+         AAdd( aBodyParts, "   __cOut += UEchoBlockFlush() + __cRet" + hb_eol() )
 
       CASE cFirst == "@view"
 
@@ -1320,4 +1337,32 @@ FUNCTION HIX_ExprCurlyBalancedForTest( cExpr )
 RETURN _HixExprCurlyBalanced( cExpr )
 
 // -------------------------------------------------------------
+// Preambulo runtime que se inyecta en cada bloque @prg antes de
+// compilar/emitir el codigo del usuario. Aqui centralizas los
+// #xcommand y #xtranslate que quieres disponibles por defecto
+// dentro de cualquier @prg…@endprg de una vista.
+//
+// Si añades o quitas lineas, ajusta _HixViewPrgPreambleLines().
+// -------------------------------------------------------------
+STATIC FUNCTION _HixViewPrgPreamble()
+
+   LOCAL cPre := ""
+
+   BLOCK TO cPre 
+      
+      #xcommand ?  [<explist,...>] => UEchoBlock( '<br>' [,<explist>] )
+      #xcommand ?? [<explist,...>] => UEchoBlock( [<explist>] )
+      #xcommand TRY  => BEGIN SEQUENCE WITH {| oErr | Break( oErr ) }
+      #xcommand CATCH [<!oErr!>] => RECOVER [USING <oErr>] <-oErr->
+      #xcommand FINALLY => ALWAYS
+      #xtranslate Throw( <oErr> ) => ( Eval( ErrorBlock(), <oErr> ), Break( <oErr> ) )
+      #xcommand BLOCK <into:TO,INTO> <o> [RAW] => #pragma __cstream|<o> += %s
+      #xcommand BLOCK <into:TO,INTO> <o> [RAW] [ PARAMS [<v1>] [,<vn>] ] => #pragma __cstream|<o>+= HIX_Block( %s [,<(v1)>][+","+<(vn)>] [, @<v1>][, @<vn>] ) 
+   ENDTEXT  
+
+RETURN cPre
+
+STATIC FUNCTION _HixViewPrgPreambleLines()
+
+RETURN MLCount( _HixViewPrgPreamble() )
 

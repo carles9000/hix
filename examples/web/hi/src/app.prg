@@ -18,7 +18,13 @@ FUNCTION Main()
 
    LOCAL oServer := THixServer():New()
 
+   
+
    oServer:bOnWsMessage := {| oConn, cMsg, nOpcode | _WsPing( oConn, cMsg, nOpcode ) }
+
+   //  Diagnostic trace for bench/demo controllers -> dbg.log
+   HIX_DbgReset()
+   HIX_DbgEnable( .T. )
 
    oServer:Start()
 

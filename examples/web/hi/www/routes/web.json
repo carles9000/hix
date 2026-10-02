@@ -13,6 +13,9 @@
   { "name": "jobtest",        "url": "/job-test",                      "action": "views/job-test.html",                      "method": "GET" },
   { "name": "blog.index",     "url": "/blog",                          "action": "controllers/blog_index.prg",               "method": "GET" },
   { "name": "blog.article",   "url": "/blog/article",                  "action": "controllers/blog_article.prg",             "method": "GET" },
+  { "name": "mysqltest",      "url": "/mysql-test",                    "action": "views/mysql-test.html",                    "method": "GET" },
+  { "name": "benchtest",      "url": "/bench",                         "action": "views/bench-test.html",                    "method": "GET" },
+  { "name": "mysqldemo",      "url": "/mysql-demo",                    "action": "views/mysql-demo.html",                    "method": "GET" },
   { "name": "yourmodule",     "url": "/your-module",                   "action": "views/yourmodule.html",                    "method": "GET" },
 
   { "name": "api.ping",       "url": "/api/ping",                      "action": "controllers/api_ping.prg",                 "method": "GET" },
@@ -26,5 +29,8 @@
   { "name": "api.upload",     "url": "/api/upload",                    "action": "controllers/api_upload.prg",               "method": "POST" },
   { "name": "api.message",    "url": "/api/message",                   "action": "controllers/api_message.prg",              "method": "POST", "middleware": "MyMsgGuard" },
   { "name": "api.sse.tick",   "url": "/api/sse/ticker",                "action": "controllers/api_sse_ticker.prg",           "method": "GET", "stream": true },
-  { "name": "api.sse.job",    "url": "/api/sse/job/:nonce",            "action": "controllers/api_sse_job.prg",              "method": "GET", "stream": true }
+  { "name": "api.sse.job",    "url": "/api/sse/job/:nonce",            "action": "controllers/api_sse_job.prg",              "method": "GET", "stream": true },
+  { "name": "api.mysqltest",  "url": "/api/mysql-test",                "action": "controllers/api_mysql_test.prg",           "method": "POST" },
+  { "name": "api.mysqlbench", "url": "/api/mysql-bench",               "action": "controllers/api_mysql_bench.prg",          "method": "POST" },
+  { "name": "api.mysqldemo",  "url": "/api/mysql-demo",                "action": "controllers/api_mysql_demo.prg",           "method": "POST" },
 ]

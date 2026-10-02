@@ -7,8 +7,8 @@
                Mozilla Public License, v. 2.0. (https://mozilla.org/MPL/2.0/).
                Copyright (c) 2026 Carles Aubia Floresví - HIX Server Project
  -----------------------------------------------------------*/
-#DEFINE HIX_VERSION_SERVER                "2.2"
-#DEFINE HIX_SUBVERSION_SERVER             ".01"       
+#DEFINE HIX_VERSION_SERVER                "2.3"
+#DEFINE HIX_SUBVERSION_SERVER             ".06"
 #DEFINE HIX_LOG_MODULE HIX_MOD_SERVER
 #DEFINE SW_SHOW                              5
 
@@ -233,6 +233,10 @@ METHOD Start( lModal ) CLASS THixServer
 
       HIX_LoadMiddleware()
 
+      //  Auto-init WDO connection pools declared under "databases" in
+      //  config.json. Aborts startup if any declared pool fails to open.
+      HIX_InitPoolsFromConfig()
+
    ENDIF
 
    _LC( "start", "Init pools..." )
@@ -326,6 +330,7 @@ METHOD Stop() CLASS THixServer
 
       IF ::lOwnsGlobals
 
+         WDO_MetricsClose()
          HIX_MetricsClose()
          HIX_AccessLogClose()
          HIX_ErrorLogClose()
@@ -376,11 +381,13 @@ METHOD Stop() CLASS THixServer
 
    _LC( "stop", "Stopping pools..." )
    nT0 := hb_MilliSeconds()
+   HIX_EndPoolsFromConfig()
    ::_DestroyPools()
    _LC( "stop", "Pools stopped (" + _FmtElapsed( nT0 ) + ")" )
 
    IF ::lOwnsGlobals
 
+      WDO_MetricsClose()
       HIX_MetricsClose()
       HIX_AccessLogClose()
       HIX_ErrorLogClose()
@@ -460,6 +467,8 @@ METHOD _Init() CLASS THixServer
          " file=" + UConfig( "access_log", "file", "access.log" ) )
       HIX_MetricsInit()
       HIX_BootLogAdd( "server", "init", .T., "metrics" )
+
+      _HixStartWdoMetrics()
 
    ENDIF
 
@@ -968,6 +977,7 @@ STATIC FUNCTION ShowInit( oSrv )
    LOCAL cTitle   := "Hix server vrs. " + HIX_VERSION_SERVER + HIX_SUBVERSION_SERVER + " => Running on " + cDomain
    LOCAL cLang    := hb_oemtoansi(hb_langName()) + ', ' + hb_SetCodePage() + '/' + hb_cdpUniID( hb_SetCodePage() )
    LOCAL nRow, cI := ''
+   LOCAL hWdoInfo
    
    if nPort <> 80 
       cTitle += ':' + ltrim(str(nPort))
@@ -1021,6 +1031,13 @@ STATIC FUNCTION ShowInit( oSrv )
 	HIX_Info( @nRow, 'Version Compiler'	, HB_COMPILER() )
 	HIX_Info( @nRow, 'RDD List' 			   , cI )
 	HIX_Info( @nRow, 'RDD Default'        , RddSetDefault() )
+	IF ! Empty( WDO_Loaded() )
+	   HIX_Info( @nRow, 'WDO Loaded'      , WDO_Loaded() )
+	   hWdoInfo := WDO_InfoList()
+	   FOR EACH cI IN hb_HKeys( hWdoInfo )
+	      HIX_Info( @nRow, cI             , hWdoInfo[ cI ] )
+	   NEXT
+	ENDIF
 	HIX_Info( @nRow, 'Language/Codepage' 	, cLang )
    
 	nRow++
@@ -1130,6 +1147,32 @@ RETURN cOut
 
 // Construye la ruta de un log a partir de paths.log + nombre.
 // Si cFile ya contiene separador (path explicito) se devuelve tal cual.
+//  Opt-in WDO metrics via www/config.json → sets.wdo_metrics=true.
+//  Zero overhead when disabled (WDO_Metric* fast-path bails on soMetrics==NIL).
+STATIC FUNCTION _HixStartWdoMetrics()
+
+   LOCAL hSets
+   LOCAL lEnabled := .F.
+   LOCAL nTopN
+
+   hSets := HIX_ConfigApp( "sets", NIL )
+
+   IF HB_ISHASH( hSets )
+      lEnabled := hb_HGetDef( hSets, "wdo_metrics", .F. )
+   ENDIF
+
+   IF ! lEnabled
+      RETURN NIL
+   ENDIF
+
+   nTopN := hb_HGetDef( hSets, "wdo_metrics_top_n", 10 )
+   WDO_MetricsSetTopN( nTopN )
+   WDO_MetricsInit()
+   HIX_BootLogAdd( "server", "init", .T., "wdo_metrics top_n=" + hb_NToS( nTopN ) )
+
+RETURN NIL
+
+
 STATIC FUNCTION _HixLogPath( cFile )
 
    LOCAL cDir

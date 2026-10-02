@@ -9,6 +9,7 @@
 -head=full
 -mt
 -isrc/include
+-isrc/wdo/include
 -workdir=.hbmk/${hb_compiler}/server
 
 
@@ -121,6 +122,18 @@ src/validator/hix_val_helpers.prg
 
 # RDD Dbf 
 src/dbf/hix_dbf.prg
+
+# WDO Web Database Objects
+src/wdo/wdo.prg
+src/wdo/wdo_pool.prg
+src/wdo/wdo_metrics.prg
+src/wdo/legacy_func.c
+src/wdo/mysql/wdo_mysql.prg
+src/wdo/mysql/wdo_mysql_stmt.prg
+src/wdo/mysql/wdo_mysql_stmt_bin.prg
+src/wdo/mysql/wdo_mysql_pool.prg
+src/wdo/wdo_config.prg
+src/wdo/wdo_error_handler_default.prg
 
 # Pdf 
 src/pdf/tpdf.prg

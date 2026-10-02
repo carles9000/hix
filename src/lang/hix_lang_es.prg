@@ -121,4 +121,30 @@ FUNCTION LangStrings_ES()
    hLang[ 'ADMIN_ERR_PASSWORD_SHORT'     ] := "La contrasena debe tener al menos 6 caracteres"
    hLang[ 'ADMIN_ERR_PASSWORD_MISMATCH'  ] := "Las contrasenas no coinciden"
 
+   // ---- WDO / MySQL ----
+   hLang[ 'WDO_LOG_POOL_INIT_FAIL'      ] := "WDO_Pool[{1}] Init: conexion #{2} fallo al abrir{3}"
+   hLang[ 'WDO_LOG_ACQUIRE_TIMEOUT'     ] := "WDO_Pool[{1}] Timeout de Acquire tras {2}ms"
+   hLang[ 'WDO_LOG_PING_RECONNECT'      ] := "WDO_Pool[{1}] ping fallido -- reconectando"
+   hLang[ 'WDO_LOG_GET_NO_POOL'         ] := "WDO_Get: no hay pool registrado para el driver '{1}'"
+   hLang[ 'WDO_LOG_RELEASE_RECLAIM'     ] := "WDO_ReleaseAllThread: reclamando {1} conexion(es) filtrada(s) del thread {2}"
+   hLang[ 'WDO_LOG_MYSQL_POOL_INIT'     ] := "WDO_InitPoolMySql: abiertas {1}/{2} conexiones a {3}@{4}:{5}/{6}"
+   hLang[ 'WDO_LOG_MYSQL_POOL_INIT_FAIL' ] := "WDO_InitPoolMySql: no se pudo abrir ninguna conexion -- pool deshabilitado"
+   hLang[ 'WDO_LOG_MYSQL_POOL_END'      ] := "WDO_EndPoolMySql: cerrando pool (size={1}, busy={2})"
+   hLang[ 'WDO_LOG_POOLS_INIT'          ] := "HIX_InitPoolsFromConfig: {1}/{2} pool(s) iniciado(s) OK"
+   hLang[ 'WDO_LOG_POOLS_INIT_NONE'     ] := "HIX_InitPoolsFromConfig: no hay seccion 'databases' en config.json"
+   hLang[ 'WDO_LOG_POOLS_INIT_BAD_ENTRY' ] := "HIX_InitPoolsFromConfig: la entrada '{1}' no es un hash -- omitida"
+   hLang[ 'WDO_LOG_POOLS_INIT_NO_DRIVER' ] := "HIX_InitPoolsFromConfig: la entrada '{1}' no tiene 'driver' -- omitida"
+   hLang[ 'WDO_LOG_POOLS_END'           ] := "HIX_EndPoolsFromConfig: cerrados {1} pool(s)"
+   hLang[ 'WDO_ERR_DRIVER_UNKNOWN'      ] := "Driver desconocido '{1}' para el pool '{2}' -- omitido"
+   hLang[ 'WDO_WARN_BERROR_NOT_FOUND'   ] := "Funcion bError '{1}' no linkada estaticamente -- el pool arrancara sin handler"
+   hLang[ 'WDO_ERR_LIB_TYPE'            ] := "Error: Tipo de libreria: {1}"
+   hLang[ 'WDO_ERR_LIB_NOT_FOUND'       ] := "Fichero no encontrado: {1}"
+   hLang[ 'WDO_ERR_LIB_WRONG'           ] := "Error: libreria MySQL incorrecta: {1}"
+   hLang[ 'WDO_ERR_INIT_FAIL'           ] := "hMySql = 0 (la libreria MySQL fallo al inicializarse)"
+   hLang[ 'WDO_ERR_CONNECT'             ] := "Conexion = (Conexion fallida) {1}"
+   hLang[ 'WDO_WARN_NEW_IN_REQUEST'     ] := ;
+      'WDO_MySql:New llamado dentro de un handler HTTP. ' + ;
+      'Usa WDO_Get("MYSQL") + oConn:Close() para evitar agotar los puertos TCP. ' + ;
+      'Ver docs/mysql/pool_vs_open.md.'
+
 RETURN hLang

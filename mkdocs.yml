@@ -136,7 +136,17 @@ plugins:
             - Tiempo Real:
                 - SSE: es/tiempo-real/sse.md
                 - WS: es/tiempo-real/ws.md
-                - LongPolling: es/tiempo-real/longpolling.md            
+                - LongPolling: es/tiempo-real/longpolling.md
+            - WDO:
+                - Introducción: es/wdo/index.md
+                - MySQL:
+                    - Concepto y Pool: es/wdo/mysql/index.md
+                    - Instalación: es/wdo/mysql/instalacion.md
+                    - Configuración: es/wdo/mysql/config.md
+                    - Uso del pool: es/wdo/mysql/uso.md
+                    - Prepared Statements: es/wdo/mysql/prepared.md
+                    - Transacciones: es/wdo/mysql/transacciones.md
+                    - Troubleshooting: es/wdo/mysql/troubleshooting.md
             - API:
                 - Admin: es/api/admin.md
             - Sistema:
@@ -212,6 +222,16 @@ plugins:
                 - SSE: en/tiempo-real/sse.md
                 - WS: en/tiempo-real/ws.md
                 - LongPolling: en/tiempo-real/longpolling.md
+            - WDO:
+                - Introduction: en/wdo/index.md
+                - MySQL:
+                    - Concept and Pool: en/wdo/mysql/index.md
+                    - Installation: en/wdo/mysql/installation.md
+                    - Configuration: en/wdo/mysql/config.md
+                    - Pool Usage: en/wdo/mysql/usage.md
+                    - Prepared Statements: en/wdo/mysql/prepared.md
+                    - Transactions: en/wdo/mysql/transactions.md
+                    - Troubleshooting: en/wdo/mysql/troubleshooting.md
             - API:
                 - Admin: en/api/admin.md
             - System:
@@ -288,6 +308,16 @@ plugins:
                 - SSE: it/tiempo-real/sse.md
                 - WS: it/tiempo-real/ws.md
                 - LongPolling: it/tiempo-real/longpolling.md
+            - WDO:
+                - Introduzione: it/wdo/index.md
+                - MySQL:
+                    - Concetto e Pool: it/wdo/mysql/index.md
+                    - Installazione: it/wdo/mysql/installazione.md
+                    - Configurazione: it/wdo/mysql/config.md
+                    - Utilizzo del pool: it/wdo/mysql/utilizzo.md
+                    - Prepared Statements: it/wdo/mysql/prepared.md
+                    - Transazioni: it/wdo/mysql/transazioni.md
+                    - Troubleshooting: it/wdo/mysql/troubleshooting.md
             - API:
                 - Admin: it/api/admin.md
             - Sistema:

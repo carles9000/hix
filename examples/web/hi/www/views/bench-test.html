@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+   @view 'common/header.html'
+
+   <link href='/public/css/main.css' rel='stylesheet'>
+
+   <style>
+      .metric       { background:#f6f8fa; border:1px solid #e1e4e8; border-radius:.4rem; padding:.4rem .6rem; }
+      .metric-lbl   { font-size:.72rem; color:#6a737d; text-transform:uppercase; letter-spacing:.03em; }
+      .metric-val   { font-size:1.25rem; font-weight:600; font-variant-numeric:tabular-nums; }
+      .metric-sub   { font-size:.75rem; color:#6a737d; font-variant-numeric:tabular-nums; }
+      .bar          { height:.6rem; background:#e9ecef; border-radius:.3rem; overflow:hidden; margin-top:.3rem; }
+      .bar > div    { height:100%; background:linear-gradient(90deg,#198754 0%,#20c997 100%); transition:width .15s linear; }
+      .lat-grid     { display:grid; grid-template-columns:repeat(4, 1fr); gap:.4rem; }
+      .err-badge    { background:#f8d7da; color:#842029; padding:.1rem .4rem; border-radius:.25rem; font-size:.78rem; }
+      .ok-badge     { background:#d1e7dd; color:#0f5132; padding:.1rem .4rem; border-radius:.25rem; font-size:.78rem; }
+      #sparkline    { width:100%; height:80px; background:#0d1117; border-radius:.3rem; display:block; }
+
+      @media (max-width: 480px) {
+         .mycontainer-bench { height:auto !important; min-height:0 !important;
+                              padding-bottom:5rem !important; }
+      }
+   </style>
+
+</head>
+
+<body>
+
+   <!-- Navbar -->
+
+   @view 'common/navbar.html'
+
+   <main class="container-fluid mycontainer d-flex flex-column mycontainer-bench"
+         style="height:calc(100vh - 170px);height:calc(100dvh - 170px)">
+
+      <div class="d-flex align-items-center justify-content-between mb-2 flex-shrink-0">
+         <h4 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>DB Bench</h4>
+         <span id="status" class="badge bg-secondary">idle</span>
+      </div>
+
+      <!-- Controls -->
+
+      <div class="row g-2 mb-2 flex-shrink-0">
+         <div class="col-4">
+            <label for="N" class="form-label small mb-1">Concurrency</label>
+            <input id="N" type="number" class="form-control form-control-sm" min="1" max="200" value="20" title="Concurrency (1-200)">
+            <div class="form-text mt-0" style="font-size:.7rem">Max: 200</div>
+         </div>
+         <div class="col-4">
+            <label for="M" class="form-label small mb-1">Total req.</label>
+            <input id="M" type="number" class="form-control form-control-sm" min="10" max="20000" value="1000" title="Total requests (10-20000)">
+            <div class="form-text mt-0" style="font-size:.7rem">Max: 20000</div>
+         </div>
+         <div class="col-4">
+            <label for="L" class="form-label small mb-1">Rows query</label>
+            <input id="L" type="number" class="form-control form-control-sm" min="1" max="1000" value="100" title="Rows per query (1-1000)">
+            <div class="form-text mt-0" style="font-size:.7rem">Max: 1000</div>
+         </div>
+      </div>
+
+      <!-- Progress -->
+
+      <div class="metric mb-2 flex-shrink-0">
+         <div class="d-flex justify-content-between align-items-center">
+            <span class="metric-lbl">Progress</span>
+            <span id="pLabel" class="metric-sub">0 / 0</span>
+         </div>
+         <div class="bar"><div id="pBar" style="width:0%"></div></div>
+      </div>
+
+      <!-- Main metrics -->
+
+      <div class="row g-2 mb-2 flex-shrink-0">
+         <div class="col-6 col-md-3"><div class="metric">
+            <div class="metric-lbl">Throughput</div>
+            <div class="metric-val"><span id="rps">0</span><span class="metric-sub"> req/s</span></div>
+            <div class="metric-sub">avg over run</div>
+         </div></div>
+         <div class="col-6 col-md-3"><div class="metric">
+            <div class="metric-lbl">In-flight</div>
+            <div class="metric-val" id="inflight">0</div>
+            <div class="metric-sub">of <span id="nTarget">—</span> concurrent</div>
+         </div></div>
+         <div class="col-6 col-md-3"><div class="metric">
+            <div class="metric-lbl">Succeeded</div>
+            <div class="metric-val"><span id="okCount">0</span></div>
+            <div class="metric-sub"><span class="ok-badge" id="okPct">—</span></div>
+         </div></div>
+         <div class="col-6 col-md-3"><div class="metric">
+            <div class="metric-lbl">Errors</div>
+            <div class="metric-val"><span id="errCount">0</span></div>
+            <div class="metric-sub"><span class="err-badge" id="errPct">—</span></div>
+         </div></div>
+      </div>
+
+      <!-- Latency percentiles -->
+
+      <div class="metric mb-2 flex-shrink-0">
+         <div class="metric-lbl mb-2">Latency (ms, client-side)</div>
+         <div class="lat-grid">
+            <div><div class="metric-sub">p50</div><div class="metric-val" id="p50">—</div></div>
+            <div><div class="metric-sub">p95</div><div class="metric-val" id="p95">—</div></div>
+            <div><div class="metric-sub">p99</div><div class="metric-val" id="p99">—</div></div>
+            <div><div class="metric-sub">max</div><div class="metric-val" id="pmax">—</div></div>
+         </div>
+      </div>
+
+      <!-- Live sparkline (per-request latency over last ~400 reqs) -->
+
+      <div class="metric flex-grow-1 d-flex flex-column" style="min-height:0;">
+         <div class="metric-lbl mb-1">Per-request latency (last 400)</div>
+         <canvas id="sparkline"></canvas>
+         <div class="metric-sub mt-1">
+            Source: <span id="dbSource">—</span> &nbsp;·&nbsp;
+            Rows returned (last): <span id="dbRows">—</span>
+         </div>
+      </div>
+
+   </main>
+
+   <!-- Bottom nav -->
+
+   <nav class="navbar navbar-dark bg-dark fixed-bottom p-0">
+      <div class="d-flex w-100" role="group" aria-label="Bottom navigation">
+         <a href="/main#mysql" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0">
+            <i class="bi bi-box-arrow-left"></i><span class="btn-lbl">Back</span>
+         </a>
+         <button id="btnRun" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="startBench()">
+            <i class="bi bi-play-fill"></i><span class="btn-lbl">Start</span>
+         </button>
+         <button id="btnStop" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="stopBench()" disabled>
+            <i class="bi bi-stop-fill"></i><span class="btn-lbl">Stop</span>
+         </button>
+      </div>
+   </nav>
+
+<script>
+
+   const $N        = document.getElementById('N');
+   const $M        = document.getElementById('M');
+   const $L        = document.getElementById('L');
+   const $status   = document.getElementById('status');
+   const $pBar     = document.getElementById('pBar');
+   const $pLabel   = document.getElementById('pLabel');
+   const $rps      = document.getElementById('rps');
+   const $inflight = document.getElementById('inflight');
+   const $nTarget  = document.getElementById('nTarget');
+   const $okCount  = document.getElementById('okCount');
+   const $okPct    = document.getElementById('okPct');
+   const $errCount = document.getElementById('errCount');
+   const $errPct   = document.getElementById('errPct');
+   const $p50      = document.getElementById('p50');
+   const $p95      = document.getElementById('p95');
+   const $p99      = document.getElementById('p99');
+   const $pmax     = document.getElementById('pmax');
+   const $dbSrc    = document.getElementById('dbSource');
+   const $dbRows   = document.getElementById('dbRows');
+   const $btnRun   = document.getElementById('btnRun');
+   const $btnStop  = document.getElementById('btnStop');
+   const $spark    = document.getElementById('sparkline');
+
+   let state = null;
+
+   function setStatus(label, cls) {
+      $status.textContent = label;
+      $status.className   = 'badge bg-' + cls;
+   }
+
+   function percentile(sorted, p) {
+      if (!sorted.length) return null;
+      const idx = Math.min(sorted.length - 1, Math.floor(sorted.length * p));
+      return sorted[idx];
+   }
+
+   function drawSpark() {
+      if (!state) return;
+      const ctx = $spark.getContext('2d');
+      const w = $spark.width  = $spark.clientWidth  || 400;
+      const h = $spark.height = $spark.clientHeight || 80;
+      ctx.clearRect(0, 0, w, h);
+
+      const samples = state.sparkBuf;
+      if (!samples.length) return;
+
+      const max = Math.max(...samples, 1);
+      const n = samples.length;
+      const step = w / Math.max(n, 1);
+
+      // Grid line at p95 for reference
+      if (state.p95 != null && max > 0) {
+         const y = h - (state.p95 / max) * h;
+         ctx.strokeStyle = '#f0883e55';
+         ctx.setLineDash([3, 3]);
+         ctx.beginPath();
+         ctx.moveTo(0, y);
+         ctx.lineTo(w, y);
+         ctx.stroke();
+         ctx.setLineDash([]);
+      }
+
+      ctx.strokeStyle = '#58a6ff';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 0; i < n; i++) {
+         const x = i * step;
+         const y = h - (samples[i] / max) * h;
+         if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+   }
+
+   function refreshMetrics() {
+      if (!state) return;
+
+      const done = state.done;
+      const ok   = state.ok;
+      const err  = state.err;
+      const M    = state.M;
+      const N    = state.N;
+      const inf  = state.inflight;
+
+      $pLabel.textContent = done + ' / ' + M;
+      $pBar.style.width = (100 * done / M).toFixed(1) + '%';
+      $inflight.textContent = inf;
+      $nTarget.textContent  = N;
+      $okCount.textContent  = ok;
+      $errCount.textContent = err;
+
+      const okPct  = done ? (100 * ok / done).toFixed(1) : '—';
+      const errPct = done ? (100 * err / done).toFixed(1) : '—';
+      $okPct.textContent  = okPct + (okPct === '—' ? '' : '%');
+      $errPct.textContent = errPct + (errPct === '—' ? '' : '%');
+
+      const elapsed = (performance.now() - state.t0) / 1000;
+      const rps = elapsed > 0 ? (done / elapsed) : 0;
+      $rps.textContent = rps.toFixed(1);
+
+      if (state.lats.length) {
+         const sorted = state.sortedCache;
+         state.p95 = percentile(sorted, 0.95);
+         $p50.textContent  = (percentile(sorted, 0.50) | 0) + ' ms';
+         $p95.textContent  = (state.p95 | 0) + ' ms';
+         $p99.textContent  = (percentile(sorted, 0.99) | 0) + ' ms';
+         $pmax.textContent = (sorted[sorted.length - 1] | 0) + ' ms';
+      }
+
+      drawSpark();
+   }
+
+   async function oneRequest() {
+      const t0 = performance.now();
+      let ok = false;
+      try {
+         const r = await fetch('/api/mysql-bench', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ limit: state.L })
+         });
+         const h = await r.json();
+         ok = !!h.ok;
+         if (ok) {
+            state.lastSource = h.source;
+            state.lastRows   = h.rows_returned;
+         }
+      } catch (e) {
+         ok = false;
+      }
+      const t = performance.now() - t0;
+
+      state.inflight--;
+      state.done++;
+      if (ok) state.ok++; else state.err++;
+
+      state.lats.push(t);
+      // Rebuild sorted cache incrementally would be cheaper; for a demo
+      // the sort cost at every tick is fine (slice is O(n log n) over
+      // the full set, called at ~10 Hz by the refresh timer).
+
+      state.sparkBuf.push(t);
+      if (state.sparkBuf.length > 400) state.sparkBuf.shift();
+   }
+
+   async function workerLoop() {
+      while (state && state.running && state.sent < state.M) {
+         state.sent++;
+         state.inflight++;
+         // Fire and continue on the same worker only after it resolves,
+         // so each worker holds exactly 1 in-flight request. N workers
+         // => N in-flight at any moment.
+         await oneRequest();
+      }
+   }
+
+   function startBench() {
+
+      const N = Math.max(1, Math.min(200, parseInt($N.value, 10) || 1));
+      const M = Math.max(10, Math.min(20000, parseInt($M.value, 10) || 10));
+      const L = Math.max(1, Math.min(1000, parseInt($L.value, 10) || 100));
+
+      state = {
+         N, M, L,
+         running: true,
+         sent: 0, done: 0, ok: 0, err: 0, inflight: 0,
+         lats: [], sortedCache: [], sparkBuf: [],
+         t0: performance.now(),
+         lastSource: '—', lastRows: '—', p95: null
+      };
+
+      $btnRun.disabled  = true;
+      $btnStop.disabled = false;
+      $N.disabled = $M.disabled = $L.disabled = true;
+      setStatus('running', 'warning');
+
+      // Refresh ticker (10 Hz). Cheap; sorts the lats array for percentiles.
+      state.ticker = setInterval(() => {
+         if (!state) return;
+         state.sortedCache = state.lats.slice().sort((a, b) => a - b);
+         $dbSrc.textContent  = state.lastSource;
+         $dbRows.textContent = state.lastRows;
+         refreshMetrics();
+         if (state.inflight === 0 && (!state.running || state.sent >= state.M)) finishBench();
+      }, 100);
+
+      // Launch N worker coroutines.
+      for (let i = 0; i < N; i++) workerLoop();
+   }
+
+   function stopBench() {
+      if (!state) return;
+      state.running = false;
+      setStatus('stopping', 'warning');
+      $btnStop.disabled = true;
+   }
+
+   function finishBench() {
+      clearInterval(state.ticker);
+      refreshMetrics();
+      setStatus('done', 'success');
+      $btnRun.disabled  = false;
+      $btnStop.disabled = true;
+      $N.disabled = $M.disabled = $L.disabled = false;
+      state.running = false;
+   }
+
+   window.addEventListener('resize', drawSpark);
+
+</script>
+
+</body>
+</html>

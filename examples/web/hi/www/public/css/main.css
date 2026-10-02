@@ -110,3 +110,22 @@
 /* Some mobile browsers still paint the ring on tap, not only on keyboard */
 
 .btn:focus:not(:focus-visible) { box-shadow: none; }
+
+/* --- Main tabs (System / MySQL / Dbf) -------------------------------------
+   Default: dark text, no background.
+   Active:  green, bold, slightly larger — stands out clearly on mobile.
+   -------------------------------------------------------------------------- */
+
+#mainTabs .nav-link {
+   color: #212529;
+   font-size: .95rem;
+   border-bottom: 2px solid transparent;
+}
+
+#mainTabs .nav-link.active {
+   color: #198754;
+   font-weight: 700;
+   font-size: 1.05rem;
+   border-bottom: 2px solid #198754;
+   background: transparent;
+}

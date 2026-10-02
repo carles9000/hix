@@ -1209,6 +1209,10 @@ STATIC FUNCTION _HixEvalAction( bAction, oReq, hParams, cRouteName, nTimeoutMs )
       FINALLY
       // Cierra areas DBF incluso si la ejecucion aborto por excepcion.
       HIX_CloseDbfAreas()
+      // Devuelve al pool cualquier conexion WDO_Get() que el handler
+      // olvido cerrar (o perdio por excepcion). Fast-path ~1ns cuando
+      // no hay pools registrados.
+      WDO_ReleaseAllThread()
 
    END
 

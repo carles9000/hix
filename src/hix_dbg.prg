@@ -12,12 +12,21 @@
 
 #include "fileio.ch"
 
-STATIC s_hMtx  := NIL
-STATIC s_cFile := "dbg.log"
+STATIC s_hMtx     := NIL
+STATIC s_cFile    := "dbg.log"
+STATIC s_lEnabled := .F.                    // default OFF — zero cost in hot paths
 
 FUNCTION HIX_Dbg( cMsg )
 
    LOCAL cLine, hFile
+
+   //  Fast-path: one boolean check when disabled. NEVER touch mutex/disk
+   //  unless someone explicitly enabled tracing. This keeps HIX_Dbg calls
+   //  scattered in hot paths (pool Acquire/Release, connection Close, etc.)
+   //  effectively free in production and benchmarks.
+   IF ! s_lEnabled
+      RETU NIL
+   ENDIF
 
    IF s_hMtx == NIL
       s_hMtx := hb_mutexCreate()
@@ -66,3 +75,16 @@ FUNCTION HIX_DbgReset()
    hb_mutexUnlock( s_hMtx )
 
 RETURN NIL
+
+
+//  Enable/disable runtime tracing. Default is OFF: HIX_Dbg() early-returns
+//  without touching mutex or disk. Turn ON only in tests or when actively
+//  diagnosing. Callers that want traces (functional tests, ad-hoc debug)
+//  should call HIX_DbgEnable() explicitly.
+FUNCTION HIX_DbgEnable( lOn )
+   LOCAL lPrev := s_lEnabled
+   s_lEnabled := hb_defaultValue( lOn, .T. )
+RETURN lPrev
+
+FUNCTION HIX_DbgEnabled()
+RETURN s_lEnabled

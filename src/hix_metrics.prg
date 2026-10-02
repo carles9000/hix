@@ -83,13 +83,22 @@ RETURN 0
 
 FUNCTION HIX_MetricsJson()
 
-   IF soMetrics != NIL
+   LOCAL cJson
 
-      RETURN soMetrics:ToJson()
-
+   IF soMetrics == NIL
+      RETURN "{}"
    ENDIF
 
-RETURN "{}"
+   cJson := soMetrics:ToJson()
+
+   //  Opt-in WDO block injected before the closing brace when the WDO
+   //  metrics registry is active (sets.wdo_metrics=true in config.json).
+   IF WDO_MetricsIsActive() .AND. Right( cJson, 1 ) == "}"
+      cJson := Left( cJson, Len( cJson ) - 1 ) + ;
+               ',"wdo":' + WDO_MetricsJson() + "}"
+   ENDIF
+
+RETURN cJson
 
 FUNCTION HIX_MetricsDump()
 

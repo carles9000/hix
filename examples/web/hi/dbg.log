@@ -1,0 +1,39 @@
+2026-10-02 13:57:27.58 [tid=1] [WDO_Config] InitPoolsFromConfig: 1 entries
+2026-10-02 13:57:27.581 [tid=1] [WDO_Config] InitPoolsFromConfig: 'mysql' driver=mariadb
+2026-10-02 13:57:27.581 [tid=1] [WDO_MySqlPool] InitPoolMySqlEx[mysql]: BEGIN harbour@127.0.0.1:3306/employees size=32 timeout=5000ms ping=T
+2026-10-02 13:57:27.581 [tid=1] [WDO_Pool:MYSQL] Init: opening 32 connections (ping=T timeout=5000ms)
+2026-10-02 13:57:27.592 [tid=1] [WDO_Pool:MYSQL] Init:   slot #1 OPENED
+2026-10-02 13:57:27.593 [tid=1] [WDO_Pool:MYSQL] Init:   slot #2 OPENED
+2026-10-02 13:57:27.594 [tid=1] [WDO_Pool:MYSQL] Init:   slot #3 OPENED
+2026-10-02 13:57:27.595 [tid=1] [WDO_Pool:MYSQL] Init:   slot #4 OPENED
+2026-10-02 13:57:27.597 [tid=1] [WDO_Pool:MYSQL] Init:   slot #5 OPENED
+2026-10-02 13:57:27.598 [tid=1] [WDO_Pool:MYSQL] Init:   slot #6 OPENED
+2026-10-02 13:57:27.599 [tid=1] [WDO_Pool:MYSQL] Init:   slot #7 OPENED
+2026-10-02 13:57:27.601 [tid=1] [WDO_Pool:MYSQL] Init:   slot #8 OPENED
+2026-10-02 13:57:27.603 [tid=1] [WDO_Pool:MYSQL] Init:   slot #9 OPENED
+2026-10-02 13:57:27.604 [tid=1] [WDO_Pool:MYSQL] Init:   slot #10 OPENED
+2026-10-02 13:57:27.606 [tid=1] [WDO_Pool:MYSQL] Init:   slot #11 OPENED
+2026-10-02 13:57:27.608 [tid=1] [WDO_Pool:MYSQL] Init:   slot #12 OPENED
+2026-10-02 13:57:27.609 [tid=1] [WDO_Pool:MYSQL] Init:   slot #13 OPENED
+2026-10-02 13:57:27.611 [tid=1] [WDO_Pool:MYSQL] Init:   slot #14 OPENED
+2026-10-02 13:57:27.613 [tid=1] [WDO_Pool:MYSQL] Init:   slot #15 OPENED
+2026-10-02 13:57:27.615 [tid=1] [WDO_Pool:MYSQL] Init:   slot #16 OPENED
+2026-10-02 13:57:27.616 [tid=1] [WDO_Pool:MYSQL] Init:   slot #17 OPENED
+2026-10-02 13:57:27.618 [tid=1] [WDO_Pool:MYSQL] Init:   slot #18 OPENED
+2026-10-02 13:57:27.62 [tid=1] [WDO_Pool:MYSQL] Init:   slot #19 OPENED
+2026-10-02 13:57:27.621 [tid=1] [WDO_Pool:MYSQL] Init:   slot #20 OPENED
+2026-10-02 13:57:27.623 [tid=1] [WDO_Pool:MYSQL] Init:   slot #21 OPENED
+2026-10-02 13:57:27.625 [tid=1] [WDO_Pool:MYSQL] Init:   slot #22 OPENED
+2026-10-02 13:57:27.626 [tid=1] [WDO_Pool:MYSQL] Init:   slot #23 OPENED
+2026-10-02 13:57:27.628 [tid=1] [WDO_Pool:MYSQL] Init:   slot #24 OPENED
+2026-10-02 13:57:27.63 [tid=1] [WDO_Pool:MYSQL] Init:   slot #25 OPENED
+2026-10-02 13:57:27.632 [tid=1] [WDO_Pool:MYSQL] Init:   slot #26 OPENED
+2026-10-02 13:57:27.634 [tid=1] [WDO_Pool:MYSQL] Init:   slot #27 OPENED
+2026-10-02 13:57:27.635 [tid=1] [WDO_Pool:MYSQL] Init:   slot #28 OPENED
+2026-10-02 13:57:27.637 [tid=1] [WDO_Pool:MYSQL] Init:   slot #29 OPENED
+2026-10-02 13:57:27.638 [tid=1] [WDO_Pool:MYSQL] Init:   slot #30 OPENED
+2026-10-02 13:57:27.641 [tid=1] [WDO_Pool:MYSQL] Init:   slot #31 OPENED
+2026-10-02 13:57:27.642 [tid=1] [WDO_Pool:MYSQL] Init:   slot #32 OPENED
+2026-10-02 13:57:27.642 [tid=1] [WDO_Pool:MYSQL] Init: done, opened 32/32
+2026-10-02 13:57:27.643 [tid=1] [WDO_Pool] RegisterPool: 'MYSQL' registered (sl_HasPools=T)
+2026-10-02 13:57:27.643 [tid=1] [WDO_MySqlPool] InitPoolMySqlEx[mysql]: END OK (32/32 connections)

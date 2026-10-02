@@ -1,8 +1,14 @@
 # Readme !
 
+This HIX feature demonstration program was created entirely using Claude Code; 
+I simply gave instructions on what each module should do.
+
+
 1.- Adjust the paths of compilation files
 
 2.- Copy .\dll\<compiler>\*.dll to server path
+
+3.- If you wish to test MySQL, read doc/mysql.md
 
 --- 
 
