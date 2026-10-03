@@ -32,5 +32,6 @@
   { "name": "api.sse.job",    "url": "/api/sse/job/:nonce",            "action": "controllers/api_sse_job.prg",              "method": "GET", "stream": true },
   { "name": "api.mysqltest",  "url": "/api/mysql-test",                "action": "controllers/api_mysql_test.prg",           "method": "POST" },
   { "name": "api.mysqlbench", "url": "/api/mysql-bench",               "action": "controllers/api_mysql_bench.prg",          "method": "POST" },
-  { "name": "api.mysqldemo",  "url": "/api/mysql-demo",                "action": "controllers/api_mysql_demo.prg",           "method": "POST" },
+  { "name": "api.mysqldemo",        "url": "/api/mysql-demo",         "action": "controllers/api_mysql_demo.prg",        "method": "POST" },
+  { "name": "api.mysql.pool.stats", "url": "/api/mysql-pool-stats",  "action": "controllers/api_mysql_pool_stats.prg",  "method": "GET"  }
 ]

@@ -67,6 +67,7 @@
       .mini-click-hint   { font-size:.68rem; color:#0d6efd; margin-top:.3rem; opacity:0;
                            transition:opacity .15s; }
       .mini-card.done:hover .mini-click-hint { opacity:1; }
+      .mini-sublabel     { font-size:.64rem; color:#856404; margin-top:-.1rem; letter-spacing:.01em; }
 
       .metric            { background:#f6f8fa; border:1px solid #e1e4e8; border-radius:.4rem;
                            padding:.3rem .6rem; min-width:9rem; }
@@ -115,7 +116,9 @@
 
       <div class="d-flex align-items-center justify-content-between mb-2 flex-shrink-0">
          <h4 class="mb-0"><i class="bi bi-lightning-charge me-2"></i>MySQL Showcase</h4>
-         <span id="status" class="badge bg-secondary">idle</span>
+         <div class="d-flex align-items-center gap-2">
+            <span id="status" class="badge bg-secondary">idle</span>
+         </div>
       </div>
 
       <!-- Dataset summary -->
@@ -356,10 +359,16 @@
       return 'slow';
    }
 
+   function qLabel(idx) {
+      let s = '<div class="mini-label">Query ' + idx + '</div>';
+      if (idx === 5) s += '<div class="mini-sublabel">&#177; 5 sec.</div>';
+      return s;
+   }
+
    function miniHtml(idx, state, body) {
       return (
          '<div class="mini-card ' + state + '" id="mini-' + idx + '" data-idx="' + idx + '">' +
-            '<div class="mini-label">Query ' + idx + '</div>' +
+            qLabel(idx) +
             '<div class="mini-body">' + body + '</div>' +
             '<div class="mini-click-hint">&nbsp;</div>' +
          '</div>'
@@ -376,10 +385,17 @@
              '<div class="mini-sub">running...</div>';
    }
 
+   function fmtMs(ms) {
+      if (ms >= 1000) return { val: (ms / 1000).toFixed(2), unit: 's' };
+      return { val: ms, unit: 'ms' };
+   }
+
    function doneBody(q) {
-      const cls = msClass(q.ms | 0);
-      return '<div class="mini-ms ' + cls + '">' + (q.ms | 0) +
-                '<span class="mini-ms-unit">ms</span></div>' +
+      const ms  = q.ms | 0;
+      const cls = msClass(ms);
+      const fmt = fmtMs(ms);
+      return '<div class="mini-ms ' + cls + '">' + fmt.val +
+                '<span class="mini-ms-unit">' + fmt.unit + '</span></div>' +
              '<div class="mini-rows">' + (q.row_count | 0).toLocaleString('en-US') + ' row(s)</div>';
    }
 
@@ -415,9 +431,10 @@
       const q = results[idx];
       if (!q) return;
       $qmTitle.textContent = q.label || ('Query ' + idx);
+      const _fmt = fmtMs(q.ms | 0);
       $qmFooter.innerHTML = '<strong class="text-dark">' +
          (q.row_count | 0).toLocaleString('en-US') + ' row(s)</strong> · ' +
-         (q.ms | 0) + ' ms';
+         _fmt.val + ' ' + _fmt.unit;
       if (q.ok) {
          $qmBody.innerHTML =
             '<div class="md-desc">' + esc(q.desc) + '</div>' +
@@ -466,7 +483,7 @@
       // Flip to running
       const el = document.getElementById('mini-' + idx);
       el.className = 'mini-card running';
-      el.innerHTML = '<div class="mini-label">Query ' + idx + '</div>' +
+      el.innerHTML = qLabel(idx) +
                      '<div class="mini-body">' + runningBody() + '</div>' +
                      '<div class="mini-click-hint">&nbsp;</div>';
       el.onclick = null;
@@ -495,7 +512,7 @@
       const state = h.ok ? 'ok done' : 'ko done';
       const body  = h.ok ? doneBody(h) : errorBody(h.error || 'error');
       el.className = 'mini-card ' + state;
-      el.innerHTML = '<div class="mini-label">Query ' + idx + '</div>' +
+      el.innerHTML = qLabel(idx) +
                      '<div class="mini-body">' + body + '</div>' +
                      doneHint();
       el.dataset.idx = idx;

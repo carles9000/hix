@@ -95,6 +95,33 @@
          </div></div>
       </div>
 
+      <!-- Pool stats -->
+
+      <div class="metric mb-2 flex-shrink-0">
+         <div class="d-flex align-items-center gap-3">
+            <div style="min-width:7rem">
+               <div class="metric-lbl">MySQL Pool</div>
+               <div class="metric-val">
+                  <span id="poolBusy">—</span><span class="metric-sub"> / <span id="poolSize">—</span></span>
+               </div>
+               <div class="metric-sub"><span id="poolStatusTxt">—</span></div>
+            </div>
+            <div style="min-width:4rem">
+               <div class="metric-lbl">Max busy</div>
+               <div class="metric-val" id="poolBusyMax">—</div>
+               <div class="metric-sub">this run</div>
+            </div>
+            <div class="flex-grow-1">
+               <div class="bar"><div id="poolBar" style="width:0%"></div></div>
+               <div class="metric-sub mt-1"><span id="poolFree">—</span> free</div>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
+                    onclick="refreshPool()" title="Refresh pool stats" id="btnPool">
+               <i class="bi bi-arrow-clockwise"></i>
+            </button>
+         </div>
+      </div>
+
       <!-- Latency percentiles -->
 
       <div class="metric mb-2 flex-shrink-0">
@@ -313,6 +340,13 @@
       $N.disabled = $M.disabled = $L.disabled = true;
       setStatus('running', 'warning');
 
+      // Pool stats: reset max + refresh every 300 ms during the bench
+      poolBusyMax = 0;
+      document.getElementById('poolBusyMax').textContent = '—';
+      clearInterval(poolPassiveTimer);
+      refreshPool();
+      state.poolTimer = setInterval(refreshPool, 300);
+
       // Refresh ticker (10 Hz). Cheap; sorts the lats array for percentiles.
       state.ticker = setInterval(() => {
          if (!state) return;
@@ -335,8 +369,11 @@
    }
 
    function finishBench() {
+      clearInterval(state.poolTimer);
       clearInterval(state.ticker);
+      poolPassiveTimer = setInterval(refreshPool, 3000);
       refreshMetrics();
+      refreshPool();
       setStatus('done', 'success');
       $btnRun.disabled  = false;
       $btnStop.disabled = true;
@@ -345,6 +382,49 @@
    }
 
    window.addEventListener('resize', drawSpark);
+
+   // ---- Pool stats ----
+
+   let poolBusyMax = 0;
+   let poolPassiveTimer = setInterval(refreshPool, 3000);
+
+   async function refreshPool() {
+      try {
+         const r = await fetch('/api/mysql-pool-stats');
+         const h = await r.json();
+         updatePoolUI(h);
+      } catch(e) {}
+   }
+
+   function updatePoolUI(h) {
+      const busy   = (h && h.registered) ? h.busy   : null;
+      const size   = (h && h.registered) ? h.size   : null;
+      const free   = (h && h.registered) ? h.free   : null;
+      const closed = (h && h.registered) ? h.closed : null;
+
+      document.getElementById('poolBusy').textContent = busy != null ? busy : '—';
+      document.getElementById('poolSize').textContent = size != null ? size : '—';
+      document.getElementById('poolFree').textContent = free != null ? free : '—';
+
+      if (busy != null && busy > poolBusyMax) {
+         poolBusyMax = busy;
+         document.getElementById('poolBusyMax').textContent = poolBusyMax;
+      }
+
+      if (!h || !h.registered) {
+         document.getElementById('poolStatusTxt').textContent = 'not registered';
+         document.getElementById('poolBar').style.cssText = 'width:0%';
+         return;
+      }
+      const pct = size > 0 ? (busy / size) : 0;
+      const color = closed ? '#6c757d' : pct >= 1 ? '#dc3545' : pct >= 0.75 ? '#ffc107' : '#198754';
+      document.getElementById('poolBar').style.cssText =
+         'width:' + (pct * 100).toFixed(0) + '%;background:' + color + ';transition:width .3s,background .3s';
+      document.getElementById('poolStatusTxt').textContent =
+         closed ? 'closed' : pct >= 1 ? 'SATURATED' : pct >= 0.75 ? 'high' : 'OK';
+   }
+
+   refreshPool();
 
 </script>
 

@@ -29,6 +29,8 @@ FUNCTION Main()
    LOCAL hResult
    LOCAL cLabel, cDesc, cVolume, cSql
    LOCAL nYear, cDept, nOffset
+   LOCAL oError
+   LOCAL hStats
    LOCAL aDepts  := { "d001", "d002", "d003", "d004", "d005", ;
                       "d006", "d007", "d008", "d009" }
 
@@ -40,6 +42,10 @@ FUNCTION Main()
    oConn := WDO_Get( "mysql" )
 
    IF oConn == NIL
+      hStats := WDO_PoolStats( "mysql" )
+      _l( "[mysql:demo] pool unavailable q=" + hb_NToS( nQ ) + ;
+         iif( HB_ISHASH( hStats ), ;
+              " busy=" + hb_NToS( hStats["busy"] ) + "/" + hb_NToS( hStats["size"] ), "" ), 4, "mysql" )
       USendJson( { "ok"    => .F., ;
                    "q"     => nQ, ;
                    "error" => "mysql pool unavailable", ;
@@ -155,10 +161,16 @@ FUNCTION Main()
 
    ENDCASE
 
-   hResult := _RunQuery( oConn, nQ, cLabel, cDesc, cVolume, cSql )
-   oConn:Close()
-
-   USendJson( hResult )
+   TRY
+      hResult := _RunQuery( oConn, nQ, cLabel, cDesc, cVolume, cSql )
+      USendJson( hResult )
+   CATCH oError
+      HIX_Dbg( "api_mysql_demo error: " + oError:description )
+      _l( "[mysql:demo] exception q=" + hb_NToS( nQ ) + ": " + oError:description, 4, "mysql" )
+      USendError( 500, oError:description )
+   FINALLY
+      oConn:Close()
+   END
 
 RETURN NIL
 
@@ -252,8 +264,10 @@ STATIC FUNCTION _RunQuery( oConn, nQ, cLabel, cDesc, cVolume, cSql )
 
    IF oStmt == NIL
       hStep[ "error" ] := "query returned NIL (connection lost?)"
+      _l( "[mysql:demo] q=" + hb_NToS( nQ ) + " NIL stmt — connection lost?", 4, "mysql" )
    ELSEIF oStmt:lError
       hStep[ "error" ] := oStmt:cError
+      _l( "[mysql:demo] q=" + hb_NToS( nQ ) + " query error: " + oStmt:cError, 4, "mysql" )
       oStmt:Free()
    ELSE
       oStmt:lWeb := .F.
@@ -261,6 +275,10 @@ STATIC FUNCTION _RunQuery( oConn, nQ, cLabel, cDesc, cVolume, cSql )
       hStep[ "row_count" ] := Len( hStep[ "rows" ] )
       hStep[ "ok" ]        := .T.
       oStmt:Free()
+      IF hStep[ "ms" ] > 1000
+         _l( "[mysql:demo] q=" + hb_NToS( nQ ) + " slow " + ;
+                  hb_NToS( hStep["ms"] ) + "ms rows=" + hb_NToS( hStep["row_count"] ), 3, "mysql" )
+      ENDIF
    ENDIF
 
 RETURN hStep

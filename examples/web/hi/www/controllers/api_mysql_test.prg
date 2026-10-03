@@ -26,6 +26,8 @@ FUNCTION Main()
    LOCAL nT0    := hb_MilliSeconds()
    LOCAL lTrans := .F.
    LOCAL i
+   LOCAL oError
+   LOCAL hStats
 
    IF cTest != "A" .AND. cTest != "B"
       USendJson( { "ok" => .F., "error" => "test must be 'A' or 'B'" }, 400 )
@@ -35,6 +37,10 @@ FUNCTION Main()
    oConn := WDO_Get( "mysql" )
 
    IF oConn == NIL
+      hStats := WDO_PoolStats( "mysql" )
+      _l( "[mysql:test] pool unavailable test=" + cTest + ;
+         iif( HB_ISHASH( hStats ), ;
+              " busy=" + hb_NToS( hStats["busy"] ) + "/" + hb_NToS( hStats["size"] ), "" ), 4, "mysql" )
       USendJson( { "ok"    => .F., ;
                    "error" => "mysql pool unavailable", ;
                    "diag"  => _MysqlDiag() }, 503 )
@@ -43,81 +49,89 @@ FUNCTION Main()
 
    lTrans := ( cTest == "B" )
 
-   _RunStep( oConn, aSteps, "DROP",   ;
-             "DROP TEMPORARY TABLE IF EXISTS _hix_test" )
+   TRY
 
-   lOk := _RunStep( oConn, aSteps, "CREATE", ;
-             "CREATE TEMPORARY TABLE _hix_test ( " + ;
-             "id INT AUTO_INCREMENT PRIMARY KEY, " + ;
-             "valor VARCHAR(100), " + ;
-             "creado DATETIME DEFAULT CURRENT_TIMESTAMP )" )
+      _RunStep( oConn, aSteps, "DROP",   ;
+                "DROP TEMPORARY TABLE IF EXISTS _hix_test" )
 
-   IF lOk .AND. lTrans
-      lOk := _RunStep( oConn, aSteps, "BEGIN", "START TRANSACTION", ;
-             {|| oConn:BeginTrans() } )
-   ENDIF
+      lOk := _RunStep( oConn, aSteps, "CREATE", ;
+                "CREATE TEMPORARY TABLE _hix_test ( " + ;
+                "id INT AUTO_INCREMENT PRIMARY KEY, " + ;
+                "valor VARCHAR(100), " + ;
+                "creado DATETIME DEFAULT CURRENT_TIMESTAMP )" )
 
-   //  5x INSERT -- distinct `valor` per row
-   IF lOk
-      FOR i := 1 TO 5
-         lOk := _RunStep( oConn, aSteps, "INSERT " + hb_NToS( i ), ;
-                "INSERT INTO _hix_test (valor) VALUES ('prueba_hix_" + ;
-                hb_NToS( i ) + "')" )
-         IF ! lOk ; EXIT ; ENDIF
-      NEXT
-   ENDIF
-
-   IF lOk
-      lOk := _RunStep( oConn, aSteps, "SELECT inserted", ;
-             "SELECT * FROM _hix_test ORDER BY id" )
-   ENDIF
-
-   //  5x UPDATE -- flips each `valor` to its "_up" twin
-   IF lOk
-      FOR i := 1 TO 5
-         lOk := _RunStep( oConn, aSteps, "UPDATE " + hb_NToS( i ), ;
-                "UPDATE _hix_test SET valor = 'prueba_hix_" + hb_NToS( i ) + ;
-                "_up' WHERE valor = 'prueba_hix_" + hb_NToS( i ) + "'" )
-         IF ! lOk ; EXIT ; ENDIF
-      NEXT
-   ENDIF
-
-   IF lOk
-      lOk := _RunStep( oConn, aSteps, "SELECT updated", ;
-             "SELECT * FROM _hix_test ORDER BY id" )
-   ENDIF
-
-   //  5x DELETE -- removes each updated row one by one
-   IF lOk
-      FOR i := 1 TO 5
-         lOk := _RunStep( oConn, aSteps, "DELETE " + hb_NToS( i ), ;
-                "DELETE FROM _hix_test WHERE valor = 'prueba_hix_" + ;
-                hb_NToS( i ) + "_up'" )
-         IF ! lOk ; EXIT ; ENDIF
-      NEXT
-   ENDIF
-
-   IF lOk
-      lOk := _RunStep( oConn, aSteps, "SELECT after", ;
-             "SELECT * FROM _hix_test" )
-   ENDIF
-
-   IF lTrans
-      IF lOk
-         _RunStep( oConn, aSteps, "COMMIT", "COMMIT", {|| oConn:Commit() } )
-      ELSE
-         _RunStep( oConn, aSteps, "ROLLBACK", "ROLLBACK", {|| oConn:Rollback() } )
+      IF lOk .AND. lTrans
+         lOk := _RunStep( oConn, aSteps, "BEGIN", "START TRANSACTION", ;
+                {|| oConn:BeginTrans() } )
       ENDIF
-   ENDIF
 
-   oConn:Close()
+      //  5x INSERT -- distinct `valor` per row
+      IF lOk
+         FOR i := 1 TO 5
+            lOk := _RunStep( oConn, aSteps, "INSERT " + hb_NToS( i ), ;
+                   "INSERT INTO _hix_test (valor) VALUES ('prueba_hix_" + ;
+                   hb_NToS( i ) + "')" )
+            IF ! lOk ; EXIT ; ENDIF
+         NEXT
+      ENDIF
 
-   USendJson( { ;
-      "ok"       => lOk, ;
-      "test"     => cTest, ;
-      "trans"    => lTrans, ;
-      "took_ms"  => hb_MilliSeconds() - nT0, ;
-      "steps"    => aSteps } )
+      IF lOk
+         lOk := _RunStep( oConn, aSteps, "SELECT inserted", ;
+                "SELECT * FROM _hix_test ORDER BY id" )
+      ENDIF
+
+      //  5x UPDATE -- flips each `valor` to its "_up" twin
+      IF lOk
+         FOR i := 1 TO 5
+            lOk := _RunStep( oConn, aSteps, "UPDATE " + hb_NToS( i ), ;
+                   "UPDATE _hix_test SET valor = 'prueba_hix_" + hb_NToS( i ) + ;
+                   "_up' WHERE valor = 'prueba_hix_" + hb_NToS( i ) + "'" )
+            IF ! lOk ; EXIT ; ENDIF
+         NEXT
+      ENDIF
+
+      IF lOk
+         lOk := _RunStep( oConn, aSteps, "SELECT updated", ;
+                "SELECT * FROM _hix_test ORDER BY id" )
+      ENDIF
+
+      //  5x DELETE -- removes each updated row one by one
+      IF lOk
+         FOR i := 1 TO 5
+            lOk := _RunStep( oConn, aSteps, "DELETE " + hb_NToS( i ), ;
+                   "DELETE FROM _hix_test WHERE valor = 'prueba_hix_" + ;
+                   hb_NToS( i ) + "_up'" )
+            IF ! lOk ; EXIT ; ENDIF
+         NEXT
+      ENDIF
+
+      IF lOk
+         lOk := _RunStep( oConn, aSteps, "SELECT after", ;
+                "SELECT * FROM _hix_test" )
+      ENDIF
+
+      IF lTrans
+         IF lOk
+            _RunStep( oConn, aSteps, "COMMIT", "COMMIT", {|| oConn:Commit() } )
+         ELSE
+            _RunStep( oConn, aSteps, "ROLLBACK", "ROLLBACK", {|| oConn:Rollback() } )
+         ENDIF
+      ENDIF
+
+      USendJson( { ;
+         "ok"       => lOk, ;
+         "test"     => cTest, ;
+         "trans"    => lTrans, ;
+         "took_ms"  => hb_MilliSeconds() - nT0, ;
+         "steps"    => aSteps } )
+
+   CATCH oError
+      HIX_Dbg( "api_mysql_test error: " + oError:description )
+      _l( "[mysql:test] exception test=" + cTest + ": " + oError:description, 4, "mysql" )
+      USendError( 500, oError:description )
+   FINALLY
+      oConn:Close()
+   END
 
 RETURN NIL
 
@@ -216,8 +230,10 @@ STATIC FUNCTION _RunStep( oConn, aSteps, cLabel, cSql, bCustom )
 
       IF oStmt == NIL
          hStep[ "info" ] := "query returned NIL (connection lost?)"
+         _l( "[mysql:test] step [" + cLabel + "] NIL stmt — connection lost?", 4, "mysql" )
       ELSEIF oStmt:lError
          hStep[ "info" ] := "mysql error: " + oStmt:cError
+         _l( "[mysql:test] step [" + cLabel + "] error: " + oStmt:cError, 4, "mysql" )
          oStmt:Free()
       ELSE
          hStep[ "ok" ]       := .T.

@@ -473,6 +473,7 @@ METHOD ExecuteHtml( cPath ) CLASS THixDispatcher
       HIX_Throw( oError )
       FINALLY
       HIX_CloseDbfAreas()
+      WDO_ReleaseAllThread()
 
    END
 
@@ -489,8 +490,9 @@ METHOD ExecuteView( cPath ) CLASS THixDispatcher
       cHtml := UView( cPath )
       
    FINALLY
-   
+
       HIX_CloseDbfAreas()
+      WDO_ReleaseAllThread()
 
    END
 
@@ -876,6 +878,7 @@ STATIC FUNCTION _HixRunHrb( oHrb, cPath  )
       ENDIF
 
       HIX_CloseDbfAreas()
+      WDO_ReleaseAllThread()
 
    END
 
@@ -1098,6 +1101,7 @@ STATIC FUNCTION _HixRunHrbClass( oHrb, cPath, hClass )
             HIX_Throw( oError )
             FINALLY
             HIX_CloseDbfAreas()
+            WDO_ReleaseAllThread()
 
          END
 

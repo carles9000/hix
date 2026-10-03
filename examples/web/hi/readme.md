@@ -8,7 +8,7 @@ I simply gave instructions on what each module should do.
 
 2.- Copy .\dll\<compiler>\*.dll to server path
 
-3.- If you wish to test MySQL, read doc/mysql.md
+3.- If you wish to test MySQL, please read the help entry at https://carles9000.github.io/hix/wdo/mysql/installation/
 
 --- 
 

@@ -1,3 +1,6 @@
+2.3.07 WDO_ReleaseAllThread() conectada al dispatcher (fix saturación pool
+       MySQL). TRY/CATCH/FINALLY en controllers Hi. Pool stats widget en
+       bench (300ms). Logging via _l(). Q5 ±5sec, ms→s ≥1000ms.
 2.3.06 WDO MySql docs+examples: employees DB, site-docs ES/EN/IT
        (7 pages x3), lAbortOnFail default .T., DLL error simplificado,
        old_version eliminado. Cierre ciclo WDO MySQL.
