@@ -35,6 +35,11 @@
    <main class="container-fluid mycontainer d-flex flex-column mycontainer-bench"
          style="height:calc(100vh - 170px);height:calc(100dvh - 170px)">
 
+      <div id="mysql-cfg-warn" class="alert alert-warning py-2 px-3 mb-2 flex-shrink-0" style="display:none">
+         <i class="bi bi-exclamation-triangle-fill me-2"></i>
+         MySQL configuration pending, read <strong>readme.md</strong>
+      </div>
+
       <div class="d-flex align-items-center justify-content-between mb-2 flex-shrink-0">
          <h4 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>DB Bench</h4>
          <span id="status" class="badge bg-secondary">idle</span>
@@ -45,8 +50,8 @@
       <div class="row g-2 mb-2 flex-shrink-0">
          <div class="col-4">
             <label for="N" class="form-label small mb-1">Concurrency</label>
-            <input id="N" type="number" class="form-control form-control-sm" min="1" max="200" value="20" title="Concurrency (1-200)">
-            <div class="form-text mt-0" style="font-size:.7rem">Max: 200</div>
+            <input id="N" type="number" class="form-control form-control-sm" min="1" max="20" value="5" title="Concurrency (1-20) — must be <= MySQL pool_size">
+            <div class="form-text mt-0" style="font-size:.7rem">Max: 20 (pool_size)</div>
          </div>
          <div class="col-4">
             <label for="M" class="form-label small mb-1">Total req.</label>
@@ -322,7 +327,7 @@
 
    function startBench() {
 
-      const N = Math.max(1, Math.min(200, parseInt($N.value, 10) || 1));
+      const N = Math.max(1, Math.min(20, parseInt($N.value, 10) || 1));
       const M = Math.max(10, Math.min(20000, parseInt($M.value, 10) || 10));
       const L = Math.max(1, Math.min(1000, parseInt($L.value, 10) || 100));
 
@@ -383,7 +388,32 @@
 
    window.addEventListener('resize', drawSpark);
 
+   // Clamp Concurrency to [1..20] on every keystroke — hard cap tied to pool_size.
+   $N.addEventListener('input', () => {
+      const v = parseInt($N.value, 10);
+      if (!isNaN(v) && v > 20) $N.value = 20;
+   });
+   $N.addEventListener('blur', () => {
+      const v = parseInt($N.value, 10);
+      if (isNaN(v) || v < 1) $N.value = 1;
+      else if (v > 20)       $N.value = 20;
+   });
+
    // ---- Pool stats ----
+
+   // Check MySQL pool on load — disable Start button if not configured
+   fetch('/api/mysql-pool-stats')
+      .then(r => r.json())
+      .then(data => {
+         if (!data.registered) {
+            document.getElementById('mysql-cfg-warn').style.display = 'block';
+            $btnRun.disabled = true;
+         }
+      })
+      .catch(function () {
+         document.getElementById('mysql-cfg-warn').style.display = 'block';
+         $btnRun.disabled = true;
+      });
 
    let poolBusyMax = 0;
    let poolPassiveTimer = setInterval(refreshPool, 3000);

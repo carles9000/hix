@@ -16,10 +16,12 @@ Aggiungi la sezione `databases` in `www/config.json`:
       "pwd":        "hb1234",
       "db":         "employees",
       "port":       3306,
-      "pool_size":  5,
-      "timeout_ms": 5000,
-      "ping":       true,
-      "berror":     "WDO_DefaultErrorHandler"
+      "pool_size":         5,
+      "timeout_ms":        5000,
+      "ping":              true,
+      "read_timeout_s":    30,
+      "connect_timeout_s": 10,
+      "berror":            "WDO_DefaultErrorHandler"
     }
   }
 }
@@ -31,19 +33,29 @@ In app senza hixstyle:
 
 ```harbour
 PROCEDURE Main()
-
    LOCAL oSrv := THixServer():New()
-   
    HIX_ConfigAppLoad( "www/config.json" )
-   
    HIX_InitPoolsFromConfig()   // interrompe se qualche pool fallisce (default)
-   
    oSrv:Start()
-
+   IF oSrv:hThread != NIL
+      hb_threadJoin( oSrv:hThread )
+   ENDIF
    HIX_EndPoolsFromConfig()
 RETURN
 ```
 
+### Pool multipli
+
+Puoi dichiarare più database con chiavi distinte:
+
+```json
+{
+  "databases": {
+    "mysql":     { "driver": "mysql",   "host": "127.0.0.1", ... },
+    "analytics": { "driver": "mariadb", "host": "10.0.0.42", ... }
+  }
+}
+```
 
 Negli handler: `WDO_Get("mysql")` e `WDO_Get("analytics")` coesistono nello stesso processo.
 
@@ -60,8 +72,14 @@ Negli handler: `WDO_Get("mysql")` e `WDO_Get("analytics")` coesistono nello stes
 | `pool_size` | `5` | Numero di connessioni all'avvio |
 | `timeout_ms` | `5000` | Tempo massimo di attesa in `WDO_Get()` (0 = infinito) |
 | `ping` | `true` | Ping prima di consegnare ogni slot; riconnette se è inattivo |
+| `read_timeout_s` | `30` | Timeout di lettura/scrittura del socket MySQL in secondi (0 = senza timeout). Limita il blocco in `recv()` quando un thread figlio del dispatcher supera `exec_timeout_ms`; senza di esso la connessione diventa zombie e lo slot non torna mai al pool |
+| `connect_timeout_s` | `10` | Timeout della fase di connessione al server in secondi (0 = senza timeout). Evita che l'avvio del pool rimanga bloccato se il server MySQL non risponde |
+| `debug` | `false` | Se un pool ha `"debug": true`, `HIX_Dbg()` globale viene attivato: `dbg.log` registra Acquire/Release del pool e ogni `HIX_Dbg()` strumentato nei controller. `dbg.log` viene svuotato all'avvio. Solo in sviluppo — ha costo di I/O. |
 | `berror` | - | Nome della funzione Harbour per gestire gli errori del pool |
 | `dll` | - | Percorso esplicito alla DLL (override della risoluzione automatica) |
+
+!!! warning "Relazione con `exec_timeout_ms`"
+    `read_timeout_s` deve essere **maggiore** della query legittima più lenta e in linea con `exec_timeout_ms` del dispatcher (in `hix.json`). Se aumenti `exec_timeout_ms`, aumenta anche `read_timeout_s`: se una query dura più del socket read timeout, MySQL restituirà errore prima che la query termini.
 
 !!! tip "berror di default"
     `"berror": "WDO_DefaultErrorHandler"` è già incluso nella lib: registra l'errore con `le()` e restituisce 500 se c'è una richiesta attiva. Sufficiente per la maggior parte dei progetti.

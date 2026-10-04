@@ -27,6 +27,12 @@
 #define HB_VERSION_BITWIDTH        17
 #define NULL                       0
 
+//  libmysql option enums (stable since MySQL 4.1 / MariaDB 5.x).
+//  See include/mysql.h: enum mysql_option.
+#define MYSQL_OPT_CONNECT_TIMEOUT  0
+#define MYSQL_OPT_READ_TIMEOUT     11
+#define MYSQL_OPT_WRITE_TIMEOUT    12
+
 STATIC snOpen  := 0
 STATIC soMutex
 STATIC sl_PoolGuardWarn := .T.
@@ -96,6 +102,18 @@ CLASS WDO_MySql FROM WDO
    DATA cDllPath                       INIT NIL   // explicit override (New() 7th param)
    DATA cDllSource                     INIT ''    // "override" | "WDO_LIB_MYSQL" | "WDO_PATH_MYSQL" | "default"
 
+   //  Socket-level read/write timeout in seconds, applied via mysql_options
+   //  (MYSQL_OPT_READ_TIMEOUT / MYSQL_OPT_WRITE_TIMEOUT) before connect.
+   //  0 disables. Protects the pool from zombie child threads stuck forever
+   //  in recv() when a controller times out via exec_timeout_ms -- without
+   //  this, the FINALLY block in _HixRunHrb never fires and the pool slot
+   //  stays busy indefinitely. 30 s is enough headroom for a slow query
+   //  under load while bounding the leak window.
+   DATA nReadTimeout                   INIT 30
+   //  Connect-phase socket timeout (seconds). Separate from the TCP preflight
+   //  that already short-circuits "server not running" cases.
+   DATA nConnectTimeout                INIT 10
+
    CLASSDATA lUtf8                     INIT .F.
 
    METHOD New( cServer, cUser, cPwd, cDb, nPort, lOpen, cDllPath, cType ) CONSTRUCTOR
@@ -139,6 +157,7 @@ CLASS WDO_MySql FROM WDO
    //  DynCall wrappers
    METHOD mysql_init()
    METHOD mysql_close()
+   METHOD mysql_options( nOption, nValue )
    METHOD mysql_real_connect( cServer, cUser, cPwd, cDb, nPort )
    METHOD mysql_error()
    METHOD mysql_query( cQuery )
@@ -298,6 +317,19 @@ METHOD Open() CLASS WDO_MySql
    IF ::hMySql == 0
       ::SetError( _( 'WDO_ERR_INIT_FAIL' ) )
       RETU SELF
+   ENDIF
+
+   //  Apply socket read/write timeout BEFORE connect so libmysql wires it
+   //  into the socket setup. Required to prevent child-thread leaks when
+   //  the dispatcher aborts a controller via exec_timeout_ms: without a
+   //  recv() timeout on the MySQL socket, a slow query keeps the child
+   //  blocked forever and the pool slot never comes back.
+   IF ::nReadTimeout > 0
+      ::mysql_options( MYSQL_OPT_READ_TIMEOUT,  ::nReadTimeout )
+      ::mysql_options( MYSQL_OPT_WRITE_TIMEOUT, ::nReadTimeout )
+   ENDIF
+   IF ::nConnectTimeout > 0
+      ::mysql_options( MYSQL_OPT_CONNECT_TIMEOUT, ::nConnectTimeout )
    ENDIF
 
    //  On Linux, mysql_real_connect("localhost",...) uses Unix socket instead
@@ -887,6 +919,27 @@ RETU u
 METHOD mysql_close() CLASS WDO_MySql
 
 RETU hb_DynCall( { "mysql_close", ::pLib, ::nSysCallConv, ::nSysLong }, ::hMySql )
+
+//	-------------------------------------------------------  //
+//  int mysql_options( MYSQL *, enum mysql_option, const void *arg )
+//  Numeric options (READ/WRITE/CONNECT_TIMEOUT) expect arg to point at
+//  an unsigned int. Marshal the value LE into a 4-byte raw buffer and
+//  pass as CHAR_UNSIGNED_PTR -- that path memcpy's the string verbatim
+//  into a native buffer (no CDP translation; see hb_dyn.c:198) which is
+//  what libmysql dereferences as const unsigned int *.
+METHOD mysql_options( nOption, nValue ) CLASS WDO_MySql
+
+   LOCAL cBuf
+
+   cBuf := Chr( hb_bitAnd( nValue, 0xFF ) ) + ;
+           Chr( hb_bitAnd( hb_bitShift( nValue,  -8 ), 0xFF ) ) + ;
+           Chr( hb_bitAnd( hb_bitShift( nValue, -16 ), 0xFF ) ) + ;
+           Chr( hb_bitAnd( hb_bitShift( nValue, -24 ), 0xFF ) )
+
+RETU hb_DynCall( { "mysql_options", ::pLib, ;
+                    hb_bitOr( HB_DYN_CTYPE_INT, ::nSysCallConv ), ::nSysLong, ;
+                    HB_DYN_CTYPE_INT, HB_DYN_CTYPE_CHAR_UNSIGNED_PTR }, ;
+                  ::hMySql, nOption, cBuf )
 
 //	-------------------------------------------------------  //
 

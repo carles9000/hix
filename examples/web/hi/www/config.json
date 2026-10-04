@@ -23,19 +23,19 @@
     "token": "H!x@TOKEN@2026",
     "resource": "H!x@RES@2026"
   },
-  "databases":
-  {
-    "mysql":
-    {
+  "databases": {
+    "mysql": {
       "driver":     "mysql",
       "host":       "127.0.0.1",
       "user":       "harbour",
       "pwd":        "hb1234",
       "db":         "employees",
       "port":       3306,
-      "pool_size":  32,
+      "pool_size":  20,
       "timeout_ms": 5000,
-      "ping":       true
+      "ping":       true,
+      "debug":      true,
+      "berror":     "WdoErrorHandler"
     }
   }
 }

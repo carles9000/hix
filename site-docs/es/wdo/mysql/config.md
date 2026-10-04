@@ -16,10 +16,12 @@ Añade la sección `databases` en `www/config.json`:
       "pwd":        "hb1234",
       "db":         "employees",
       "port":       3306,
-      "pool_size":  5,
-      "timeout_ms": 5000,
-      "ping":       true,
-      "berror":     "WDO_DefaultErrorHandler"
+      "pool_size":         5,
+      "timeout_ms":        5000,
+      "ping":              true,
+      "read_timeout_s":    30,
+      "connect_timeout_s": 10,
+      "berror":            "WDO_DefaultErrorHandler"
     }
   }
 }
@@ -70,8 +72,14 @@ En los handlers: `WDO_Get("mysql")` y `WDO_Get("analytics")` coexisten en el mis
 | `pool_size` | `5` | Número de conexiones al arrancar |
 | `timeout_ms` | `5000` | Tiempo máximo de espera en `WDO_Get()` (0 = infinito) |
 | `ping` | `true` | Ping antes de entregar cada slot; reconecta si está muerto |
+| `read_timeout_s` | `30` | Timeout de lectura/escritura del socket MySQL en segundos (0 = sin timeout). Acota el bloqueo en `recv()` cuando un hilo hijo del dispatcher excede `exec_timeout_ms`; sin esto la conexión queda zombi y el slot nunca vuelve al pool |
+| `connect_timeout_s` | `10` | Timeout de la fase de conexión al servidor en segundos (0 = sin timeout). Evita que el arranque del pool quede colgado si el servidor MySQL no responde |
+| `debug` | `false` | Si cualquier pool tiene `"debug": true`, se activa `HIX_Dbg()` globalmente: `dbg.log` captura trazas de Acquire/Release del pool y toda llamada `HIX_Dbg()` instrumentada en controllers. `dbg.log` se vacía al arrancar. Usar solo en desarrollo — tiene coste de I/O. |
 | `berror` | — | Nombre de función Harbour para manejar errores del pool |
 | `dll` | — | Ruta explícita a la DLL (override de la resolución automática) |
+
+!!! warning "Relación con `exec_timeout_ms`"
+    `read_timeout_s` debe ser **mayor** que la query legítima más lenta y acorde con el `exec_timeout_ms` del dispatcher (en `hix.json`). Si subes `exec_timeout_ms`, sube también `read_timeout_s`: si una query tarda más que el socket read timeout MySQL retornará error antes de que la query termine.
 
 !!! tip "berror por defecto"
     `"berror": "WDO_DefaultErrorHandler"` ya viene incluido en la lib: loguea el error con `le()` y devuelve 500 si hay request activo. Suficiente para la mayoría de proyectos.

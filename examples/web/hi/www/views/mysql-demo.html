@@ -114,49 +114,58 @@
    <main class="container-fluid mycontainer d-flex flex-column mycontainer-mysql"
          style="height:calc(100vh - 120px);height:calc(100dvh - 120px)">
 
-      <div class="d-flex align-items-center justify-content-between mb-2 flex-shrink-0">
-         <h4 class="mb-0"><i class="bi bi-lightning-charge me-2"></i>MySQL Showcase</h4>
-         <div class="d-flex align-items-center gap-2">
-            <span id="status" class="badge bg-secondary">idle</span>
-         </div>
+      <div id="mysql-cfg-warn" class="alert alert-warning py-2 px-3 mb-2 flex-shrink-0" style="display:none">
+         <i class="bi bi-exclamation-triangle-fill me-2"></i>
+         MySQL configuration pending, read <strong>readme.md</strong>
       </div>
 
-      <!-- Dataset summary -->
+      <div id="mysql-content" style="display:none">
 
-      <div class="ds-wrap mb-2 flex-shrink-0">
-         <div class="ds-head">
-            <span class="ds-ttl">Dataset: <code>employees</code> sample DB</span>
+         <div class="d-flex align-items-center justify-content-between mb-2 flex-shrink-0">
+            <h4 class="mb-0"><i class="bi bi-lightning-charge me-2"></i>MySQL Showcase</h4>
+            <div class="d-flex align-items-center gap-2">
+               <span id="status" class="badge bg-secondary">idle</span>
+            </div>
          </div>
-         <table class="ds-table">
-            <thead>
-               <tr><th>Table</th><th class="num">Rows</th><th></th></tr>
-            </thead>
-            <tbody>
-               <tr><td class="nm">salaries</td>   <td class="vl">2,844,047</td><td class="un">rows</td></tr>
-               <tr><td class="nm">titles</td>     <td class="vl">443,308</td>  <td class="un">rows</td></tr>
-               <tr><td class="nm">dept_emp</td>   <td class="vl">331,603</td>  <td class="un">rows</td></tr>
-               <tr><td class="nm">employees</td>  <td class="vl">300,024</td>  <td class="un">rows</td></tr>
-               <tr><td class="nm">departments</td><td class="vl">9</td>        <td class="un">rows</td></tr>
-            </tbody>
-         </table>
-         <div class="ds-note mt-2 text-center">
-            Each run picks fresh random inputs &middot; click a card for details
+
+         <!-- Dataset summary -->
+
+         <div class="ds-wrap mb-2 flex-shrink-0">
+            <div class="ds-head">
+               <span class="ds-ttl">Dataset: <code>employees</code> sample DB</span>
+            </div>
+            <table class="ds-table">
+               <thead>
+                  <tr><th>Table</th><th class="num">Rows</th><th></th></tr>
+               </thead>
+               <tbody>
+                  <tr><td class="nm">salaries</td>   <td class="vl">2,844,047</td><td class="un">rows</td></tr>
+                  <tr><td class="nm">titles</td>     <td class="vl">443,308</td>  <td class="un">rows</td></tr>
+                  <tr><td class="nm">dept_emp</td>   <td class="vl">331,603</td>  <td class="un">rows</td></tr>
+                  <tr><td class="nm">employees</td>  <td class="vl">300,024</td>  <td class="un">rows</td></tr>
+                  <tr><td class="nm">departments</td><td class="vl">9</td>        <td class="un">rows</td></tr>
+               </tbody>
+            </table>
+            <div class="ds-note mt-2 text-center">
+               Each run picks fresh random inputs &middot; click a card for details
+            </div>
          </div>
+
+         <!-- Mini cards row -->
+
+         <div id="miniRow" class="mini-row mb-3 flex-shrink-0"></div>
+
+         <!-- Totals strip -->
+
+         <div id="totals" class="d-flex gap-2 mb-2 flex-shrink-0" style="display:none !important">
+            <div class="metric"><div class="metric-lbl">Total time</div><div class="metric-val" id="tTotal">&mdash;</div></div>
+            <div class="metric"><div class="metric-lbl">Queries</div><div class="metric-val" id="tCount">&mdash;</div></div>
+            <div class="metric"><div class="metric-lbl">Rows returned</div><div class="metric-val" id="tRows">&mdash;</div></div>
+         </div>
+
+         <div class="flex-grow-1"></div>
+
       </div>
-
-      <!-- Mini cards row -->
-
-      <div id="miniRow" class="mini-row mb-3 flex-shrink-0"></div>
-
-      <!-- Totals strip -->
-
-      <div id="totals" class="d-flex gap-2 mb-2 flex-shrink-0" style="display:none !important">
-         <div class="metric"><div class="metric-lbl">Total time</div><div class="metric-val" id="tTotal">&mdash;</div></div>
-         <div class="metric"><div class="metric-lbl">Queries</div><div class="metric-val" id="tCount">&mdash;</div></div>
-         <div class="metric"><div class="metric-lbl">Rows returned</div><div class="metric-val" id="tRows">&mdash;</div></div>
-      </div>
-
-      <div class="flex-grow-1"></div>
 
    </main>
 
@@ -542,6 +551,24 @@
       $btnRun.disabled   = false;
       $btnClear.disabled = false;
    }
+
+   // Both panels start hidden; show the correct one once the pool status is known
+   fetch('/api/mysql-pool-stats')
+      .then(r => r.json())
+      .then(data => {
+         if (data.registered) {
+            document.getElementById('mysql-content').style.display = 'block';
+         } else {
+            document.getElementById('mysql-cfg-warn').style.display = 'block';
+            $btnRun.disabled   = true;
+            $btnClear.disabled = true;
+         }
+      })
+      .catch(function () {
+         document.getElementById('mysql-cfg-warn').style.display = 'block';
+         $btnRun.disabled   = true;
+         $btnClear.disabled = true;
+      });
 
    async function runDemo() {
 

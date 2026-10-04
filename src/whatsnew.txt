@@ -1,3 +1,7 @@
+2.3.08 WDO MySql fix leak permanente del pool bajo dispatcher timeout:
+       MYSQL_OPT_READ/WRITE/CONNECT_TIMEOUT en Open() + nuevas claves
+       read_timeout_s/connect_timeout_s/debug en databases.<pool>. Hi
+       bench UI con cap duro N<=20 y pool_size=20 (ver changes/2.3.08.md).
 2.3.07 WDO_ReleaseAllThread() conectada al dispatcher (fix saturación pool
        MySQL). TRY/CATCH/FINALLY en controllers Hi. Pool stats widget en
        bench (300ms). Logging via _l(). Q5 ±5sec, ms→s ≥1000ms.

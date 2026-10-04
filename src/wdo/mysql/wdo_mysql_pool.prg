@@ -89,7 +89,7 @@ FUNCTION WDO_InitPoolMySqlEx( cKey, hParams )
 
    LOCAL oPool, bFactory, nOk
    LOCAL cHost, cUser, cPwd, cDb, cDllPath, cBErrorName, cDriver
-   LOCAL nPort, nSize, nTimeoutMs
+   LOCAL nPort, nSize, nTimeoutMs, nReadTimeout, nConnectTimeout
    LOCAL lPing
    LOCAL bError
 
@@ -101,17 +101,23 @@ FUNCTION WDO_InitPoolMySqlEx( cKey, hParams )
       hParams := { => }
    ENDIF
 
-   cHost       := hb_HGetDef( hParams, "host",       "localhost" )
-   cUser       := hb_HGetDef( hParams, "user",       "" )
-   cPwd        := hb_HGetDef( hParams, "pwd",        "" )
-   cDb         := hb_HGetDef( hParams, "db",         "" )
-   nPort       := hb_HGetDef( hParams, "port",       3306 )
-   nSize       := hb_HGetDef( hParams, "pool_size",  5 )
-   nTimeoutMs  := hb_HGetDef( hParams, "timeout_ms", 5000 )
-   lPing       := hb_HGetDef( hParams, "ping",       .T. )
-   cDllPath    := hb_HGetDef( hParams, "dll",        NIL )
-   cBErrorName := hb_HGetDef( hParams, "berror",     "" )
-   cDriver     := Upper( AllTrim( hb_HGetDef( hParams, "driver", "MYSQL" ) ) )
+   cHost           := hb_HGetDef( hParams, "host",             "localhost" )
+   cUser           := hb_HGetDef( hParams, "user",             "" )
+   cPwd            := hb_HGetDef( hParams, "pwd",              "" )
+   cDb             := hb_HGetDef( hParams, "db",               "" )
+   nPort           := hb_HGetDef( hParams, "port",             3306 )
+   nSize           := hb_HGetDef( hParams, "pool_size",        5 )
+   nTimeoutMs      := hb_HGetDef( hParams, "timeout_ms",       5000 )
+   lPing           := hb_HGetDef( hParams, "ping",             .T. )
+   cDllPath        := hb_HGetDef( hParams, "dll",              NIL )
+   cBErrorName     := hb_HGetDef( hParams, "berror",           "" )
+   cDriver         := Upper( AllTrim( hb_HGetDef( hParams, "driver", "MYSQL" ) ) )
+   //  Socket-level read/write timeout (seconds). 0 disables. See the
+   //  commentary on WDO_MySql:nReadTimeout in wdo_mysql.prg for the
+   //  rationale -- bounds the leak window when a controller exceeds
+   //  exec_timeout_ms and leaves the child thread stuck in recv().
+   nReadTimeout    := hb_HGetDef( hParams, "read_timeout_s",   30 )
+   nConnectTimeout := hb_HGetDef( hParams, "connect_timeout_s", 10 )
 
    //  bError: codeblock takes precedence over string name (positional
    //  wrapper uses the block-shortcut; config-json path uses the name).
@@ -123,11 +129,14 @@ FUNCTION WDO_InitPoolMySqlEx( cKey, hParams )
 
    bFactory := {| nIdx | ;
       HB_SYMBOL_UNUSED( nIdx ), ;
-      _WdoMySqlPoolNew( cHost, cUser, cPwd, cDb, nPort, bError, cDllPath, cKey, cDriver ) }
+      _WdoMySqlPoolNew( cHost, cUser, cPwd, cDb, nPort, bError, cDllPath, cKey, cDriver, ;
+                        nReadTimeout, nConnectTimeout ) }
 
    HIX_Dbg( "[WDO_MySqlPool] InitPoolMySqlEx[" + cKey + "]: BEGIN " + cUser + "@" + cHost + ":" + ;
             hb_NToS( nPort ) + "/" + cDb + " size=" + hb_NToS( nSize ) + ;
             " timeout=" + hb_NToS( nTimeoutMs ) + "ms ping=" + iif( lPing, "T", "F" ) + ;
+            " read_to=" + hb_NToS( nReadTimeout ) + "s" + ;
+            " conn_to=" + hb_NToS( nConnectTimeout ) + "s" + ;
             iif( cDllPath != NIL, " dll=" + cDllPath, "" ) )
 
    oPool := WDO_Pool():New( cKey, nSize, nTimeoutMs, lPing, bFactory )
@@ -176,14 +185,28 @@ FUNCTION WDO_GetMySql()
 RETU WDO_Get( WDO_MYSQL_POOL_KEY )
 
 
-STATIC FUNCTION _WdoMySqlPoolNew( cHost, cUser, cPwd, cDb, nPort, bError, cDllPath, cKey, cDriver )
-   LOCAL oConn := WDO_MySql():New( cHost, cUser, cPwd, cDb, nPort, .T., cDllPath, cDriver )
+STATIC FUNCTION _WdoMySqlPoolNew( cHost, cUser, cPwd, cDb, nPort, bError, cDllPath, cKey, cDriver, ;
+                                  nReadTimeout, nConnectTimeout )
+
+   //  Defer Open() so we can set the timeout DATAs first -- mysql_options
+   //  must be called BEFORE mysql_real_connect for the socket options to
+   //  take effect. The class default (30 s) is already sensible, but a
+   //  pool configured with read_timeout_s=NN needs the override before
+   //  the socket is created.
+   LOCAL oConn := WDO_MySql():New( cHost, cUser, cPwd, cDb, nPort, .F., cDllPath, cDriver )
    IF oConn != NIL
+      IF HB_ISNUMERIC( nReadTimeout )
+         oConn:nReadTimeout := nReadTimeout
+      ENDIF
+      IF HB_ISNUMERIC( nConnectTimeout )
+         oConn:nConnectTimeout := nConnectTimeout
+      ENDIF
       IF bError != NIL
          oConn:bError := bError
       ENDIF
       IF cKey != NIL .AND. ! Empty( cKey )
          oConn:cPoolKey := Lower( cKey )
       ENDIF
+      oConn:Open()
    ENDIF
 RETU oConn

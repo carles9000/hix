@@ -39,6 +39,7 @@ FUNCTION HIX_InitPoolsFromConfig( lAbortOnFail )
 
    LOCAL hDatabases, hResult := { => }
    LOCAL cKey, hEntry, cDriver, lOk
+   LOCAL lDebug := .F.
 
    hb_default( @lAbortOnFail, .T. )
 
@@ -48,6 +49,23 @@ FUNCTION HIX_InitPoolsFromConfig( lAbortOnFail )
       l( _( 'WDO_LOG_POOLS_INIT_NONE' ) )
       HIX_Dbg( "[WDO_Config] InitPoolsFromConfig: no 'databases' section (or empty)" )
       RETU hResult
+   ENDIF
+
+   //  Debug opt-in: any pool entry with "debug": true flips the global
+   //  HIX_Dbg flag so WDO Acquire/Release and HIX_Dbg() instrumentation
+   //  in controllers start writing to dbg.log. First match wins (global
+   //  switch); dbg.log is wiped so each run starts clean.
+   FOR EACH cKey IN hb_HKeys( hDatabases )
+      hEntry := hDatabases[ cKey ]
+      IF HB_ISHASH( hEntry ) .AND. hb_HGetDef( hEntry, "debug", .F. )
+         lDebug := .T.
+         EXIT
+      ENDIF
+   NEXT
+   IF lDebug
+      HIX_DbgReset()
+      HIX_DbgEnable( .T. )
+      l( "[WDO_Config] databases.debug=true -> HIX_Dbg tracing enabled (dbg.log)" )
    ENDIF
 
    HIX_Dbg( "[WDO_Config] InitPoolsFromConfig: " + hb_NToS( Len( hDatabases ) ) + " entries" )

@@ -125,7 +125,11 @@
          <!-- MySQL tab -->
          <div class="tab-pane fade" id="tab-mysql" role="tabpanel"
               aria-labelledby="tab-mysql-btn">
-            <div class="row row-cols-2 g-3">
+            <div id="mysql-not-configured" class="alert alert-warning mt-2" style="display:none">
+               <i class="bi bi-exclamation-triangle-fill me-2"></i>
+               MySQL configuration pending, read <strong>readme.md</strong>
+            </div>
+            <div id="mysql-modules" class="row row-cols-2 g-3" style="display:none">
                <div class="col">
                   <a href="/mysql-test" class="btn btn-outline-dark w-100 btn-tile">
                      <i class="bi bi-database fs-3 d-block mb-1"></i>MySQL Test
@@ -155,6 +159,29 @@
 	      if (!hash) return;
 	      const btn = document.getElementById('tab-' + hash + '-btn');
 	      if (btn) new bootstrap.Tab(btn).show();
+	   })();
+
+	   // MySQL tab: check pool registration before showing modules
+	   (function () {
+	      let checked = false;
+	      function checkMysql() {
+	         if (checked) return;
+	         checked = true;
+	         fetch('/api/mysql-pool-stats')
+	            .then(r => r.json())
+	            .then(data => {
+	               if (data.registered) {
+	                  document.getElementById('mysql-modules').style.display = '';
+	               } else {
+	                  document.getElementById('mysql-not-configured').style.display = 'block';
+	               }
+	            })
+	            .catch(function () {
+	               document.getElementById('mysql-not-configured').style.display = 'block';
+	            });
+	      }
+	      document.getElementById('tab-mysql-btn').addEventListener('show.bs.tab', checkMysql);
+	      if (document.getElementById('tab-mysql-btn').classList.contains('active')) checkMysql();
 	   })();
 	</script>
 
