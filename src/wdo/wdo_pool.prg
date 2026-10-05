@@ -148,6 +148,7 @@ METHOD Acquire() CLASS WDO_Pool
    LOCAL nWaited := 0
    LOCAL nTid    := hb_threadId( hb_threadSelf() )
    LOCAL nT0     := hb_MilliSeconds()
+   LOCAL lPingOk, nPos, oErr
 
    IF ::lClosed
       HIX_Dbg( "[WDO_Pool:" + ::cDriver + "] Acquire (tid=" + hb_NToS( nTid ) + ;
@@ -199,39 +200,55 @@ METHOD Acquire() CLASS WDO_Pool
 
    ENDDO
 
-   //  Health check
-   IF ::lPing .AND. ! oConn:Ping()
-      lw( _( 'WDO_LOG_PING_RECONNECT', ::cDriver ) )
-      HIX_Dbg( "[WDO_Pool:" + ::cDriver + "] Acquire (tid=" + hb_NToS( nTid ) + ;
-               "): ping FAILED on slot #" + hb_NToS( nSlot ) + ", reconnecting" )
-      oConn:oPool := NIL          // avoid recursive Close-as-release
-      oConn:Close()
-      oConn:Open()
-      oConn:oPool := SELF
-      //  Reconnect wipes bError; re-inject the snapshot to keep the
-      //  invariant "acquired conn always has pool-wide handler".
-      oConn:bError := ::aItems[ nSlot ][ 5 ]
-      IF ! oConn:lConnect
-         HIX_Dbg( "[WDO_Pool:" + ::cDriver + "] Acquire (tid=" + hb_NToS( nTid ) + ;
-                  "): reconnect FAILED on slot #" + hb_NToS( nSlot ) )
-         //  Reconnect failed: mark busy=.F. and return NIL
-         hb_mutexLock( ::hMutex )
-         FOR i := 1 TO Len( ::aItems )
-            IF ::aItems[ i ][ 1 ] == oConn
-               ::aItems[ i ][ 2 ] := .F.
-               EXIT
-            ENDIF
-         NEXT
-         hb_mutexUnlock( ::hMutex )
-         hb_mutexNotify( ::hNotify )
-         RETU NIL
-      ENDIF
-      HIX_Dbg( "[WDO_Pool:" + ::cDriver + "] Acquire (tid=" + hb_NToS( nTid ) + ;
-               "): reconnect OK on slot #" + hb_NToS( nSlot ) )
-   ENDIF
-
-   //  Track in thread-local list
+   //  Track in thread-local list BEFORE Ping so that if Ping hangs or
+   //  throws, WDO_ReleaseAllThread() can still reclaim this connection.
    AAdd( _Borrowed(), oConn )
+
+   //  Health check — wrapped in TRY/CATCH so a Ping exception doesn't
+   //  bypass the fail-path (which would leave the slot busy forever).
+   IF ::lPing
+      TRY
+         lPingOk := oConn:Ping()
+      CATCH oErr
+         HIX_Dbg( "[WDO_Pool:" + ::cDriver + "] Acquire (tid=" + hb_NToS( nTid ) + ;
+                  "): ping THREW on slot #" + hb_NToS( nSlot ) + ": " + oErr:description )
+         lPingOk := .F.
+      END
+      IF ! lPingOk
+         lw( _( 'WDO_LOG_PING_RECONNECT', ::cDriver ) )
+         HIX_Dbg( "[WDO_Pool:" + ::cDriver + "] Acquire (tid=" + hb_NToS( nTid ) + ;
+                  "): ping FAILED on slot #" + hb_NToS( nSlot ) + ", reconnecting" )
+         oConn:oPool := NIL          // avoid recursive Close-as-release
+         oConn:Close()
+         oConn:Open()
+         oConn:oPool := SELF
+         //  Reconnect wipes bError; re-inject the snapshot to keep the
+         //  invariant "acquired conn always has pool-wide handler".
+         oConn:bError := ::aItems[ nSlot ][ 5 ]
+         IF ! oConn:lConnect
+            HIX_Dbg( "[WDO_Pool:" + ::cDriver + "] Acquire (tid=" + hb_NToS( nTid ) + ;
+                     "): reconnect FAILED on slot #" + hb_NToS( nSlot ) )
+            //  Reconnect failed: untrack from _Borrowed (we added it above),
+            //  mark busy=.F. and return NIL
+            nPos := AScan( _Borrowed(), {| x | x == oConn } )
+            IF nPos > 0
+               hb_ADel( _Borrowed(), nPos, .T. )
+            ENDIF
+            hb_mutexLock( ::hMutex )
+            FOR i := 1 TO Len( ::aItems )
+               IF ::aItems[ i ][ 1 ] == oConn
+                  ::aItems[ i ][ 2 ] := .F.
+                  EXIT
+               ENDIF
+            NEXT
+            hb_mutexUnlock( ::hMutex )
+            hb_mutexNotify( ::hNotify )
+            RETU NIL
+         ENDIF
+         HIX_Dbg( "[WDO_Pool:" + ::cDriver + "] Acquire (tid=" + hb_NToS( nTid ) + ;
+                  "): reconnect OK on slot #" + hb_NToS( nSlot ) )
+      ENDIF
+   ENDIF
 
    WDO_Metric( WDOM_ACQUIRES_TOTAL )
    WDO_Metric( WDOM_ACTIVE_CONN )

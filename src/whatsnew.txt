@@ -1,3 +1,10 @@
+2.3.09 WDO pool fix leak residual cuando Ping cuelga sobre conexión
+       muerta por wait_timeout: AAdd(_Borrowed) antes de Ping,
+       TRY/CATCH alrededor de Ping, fail-path limpia _Borrowed.
+       _HixThreadExec llama WDO_ReleaseAllThread() antes de notificar
+       al padre — libera conns del hijo aunque el padre haya detachado
+       por 504. 21 slots fugadas observadas en prod, cero reclaims
+       (ver changes/2.3.09.md). Suite 2148/2149 (SSL cert pre-exist).
 2.3.08 WDO MySql fix leak permanente del pool bajo dispatcher timeout:
        MYSQL_OPT_READ/WRITE/CONNECT_TIMEOUT en Open() + nuevas claves
        read_timeout_s/connect_timeout_s/debug en databases.<pool>. Hi

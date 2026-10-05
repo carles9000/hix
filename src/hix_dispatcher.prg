@@ -801,6 +801,12 @@ STATIC FUNCTION _HixThreadExec( oHrb, hMutex, aShared, hClass, oReq, cPath )
 
    END
 
+   // Reclaim pooled connections acquired by this child thread before it
+   // dies. Needed because _Borrowed is THREAD STATIC: the parent's
+   // WDO_ReleaseAllThread() hook can't see slots acquired here, and if
+   // the parent timed out it has already detached us.
+   WDO_ReleaseAllThread()
+
    // Limpiar propia entrada del abort map antes de notificar al padre
    _HixAbortMapDel( hb_threadId() )
 
