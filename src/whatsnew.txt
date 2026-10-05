@@ -1,3 +1,5 @@
+2.3.10 Move /dll to /resources/dll. Updated all references in
+       site-docs (es/en/it), examples and tests (18 files).
 2.3.09 WDO pool fix leak residual cuando Ping cuelga sobre conexión
        muerta por wait_timeout: AAdd(_Borrowed) antes de Ping,
        TRY/CATCH alrededor de Ping, fail-path limpia _Borrowed.

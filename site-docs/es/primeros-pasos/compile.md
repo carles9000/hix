@@ -47,5 +47,5 @@ Compila tu servidor `hix.exe` enlazando contra `hix_server.lib`.
 Usa este proyecto como punto de partida: añade tus rutas, middlewares y librerías adicionales 
 en `examples/server/src/app.prg` y `hix.hbp`.
 
-Recuerda que en todos los proyectos que realizes has de copiar las dll de la carpeta /dll 
+Recuerda que en todos los proyectos que realizes has de copiar las dll de la carpeta /resources/dll 
 en el directorio donde tengas el server. 

@@ -3,7 +3,7 @@
 This is a suite for testing the various functionalities of the HIX server. 
 This test was built 100% by CC.
 
-- Copy the DLLs from the /dll folder.
+- Copy the DLLs from the /resources/dll folder.
 
 - Validate the paths in the compilation script.
 

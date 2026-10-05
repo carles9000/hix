@@ -41,5 +41,5 @@ La prima volta che avvii il server mostra la configurazione del server.
 Compila il tuo server `hix.exe` linkando contro `hix_server.lib`.
 Usa questo progetto come punto di partenza: aggiungi le tue route, middleware e librerie aggiuntive in `examples/server/src/app.prg` e `hix.hbp`.
 
-Ricorda che in tutti i tuoi progetti devi copiare le DLL dalla cartella `/dll`
+Ricorda che in tutti i tuoi progetti devi copiare le DLL dalla cartella `/resources/dll`
 nella directory in cui hai il tuo server.
