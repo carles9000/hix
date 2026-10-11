@@ -1,0 +1,27 @@
+{
+  "sets": {
+    "language":   "EN",
+    "dateformat": "yyyy-mm-dd",
+    "decimals":   2,
+    "deleted":    false
+  },
+  "dbf": {
+    "rddname": "DBFCDX"
+  },
+  "databases": {
+    "mysql": {
+      "driver":            "mysql",
+      "host":              "127.0.0.1",
+      "user":              "harbour",
+      "pwd":               "hb1234",
+      "db":                "employees",
+      "port":              3306,
+      "pool_size":         5,
+      "timeout_ms":        5000,
+      "ping":              true,
+      "read_timeout_s":    30,
+      "connect_timeout_s": 10,
+      "berror":            "WdoErrorHandler"
+    }
+  }
+}

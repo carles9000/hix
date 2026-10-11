@@ -1,0 +1,20 @@
+@view 'header.html', 'WDO MySql', 'Example simple connection (pool)...'
+
+@prg
+
+   LOCAL oConn := WDO_Get( "MYSQL" )
+
+   IF oConn == NIL
+      ? 'Error: pool not registered or Acquire timeout'
+      RETU NIL
+   ENDIF
+
+   ?? 'Connected (from pool) !<hr>'
+
+   ?? 'Version: '   + oConn:VersionName()
+   ?  'Server: '    + oConn:mysql_get_server_info()
+   ?  oConn:GetDllVersion()
+
+   oConn:Close()
+
+@endprg

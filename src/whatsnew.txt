@@ -1,3 +1,6 @@
+2.3.11 Split examples/wdo/ per driver — mysql/ and sqlite3/ ship
+       as self-contained HIX projects (own app.hbp, hix.json, www).
+       Isolates runtime deps: SQLite3 needs no DLL at all.
 2.3.10 Move /dll to /resources/dll. Updated all references in
        site-docs (es/en/it), examples and tests (18 files).
 2.3.09 WDO pool fix leak residual cuando Ping cuelga sobre conexión

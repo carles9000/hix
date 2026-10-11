@@ -35,8 +35,16 @@ STATIC sh_Pools    := {=>}
 STATIC sl_HasPools := .F.
 STATIC so_Mutex                                     // guards sh_Pools registry
 
+//  Standalone connection registry (sibling of sh_Pools) for drivers
+//  without pool semantics (e.g. SQLite3). WDO_Get(cKey) resolves this
+//  first; falls back to pool registry. Standalone conns live from
+//  bootstrap to shutdown -- never released by WDO_ReleaseAllThread.
+STATIC sh_StandaloneConns := {=>}
+STATIC so_MutexConn                                 // guards sh_StandaloneConns
+
 INIT PROCEDURE _WDO_PoolInit()
-   so_Mutex := hb_mutexCreate()
+   so_Mutex     := hb_mutexCreate()
+   so_MutexConn := hb_mutexCreate()
 RETURN
 
 
@@ -433,12 +441,24 @@ FUNCTION WDO_UnregisterPool( cDriver )
 RETU NIL
 
 
-//  Acquire a connection from the named pool. Returns NIL on timeout
-//  or if the driver is not registered.
+//  Acquire a connection by key. Resolves in this order:
+//    1. Standalone connection registry (SQLite3 and similar)
+//    2. Pool registry (MySQL, future PostgreSQL, ...)
+//  Returns NIL on timeout or if the driver is not registered.
 FUNCTION WDO_Get( cDriver )
 
    LOCAL cKey := Upper( hb_defaultValue( cDriver, "" ) )
-   LOCAL oPool
+   LOCAL oPool, oConn
+
+   hb_mutexLock( so_MutexConn )
+   IF hb_HHasKey( sh_StandaloneConns, cKey )
+      oConn := sh_StandaloneConns[ cKey ]
+   ENDIF
+   hb_mutexUnlock( so_MutexConn )
+
+   IF oConn != NIL
+      RETU oConn
+   ENDIF
 
    hb_mutexLock( so_Mutex )
    IF hb_HHasKey( sh_Pools, cKey )
@@ -452,6 +472,66 @@ FUNCTION WDO_Get( cDriver )
    ENDIF
 
 RETU oPool:Acquire()
+
+
+//  Register a long-lived standalone connection under a key. Used by
+//  drivers without pool semantics (SQLite3). Idempotent: re-registering
+//  the same key overwrites. Callers typically pair with WDO_UnregisterConn
+//  from a shutdown hook.
+FUNCTION WDO_RegisterConn( cKey, oConn )
+
+   LOCAL cUKey := Upper( hb_defaultValue( cKey, "" ) )
+
+   IF Empty( cUKey ) .OR. oConn == NIL
+      RETU NIL
+   ENDIF
+
+   hb_mutexLock( so_MutexConn )
+   sh_StandaloneConns[ cUKey ] := oConn
+   hb_mutexUnlock( so_MutexConn )
+
+   HIX_Dbg( "[WDO_Pool] RegisterConn: '" + cUKey + "' standalone registered" )
+
+RETU NIL
+
+
+//  Unregister and close a standalone connection. Safe to call for
+//  an unknown key.
+FUNCTION WDO_UnregisterConn( cKey )
+
+   LOCAL cUKey := Upper( hb_defaultValue( cKey, "" ) )
+   LOCAL oConn
+
+   hb_mutexLock( so_MutexConn )
+   IF hb_HHasKey( sh_StandaloneConns, cUKey )
+      oConn := sh_StandaloneConns[ cUKey ]
+      hb_HDel( sh_StandaloneConns, cUKey )
+   ENDIF
+   hb_mutexUnlock( so_MutexConn )
+
+   IF oConn != NIL .AND. hb_isObject( oConn )
+      TRY
+         oConn:Close()
+      CATCH
+      END
+   ENDIF
+
+   HIX_Dbg( "[WDO_Pool] UnregisterConn: '" + cUKey + "' end" )
+
+RETU NIL
+
+
+//  Snapshot of standalone registry keys. Consumed by HIX_EndPoolsFromConfig
+//  so shutdown closes both pooled and standalone connections.
+FUNCTION WDO_ListStandaloneConns()
+
+   LOCAL aKeys
+
+   hb_mutexLock( so_MutexConn )
+   aKeys := hb_HKeys( sh_StandaloneConns )
+   hb_mutexUnlock( so_MutexConn )
+
+RETU aKeys
 
 
 //  Fast-path flag reader. Dispatcher hook uses this to skip work

@@ -218,4 +218,13 @@ FUNCTION HIX_InitLang()    // English is default value
       'Use WDO_Get("MYSQL") + oConn:Close() to avoid TCP port exhaustion. ' + ;
       'See docs/mysql/pool_vs_open.md.'
 
+   // SQLite3 driver
+   hLang[ 'WDO_LOG_SQLITE_INIT'         ] := "WDO_InitSqlite3[{1}]: opened '{2}'"
+   hLang[ 'WDO_LOG_SQLITE_INIT_FAIL'    ] := "WDO_InitSqlite3[{1}]: failed to open '{2}'"
+   hLang[ 'WDO_ERR_SQLITE_OPEN'         ] := "SQLite3: cannot open database '{1}'"
+   hLang[ 'WDO_ERR_SQLITE_EXEC'         ] := "SQLite3 Exec: {1}"
+   hLang[ 'WDO_ERR_SQLITE_PREPARE'      ] := "SQLite3 Prepare: {1}"
+   hLang[ 'WDO_ERR_SQLITE_STEP'         ] := "SQLite3 Step: {1}"
+   hLang[ 'WDO_ERR_SQLITE_BIND'         ] := "SQLite3 Bind: {1}"
+
 RETURN hLang

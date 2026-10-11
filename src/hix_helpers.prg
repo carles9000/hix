@@ -236,7 +236,7 @@ FUNCTION UIP()
 
    LOCAL o := HIX_GetRequest()
 
-RETURN iif( o != NIL, o:RealIP(), "" )
+RETURN iif( o != NIL, HIX_GetClientIP( o ), "" )
 
 FUNCTION UHost()
 

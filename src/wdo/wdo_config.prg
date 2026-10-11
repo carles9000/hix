@@ -94,6 +94,9 @@ FUNCTION HIX_InitPoolsFromConfig( lAbortOnFail )
       CASE cDriver == "mysql" .OR. cDriver == "mariadb"
          lOk := WDO_InitPoolMySqlEx( cKey, hEntry )
 
+      CASE cDriver == "sqlite3" .OR. cDriver == "sqlite"
+         lOk := WDO_InitSqlite3Ex( cKey, hEntry )
+
       OTHERWISE
          lw( _( 'WDO_ERR_DRIVER_UNKNOWN', cDriver, cKey ) )
          HIX_Dbg( "[WDO_Config] InitPoolsFromConfig: driver '" + cDriver + ;
@@ -126,7 +129,7 @@ RETU hResult
 
 FUNCTION HIX_EndPoolsFromConfig()
 
-   LOCAL aKeys, cKey, nCount
+   LOCAL aKeys, cKey, nCount, aConns, nConns
 
    aKeys  := WDO_ListPools()
    nCount := Len( aKeys )
@@ -137,7 +140,19 @@ FUNCTION HIX_EndPoolsFromConfig()
       WDO_UnregisterPool( cKey )
    NEXT
 
-   l( _( 'WDO_LOG_POOLS_END', nCount ) )
+   //  Close standalone connections (SQLite3 and similar). Separate
+   //  from pool shutdown but part of the same WDO lifecycle hook.
+   aConns := WDO_ListStandaloneConns()
+   nConns := Len( aConns )
+
+   IF nConns > 0
+      HIX_Dbg( "[WDO_Config] EndPoolsFromConfig: closing " + hb_NToS( nConns ) + " standalone conn(s)" )
+      FOR EACH cKey IN aConns
+         WDO_UnregisterConn( cKey )
+      NEXT
+   ENDIF
+
+   l( _( 'WDO_LOG_POOLS_END', nCount + nConns ) )
 
 RETU NIL
 

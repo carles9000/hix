@@ -1,0 +1,90 @@
+@view 'header.html', 'WDO MySql', 'Prepare — bind variables (? and :name)'
+
+@prg
+
+   //  ------------------------------------------------------------
+   //  Prepared statements v2.3.00 — server-side PREPARE emulation.
+   //  Same endpoint covers the canonical anti-SQL-injection pattern:
+   //  Prepare + BindParam + Execute + Free, always on a pool connection.
+   //  ------------------------------------------------------------
+
+   LOCAL oConn    := WDO_Get( "MYSQL" )
+   LOCAL oStmt, aRows, hRow
+   LOCAL cHireFrom := "2000-01-01"
+   LOCAL cGender   := "F"
+
+   IF oConn == NIL
+      ? 'Error: pool not registered or Acquire timeout'
+      RETU NIL
+   ENDIF
+
+   ?? '<h3>1) Positional placeholders <code>?</code></h3>'
+   ?  '<pre>SELECT emp_no, first_name, last_name, gender, hire_date FROM employees'
+   ?  '  WHERE hire_date &gt; ? AND gender = ?'
+   ?  '  ORDER BY emp_no LIMIT 10</pre>'
+
+   oStmt := oConn:Prepare( "SELECT emp_no, first_name, last_name, gender, hire_date " + ;
+                           "FROM employees " + ;
+                           "WHERE hire_date > ? AND gender = ? ORDER BY emp_no LIMIT 10" )
+
+   IF oStmt:lError
+      ? '<b>Prepare error:</b> ' + oStmt:cError
+      oStmt:Free()
+      oConn:Close()
+      RETU NIL
+   ENDIF
+
+   oStmt:BindParam( 1, cHireFrom, "s" )
+   oStmt:BindParam( 2, cGender,   "s" )
+   oStmt:Execute()
+
+   IF oStmt:lError
+      ? '<b>Execute error:</b> ' + oStmt:cError
+   ELSE
+      ?? "<pre>"
+      DO WHILE ! Empty( hRow := oStmt:Fetch_Assoc() )
+         ? hRow[ 'emp_no' ] + '  ' + hRow[ 'first_name' ] + ' ' + hRow[ 'last_name' ] + ;
+           '  (' + hRow[ 'gender' ] + ', hired ' + hRow[ 'hire_date' ] + ')'
+      ENDDO
+      ?? "</pre>"
+   ENDIF
+
+   oStmt:Free()
+
+   //  ------------------------------------------------------------
+
+   ?? '<h3>2) Named placeholders <code>:name</code></h3>'
+   ?  '<pre>SELECT emp_no, first_name, last_name FROM employees'
+   ?  '  WHERE gender = :gen AND hire_date BETWEEN :lo AND :hi'
+   ?  '  ORDER BY emp_no LIMIT 10</pre>'
+
+   oStmt := oConn:Prepare( "SELECT emp_no, first_name, last_name FROM employees " + ;
+                           "WHERE gender = :gen AND hire_date BETWEEN :lo AND :hi " + ;
+                           "ORDER BY emp_no LIMIT 10" )
+
+   oStmt:BindParam( ":gen", "M",          "s" )
+   oStmt:BindParam( ":lo",  "1999-01-01", "s" )
+   oStmt:BindParam( ":hi",  "2000-12-31", "s" )
+   oStmt:Execute()
+
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+
+   ?? oConn:View( aRows,, 'Men hired 1999-2000' )
+
+   //  ------------------------------------------------------------
+
+   ?? '<h3>3) Hostile input — single quote in value</h3>'
+   ?  'The value <code>O&apos;Brien</code> cannot break the SQL: it travels '
+   ?  'as <code>SET @p1 := ...</code> separately from the <code>EXECUTE</code>.'
+
+   oStmt := oConn:Prepare( "SELECT COUNT(*) AS n FROM employees WHERE last_name = ?" )
+   oStmt:BindParam( 1, "O'Brien", "s" )
+   oStmt:Execute()
+   hRow := oStmt:Fetch_Assoc()
+   ? '<b>Matches:</b> ' + hRow[ "n" ]
+   oStmt:Free()
+
+   oConn:Close()
+
+@endprg

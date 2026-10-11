@@ -1,0 +1,135 @@
+@view 'header.html', 'WDO MySql', 'Transactions - BeginTrans / Commit / Rollback / Transaction( bCode )'
+
+@prg
+
+   //  ------------------------------------------------------------
+   //  Three transaction patterns in WDO_MySql:
+   //
+   //    1) BeginTrans + Commit           -- happy path flow.
+   //    2) BeginTrans + Rollback         -- undo on error.
+   //    3) oConn:Transaction( bCode )    -- sugar: begin + eval +
+   //                                        commit / rollback + re-raise.
+   //
+   //  A temporary table keeps the example idempotent: every refresh
+   //  starts clean.
+   //  ------------------------------------------------------------
+
+   LOCAL oConn := WDO_Get( "MYSQL" )
+   LOCAL oStmt, aRows, hRow, oErr
+   LOCAL cTbl := "hix_demo_accounts"
+
+   IF oConn == NIL
+      ? 'Error: pool not registered or Acquire timeout'
+      RETU NIL
+   ENDIF
+
+   //  Clean table with two accounts: alice=1000, bob=500
+   oConn:Exec( "DROP TABLE IF EXISTS " + cTbl )
+   oConn:Exec( "CREATE TABLE " + cTbl + " ( " + ;
+               "  id      INT AUTO_INCREMENT PRIMARY KEY, " + ;
+               "  owner   VARCHAR(30) NOT NULL UNIQUE, " + ;
+               "  balance INT NOT NULL )" )
+   oConn:Exec( "INSERT INTO " + cTbl + " (owner, balance) VALUES ('alice', 1000), ('bob', 500)" )
+
+   //  ------------------------------------------------------------
+   //  1) BeginTrans + Commit -- transfer 200 from alice to bob
+   //  ------------------------------------------------------------
+
+   ?? '<h3>1) BeginTrans + Commit</h3>'
+   ?  '<pre>oConn:BeginTrans()'
+   ?  "UPDATE ... SET balance = balance - 200 WHERE owner = 'alice'"
+   ?  "UPDATE ... SET balance = balance + 200 WHERE owner = 'bob'"
+   ?  'oConn:Commit()</pre>'
+
+   oConn:BeginTrans()
+
+   oConn:Exec( "UPDATE " + cTbl + " SET balance = balance - 200 WHERE owner = 'alice'" )
+   oConn:Exec( "UPDATE " + cTbl + " SET balance = balance + 200 WHERE owner = 'bob'"   )
+
+   oConn:Commit()
+
+   ? '<b>InTransaction() after Commit:</b> ' + iif( oConn:InTransaction(), 'T', 'F' )
+
+   oStmt := oConn:Query( "SELECT owner, balance FROM " + cTbl + " ORDER BY id" )
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+   ?? oConn:View( aRows,, 'State after Commit' )
+
+   //  ------------------------------------------------------------
+   //  2) BeginTrans + Rollback -- failed attempt, state untouched
+   //  ------------------------------------------------------------
+
+   ?? '<h3>2) BeginTrans + Rollback on error</h3>'
+   ?  'We detect insufficient balance and undo the transfer. '
+   ?  'The UPDATE already issued does not persist after Rollback.'
+
+   oConn:BeginTrans()
+
+   //  Deduct 5000 from alice (current balance 800 -> would become -4200)
+   oConn:Exec( "UPDATE " + cTbl + " SET balance = balance - 5000 WHERE owner = 'alice'" )
+
+   //  Business rule: negative balance not allowed -> rollback
+   oStmt := oConn:Query( "SELECT balance FROM " + cTbl + " WHERE owner = 'alice'" )
+   hRow  := oStmt:Fetch_Assoc()
+   oStmt:Free()
+
+   IF Val( hRow[ "balance" ] ) < 0
+      ? '<b>provisional balance inside transaction:</b> ' + hRow[ "balance" ] + ' -> Rollback'
+      oConn:Rollback()
+   ELSE
+      oConn:Commit()
+   ENDIF
+
+   oStmt := oConn:Query( "SELECT owner, balance FROM " + cTbl + " ORDER BY id" )
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+   ?? oConn:View( aRows,, 'State after Rollback -- alice still has 800' )
+
+   //  ------------------------------------------------------------
+   //  3) Transaction( bCode ) -- sugar with auto-rollback
+   //  ------------------------------------------------------------
+
+   ?? '<h3>3) <code>oConn:Transaction( bCode )</code> - sugar</h3>'
+   ?  'The method calls <code>BeginTrans</code>, evaluates the codeblock, '
+   ?  'then calls <code>Commit</code> on success or <code>Rollback</code> '
+   ?  'if an exception is raised (which it then re-raises via <code>Break</code>).'
+
+   ?  '<h4>3a) Codeblock that succeeds -> automatic Commit</h4>'
+
+   oConn:Transaction( {| o | ;
+      o:Exec( "UPDATE " + cTbl + " SET balance = balance + 50 WHERE owner = 'alice'" ), ;
+      o:Exec( "UPDATE " + cTbl + " SET balance = balance + 50 WHERE owner = 'bob'"   ) ;
+   } )
+
+   oStmt := oConn:Query( "SELECT owner, balance FROM " + cTbl + " ORDER BY id" )
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+   ?? oConn:View( aRows,, 'After Transaction() OK -- +50 on each account' )
+
+   ?  '<h4>3b) Codeblock that throws -> automatic Rollback</h4>'
+   ?  'We force a runtime error (<code>AAdd( NIL, 1 )</code>) after the '
+   ?  'UPDATE. <code>Transaction()</code> catches it, Rollbacks, and '
+   ?  're-raises so the caller can decide how to respond.'
+
+   TRY
+      oConn:Transaction( {| o | ;
+         o:Exec( "UPDATE " + cTbl + " SET balance = 0 WHERE owner = 'alice'" ), ;
+         AAdd( NIL, 1 ) ;
+      } )
+   CATCH oErr
+      ? '<b>Exception received in caller:</b> ' + oErr:description
+   END
+
+   ? '<b>InTransaction() after catch:</b> ' + iif( oConn:InTransaction(), 'T', 'F' )
+
+   oStmt := oConn:Query( "SELECT owner, balance FROM " + cTbl + " ORDER BY id" )
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+   ?? oConn:View( aRows,, 'alice still intact -- automatic Rollback' )
+
+   //  Cleanup
+   oConn:Exec( "DROP TABLE IF EXISTS " + cTbl )
+
+   oConn:Close()
+
+@endprg
