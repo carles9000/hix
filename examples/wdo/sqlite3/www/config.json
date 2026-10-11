@@ -1,0 +1,22 @@
+{
+  "sets": {
+    "language":   "EN",
+    "dateformat": "yyyy-mm-dd",
+    "decimals":   2,
+    "deleted":    false
+  },
+  "dbf": {
+    "rddname": "DBFCDX"
+  },
+  "databases": {
+    "sqlite": {
+      "driver":        "sqlite3",
+      "file":          "www/data/demo.db",
+      "create":        true,
+      "journal_mode":  "WAL",
+      "synchronous":   "NORMAL",
+      "foreign_keys":  true,
+      "berror":        "WdoErrorHandler"
+    }
+  }
+}

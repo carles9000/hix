@@ -1,0 +1,82 @@
+@view 'header.html', 'WDO SQLite3', 'Prepare + loop — bulk insert reusing the same statement'
+
+@prg
+
+   //  ------------------------------------------------------------
+   //  Canonical re-Execute pattern on SQLite3: Prepare once,
+   //  Reset + BindParam + Execute N times. The compiled plan is
+   //  reused -- SQLite doesn't rebuild the VDBE program per loop.
+   //
+   //  A temporary table keeps the example idempotent across refreshes.
+   //  ------------------------------------------------------------
+
+   LOCAL oConn := WDO_Get( "SQLITE" )
+   LOCAL oStmt, aRows, i, nT0, nElapsed
+   LOCAL cTbl  := "hix_demo_bulk"
+   LOCAL nRows := 20
+
+   IF oConn == NIL
+      ? 'Error: standalone conn not registered'
+      RETU NIL
+   ENDIF
+
+   //  1) Clean table
+   oConn:Exec( "DROP TABLE IF EXISTS " + cTbl )
+   oConn:Exec( "CREATE TABLE " + cTbl + " ( " + ;
+               "  id     INTEGER PRIMARY KEY AUTOINCREMENT, " + ;
+               "  name   VARCHAR(60), " + ;
+               "  score  INTEGER, " + ;
+               "  note   VARCHAR(120) )" )
+
+   //  2) Prepare once, then Reset + Bind + Execute inside the loop.
+   oStmt := oConn:Prepare( "INSERT INTO " + cTbl + " (name, score, note) " + ;
+                           "VALUES (?, ?, ?)" )
+
+   IF oStmt:lError
+      ? '<b>Prepare error:</b> ' + oStmt:cError
+      oStmt:Free()
+      RETU NIL
+   ENDIF
+
+   ?? '<h3>1) Bulk insert — <code>' + hb_NToS( nRows ) + '</code> Execute calls on the same Prepare</h3>'
+
+   //  3) Wrap the loop in a single transaction -- SQLite flushes to
+   //     disk on COMMIT, so one BEGIN/COMMIT turns 20 fsyncs into one.
+   oConn:BeginTrans()
+   nT0 := hb_MilliSeconds()
+
+   FOR i := 1 TO nRows
+      oStmt:Reset()
+      oStmt:BindParam( 1, "user_" + StrZero( i, 3 ) )
+      oStmt:BindParam( 2, 100 + ( i * 3 ) )
+      oStmt:BindParam( 3, "row generated at " + Time() )
+      oStmt:Execute()
+
+      IF oStmt:lError
+         ? '<b>Execute error #' + hb_NToS( i ) + ':</b> ' + oStmt:cError
+         EXIT
+      ENDIF
+   NEXT
+
+   nElapsed := hb_MilliSeconds() - nT0
+   oConn:Commit()
+
+   oStmt:Free()
+
+   ? '<pre>' + hb_NToS( nRows ) + ' rows inserted in ' + ;
+     hb_NToS( nElapsed ) + ' ms  (' + ;
+     hb_NToS( Int( ( nRows * 1000 ) / Max( nElapsed, 1 ) ) ) + ' rows/s)</pre>'
+
+   //  4) Visual verification of the resulting table
+   ?? '<h3>2) Contents of <code>' + cTbl + '</code></h3>'
+
+   oStmt := oConn:Query( "SELECT id, name, score, note FROM " + cTbl + " ORDER BY id" )
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+
+   ?? oConn:View( aRows,, 'Bulk insert result' )
+
+   //  5) Cleanup
+   oConn:Exec( "DROP TABLE IF EXISTS " + cTbl )
+
+@endprg

@@ -1,0 +1,27 @@
+@view 'header.html', 'WDO SQLite3', 'Direct instance (own file)...'
+
+@prg
+
+   /*  Normally we use the registered singleton via `WDO_Get( "SQLITE" )`,
+       but we can also open our own standalone handle to a different file.
+       Remember to Close() it when done -- unlike the registered conn, this
+       one is not shared with other workers.                               */
+
+   LOCAL oConn := WDO_Sqlite3():New( ":memory:", .T. )
+
+   oConn:Open()
+
+   IF ! oConn:lConnect
+      ? 'Error: cannot open :memory: database'
+      RETU NIL
+   ENDIF
+
+   ?? 'Connected !<hr>'
+
+   ?? 'Version: '    + oConn:VersionName()
+   ?  'SQLite lib: ' + oConn:ServerInfo()
+   ?  'File: '       + oConn:cFile
+
+   oConn:Close()      //  Always close direct instances...
+
+@endprg

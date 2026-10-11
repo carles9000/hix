@@ -1,0 +1,25 @@
+@view 'header.html', 'WDO SQLite3', 'Example simple connection (standalone singleton)...'
+
+@prg
+
+   LOCAL oConn := WDO_Get( "SQLITE" )
+
+   IF oConn == NIL
+      ? 'Error: pool not registered or Acquire timeout'
+      RETU NIL
+   ENDIF
+
+   ?? 'Connected (standalone singleton) !<hr>'
+
+   ?? 'Version: '    + oConn:VersionName()
+   ?  'SQLite lib: ' + oConn:ServerInfo()
+   ?  'File: '       + oConn:cFile
+   ?  'Journal: '    + oConn:cJournalMode
+   ?  'Synchronous:' + oConn:cSynchronous
+   ?  'ForeignKeys:' + iif( oConn:lForeignKeys, 'ON', 'OFF' )
+
+   //  NOTE: do NOT :Close() the standalone singleton -- it is shared
+   //  across worker threads. The dispatcher releases pool connections
+   //  automatically; SQLite3 is registered, not pooled.
+
+@endprg

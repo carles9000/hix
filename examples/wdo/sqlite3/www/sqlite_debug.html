@@ -1,0 +1,25 @@
+@view 'header.html', 'Debug'
+
+@prg
+
+   LOCAL oConn := WDO_Get( "SQLITE" )
+   LOCAL oStmt
+
+   ? "Step 1: got conn=" + iif( oConn == NIL, "NIL", "obj" )
+
+   oConn:bError := {|oErr| QOut( "bError fired: " + oErr:description ) }
+
+   ? "Step 2: calling bad Query"
+
+   oStmt := oConn:Query( "select * from zzz" )
+
+   ? "Step 3: returned, oStmt=" + iif( oStmt == NIL, "NIL", "obj" )
+
+   IF oStmt != NIL
+      ? "Step 4: oStmt:lError=" + iif( oStmt:lError, "T", "F" )
+      ? "Step 5: oStmt:pStmt=" + iif( oStmt:pStmt == NIL, "NIL", "ptr" )
+   ENDIF
+
+   ? "Step 6: done"
+
+@endprg

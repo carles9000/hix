@@ -1,0 +1,137 @@
+@view 'header.html', 'WDO SQLite3', 'Query example'
+
+@prg
+
+   /*  Seeds a small `employees_demo` table on the shared singleton and
+       exercises Query / Fetch_Assoc / FetchAll / DbStruct in the same
+       endpoint, mirroring the MySql example.                            */
+
+   LOCAL oConn := WDO_Get( "SQLITE" )
+   LOCAL oStmt, oRs, aSt, aData
+
+   IF oConn == NIL
+      ? 'Error: standalone conn not registered'
+      RETU NIL
+   ENDIF
+
+   oConn:bError := {|oErr| MyError( oErr ) }
+
+   //  Idempotent seed
+   oConn:Exec( "DROP TABLE IF EXISTS employees_demo" )
+   oConn:Exec( "CREATE TABLE employees_demo ( "            + ;
+               "  emp_no     INTEGER PRIMARY KEY, "        + ;
+               "  first_name VARCHAR(50) NOT NULL, "       + ;
+               "  last_name  VARCHAR(50) NOT NULL, "       + ;
+               "  gender     VARCHAR(1), "                 + ;
+               "  hire_date  DATE )" )
+   oConn:Exec( "INSERT INTO employees_demo VALUES "                            + ;
+               "( 1, 'Alice',   'Alvarez',   'F', '2001-03-14' ), "            + ;
+               "( 2, 'Bruno',   'Blanco',    'M', '2003-07-01' ), "            + ;
+               "( 3, 'Carla',   'Carrasco',  'F', '2005-11-21' ), "            + ;
+               "( 4, 'Diego',   'Dominguez', 'M', '2007-01-05' ), "            + ;
+               "( 5, 'Elena',   'Esteve',    'F', '2011-06-30' ), "            + ;
+               "( 6, 'Fermin',  'Flores',    'M', '2014-09-10' ), "            + ;
+               "( 7, 'Gloria',  'Guerra',    'F', '2017-02-18' ), "            + ;
+               "( 8, 'Hector',  'Herrera',   'M', '2019-04-23' ), "            + ;
+               "( 9, 'Ines',    'Ibanez',    'F', '2021-08-14' ), "            + ;
+               "(10, 'Javier',  'Jimenez',   'M', '2023-12-07' )" )
+
+   ?? "<b>==> Generate error</b>"
+   ?  "<b>==> Query( 'select * from ZZZ ') </b>"
+
+   oStmt := oConn:Query( "select * from zzz " )
+
+   IF oStmt != NIL .AND. ! oStmt:lError
+      oStmt:Free()
+   ENDIF
+
+   ?? "<hr><b>==> Fetch_Assoc  Query( 'select emp_no, first_name, last_name, gender, hire_date from employees_demo where hire_date &gt; ''2010-01-01'' limit 10 ')</b>"
+   ?? "<pre>"
+
+   oStmt := oConn:Query( "select emp_no, first_name, last_name, gender, hire_date " + ;
+                         "from employees_demo where hire_date > '2010-01-01' limit 10" )
+
+   IF oStmt != NIL .AND. ! oStmt:lError
+
+      DO WHILE ! Empty( oRs := oStmt:Fetch_Assoc() )
+
+         ? hb_NToS( oRs[ 'emp_no' ] ), oRs[ 'first_name' ], oRs[ 'last_name' ] + ;
+           '  (' + oRs[ 'gender' ] + ', hired ' + oRs[ 'hire_date' ] + ')'
+      ENDDO
+
+      oStmt:Free()
+
+   ENDIF
+
+   ?? "</pre>"
+
+   ? "<hr><b>==> DbStruct() -- PRAGMA table_info</b>"
+
+   oStmt := oConn:Prepare( "SELECT * FROM employees_demo" )
+   oStmt:cTable := "employees_demo"
+
+   IF oStmt != NIL .AND. ! oStmt:lError
+
+      aSt := oStmt:DbStruct()
+
+      ?? oConn:View( aSt, { 'Field', 'Type', 'Len', 'Dec', 'NotNull', 'PK', 'Default' } )
+
+      oStmt:Free()
+
+   ENDIF
+
+   ? "<hr><b>==> FetchAll Query( 'select emp_no, first_name, last_name, gender, hire_date from employees_demo where hire_date &gt; ''2010-01-01''') </b>"
+
+   oStmt := oConn:Query( "select emp_no, first_name, last_name, gender, hire_date " + ;
+                         "from employees_demo where hire_date > '2010-01-01'" )
+
+   IF oStmt != NIL .AND. ! oStmt:lError
+
+      aData := oStmt:FetchAll( .T. )
+
+      oStmt:Free()
+
+      ?? oConn:View( aData,, 'Employees hired after 2010' )
+
+   ENDIF
+
+   //  No Close() -- the singleton stays alive for all workers.
+
+
+FUNCTION MyError( oErr )
+
+   LOCAL cHtml := ''
+
+   BLOCK TO cHtml PARAMS oErr
+      <br>
+      <style>
+         .mybox {
+            background-color:lightgray;
+            border:1px solid gray;
+            padding:20px;
+            box-shadow: 5px 5px 5px gray;
+            border-radius: 10px;
+            margin: 10px;
+         }
+
+         h6 {
+            text-align: right;
+            margin: 0;
+            font-style: italic;
+         }
+      </style>
+      <div class="mybox">
+      <h3><b>My Errorsys handler...</b></h3>
+      <h4><$ oErr:description $></h4>
+      <h5>Operation: <$ oErr:operation $></h5>
+      <h5>Subsystem: <$ oErr:subSystem $> — SubCode: <$ hb_NToS(oErr:subCode) $></h5>
+      <hr>
+      <h6>Log: <$ dtoc(date()) + ' ' + time() $></h6>
+      </div>
+   ENDTEXT
+
+   ?? cHtml
+
+RETU nil
+
+@endprg

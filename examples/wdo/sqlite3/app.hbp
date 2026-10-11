@@ -1,0 +1,37 @@
+# ============================================================
+# app.hbp — Example HIX CRUD app
+# ============================================================
+
+-n
+-w1
+-es2
+-inc
+-head=full
+-mt
+-workdir=.hbmk/${hb_compiler}/app
+
+-hbexe
+-oapp
+
+# Main
+src/app.prg
+
+# Resources file
+{msvc64}app.res
+{mingw64}app.rc
+
+#-Lc:\HIX.PROJECT\hix.wdo.pro\lib\msvc64\
+#-lhix_wdo
+
+
+{win}${hix}\hix_server.hbx
+{win}c:\harbour\include\harbour.hbx
+{win}c:\harbour\contrib\hbcurl\hbcurl.hbx
+{win}c:\harbour\contrib\hbhpdf\hbhpdf.hbx
+
+{unix}${hix}/hix_server.hbx
+{unix}${hb_inc}/harbour.hbx
+{unix}${hb_root}/contrib/hbcurl/hbcurl.hbx
+{unix}${hb_root}/contrib/hbhpdf/hbhpdf.hbx
+
+${hix}/hix_server.hbc
