@@ -927,6 +927,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../programacion/compile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Compile subsystem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3270,11 +3298,22 @@ establecido.</p>
 <li>Todo lo demás (<code>controllers/</code>, <code>views/</code>, <code>models/</code>, <code>routes/</code>...) es
   <strong>privado por defecto</strong>. Un intento de pedir <code>/controllers/auth.prg</code>
   directamente desde el navegador recibe un <strong>403/404</strong>, nunca el código.</li>
+<li><strong>La raíz de <code>www/</code> también está prohibida.</strong> Ficheros como
+  <code>config.json</code>, <code>index.html</code> o cualquier otro que pongas directamente
+  en <code>www/</code> reciben <strong>403</strong>. No hay excepciones. Si quieres servir una
+  home, declara una ruta <code>/</code> que llame a un controller (que a su vez
+  renderice una view) — nunca dejes <code>www/index.html</code> esperando que lo
+  sirva el servidor.</li>
 </ul>
 <p>Esta política se aplica a nivel de dispatcher, no por convención. No hay
 forma de filtrar un <code>.prg</code> accidentalmente: si no está montado como ruta
 en <code>routes/*.json</code>, no se ejecuta.</p>
 <blockquote>
+<p>⚠️ <strong>Breaking en v2.4.1</strong>: Antes de esta versión, los ficheros en la
+raíz de <code>www/</code> se servían directamente — en particular <code>config.json</code>
+exponía todas las keys (<code>jwt</code>, <code>csrf</code>, <code>session</code>, <code>token</code>, <code>resource</code>).
+Si tu app dependía del <code>www/index.html</code> auto-servido, migra a una
+ruta <code>/</code> explícita.</p>
 <p>🛡️ En el <a href="../modo-basico/">modo básico</a> cualquier <code>.prg</code> o <code>.hrb</code> colocado
 bajo <code>&lt;root&gt;/</code> se puede ejecutar pidiendo su URL. En HixStyle eso se
 <strong>bloquea completamente</strong> - es una de las primeras diferencias visibles

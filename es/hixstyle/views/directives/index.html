@@ -779,6 +779,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../programacion/compile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Compile subsystem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3594,6 +3622,17 @@ insertar código contenedor en medio del HTML.</p>
 </span><span id="__span-11-31"><a id="__codelineno-11-31" name="__codelineno-11-31"></a><a href="#__codelineno-11-31"><span class="linenos" data-linenos="31 "></span></a>&lt;h3&gt;Fin del resumen&lt;/h3&gt;
 </span><span id="__span-11-32"><a id="__codelineno-11-32" name="__codelineno-11-32"></a><a href="#__codelineno-11-32"><span class="linenos" data-linenos="32 "></span></a>&lt;hr&gt;
 </span></code></pre></div>
+<blockquote>
+<p><strong>Errores de compile en <code>@prg</code></strong> (v2.4.0+): si un bloque <code>@prg</code> falla al
+compilar, el <code>oError</code> que llega al handler global (<code>bOnError</code>) o al
+template <code>errorsys</code> incluye en <code>oError:cargo["hCompile"]</code> el
+diagnóstico completo del subsistema <code>HIX_Compile*</code> (fase, snippet,
+línea). Lo importante: <code>oError:cargo["line"]</code> apunta ya a la <strong>línea
+real del HTML del template</strong>, no a la línea del <code>.prg</code> intermedio
+transpilado. Ver <a href="../../../programacion/errorsys/#cargo-extendido-para-errores-de-vista">Errorsys → Cargo extendido para errores de
+vista</a>
+y <a href="../../../programacion/compile/">Compile subsystem</a>.</p>
+</blockquote>
 <h2 id="resumen-de-directivas">Resumen de directivas<a class="headerlink" href="#resumen-de-directivas" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

@@ -984,6 +984,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sottosistema Compile
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3434,6 +3462,14 @@ l'intero server va in crash.</p>
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p><strong>Errori del motore di viste</strong> (v2.4.0+): quando <code>oError</code> proviene da un
+errore di vista (compile di <code>@prg</code>, direttiva malformata, template rotto),
+<code>oError:cargo</code> include anche <code>hCompile</code> (diagnostico completo del
+sottosistema <code>HIX_Compile*</code>), <code>line</code> (numero di riga <strong>già mappato al
+template HTML</strong>, non al <code>.prg</code> transpilato), e <code>line_code</code> (snippet della
+riga che ha fallito). Vedi <a href="../errorsys/#cargo-esteso-per-errori-di-vista">Errorsys → Cargo esteso per errori di vista</a>.</p>
+</blockquote>
 <hr />
 <h2 id="pattern-nelle-action">Pattern nelle action<a class="headerlink" href="#pattern-nelle-action" title="Permanent link">&para;</a></h2>
 <h3 id="validazione-database-con-errore-controllato">Validazione + database con errore controllato<a class="headerlink" href="#validazione-database-con-errore-controllato" title="Permanent link">&para;</a></h3>

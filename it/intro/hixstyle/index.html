@@ -927,6 +927,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../programacion/compile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sottosistema Compile
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3267,11 +3295,22 @@ directory e rifiuta qualsiasi tentativo di eseguire codice fuori dal flusso stab
 <li>Tutto il resto (<code>controllers/</code>, <code>views/</code>, <code>models/</code>, <code>routes/</code>...) è
   <strong>privato per impostazione predefinita</strong>. Un tentativo di richiedere <code>/controllers/auth.prg</code>
   direttamente dal browser riceve un <strong>403/404</strong>, mai il codice.</li>
+<li><strong>Anche la radice di <code>www/</code> è vietata.</strong> File come <code>config.json</code>,
+  <code>index.html</code> o qualsiasi altro che metti direttamente in <code>www/</code>
+  ricevono <strong>403</strong>. Nessuna eccezione. Se vuoi servire una home,
+  dichiara una route <code>/</code> che chiami un controller (che a sua volta
+  renderizza una view) — non lasciare mai <code>www/index.html</code> sperando
+  che il server lo serva da solo.</li>
 </ul>
 <p>Questa policy è applicata a livello di dispatcher, non per convenzione. Non c'è
 modo di rilasciare accidentalmente un file <code>.prg</code>: se non è montato come route
 in <code>routes/*.json</code>, non viene eseguito.</p>
 <blockquote>
+<p>⚠️ <strong>Breaking change in v2.4.1</strong>: Prima di questa versione, i file
+nella radice di <code>www/</code> venivano serviti direttamente — in particolare
+<code>config.json</code> esponeva tutte le chiavi segrete (<code>jwt</code>, <code>csrf</code>,
+<code>session</code>, <code>token</code>, <code>resource</code>). Se la tua app dipendeva dal
+<code>www/index.html</code> auto-servito, migra a una route <code>/</code> esplicita.</p>
 <p>🛡️ In <a href="../modo-basico/">Modalità base</a> qualsiasi <code>.prg</code> o <code>.hrb</code> posizionato
 sotto <code>&lt;root&gt;/</code> può essere eseguito richiedendone l'URL. In HixStyle questo è
 <strong>completamente bloccato</strong> — è una delle prime differenze visibili

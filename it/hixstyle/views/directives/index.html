@@ -779,6 +779,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../programacion/compile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sottosistema Compile
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3567,6 +3595,16 @@
 </span><span id="__span-11-31"><a id="__codelineno-11-31" name="__codelineno-11-31"></a><a href="#__codelineno-11-31"><span class="linenos" data-linenos="31 "></span></a>&lt;h3&gt;Fine del riepilogo&lt;/h3&gt;
 </span><span id="__span-11-32"><a id="__codelineno-11-32" name="__codelineno-11-32"></a><a href="#__codelineno-11-32"><span class="linenos" data-linenos="32 "></span></a>&lt;hr&gt;
 </span></code></pre></div>
+<blockquote>
+<p><strong>Errori di compile in <code>@prg</code></strong> (v2.4.0+): se un blocco <code>@prg</code> fallisce
+durante la compilazione, l'<code>oError</code> che raggiunge il gestore globale
+(<code>bOnError</code>) o il template <code>errorsys</code> include in <code>oError:cargo["hCompile"]</code>
+il diagnostico completo del sottosistema <code>HIX_Compile*</code> (fase, snippet,
+riga). Importante: <code>oError:cargo["line"]</code> punta già alla <strong>riga reale
+nel template HTML</strong>, non alla riga nel <code>.prg</code> transpilato intermedio.
+Vedi <a href="../../../programacion/errorsys/#cargo-esteso-per-errori-di-vista">Errorsys → Cargo esteso per errori di vista</a>
+e <a href="../../../programacion/compile/">Sottosistema Compile</a>.</p>
+</blockquote>
 <h2 id="riepilogo-delle-direttive">Riepilogo delle direttive<a class="headerlink" href="#riepilogo-delle-direttive" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

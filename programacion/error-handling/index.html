@@ -984,6 +984,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Compile subsystem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3434,6 +3462,14 @@ the entire server crashes.</p>
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p><strong>View engine errors</strong> (v2.4.0+): when <code>oError</code> comes from a view failure
+(compile of <code>@prg</code>, malformed directive, broken template), <code>oError:cargo</code>
+also includes <code>hCompile</code> (complete diagnostic of the <code>HIX_Compile*</code>
+subsystem), <code>line</code> (line number <strong>already mapped to the HTML template</strong>,
+not to the transpiled <code>.prg</code>), and <code>line_code</code> (snippet of the failing
+line). See <a href="../errorsys/#extended-cargo-for-view-errors">Errorsys → Extended cargo for view errors</a>.</p>
+</blockquote>
 <hr />
 <h2 id="patterns-in-actions">Patterns in actions<a class="headerlink" href="#patterns-in-actions" title="Permanent link">&para;</a></h2>
 <h3 id="validation-database-with-controlled-error">Validation + database with controlled error<a class="headerlink" href="#validation-database-with-controlled-error" title="Permanent link">&para;</a></h3>

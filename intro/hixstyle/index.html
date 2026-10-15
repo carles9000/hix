@@ -927,6 +927,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../programacion/compile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Compile subsystem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3268,11 +3296,21 @@ directories and rejects any attempt to execute code outside the established flow
 <li>Everything else (<code>controllers/</code>, <code>views/</code>, <code>models/</code>, <code>routes/</code>...) is
   <strong>private by default</strong>. An attempt to request <code>/controllers/auth.prg</code>
   directly from the browser receives a <strong>403/404</strong>, never the code.</li>
+<li><strong>The root of <code>www/</code> is also forbidden.</strong> Files like <code>config.json</code>,
+  <code>index.html</code>, or anything else you drop directly in <code>www/</code> return
+  <strong>403</strong>. No exceptions. If you want to serve a home page, declare a
+  <code>/</code> route that calls a controller (which in turn renders a view) —
+  never leave <code>www/index.html</code> hoping the server will auto-serve it.</li>
 </ul>
 <p>This policy is enforced at the dispatcher level, not by convention. There's no
 way to accidentally leak a <code>.prg</code> file: if it's not mounted as a route
 in <code>routes/*.json</code>, it doesn't run.</p>
 <blockquote>
+<p>⚠️ <strong>Breaking change in v2.4.1</strong>: Before this version, files at the
+root of <code>www/</code> were served directly — in particular <code>config.json</code>
+exposed every secret key (<code>jwt</code>, <code>csrf</code>, <code>session</code>, <code>token</code>,
+<code>resource</code>). If your app relied on auto-served <code>www/index.html</code>,
+migrate to an explicit <code>/</code> route.</p>
 <p>🛡️ In <a href="../modo-basico/">Basic Mode</a> any <code>.prg</code> or <code>.hrb</code> placed
 under <code>&lt;root&gt;/</code> can be executed by requesting its URL. In HixStyle that's
 <strong>completely blocked</strong> - it's one of the first visible differences
