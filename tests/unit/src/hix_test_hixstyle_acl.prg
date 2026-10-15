@@ -53,6 +53,11 @@ STATIC FUNCTION _TmpRoot()
    hb_MemoWrit( cRoot + "micarpeta" + hb_ps() + "bar.html", "<html>bar</html>" )
    hb_MemoWrit( cRoot + "micarpeta" + hb_ps() + "bar.prg", ;
                 "FUNCTION Main()" + hb_eol() + "RETURN '<h1>bar</h1>'" )
+
+   // Ficheros en la raíz — regresión fuga config.json en hixstyle
+   hb_MemoWrit( cRoot + "config.json", '{"keys":{"jwt":"SECRET"}}' )
+   hb_MemoWrit( cRoot + "index.html",  "<html>home</html>" )
+   hb_MemoWrit( cRoot + "secret.txt",  "topsecret" )
 RETURN cRoot
 
 STATIC PROCEDURE _CleanTmpRoot( cRoot )
@@ -85,6 +90,7 @@ FUNCTION HIX_TestHixstyleAcl_Run()
    _ExecPerFolder(     hCtx, cRoot )
    _FileRouteBypass(   hCtx, cRoot )
    _GetAclShape(       hCtx )
+   _RootBlocked(       hCtx, cRoot )
 
    _CleanTmpRoot( cRoot )
    HIX_SafeDirDelete( cRoot )
@@ -269,4 +275,41 @@ STATIC PROCEDURE _GetAclShape( hCtx )
    HixTU_Check( hCtx, aAllow[2]["dir"] == "admin" .AND. aAllow[2]["exec"] == .T., ;
       "ACL: GetACL[2] admin con exec", "admin/.T.", ;
       aAllow[2]["dir"] + "/" + iif( aAllow[2]["exec"], ".T.", ".F." ) )
+RETURN
+
+// -------------------------------------------------------
+// 8. Raíz prohibida en hixstyle — regresión fuga config.json
+// Con aAllowDirs activa, NINGÚN fichero en www/ es servible
+// directamente: ni config.json (keys), ni index.html, ni cualquier
+// otro. Rutas válidas: controllers (vía router) o /public/* (whitelist).
+// -------------------------------------------------------
+STATIC PROCEDURE _RootBlocked( hCtx, cRoot )
+   LOCAL oDisp, oReq
+
+   // Hixstyle: solo "public" en whitelist
+   oDisp := THixDispatcher():New( cRoot )
+   oDisp:AllowDir( "public" )
+
+   oReq := _Dispatch( oDisp, "/config.json" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: /config.json root bloqueado (fuga keys)", "403", hb_NToS( oReq:nStatus ) )
+
+   oReq := _Dispatch( oDisp, "/index.html" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: /index.html root bloqueado", "403", hb_NToS( oReq:nStatus ) )
+
+   oReq := _Dispatch( oDisp, "/secret.txt" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: /secret.txt root bloqueado", "403", hb_NToS( oReq:nStatus ) )
+
+   // /public/* sigue sirviendo con la raíz cerrada
+   oReq := _Dispatch( oDisp, "/public/img/logo.png" )
+   HixTU_Check( hCtx, oReq:nStatus == 200, ;
+      "ACL: /public/img/logo.png sirve con raíz cerrada", "200", hb_NToS( oReq:nStatus ) )
+
+   // Modo clásico (sin AllowDir) — comportamiento sin cambios
+   oDisp := THixDispatcher():New( cRoot )
+   oReq  := _Dispatch( oDisp, "/config.json" )
+   HixTU_Check( hCtx, oReq:nStatus == 200, ;
+      "ACL: modo clásico sirve root (sin whitelist)", "200", hb_NToS( oReq:nStatus ) )
 RETURN

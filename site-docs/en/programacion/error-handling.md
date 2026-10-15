@@ -83,6 +83,13 @@ RETURN lOk
 | `oError:args` | Arguments passed to the failed function |
 | `oError:cargo` | Free hash — HIX uses it for extra context (view code, line code, ...) |
 
+> **View engine errors** (v2.4.0+): when `oError` comes from a view failure
+> (compile of `@prg`, malformed directive, broken template), `oError:cargo`
+> also includes `hCompile` (complete diagnostic of the `HIX_Compile*`
+> subsystem), `line` (line number **already mapped to the HTML template**,
+> not to the transpiled `.prg`), and `line_code` (snippet of the failing
+> line). See [Errorsys → Extended cargo for view errors](errorsys.md#extended-cargo-for-view-errors).
+
 ---
 
 ## Patterns in actions

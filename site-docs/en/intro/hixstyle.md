@@ -66,10 +66,21 @@ In HixStyle the browser **can only access `public/`**. Period.
 - Everything else (`controllers/`, `views/`, `models/`, `routes/`...) is
   **private by default**. An attempt to request `/controllers/auth.prg`
   directly from the browser receives a **403/404**, never the code.
+- **The root of `www/` is also forbidden.** Files like `config.json`,
+  `index.html`, or anything else you drop directly in `www/` return
+  **403**. No exceptions. If you want to serve a home page, declare a
+  `/` route that calls a controller (which in turn renders a view) —
+  never leave `www/index.html` hoping the server will auto-serve it.
 
 This policy is enforced at the dispatcher level, not by convention. There's no
 way to accidentally leak a `.prg` file: if it's not mounted as a route
 in `routes/*.json`, it doesn't run.
+
+> ⚠️ **Breaking change in v2.4.1**: Before this version, files at the
+> root of `www/` were served directly — in particular `config.json`
+> exposed every secret key (`jwt`, `csrf`, `session`, `token`,
+> `resource`). If your app relied on auto-served `www/index.html`,
+> migrate to an explicit `/` route.
 
 > 🛡️ In [Basic Mode](modo-basico.md) any `.prg` or `.hrb` placed
 > under `<root>/` can be executed by requesting its URL. In HixStyle that's

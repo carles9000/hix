@@ -118,6 +118,9 @@ src/hix_test_safe_fs.prg
 
 
 
+# SQLite3 (WDO driver — lib references hbsqlit3 symbols)
+hbsqlit3.hbc
+
 # PDF
 {msvc64}hbhpdf.hbc
 {mingw64}-lhbhpdf

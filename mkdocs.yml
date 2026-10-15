@@ -92,6 +92,7 @@ plugins:
                 - Errorsys: es/programacion/errorsys.md
                 - Error Handling: es/programacion/error-handling.md
                 - Error Code: es/programacion/error_codes.md
+                - Compile subsystem: es/programacion/compile.md
             - HIX Style:
                 - Rutas: es/hixstyle/routes/routes.md
                 - Middleware:
@@ -177,6 +178,7 @@ plugins:
                 - Errorsys: en/programacion/errorsys.md
                 - Error Handling: en/programacion/error-handling.md
                 - Error Code: en/programacion/error_codes.md
+                - Compile subsystem: en/programacion/compile.md
             - HIX Style:
                 - Routes: en/hixstyle/routes/routes.md
                 - Middleware:
@@ -263,6 +265,7 @@ plugins:
                 - Errorsys: it/programacion/errorsys.md
                 - Error Handling: it/programacion/error-handling.md
                 - Error Code: it/programacion/error_codes.md
+                - Sottosistema Compile: it/programacion/compile.md
             - HIX Style:
                 - Rotte: it/hixstyle/routes/routes.md
                 - Middleware:

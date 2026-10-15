@@ -243,7 +243,7 @@ RETURN NIL
 // ============================================================
 STATIC FUNCTION _BootLogDumpSection( cKey, aItems )
 
-   LOCAL aItem, cLine, cFlag, xCargo
+   LOCAL aItem, cLine, cFlag, xCargo, cSnippet
 
    QQout( "[" + cKey + "]" + hb_eol() )
 
@@ -253,7 +253,18 @@ STATIC FUNCTION _BootLogDumpSection( cKey, aItems )
       cLine := "  " + cFlag + " " + PadR( aItem[ 1 ], 8 ) + " " + aItem[ 3 ]
       xCargo := aItem[ 4 ]
 
-      IF xCargo != NIL
+      IF HB_ISHASH( xCargo )
+
+         // Structured compile diagnostic — show description + line + code + snippet.
+         cLine += "  -> " + _BootLogFormatDiag( xCargo )
+         cSnippet := iif( hb_HHasKey( xCargo, "lineCode" ) .AND. HB_ISSTRING( xCargo[ "lineCode" ] ), xCargo[ "lineCode" ], "" )
+         QQout( cLine + hb_eol() )
+         IF ! Empty( cSnippet )
+            QQout( "       | " + cSnippet + hb_eol() )
+         ENDIF
+         LOOP
+
+      ELSEIF xCargo != NIL
 
          cLine += "  -> " + hb_CStr( xCargo )
       ELSEIF ! aItem[ 2 ]
@@ -266,3 +277,31 @@ STATIC FUNCTION _BootLogDumpSection( cKey, aItems )
    NEXT
 
 RETURN NIL
+
+// ============================================================
+// _BootLogFormatDiag — one-line summary of a compile diagnostic hash.
+// Fields consumed: description, line, code (all optional).
+// ============================================================
+STATIC FUNCTION _BootLogFormatDiag( hDiag )
+
+   LOCAL cDesc, nLine, cCode, cOut
+
+   cDesc := iif( hb_HHasKey( hDiag, "description" ) .AND. HB_ISSTRING( hDiag[ "description" ] ), hDiag[ "description" ], "" )
+   nLine := iif( hb_HHasKey( hDiag, "line" ) .AND. HB_ISNUMERIC( hDiag[ "line" ] ), hDiag[ "line" ], 0 )
+   cCode := iif( hb_HHasKey( hDiag, "code" ) .AND. HB_ISSTRING( hDiag[ "code" ] ), hDiag[ "code" ], "" )
+
+   cOut := iif( Empty( cDesc ), _( "BOOT_ERR_UNKNOWN" ), cDesc )
+
+   IF nLine > 0 .OR. ! Empty( cCode )
+      cOut += " ("
+      IF nLine > 0
+         cOut += "line " + hb_NToS( nLine )
+         IF ! Empty( cCode ) ; cOut += ", " ; ENDIF
+      ENDIF
+      IF ! Empty( cCode )
+         cOut += cCode
+      ENDIF
+      cOut += ")"
+   ENDIF
+
+RETURN cOut

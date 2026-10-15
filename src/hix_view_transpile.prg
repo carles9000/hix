@@ -493,6 +493,7 @@ METHOD BuildPRG() CLASS Hix_Transpile
    LOCAL z, nStartLineBlock
    LOCAL aPair
    LOCAL nP
+   LOCAL hCmp
 
    aLines := {}
 
@@ -591,33 +592,15 @@ METHOD BuildPRG() CLASS Hix_Transpile
       cBlock += _HixViewPrgPreamble()
       cBlock += ::ReplaceVars( ::aPrgBlocks[ i ][ 2 ], .T. )
 
-      TRY
+      // Compile the @prg block in isolation to catch syntax errors with the
+      // user's own line references. No HIX preamble — views have their own
+      // runtime macros via _HixViewPrgPreamble already prepended to cBlock.
+      hCmp := HIX_CompileCode( cBlock, { "opts" => { "preamble" => .F. } }, "block.prg", "-n", "-q2" )
 
-         oTest := hb_CompileFromBuf( cBlock, .T., "-n", "-q2" )
-      CATCH oError
-
-         IF !empty( oError:cargo )
-
-            _t( 'Trenco!' )
-
-            IF !empty( oError:operation )
-
-               IF substr( oError:operation, 1, 5 ) == 'line:'
-
-                  nLine := Val( substr( oError:operation, 6 ) )
-                  oError:procline := nLine
-
-               ENDIF
-
-            ENDIF
-
-            break oError
-
-         ENDIF
+      IF ! hCmp[ "ok" ]
 
          ::_t( '>> Transpile:BuildPrg() Error 9005' )
-         ::_t( '>> Description: ' + oError:description )
-         ::_t( '>> Operation: ' + oError:operation )
+         ::_t( '>> Description: ' + hCmp[ "err" ][ "description" ] )
 
          aLines := hb_atokens( cBlock, Chr( 10 ) )
 
@@ -629,32 +612,20 @@ METHOD BuildPRG() CLASS Hix_Transpile
             ENDIF
          NEXT
 
-
-         oErrorView := HIX_ErrorView( oError, 9005, NIL, NIL, NIL, "hix_view_transpile" )
+         oErrorView := HIX_ErrorViewFromHash( hCmp[ "err" ], 9005, "hix_view_transpile" )
          oErrorView:cargo[ "aCode" ] := aLines
 
-         IF ! Empty( oError:operation )
-
-            IF SubStr( oError:operation, 1, 5 ) == 'line:'
-
-               nLine := Val( SubStr( oError:operation, 6 ) )
-
-               IF Len( aLines ) > 0 .AND. nLine <= Len( aLines )
-
-                  oErrorView:cargo[ "line"      ] := nLine
-                  oErrorView:cargo[ "line_code" ] := aLines[ nLine ]
-
-               ENDIF
-
-            ENDIF
-
+         nLine := hCmp[ "err" ][ "line" ]
+         IF nLine > 0 .AND. nLine <= Len( aLines )
+            oErrorView:cargo[ "line_code" ] := aLines[ nLine ]
          ENDIF
 
          break oErrorView
-
          RETURN NIL
 
-      END
+      ENDIF
+
+      oTest := hCmp[ "hrb" ]
 
    NEXT
 
@@ -705,57 +676,32 @@ METHOD BuildPRG() CLASS Hix_Transpile
 
    ::_t( '>> Compiling Transpile...' )
 
-   TRY
+   // Compile the fully transpiled .prg with no HIX preamble — the view engine
+   // assembles its own macros in cTranspiledPRG. The compile line from
+   // diagnostics indexes aLineMap to recover the original HTML template line.
+   hCmp := HIX_CompileCode( ::cTranspiledPRG, { "opts" => { "preamble" => .F. } }, "view.prg", "-n", "-q2" )
 
-      oHrb := hb_CompileFromBuf( ::cTranspiledPRG, .T., "-n", "-q2" )
-   CATCH oError
-
-      IF !empty( oError:cargo )
-
-         IF !empty( oError:operation )
-
-            IF substr( oError:operation, 1, 5 ) == 'line:'
-
-               nLine := Val( substr( oError:operation, 6 ) )
-               oError:procline := nLine
-
-            ENDIF
-
-         ENDIF
-
-         break oError
-
-      ENDIF
+   IF ! hCmp[ "ok" ]
 
       ::_t( '>> Transpile:BuildPrg() Error 9006' )
       // [A4.07] No logear cTranspiledPRG — filtraria el codigo fuente generado al log
 
-      oErrorView := HIX_ErrorView( oError, 9006, NIL, NIL, NIL, "hix_view_transpile" )
+      oErrorView := HIX_ErrorViewFromHash( hCmp[ "err" ], 9006, "hix_view_transpile" )
 
-      IF ! Empty( oError:operation )
-
-         IF SubStr( oError:operation, 1, 5 ) == 'line:'
-
-            nLine := Val( SubStr( oError:operation, 6 ) )
-
-            IF nLine > 0 .AND. nLine <= Len( ::aLineMap )
-
-               oErrorView:cargo[ "line"       ] := ::aLineMap[ nLine ][ 1 ]
-               oErrorView:cargo[ "line_code"  ] := ::aLineMap[ nLine ][ 2 ]
-               oErrorView:cargo[ "line_index" ] := nLine
-               oErrorView:cargo[ "aCode"      ] := ::aLineMap
-
-            ENDIF
-
-         ENDIF
-
+      nLine := hCmp[ "err" ][ "line" ]
+      IF nLine > 0 .AND. nLine <= Len( ::aLineMap )
+         oErrorView:cargo[ "line"       ] := ::aLineMap[ nLine ][ 1 ]
+         oErrorView:cargo[ "line_code"  ] := ::aLineMap[ nLine ][ 2 ]
+         oErrorView:cargo[ "line_index" ] := nLine
+         oErrorView:cargo[ "aCode"      ] := ::aLineMap
       ENDIF
 
       break oErrorView
-
       RETURN NIL
 
-   END
+   ENDIF
+
+   oHrb := hCmp[ "hrb" ]
 
    ::_t( 'Transpiled file compiled Ok ' )
 

@@ -288,7 +288,13 @@ RETURN
 STATIC PROCEDURE _TestHeaderCookie( hCtx )
    LOCAL oMock
 
+   // UIP() only trusts X-Forwarded-For when lProxied=.T. AND the TCP peer
+   // is registered as a trusted proxy (A1.13 guard). Set up both conditions
+   // for this test and reset afterwards so other tests are not affected.
+   HIX_ProxyInit( "127.0.0.1" )
+
    oMock := TMockReq():New( "GET", "/", "" )
+   oMock:lProxied                       := .T.
    oMock:hHeaders[ "accept-language"  ] := "es-ES"
    oMock:hHeaders[ "x-requested-with" ] := "XMLHttpRequest"
    oMock:hHeaders[ "x-forwarded-for"  ] := "10.0.0.1, 192.168.1.1"
@@ -304,6 +310,8 @@ STATIC PROCEDURE _TestHeaderCookie( hCtx )
    HixTU_Check( hCtx, UCookie( "sessid", "" ) == "abc123",          "Helpers: UCookie sessid=abc123",    "abc123",     UCookie( "sessid", "" ) )
    HixTU_Check( hCtx, UCookie( "theme",  "" ) == "dark",            "Helpers: UCookie theme=dark",       "dark",       UCookie( "theme", "" ) )
    HixTU_Check( hCtx, UCookie( "nope",   "x" ) == "x",              "Helpers: UCookie default",          "x",          UCookie( "nope", "x" ) )
+
+   HIX_ProxyInit( "" )   // reset — no proxy trust list active after this test
 RETURN
 
 STATIC PROCEDURE _TestBody( hCtx )

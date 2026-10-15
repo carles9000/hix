@@ -93,9 +93,15 @@ src/hix_sse.prg
 src/hix_worker_otros.prg
 src/hix_zombie.prg
 src/hix_block.prg
-src/hix_prepro.prg
 src/hix_helpers.prg
 #src/hix_hrb_exports.prg
+
+# Compile — bridge to Harbour compiler + HRB runner
+src/compile/hix_compex.c
+src/compile/hix_frombufex.prg
+src/compile/hix_exrun.prg
+src/compile/hix_err_shim.prg
+src/compile/hix_preamble.prg
 
 # Monitor & Server
 src/hix_server.prg

@@ -83,6 +83,13 @@ RETURN lOk
 | `oError:args` | Argomenti passati alla funzione fallita |
 | `oError:cargo` | Hash libero — HIX lo usa per contesto extra (codice view, codice riga, ...) |
 
+> **Errori del motore di viste** (v2.4.0+): quando `oError` proviene da un
+> errore di vista (compile di `@prg`, direttiva malformata, template rotto),
+> `oError:cargo` include anche `hCompile` (diagnostico completo del
+> sottosistema `HIX_Compile*`), `line` (numero di riga **già mappato al
+> template HTML**, non al `.prg` transpilato), e `line_code` (snippet della
+> riga che ha fallito). Vedi [Errorsys → Cargo esteso per errori di vista](errorsys.md#cargo-esteso-per-errori-di-vista).
+
 ---
 
 ## Pattern nelle action

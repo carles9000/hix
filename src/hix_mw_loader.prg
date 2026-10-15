@@ -91,7 +91,7 @@ RETURN _MwHGet( s_hAppConfig, cKey, xDef )
 FUNCTION HIX_LoadMiddleware()
 
    LOCAL cRoot, cMwDir, cConfigFile, cJson, hConfig
-   LOCAL aLoad, hSetup, cFile, cPhysical, oHrb, pHandle, oErr
+   LOCAL aLoad, hSetup, cFile, cPhysical, oHrb, pHandle, oErr, hCmp
    LOCAL nLoaded, nTotal
 
    nLoaded := 0
@@ -168,11 +168,21 @@ FUNCTION HIX_LoadMiddleware()
       nTotal++
       cPhysical := cMwDir + cFile
 
-      oHrb := HIX_CompileFile( cPhysical )
+      hCmp := HIX_CompileCodeFromFile( cPhysical )
+
+      IF ! hCmp[ "ok" ]
+
+         lw( "HIX_LoadMiddleware: compile failed -> " + cFile )
+         HIX_BootLogAdd( "middlewares", "file", .F., cFile, hCmp[ "err" ] )
+         LOOP
+
+      ENDIF
+
+      oHrb := hCmp[ "hrb" ]
 
       IF Empty( oHrb )
 
-         lw( "HIX_LoadMiddleware: compile failed -> " + cFile )
+         lw( "HIX_LoadMiddleware: compile ok but no hrb -> " + cFile )
          HIX_BootLogAdd( "middlewares", "file", .F., cFile, _( "BOOT_LOADER_COMPILE_FAIL" ) )
          LOOP
 

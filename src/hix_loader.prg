@@ -51,7 +51,7 @@ FUNCTION HIX_Loaders()
    LOCAL n, aFiles, aItem, cFile, cExt, hItem, cFilePrg, cFileHrb, aInfo, nLenModules
    LOCAL aError   := {}
    LOCAL nPendent, nIteracio, lExit, lError, nOk, nKo, nModulesKo, oError
-   LOCAL cErrText
+   LOCAL cErrText, hErr
    // [A3.4.5] Trabajar con arrays locales; swap atomico al final para
    // que workers concurrentes vean siempre un estado coherente.
    LOCAL aWork     := {}
@@ -228,8 +228,13 @@ FUNCTION HIX_Loaders()
       ELSE
 
          oError := s_aModules[ n ][ 'oError' ]
+         hErr   := iif( hb_HHasKey( s_aModules[ n ], 'hErr' ), s_aModules[ n ][ 'hErr' ], NIL )
 
-         IF oError != NIL
+         IF HB_ISHASH( hErr )
+            // Compile failure — pass structured diagnostic hash so bootlog can
+            // show line/code; downstream formatter handles the hash shape.
+            HIX_BootLogAdd( "loaders", "file", .F., s_aModules[ n ][ 'file' ], hErr )
+         ELSEIF oError != NIL
 
             cErrText := _LoaderErrText( oError, s_aModules[ n ][ 'msg' ] )
             HIX_BootLogAdd( "loaders", "file", .F., s_aModules[ n ][ 'file' ], cErrText )
@@ -325,7 +330,7 @@ RETURN cSaved == cNow
 
 STATIC FUNCTION HIX_LoaderCompile( cDir, cFile, hItem )
 
-   LOCAL oHrb, oErr, cFileNoExt
+   LOCAL oHrb, oErr, cFileNoExt, hCmp
 
    hItem := {  'file' => cFile, ;
       'msg' => '', ;
@@ -334,31 +339,24 @@ STATIC FUNCTION HIX_LoaderCompile( cDir, cFile, hItem )
       'process' => .T., ;
       'loaded' => .F., ;
       'oError' => NIL, ;
+      'hErr'   => NIL, ;
       'error' => .F. }
 
-   TRY
+   hCmp := HIX_CompileCodeFromFile( cDir + cFile )
 
-      oHrb := HIX_CompileFile( cDir + cFile )
-
-   CATCH oErr
-
-      hItem[ 'oError' ] := oErr
-
+   IF ! hCmp[ "ok" ]
+      hItem[ 'hErr' ]   := hCmp[ "err" ]
+      hItem[ 'oError' ] := HIX_CompileErrorFromHash( hCmp[ "err" ] )
       RETURN .F.
+   ENDIF
 
-   END
+   oHrb := hCmp[ "hrb" ]
 
-   IF Empty( oHrb  )           // Fals positiu
-
+   IF Empty( oHrb )           // Defensive: compile ok but no bytes
       oErr := ErrorNew()
-
       oErr:description := _( "BOOT_LOADER_FALSE_POS" )
-      // oErr:operation := ''
-
       hItem[ 'oError' ] := oErr
-
       RETURN .F.
-
    ENDIF
 
    // Si compilamos el prg, salvamos el hrb en disco

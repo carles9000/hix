@@ -401,31 +401,25 @@ RETURN Self
 // ------------------------------------------------------------
 METHOD ExecutePrg( cPath, oReq, hClass, nTimeoutMs ) CLASS THixDispatcher
 
-   LOCAL oHrb
-   LOCAL oError, cHtml
+   LOCAL oHrb, cHtml, hCmp
    LOCAL nMs := iif( nTimeoutMs == NIL, ::nExecTimeout, nTimeoutMs )
 
-   TRY
+   hCmp := HIX_CompileCodeFromFile( cPath )
 
-      oHrb := HIX_CompileFile( cPath )
-
-   CATCH oError
-
-      HIX_Throw( oError )
-
-   END
-
-   // Puede que no de error per no se genera hrb
-
-   IF empty( oHrb )
-
-      HIX_Throw( HIX_NewError( ;
-         "Compile error ", ;
-         "Dispatcher", 500, "Compiler" ) )
+   IF ! hCmp[ "ok" ]
+      // Compile failure: build a legacy oError from the diagnostic hash so the
+      // worker HTTP catches it like any other error. The hash itself travels
+      // under oError:cargo for consumers that render structured diagnostics.
+      HIX_Throw( HIX_CompileErrorFromHash( hCmp[ "err" ] ) )
       RETU ''
-
    ENDIF
 
+   oHrb := hCmp[ "hrb" ]
+
+   IF Empty( oHrb )
+      HIX_Throw( HIX_NewError( "Compile error ", "Dispatcher", 500, "Compiler" ) )
+      RETU ''
+   ENDIF
 
    cHtml := _HixExecWithTimeout( oHrb, nMs, cPath, hClass, oReq )
 
@@ -556,7 +550,19 @@ STATIC FUNCTION _HixCheckACL( oReq, cPath, cRelDir, aDenyDirs, aAllowDirs )
 
    ENDIF
 
-   IF aAllowDirs != NIL .AND. ! Empty( cRelDir )
+   IF aAllowDirs != NIL
+
+      // Hixstyle whitelist activa: la raíz de www/ está siempre prohibida.
+      // Rutas válidas son controllers (via router, resueltos antes del
+      // dispatcher) o /public/* (via whitelist). Ningún fichero del root
+      // es servible — ni config.json, ni index.html, ni cualquier otro.
+      IF Empty( cRelDir )
+
+         lw( "Dispatch: acceso al root bloqueado [" + cPath + "]" )
+         HIX_HttpError( oReq, 403 )
+         RETURN .F.
+
+      ENDIF
 
       IF ! _HixWhitelistMatch( aAllowDirs, cRelDir )
 
@@ -921,7 +927,7 @@ STATIC FUNCTION _HixCaptureRuntimeLine( oErr )
 
    IF nLine > 0
 
-      nLine -= HIX_PreambleLines()
+      nLine -= HIX_CompilePreambleLines()
 
       IF nLine < 1
 

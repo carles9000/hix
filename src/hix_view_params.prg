@@ -278,7 +278,10 @@ FUNCTION HIX_ErrorView( oError, nCode, cDescription, nLine, cLine_Code, cModule 
    oErr:description := iif( ! Empty( cDescription ), cDescription, ;
       iif( ValType( oError ) == "O", ;
       hb_defaultValue( oError:description, "" ), "" ) )
-   oErr:operation   := iif( nLine > 0, "line:" + hb_NToS( nLine ), ;
+   // Line number lives natively in cargo["line"]; operation is kept purely
+   // informational so the errorsys HTML has something readable without
+   // forcing downstream consumers to parse a magic "line:N" prefix.
+   oErr:operation   := iif( nLine > 0, "line " + hb_NToS( nLine ), ;
       iif( ValType( oError ) == "O", ;
       hb_defaultValue( oError:operation, "" ), "" ) )
    oErr:filename    := iif( ValType( oError ) == "O", ;
@@ -293,5 +296,34 @@ FUNCTION HIX_ErrorView( oError, nCode, cDescription, nLine, cLine_Code, cModule 
    hExtra[ "line_code" ] := cLine_Code
    hExtra[ "aCode"     ] := {}
    oErr:cargo := hExtra
+
+RETURN oErr
+
+// ============================================================
+// HIX_ErrorViewFromHash — builds an HIX_ErrorView-compatible oError
+// directly from a compile diagnostic hash produced by HIX_CompileCode.
+// Consumes { description, line, lineCode, file, code, severity } and
+// publishes the original hash under oErr:cargo["hCompile"] for any
+// downstream consumer that wants the full diagnostic.
+// ============================================================
+FUNCTION HIX_ErrorViewFromHash( hErr, nCode, cModule )
+
+   LOCAL cDesc, nLine, cLineCode, oErr
+
+   hb_default( @nCode,   9006 )
+   hb_default( @cModule, ""   )
+
+   IF ! HB_ISHASH( hErr )
+      RETURN HIX_ErrorView( NIL, nCode, "Invalid diagnostic hash", 0, "", cModule )
+   ENDIF
+
+   cDesc     := iif( hb_HHasKey( hErr, "description" ) .AND. HB_ISSTRING( hErr[ "description" ] ), hErr[ "description" ], "" )
+   nLine     := iif( hb_HHasKey( hErr, "line" ) .AND. HB_ISNUMERIC( hErr[ "line" ] ), hErr[ "line" ], 0 )
+   cLineCode := iif( hb_HHasKey( hErr, "lineCode" ) .AND. HB_ISSTRING( hErr[ "lineCode" ] ), hErr[ "lineCode" ], "" )
+
+   oErr := HIX_ErrorView( NIL, nCode, cDesc, nLine, cLineCode, cModule )
+
+   // Preserve the original compile diagnostic for downstream consumers.
+   oErr:cargo[ "hCompile" ] := hErr
 
 RETURN oErr
