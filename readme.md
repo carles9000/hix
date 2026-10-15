@@ -36,7 +36,8 @@ Full documentation is available at: https://carles9000.github.io/hix/
 
 **HIX v2.4 - New Commpile System**
 
-2.4 HIX Compile unified subsystem is now the only compile path in the lib
+2.4 HIX Compile unified subsystem is now the only compile path in the lib  
+
 2.3 WDO MySql & WDO Sqlite3
 
   
