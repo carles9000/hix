@@ -455,7 +455,7 @@ FUNCTION RouteApiInfo()
       "compiler" => hb_Compiler(), ;
       "os"       => OS(),          ;
       "harbour"  => Version(),     ;
-      "version"  => HIX_Version()  ;
+      "version"  => HIX_Version() + HIX_SubVersion() ;
       } )
 
 RETURN NIL
@@ -1119,6 +1119,7 @@ RETURN { ;
       } }, ;
       { "Views & Exec", { ;
       { "ExecutePrg",   {|| HIX_TestExecutePrg_Run() } }, ;
+      { "ExecuteHrb",   {|| HIX_TestExecuteHrb_Run() } }, ;
       { "Views",        {|| HIX_TestViews_Run()         } }, ;
       { "ViewPerf",     {|| HIX_TestViewPerf_Run()         } }, ;
       { "VCacheMetrics", {|| HIX_TestVCacheMetrics_Run()  } }, ;

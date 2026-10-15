@@ -1165,7 +1165,7 @@ STATIC FUNCTION _HixEvalAction( bAction, oReq, hParams, cRouteName, nTimeoutMs )
                   ENDIF
 
                CASE cExt == ".hrb"
-                  xResult := s_oRouteDisp:ExecuteHrb( cPhysical, nTimeoutMs )
+                  xResult := s_oRouteDisp:ExecuteHrb( cPhysical, nTimeoutMs, oReq )
 
                IF ! oReq:lResponded .AND. ! Empty( xResult )
 

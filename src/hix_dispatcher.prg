@@ -37,7 +37,7 @@ CLASS THixDispatcher
    METHOD GetACL()             // hash con la configuracion ACL actual
 
    METHOD ExecutePrg(  cPath, oReq, hClass, nTimeoutMs )
-   METHOD ExecuteHrb(  cPath, nTimeoutMs )
+   METHOD ExecuteHrb(  cPath, nTimeoutMs, oReq )
    METHOD ExecuteHtml( cPath )
    METHOD ExecuteView( cPath )
    METHOD ExecuteFile( cPath )
@@ -426,15 +426,23 @@ METHOD ExecutePrg( cPath, oReq, hClass, nTimeoutMs ) CLASS THixDispatcher
 RETURN cHtml
 
 // ------------------------------------------------------------
-METHOD ExecuteHrb( cPath, nTimeoutMs ) CLASS THixDispatcher
+METHOD ExecuteHrb( cPath, nTimeoutMs, oReq ) CLASS THixDispatcher
 
    LOCAL oHrb
    LOCAL nMs := iif( nTimeoutMs == NIL, ::nExecTimeout, nTimeoutMs )
 
+   // Sin oReq, _HixExecWithTimeout hacía HIX_SetRequest( NIL ) y el HRB
+   // perdía la petición. Las llamadas internas del dispatcher (fallback a
+   // .hrb desde ExecutePrg y _HixPreviewExec) se ejecutan en el hilo del
+   // worker con petición activa, así que recuperarla aquí es seguro.
+   IF oReq == NIL
+      oReq := HIX_GetRequest()
+   ENDIF
+
    l( "ExecuteHrb: " + cPath )
    oHrb := hb_MemoRead( cPath )
 
-RETURN _HixExecWithTimeout( oHrb, nMs, cPath )
+RETURN _HixExecWithTimeout( oHrb, nMs, cPath, NIL, oReq )
 
 // ------------------------------------------------------------
 METHOD ExecuteHtml( cPath ) CLASS THixDispatcher
@@ -713,8 +721,11 @@ STATIC FUNCTION _HixExecWithTimeout( oHrb, nMs, cPath, hClass, oReq )
    hb_default( @cPath, "" )
 
    // Vincular oReq al hilo padre para que HIX_EchoGet/GetMime/GetStatus lean
-   // del objeto compartido tras el mutex (tanto en path directa como con timeout)
-   HIX_SetRequest( oReq )
+   // del objeto compartido tras el mutex (tanto en path directa como con timeout).
+   // Guard: no pisar la petición del hilo padre si el caller no la propagó.
+   IF oReq != NIL
+      HIX_SetRequest( oReq )
+   ENDIF
    HIX_EchoClear()
 
 

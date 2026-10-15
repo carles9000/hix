@@ -32,18 +32,12 @@ Full documentation is available at: https://carles9000.github.io/hix/
 
 ---
 
-## ✔️ Last Audited Version
+## ✔️ Last Version
 
-**HIX v2.2 - Audit Edition**
+**HIX v2.4 - New Commpile System**
 
-HIX reaches version 2.2 with a complete security audit behind it: 87 points reviewed, 
-87 closed, 2105 tests passing on Windows and Linux.
-
-The classic vectors were audited and fixed - path traversal, cookie injection, timing 
-attacks on JWT, mutex races, misconfigured CORS, IPv6 bypass in the firewall - and 
-everything else that can cause harm in a real environment under load.
-
-The result is a **Harbour server ready for production**: robust, secure, and validated. 
+2.4 HIX Compile unified subsystem is now the only compile path in the lib
+2.3 WDO MySql & WDO Sqlite3
 
   
 ---

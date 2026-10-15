@@ -41,6 +41,7 @@ src/hix_test_dispatcher.prg
 src/hix_test_echo.prg
 src/hix_test_error.prg
 src/hix_test_executeprg.prg
+src/hix_test_executehrb.prg
 src/hix_test_firewall.prg
 src/hix_test_flash.prg
 src/hix_test_gzip.prg

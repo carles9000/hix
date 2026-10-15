@@ -1,3 +1,6 @@
+2.4.2  BUG FIX — rutas con acción .hrb perdían la petición: ExecuteHrb y
+       _HixExecWithTimeout borraban el THREAD STATIC con NIL. Rename hix_* 
+       en src/compile/.
 2.4.1  SECURITY FIX — hixstyle root ACL. Any file at the root of www/
        was publicly servable (config.json leaked all keys: jwt, csrf,
        session, token, resource). _HixCheckACL now 403s every root
