@@ -11,6 +11,10 @@
 # WDO MySQL/MariaDB runtime DLLs — force-include
 !resources/wdo/mysql/dll/*.dll
 
+# Local commit helpers (no versionados)
+_commit.txt
+go_commit.bat
+
 
 
 

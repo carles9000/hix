@@ -47,43 +47,95 @@ FUNCTION HIX_KeyExists( cName )
 RETURN hb_HHasKey( s_hKeys, cName )
 
 // ============================================================
-// HIX_KeysLoadFromAppConfig — copy config.json > "keys" section
-// into the store. Idempotent. Values already set by HIX_KeySet
-// are overwritten — bootstrap runs before user code by design.
-// Returns the number of keys copied.
+// HIX_KeysLoadFromAppConfig — resolve the key store.
+//
+// v2.4.3 precedence (reversed from pre-v2.4.3):
+//   1. HIX_KeySet()         -- call from Main() before Start()
+//   2. config.json > "keys" -- loaded here, only when slot empty
+//   3. generated in memory  -- last-resort for the core slots
+//                              (csrf, jwt, session, token, resource)
+//
+// Returns the number of keys imported from config.json (not the
+// total in the store — kept for backward compat with existing tests).
 // ============================================================
 FUNCTION HIX_KeysLoadFromAppConfig()
 
-   LOCAL hKeys, cName, nCount := 0
+   LOCAL hKeys, cName, nCount := 0, nGen := 0
+   LOCAL aSlots := { "csrf", "jwt", "session", "token", "resource" }
 
    hKeys := HIX_ConfigApp( "keys", NIL )
 
-   IF ! HB_ISHASH( hKeys )
+   IF HB_ISHASH( hKeys )
 
-      RETURN 0
+      FOR EACH cName IN hb_HKeys( hKeys )
+
+         // v2.4.3 — never overwrite a key already set by HIX_KeySet.
+         // Previously bootstrap pisaba el valor del usuario; eso convertía
+         // config.json en autoridad (y arrastraba defaults publicados).
+         IF hb_HHasKey( s_hKeys, cName ) .AND. ! Empty( s_hKeys[ cName ] )
+
+            lw( "HIX_Keys: '" + cName + "' already set by HIX_KeySet — " + ;
+                "config.json value ignored" )
+            LOOP
+
+         ENDIF
+
+         s_hKeys[ cName ] := hKeys[ cName ]
+         nCount++
+
+         // Warn loudly when a key still carries the published default pattern.
+         IF ValType( hKeys[ cName ] ) == "C" .AND. "H!x@" $ hKeys[ cName ]
+
+            lw( "SECURITY: key '" + cName + "' uses a published default — " + ;
+                "replace it in config.json > keys before deploying to production" )
+
+         ENDIF
+
+      NEXT
 
    ENDIF
 
-   FOR EACH cName IN hb_HKeys( hKeys )
+   // v2.4.3 — last-resort generation for the core slots. Avoids a silent
+   // "empty key" state that would make engines (JWT/CSRF/session) fall
+   // back to builtin defaults. These generated keys do NOT persist: the
+   // operator must call HIX_KeySet() (or populate config.json) to keep
+   // tokens valid across restarts.
+   FOR EACH cName IN aSlots
 
-      s_hKeys[ cName ] := hKeys[ cName ]
-      nCount++
+      IF Empty( hb_HGetDef( s_hKeys, cName, "" ) )
 
-      // Warn loudly when a key still carries the published default pattern.
-      // Published defaults are predictable — anyone who reads the source can
-      // forge tokens, sessions and CSRF. Replace them in config.json (A1.16).
-      IF ValType( hKeys[ cName ] ) == "C" .AND. "H!x@" $ hKeys[ cName ]
-
-         lw( "SECURITY: key '" + cName + "' uses a published default — " + ;
-             "replace it in config.json > keys before deploying to production" )
+         s_hKeys[ cName ] := _HixGenKey()
+         nGen++
 
       ENDIF
 
    NEXT
 
-   l( "HIX_Keys: " + hb_ntos( nCount ) + " key(s) loaded from config.json" )
+   IF nGen > 0
+
+      lw( "HIX_Keys: " + hb_ntos( nGen ) + " key(s) generated in memory — " + ;
+          "tokens/sessions die with the process. Use HIX_KeySet() or " + ;
+          "config.json > keys to persist them" )
+
+   ENDIF
+
+   l( "HIX_Keys: " + hb_ntos( nCount ) + " from config.json, " + ;
+      hb_ntos( nGen ) + " generated, " + hb_ntos( Len( s_hKeys ) ) + " in store" )
 
 RETURN nCount
+
+// ============================================================
+// _HixGenKey — 64-char hex key from startup entropy. Mirrors
+// hix_config_app.prg:_HixGenRandKey() so both paths produce
+// equally unpredictable secrets.
+// ============================================================
+STATIC FUNCTION _HixGenKey()
+
+   LOCAL cMsg := hb_NToS( Int( hb_TToSec( hb_DateTime() ) ) ) + ":" + ;
+                 hb_NToS( hb_MilliSeconds()                  ) + ":" + ;
+                 hb_NToS( hb_RandomInt( 0, 2147483647 )      )
+
+RETURN hb_HMAC_SHA256( cMsg, "hix-key-init" )
 
 // ============================================================
 // HIX_KeysAsHash — returns a hash with the key NAMES only

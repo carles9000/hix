@@ -1092,6 +1092,7 @@ RETURN { ;
       { "Middleware", { ;
       { "MW-Built-In", {|| HIX_TestMw_Run()          } }, ;
       { "MwAutoApply", {|| HIX_TestMwAutoApply_Run() } }, ;
+      { "LoaderSession", {|| HIX_TestLoaderSession_Run() } }, ;
       { "MwFlush",     {|| HIX_TestMwFlush_Run()     } }, ;
       { "MwSystem",    {|| HIX_TestMwSystem_Run()    } }, ;
       { "Flash",       {|| HIX_TestFlash_Run()       } }, ;

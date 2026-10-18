@@ -163,7 +163,10 @@ FUNCTION HIX_MwCsrfCheck( oCtx )
 
    ENDIF
 
-   IF Empty( cGot ) .OR. ! HIX_CsrfValidToken( cGot, s_nLapsus )
+   // v2.4.3 Fix 6 — HIX_CsrfBound() rechaza tokens minteados en otra
+   // sesión aunque la firma HMAC sea válida. Skip stateless cuando no
+   // hay sesión activa (public forms siguen funcionando).
+   IF Empty( cGot ) .OR. ! HIX_CsrfValidToken( cGot, s_nLapsus ) .OR. ! HIX_CsrfBound( cGot )
 
       oCtx:lHandled := .T.
 

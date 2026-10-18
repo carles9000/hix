@@ -1637,28 +1637,43 @@ RETURN hCtx
 
 STATIC PROCEDURE _AudA0116_RandomDefaults( hCtx )
 
-   LOCAL hDef1, hDef2, hK1, hK2
+   LOCAL hDef, cJwt1, cJwt2, cOldJwt
 
-   hDef1 := HIX_ConfigAppDefaults()
-   hDef2 := HIX_ConfigAppDefaults()
+   hDef := HIX_ConfigAppDefaults()
 
-   hK1 := hb_HGetDef( hDef1, "keys", { => } )
-   hK2 := hb_HGetDef( hDef2, "keys", { => } )
+   // v2.4.3 Fix 5 — HIX_ConfigAppDefaults() ya no mintea claves en disco.
+   // config.json vive bajo paths.root y filtra por git/backup/proceso local.
+   HixTU_Check( hCtx, ! hb_HHasKey( hDef, "keys" ), ;
+      "A1.16/Fix 5: defaults no incluyen seccion keys (no se persiste en config.json)", ;
+      "no-keys-section", iif( hb_HHasKey( hDef, "keys" ), "LEAKED-TO-DISK", "ok" ) )
 
-   // Each call generates a distinct JWT key — no longer a fixed "H!x@JWT@2026"
-   HixTU_Check( hCtx, hb_HGetDef( hK1, "jwt", "" ) != hb_HGetDef( hK2, "jwt", "" ), ;
-      "A1.16: HIX_ConfigAppDefaults() genera clave jwt distinta en cada llamada", "distinct", ;
-      iif( hb_HGetDef( hK1, "jwt", "" ) != hb_HGetDef( hK2, "jwt", "" ), "ok", "SAME-KEY" ) )
+   // Las claves ahora las genera HIX_KeysLoadFromAppConfig() en memoria,
+   // y cada ejecucion produce valores distintos (regresion A1.16).
+   cOldJwt := HIX_KeyGet( "jwt", "" )
 
-   // The generated key must not contain the published pattern
-   HixTU_Check( hCtx, ! ( "H!x@" $ hb_HGetDef( hK1, "jwt", "" ) ), ;
+   HIX_KeysReset()
+   HIX_ConfigAppSet( "keys", NIL )
+   HIX_KeysLoadFromAppConfig()
+   cJwt1 := HIX_KeyGet( "jwt", "" )
+
+   HIX_KeysReset()
+   HIX_KeysLoadFromAppConfig()
+   cJwt2 := HIX_KeyGet( "jwt", "" )
+
+   HixTU_Check( hCtx, cJwt1 != cJwt2, ;
+      "A1.16: HIX_KeysLoadFromAppConfig() genera clave jwt distinta en cada run", "distinct", ;
+      iif( cJwt1 != cJwt2, "ok", "SAME-KEY" ) )
+
+   HixTU_Check( hCtx, ! ( "H!x@" $ cJwt1 ), ;
       "A1.16: clave jwt generada no contiene patron publicado H!x@", "ok", ;
-      iif( ! ( "H!x@" $ hb_HGetDef( hK1, "jwt", "" ) ), "ok", "HARDCODED" ) )
+      iif( ! ( "H!x@" $ cJwt1 ), "ok", "HARDCODED" ) )
 
-   // Key must be long enough (HMAC-SHA256 gives 64 hex chars)
-   HixTU_Check( hCtx, Len( hb_HGetDef( hK1, "jwt", "" ) ) >= 32, ;
-      "A1.16: clave generada tiene >= 32 chars", ">=32", ;
-      hb_NToS( Len( hb_HGetDef( hK1, "jwt", "" ) ) ) )
+   HixTU_Check( hCtx, Len( cJwt1 ) >= 32, ;
+      "A1.16: clave generada tiene >= 32 chars", ">=32", hb_NToS( Len( cJwt1 ) ) )
+
+   // Restore
+   HIX_KeysReset()
+   IF ! Empty( cOldJwt ) ; HIX_KeySet( "jwt", cOldJwt ) ; ENDIF
 
 RETURN
 

@@ -130,7 +130,7 @@ METHOD Read() CLASS THixRequest
 
    LOCAL cRaw, nEnd, cFirstLine, aParts, nQ, nCRLF2
    LOCAL aLines, cLine, nPos, nStart, cConn
-   LOCAL cFwd, cReal, cFwdHeader, hFwd, aFwd, cCandidate
+   LOCAL cFwd, cReal, cFwdHeader, hFwd, aFwd, cCandidate, cProto
 
    cRaw := ::oIO:ReadHeaders()
 
@@ -214,6 +214,11 @@ METHOD Read() CLASS THixRequest
 
    ENDIF
 
+   // v2.4.3 — seed scheme from transport; proxy headers only override below.
+   // Without this, a direct TLS request leaves cProtoScheme empty and the
+   // "Secure" cookie flag never fires in HIX_SetCookie().
+   ::cProtoScheme := iif( ::oIO != NIL .AND. ::oIO:lUseSSL, "https", "http" )
+
    IF ::lProxied .AND. HIX_IsTrustedProxy( ::cIP )
 
       // RFC 7239 Forwarded: tiene precedencia sobre X-Forwarded-*
@@ -265,7 +270,9 @@ METHOD Read() CLASS THixRequest
 
          ENDIF
 
-         ::cProtoScheme := AllTrim( hb_HGetDef( ::hHeaders, "x-forwarded-proto", "" ) )
+         // v2.4.3 — only override transport-seeded scheme when header present.
+         cProto := AllTrim( hb_HGetDef( ::hHeaders, "x-forwarded-proto", "" ) )
+         IF ! Empty( cProto ) ; ::cProtoScheme := cProto ; ENDIF
          ::cFwdHost     := AllTrim( hb_HGetDef( ::hHeaders, "x-forwarded-host",  "" ) )
          ::cFwdPort     := AllTrim( hb_HGetDef( ::hHeaders, "x-forwarded-port",  "" ) )
 

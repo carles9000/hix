@@ -15,6 +15,7 @@ FUNCTION HIX_TestKeys_Run()
    _TestKeysLoadFromConfig( hCtx )
    _TestKeysMasked( hCtx )
    _TestKeysEnginesConsume( hCtx )
+   _TestKeysPrecedence( hCtx )
 
 RETURN hCtx
 
@@ -148,5 +149,66 @@ STATIC PROCEDURE _TestKeysEnginesConsume( hCtx )
    HIX_KeySet( "token", "tok-rotated" )
    HixTU_Check( hCtx, ! HIX_TokenValid( cToken ), ;
       "Keys T17: rotating token key invalidates", ".F.", ".T." )
+
+RETURN
+
+// ============================================================
+// v2.4.3 Fix 4 — precedence HIX_KeySet > config.json > generated.
+// Antes del fix, config.json pisaba a HIX_KeySet y nadie generaba
+// claves cuando faltaban → silent default "H!x@..." o vacío.
+// ============================================================
+STATIC PROCEDURE _TestKeysPrecedence( hCtx )
+
+   LOCAL cCsrf, cJwt, cGenCsrf
+
+   // --- Case A: HIX_KeySet wins over config.json ---
+   HIX_KeysReset()
+   HIX_KeySet( "csrf", "USER-SET-CSRF" )
+   HIX_ConfigAppSet( "keys", { "csrf" => "CFG-CSRF", "jwt" => "CFG-JWT" } )
+   HIX_KeysLoadFromAppConfig()
+
+   HixTU_Check( hCtx, HIX_KeyGet( "csrf" ) == "USER-SET-CSRF", ;
+      "Keys T18: HIX_KeySet beats config.json", "USER-SET-CSRF", HIX_KeyGet( "csrf" ) )
+
+   HixTU_Check( hCtx, HIX_KeyGet( "jwt" ) == "CFG-JWT", ;
+      "Keys T19: config.json fills slots not set by user", "CFG-JWT", HIX_KeyGet( "jwt" ) )
+
+   // --- Case B: no HIX_KeySet, no config.json -> keys generated ---
+   HIX_KeysReset()
+   HIX_ConfigAppSet( "keys", NIL )
+   HIX_KeysLoadFromAppConfig()
+
+   cCsrf := HIX_KeyGet( "csrf" )
+   cJwt  := HIX_KeyGet( "jwt"  )
+
+   HixTU_Check( hCtx, Len( cCsrf ) > 0, ;
+      "Keys T20: core slot csrf auto-generated", ">0 chars", hb_NToS( Len( cCsrf ) ) )
+
+   HixTU_Check( hCtx, Len( cJwt ) > 0, ;
+      "Keys T21: core slot jwt auto-generated", ">0 chars", hb_NToS( Len( cJwt ) ) )
+
+   HixTU_Check( hCtx, cCsrf != cJwt, ;
+      "Keys T22: generated keys differ per slot", "different", "equal" )
+
+   // --- Case C: generated keys do NOT persist (reset wipes them) ---
+   cGenCsrf := cCsrf
+   HIX_KeysReset()
+   HIX_KeysLoadFromAppConfig()
+
+   HixTU_Check( hCtx, HIX_KeyGet( "csrf" ) != cGenCsrf, ;
+      "Keys T23: regenerated key is different after reset", "different", "equal" )
+
+   // --- Case D: empty HIX_KeySet value should let config.json win ---
+   HIX_KeysReset()
+   HIX_KeySet( "csrf", "" )
+   HIX_ConfigAppSet( "keys", { "csrf" => "CFG-WINS" } )
+   HIX_KeysLoadFromAppConfig()
+
+   HixTU_Check( hCtx, HIX_KeyGet( "csrf" ) == "CFG-WINS", ;
+      "Keys T24: empty HIX_KeySet value yields to config.json", "CFG-WINS", HIX_KeyGet( "csrf" ) )
+
+   // Housekeeping
+   HIX_ConfigAppSet( "keys", NIL )
+   HIX_KeysReset()
 
 RETURN

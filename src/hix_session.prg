@@ -477,12 +477,20 @@ FUNCTION HIX_SessionNewId()
 RETURN _HixSessionNewId()
 
 // [B1.S4] HIX_MwSessionConfig — configuración actual del módulo (para tests y diagnóstico).
+// prefix/crypt/seed_set/gc_days expuestos en v2.4.3 para verificar que el loader
+// propaga las cuatro claves de hix.json > session a HIX_MwSessionSetup.
+// Seed en bool para no filtrar el valor en logs de monitor/diagnóstico.
 FUNCTION HIX_MwSessionConfig()
 RETURN { ;
-   "storage"       => s_cStorage, ;
-   "ttl"           => s_nTtl,     ;
-   "gc_every"      => s_nGcEvery, ;
-   "config_applied"=> s_lConfigApplied }
+   "storage"       => s_cStorage,         ;
+   "ttl"           => s_nTtl,             ;
+   "gc_every"      => s_nGcEvery,         ;
+   "config_applied"=> s_lConfigApplied,   ;
+   "prefix"        => s_cPrefix,          ;
+   "crypt"         => s_lCrypt,           ;
+   "seed_set"      => ! Empty( s_cSeed ), ;
+   "gc_days"       => s_nGcDays,          ;
+   "path"          => s_cPath             }
 
 // Test hooks — expose internal STATIC functions for unit tests.
 FUNCTION HIX_SessionFileWriteForTest( cSid, hEntry )

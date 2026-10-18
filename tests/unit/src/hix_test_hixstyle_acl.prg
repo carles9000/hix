@@ -58,6 +58,43 @@ STATIC FUNCTION _TmpRoot()
    hb_MemoWrit( cRoot + "config.json", '{"keys":{"jwt":"SECRET"}}' )
    hb_MemoWrit( cRoot + "index.html",  "<html>home</html>" )
    hb_MemoWrit( cRoot + "secret.txt",  "topsecret" )
+
+   // v2.4.3 — fixture extendido para los bloques nuevos
+   hb_MemoWrit( cRoot + ".gitignore", "ignore" )
+   hb_MemoWrit( cRoot + ".env",       "SECRET=1" )
+
+   IF ! hb_DirExists( cRoot + "src"         ) ; hb_DirCreate( cRoot + "src"         ) ; ENDIF
+   IF ! hb_DirExists( cRoot + "data"        ) ; hb_DirCreate( cRoot + "data"        ) ; ENDIF
+   IF ! hb_DirExists( cRoot + "logs"        ) ; hb_DirCreate( cRoot + "logs"        ) ; ENDIF
+   IF ! hb_DirExists( cRoot + "models"      ) ; hb_DirCreate( cRoot + "models"      ) ; ENDIF
+   IF ! hb_DirExists( cRoot + "loaders"     ) ; hb_DirCreate( cRoot + "loaders"     ) ; ENDIF
+   IF ! hb_DirExists( cRoot + "middlewares" ) ; hb_DirCreate( cRoot + "middlewares" ) ; ENDIF
+   IF ! hb_DirExists( cRoot + "routes"      ) ; hb_DirCreate( cRoot + "routes"      ) ; ENDIF
+
+   hb_MemoWrit( cRoot + "src"         + hb_ps() + "lib.prg",   "FUNCTION Main() ; RETURN NIL" )
+   hb_MemoWrit( cRoot + "data"        + hb_ps() + "db.dbf",    "DBF"  )
+   hb_MemoWrit( cRoot + "logs"        + hb_ps() + "app.log",   "log"  )
+   hb_MemoWrit( cRoot + "models"      + hb_ps() + "user.prg",  "FUNCTION Main() ; RETURN NIL" )
+   hb_MemoWrit( cRoot + "loaders"     + hb_ps() + "init.prg",  "FUNCTION Main() ; RETURN NIL" )
+   hb_MemoWrit( cRoot + "middlewares" + hb_ps() + "auth.prg",  "FUNCTION Main() ; RETURN NIL" )
+   hb_MemoWrit( cRoot + "routes"      + hb_ps() + "web.json",  '{"routes":[]}' )
+
+   // Public: dotfiles, extensiones peligrosas, nested
+   IF ! hb_DirExists( cRoot + "public" + hb_ps() + ".git"     ) ; hb_DirCreate( cRoot + "public" + hb_ps() + ".git"     ) ; ENDIF
+   IF ! hb_DirExists( cRoot + "public" + hb_ps() + "a"        ) ; hb_DirCreate( cRoot + "public" + hb_ps() + "a"        ) ; ENDIF
+   IF ! hb_DirExists( cRoot + "public" + hb_ps() + "a" + hb_ps() + "b"           ) ; hb_DirCreate( cRoot + "public" + hb_ps() + "a" + hb_ps() + "b"            ) ; ENDIF
+   IF ! hb_DirExists( cRoot + "public" + hb_ps() + "a" + hb_ps() + "b" + hb_ps() + "c" ) ; hb_DirCreate( cRoot + "public" + hb_ps() + "a" + hb_ps() + "b" + hb_ps() + "c" ) ; ENDIF
+
+   hb_MemoWrit( cRoot + "public" + hb_ps() + ".env",       "KEY=X" )
+   hb_MemoWrit( cRoot + "public" + hb_ps() + ".htaccess",  "Deny from all" )
+   hb_MemoWrit( cRoot + "public" + hb_ps() + ".git" + hb_ps() + "config", "[core]" )
+   hb_MemoWrit( cRoot + "public" + hb_ps() + "data.dbf",   "DBF"  )
+   hb_MemoWrit( cRoot + "public" + hb_ps() + "app.prg",    "FUNCTION Main() ; RETURN '<h1>pub</h1>'" )
+   hb_MemoWrit( cRoot + "public" + hb_ps() + "code.hbp",   "-mt" )
+   hb_MemoWrit( cRoot + "public" + hb_ps() + "log.cdx",    "CDX"  )
+   hb_MemoWrit( cRoot + "public" + hb_ps() + "mem.fpt",    "FPT"  )
+   hb_MemoWrit( cRoot + "public" + hb_ps() + "key.pem",    "-----BEGIN KEY-----" )
+   hb_MemoWrit( cRoot + "public" + hb_ps() + "a" + hb_ps() + "b" + hb_ps() + "c" + hb_ps() + "nested.css", "body{}" )
 RETURN cRoot
 
 STATIC PROCEDURE _CleanTmpRoot( cRoot )
@@ -81,7 +118,12 @@ RETURN
 // -------------------------------------------------------
 FUNCTION HIX_TestHixstyleAcl_Run()
    LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
-   LOCAL cRoot := _TmpRoot()
+   LOCAL cRoot
+   // v2.4.3 — subsystems globales. Necesarios para que Dispatch() funcione
+   // cuando el grupo se filtra con --cli sin arrastrar la suite completa.
+   HIX_MetricsInit()
+   HIX_ZombieInit()
+   cRoot := _TmpRoot()
 
    _AllowDirStruct(    hCtx )
    _WhitelistBlocks(   hCtx, cRoot )
@@ -91,6 +133,13 @@ FUNCTION HIX_TestHixstyleAcl_Run()
    _FileRouteBypass(   hCtx, cRoot )
    _GetAclShape(       hCtx )
    _RootBlocked(       hCtx, cRoot )
+   // v2.4.3 — pack ampliado
+   _PathTraversal(     hCtx, cRoot )
+   _DangerousExts(     hCtx, cRoot )
+   _Dotfiles(          hCtx, cRoot )
+   _SensitiveFolders(  hCtx, cRoot )
+   _NestedPaths(       hCtx, cRoot )
+   _CaseSensitivity(   hCtx, cRoot )
 
    _CleanTmpRoot( cRoot )
    HIX_SafeDirDelete( cRoot )
@@ -222,12 +271,19 @@ STATIC PROCEDURE _ExecPerFolder( hCtx, cRoot )
    HixTU_Check( hCtx, oReq:nStatus == 200, ;
       "ACL: static + allow(exec) -> PRG 200", "200", hb_NToS( oReq:nStatus ) )
 
-   //	5c. dispatch_mode=full (default) + AllowDir sin exec -> sigue funcionando
+   //	5c. v2.4.3 hixstyle estricto: con aAllowDirs activa, AllowDir manda.
+   //	    AllowDir(_, .F.) bloquea PRG aunque lExecPrg sea .T. globalmente.
    oDisp := THixDispatcher():New( cRoot )
    oDisp:AllowDir( "micarpeta", .F. )
    oReq := _Dispatch( oDisp, "/micarpeta/bar.prg" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: hixstyle allow(no exec) -> PRG 403 (v2.4.3)", "403", hb_NToS( oReq:nStatus ) )
+
+   //	5d. Modo clasico (sin AllowDir) sigue respetando lExecPrg global
+   oDisp := THixDispatcher():New( cRoot )
+   oReq := _Dispatch( oDisp, "/micarpeta/bar.prg" )
    HixTU_Check( hCtx, oReq:nStatus == 200, ;
-      "ACL: full + allow(no exec) -> PRG 200", "200", hb_NToS( oReq:nStatus ) )
+      "ACL: clasico (sin whitelist) lExecPrg=.T. -> PRG 200", "200", hb_NToS( oReq:nStatus ) )
 RETURN
 
 // -------------------------------------------------------
@@ -312,4 +368,159 @@ STATIC PROCEDURE _RootBlocked( hCtx, cRoot )
    oReq  := _Dispatch( oDisp, "/config.json" )
    HixTU_Check( hCtx, oReq:nStatus == 200, ;
       "ACL: modo clásico sirve root (sin whitelist)", "200", hb_NToS( oReq:nStatus ) )
+RETURN
+
+// -------------------------------------------------------
+// 9. Path traversal — literal, URL-encoded, mixtos
+// Normalizacion + decode + check deben matar todos.
+// -------------------------------------------------------
+STATIC PROCEDURE _PathTraversal( hCtx, cRoot )
+   LOCAL oDisp := THixDispatcher():New( cRoot )
+   LOCAL oReq
+
+   oDisp:AllowDir( "public" )
+
+   oReq := _Dispatch( oDisp, "/public/../config.json" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: traversal literal /public/../config.json", "403", hb_NToS( oReq:nStatus ) )
+
+   oReq := _Dispatch( oDisp, "/public/..%2fconfig.json" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: traversal mixto /public/..%2fconfig.json", "403", hb_NToS( oReq:nStatus ) )
+
+   oReq := _Dispatch( oDisp, "/%2e%2e/config.json" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: traversal URL-encoded /%2e%2e/config.json", "403", hb_NToS( oReq:nStatus ) )
+
+   oReq := _Dispatch( oDisp, "//config.json" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: doble slash //config.json tras normalize queda root", "403", hb_NToS( oReq:nStatus ) )
+
+   oReq := _Dispatch( oDisp, "/public/" + Chr(0) + "secret.txt" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: null byte en path", "403", hb_NToS( oReq:nStatus ) )
+RETURN
+
+// -------------------------------------------------------
+// 10. Extensiones peligrosas — nunca servir aunque la
+// carpeta este en whitelist. .prg bajo exec=.F. tambien 403.
+// -------------------------------------------------------
+STATIC PROCEDURE _DangerousExts( hCtx, cRoot )
+   LOCAL oDisp := THixDispatcher():New( cRoot )
+   LOCAL oReq
+
+   oDisp:AllowDir( "public", .F. )
+
+   oReq := _Dispatch( oDisp, "/public/data.dbf" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: /public/data.dbf bloqueado por blacklist", "403", hb_NToS( oReq:nStatus ) )
+
+   oReq := _Dispatch( oDisp, "/public/code.hbp" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: /public/code.hbp bloqueado", "403", hb_NToS( oReq:nStatus ) )
+
+   oReq := _Dispatch( oDisp, "/public/log.cdx" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: /public/log.cdx bloqueado", "403", hb_NToS( oReq:nStatus ) )
+
+   oReq := _Dispatch( oDisp, "/public/mem.fpt" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: /public/mem.fpt bloqueado", "403", hb_NToS( oReq:nStatus ) )
+
+   oReq := _Dispatch( oDisp, "/public/key.pem" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: /public/key.pem bloqueado (crypto material)", "403", hb_NToS( oReq:nStatus ) )
+
+   // .prg con exec=.F. tambien 403 (gate en case clause, no blacklist)
+   oReq := _Dispatch( oDisp, "/public/app.prg" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: /public/app.prg bloqueado (exec=.F.)", "403", hb_NToS( oReq:nStatus ) )
+RETURN
+
+// -------------------------------------------------------
+// 11. Dotfiles — fichero oculto o cualquier segmento ".x/"
+// -------------------------------------------------------
+STATIC PROCEDURE _Dotfiles( hCtx, cRoot )
+   LOCAL oDisp := THixDispatcher():New( cRoot )
+   LOCAL oReq
+
+   oDisp:AllowDir( "public" )
+
+   oReq := _Dispatch( oDisp, "/public/.env" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: /public/.env bloqueado (dotfile)", "403", hb_NToS( oReq:nStatus ) )
+
+   oReq := _Dispatch( oDisp, "/public/.htaccess" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: /public/.htaccess bloqueado", "403", hb_NToS( oReq:nStatus ) )
+
+   oReq := _Dispatch( oDisp, "/public/.git/config" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: /public/.git/config bloqueado (dotdir)", "403", hb_NToS( oReq:nStatus ) )
+
+   oReq := _Dispatch( oDisp, "/.gitignore" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: /.gitignore bloqueado (dotfile en root)", "403", hb_NToS( oReq:nStatus ) )
+RETURN
+
+// -------------------------------------------------------
+// 12. Carpetas sensibles — sin AllowDir, todas 403
+// -------------------------------------------------------
+STATIC PROCEDURE _SensitiveFolders( hCtx, cRoot )
+   LOCAL oDisp := THixDispatcher():New( cRoot )
+   LOCAL oReq, aPaths, cP
+
+   oDisp:AllowDir( "public" )
+
+   aPaths := { ;
+      "/src/lib.prg",            ;
+      "/data/db.dbf",            ;
+      "/logs/app.log",           ;
+      "/models/user.prg",        ;
+      "/loaders/init.prg",       ;
+      "/middlewares/auth.prg",   ;
+      "/routes/web.json"         ;
+   }
+
+   FOR EACH cP IN aPaths
+      oReq := _Dispatch( oDisp, cP )
+      HixTU_Check( hCtx, oReq:nStatus == 403, ;
+         "ACL: " + cP + " bloqueado (no whitelist)", "403", hb_NToS( oReq:nStatus ) )
+   NEXT
+RETURN
+
+// -------------------------------------------------------
+// 13. Nested paths — profundidad arbitraria dentro de la whitelist
+// -------------------------------------------------------
+STATIC PROCEDURE _NestedPaths( hCtx, cRoot )
+   LOCAL oDisp := THixDispatcher():New( cRoot )
+   LOCAL oReq
+
+   oDisp:AllowDir( "public" )
+
+   oReq := _Dispatch( oDisp, "/public/a/b/c/nested.css" )
+   HixTU_Check( hCtx, oReq:nStatus == 200, ;
+      "ACL: nested /public/a/b/c/nested.css sirve", "200", hb_NToS( oReq:nStatus ) )
+
+   // Traversal con nested path
+   oReq := _Dispatch( oDisp, "/public/a/b/../../../config.json" )
+   HixTU_Check( hCtx, oReq:nStatus == 403, ;
+      "ACL: nested traversal /public/a/b/../../../config.json", "403", hb_NToS( oReq:nStatus ) )
+RETURN
+
+// -------------------------------------------------------
+// 14. Case sensitivity — Win sirve, Linux 404
+// cRelDir se compara en lowercase, asi que el whitelist pasa
+// en ambos. Lo que varia es si el FS encuentra el fichero.
+// -------------------------------------------------------
+STATIC PROCEDURE _CaseSensitivity( hCtx, cRoot )
+   LOCAL oDisp := THixDispatcher():New( cRoot )
+   LOCAL oReq, nExp
+
+   oDisp:AllowDir( "public" )
+
+   oReq := _Dispatch( oDisp, "/Public/img/logo.png" )
+   nExp := iif( hb_ps() == "\", 200, 404 )
+   HixTU_Check( hCtx, oReq:nStatus == nExp, ;
+      "ACL: /Public (case) sirve en Win, 404 en Linux", hb_NToS( nExp ), hb_NToS( oReq:nStatus ) )
 RETURN

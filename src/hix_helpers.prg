@@ -138,6 +138,24 @@ FUNCTION UParam( cKey, xDef )
 
       ENDIF
 
+      // v2.4.3 — fallback a querystring si la ruta no declara :cKey como
+      // route param. Grid/paginación (?page=N, ?sort=col) pasaban invisibles
+      // a controllers que usan UParam como accesor único. Portado de
+      // lediz/enhance; UGet() sigue existiendo como accesor explícito.
+      hCopy := o:QueryParamsAll()
+
+      IF hb_IsHash( hCopy )
+
+         HB_HCaseMatch( hCopy, .F. )
+
+         IF hb_HHasKey( hCopy, cKey )
+
+            RETURN hCopy[ cKey ]
+
+         ENDIF
+
+      ENDIF
+
    ENDIF
 
    IF lDef

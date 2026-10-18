@@ -55,6 +55,7 @@ src/hix_test_jwt.prg
 src/hix_test_jwt_scope.prg
 src/hix_test_keys.prg
 src/hix_test_load_routes.prg
+src/hix_test_loader_session.prg
 src/hix_test_multipart.prg
 src/hix_test_new_overrides.prg
 src/hix_test_mw.prg

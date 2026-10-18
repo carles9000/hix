@@ -283,6 +283,26 @@ STATIC PROCEDURE _TestGetPost( hCtx )
    HixTU_Check( hCtx, hb_HGetDef( hP, "id",   "" ) == "42",             "Helpers: UParam() id=42",        "42",      hb_HGetDef( hP, "id",   "" ) )
    HixTU_Check( hCtx, hb_HGetDef( hP, "slug", "" ) == "harbour",        "Helpers: UParam() slug",         "harbour", hb_HGetDef( hP, "slug", "" ) )
    HixTU_Check( hCtx, Len( hP ) == 2,                                    "Helpers: UParam() 2 claves",     "2",       hb_NToS( Len( hP ) ) )
+
+   // v2.4.3 — fallback a querystring cuando la ruta no declara :cKey.
+   // Grid/paginación (?page=N, ?sort=col) ahora visibles a controllers
+   // que usan UParam como accesor único.
+   oMock := TMockReq():New( "GET", "/items", "page=5&sort=name" )
+   HIX_SetRequest( oMock )
+   HixTU_Check( hCtx, UParam( "page", "" ) == "5",      ;
+      "Helpers: UParam querystring fallback (page=5)", "5", UParam( "page", "" ) )
+   HixTU_Check( hCtx, UParam( "sort", "" ) == "name",   ;
+      "Helpers: UParam querystring fallback (sort=name)", "name", UParam( "sort", "" ) )
+   HixTU_Check( hCtx, UParam( "missing", "d" ) == "d",  ;
+      "Helpers: UParam default when neither route nor query",  "d", UParam( "missing", "d" ) )
+
+   // Prioridad: route param gana sobre querystring (mismo nombre).
+   oMock := TMockReq():New( "GET", "/items/99", "id=42" )
+   oMock:hParam[ "id" ] := "99"
+   HIX_SetRequest( oMock )
+   HixTU_Check( hCtx, UParam( "id", "" ) == "99",       ;
+      "Helpers: UParam route > querystring (misma clave)", "99", UParam( "id", "" ) )
+
 RETURN
 
 STATIC PROCEDURE _TestHeaderCookie( hCtx )

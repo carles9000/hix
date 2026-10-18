@@ -18,6 +18,19 @@
 STATIC s_hAbortMx  := NIL
 STATIC s_hAbortMap := NIL
 
+// v2.4.3 — Hixstyle blacklist. Cuando aAllowDirs != NIL, estas extensiones
+// nunca se sirven como estatico (fugarian codigo o datos del backend) y
+// ningun path con un segmento que empiece por "." es servible (dotfiles
+// como .env, .htaccess, .git/config). PRG/HRB tienen su propia gate via
+// _HixExecAllowedForRelDir — no van en esta lista.
+STATIC s_aBlockedExts := { ;
+   "dbf", "cdx", "fpt", "dbt", "ntx",       ;   // Harbour/xBase data files
+   "hbp", "hbx", "hbs", "hbm", "hbc", "hbt",;   // Harbour project/toolchain
+   "ch",  "hbh",                            ;   // Harbour headers
+   "bak", "swp", "tmp", "old",              ;   // backups/editores
+   "pem", "key", "crt", "cer", "pfx", "p12" ;   // crypto material
+}
+
 CLASS THixDispatcher
 
    DATA cRoot         INIT ""
@@ -327,7 +340,17 @@ METHOD Dispatch( oReq ) CLASS THixDispatcher
 
       CASE cExt == ".prg"
 
-      IF ! ::lExecPrg .AND. ! _HixExecAllowedForRelDir( ::aAllowDirs, cRelDir )
+      // v2.4.3 — hixstyle: AllowDir manda. Clasico: lExecPrg global.
+      IF ::aAllowDirs != NIL
+
+         IF ! _HixExecAllowedForRelDir( ::aAllowDirs, cRelDir )
+
+            HIX_HttpError( oReq, 403 )
+            RETURN Self
+
+         ENDIF
+
+      ELSEIF ! ::lExecPrg
 
          HIX_HttpError( oReq, 403 )
          RETURN Self
@@ -338,7 +361,16 @@ METHOD Dispatch( oReq ) CLASS THixDispatcher
 
       CASE cExt == ".hrb"
 
-      IF ! ::lExecPrg .AND. ! _HixExecAllowedForRelDir( ::aAllowDirs, cRelDir )
+      IF ::aAllowDirs != NIL
+
+         IF ! _HixExecAllowedForRelDir( ::aAllowDirs, cRelDir )
+
+            HIX_HttpError( oReq, 403 )
+            RETURN Self
+
+         ENDIF
+
+      ELSEIF ! ::lExecPrg
 
          HIX_HttpError( oReq, 403 )
          RETURN Self
@@ -580,9 +612,67 @@ STATIC FUNCTION _HixCheckACL( oReq, cPath, cRelDir, aDenyDirs, aAllowDirs )
 
       ENDIF
 
+      // v2.4.3 — dotfile check (filename o cualquier segmento intermedio
+      // que empiece por "."). Cubre /public/.env, /public/.git/config, etc.
+      IF _HixPathHasDotfile( cPath )
+
+         lw( "Dispatch: dotfile bloqueado [" + cPath + "]" )
+         HIX_HttpError( oReq, 403 )
+         RETURN .F.
+
+      ENDIF
+
+      // v2.4.3 — blacklist de extensiones peligrosas (data/code/crypto).
+      IF _HixExtBlacklisted( cPath )
+
+         lw( "Dispatch: extension bloqueada [" + cPath + "]" )
+         HIX_HttpError( oReq, 403 )
+         RETURN .F.
+
+      ENDIF
+
    ENDIF
 
 RETURN .T.
+
+// v2.4.3 — devuelve .T. si algun segmento del path (ignorando la "/" inicial)
+// empieza por ".". Usar sobre el cPath normalizado (ya decodificado).
+STATIC FUNCTION _HixPathHasDotfile( cPath )
+
+   LOCAL aSegs := hb_ATokens( SubStr( cPath, iif( Left( cPath, 1 ) == "/", 2, 1 ) ), "/" )
+   LOCAL cSeg
+
+   FOR EACH cSeg IN aSegs
+
+      IF Len( cSeg ) > 0 .AND. Left( cSeg, 1 ) == "."
+
+         RETURN .T.
+
+      ENDIF
+
+   NEXT
+
+RETURN .F.
+
+// v2.4.3 — devuelve .T. si la extension (sin punto, en minusculas) esta en
+// s_aBlockedExts. Rutas sin extension pasan.
+STATIC FUNCTION _HixExtBlacklisted( cPath )
+
+   LOCAL cExt := Lower( hb_FNameExt( cPath ) )
+
+   IF Len( cExt ) > 0 .AND. Left( cExt, 1 ) == "."
+
+      cExt := SubStr( cExt, 2 )
+
+   ENDIF
+
+   IF Empty( cExt )
+
+      RETURN .F.
+
+   ENDIF
+
+RETURN AScan( s_aBlockedExts, {| x | x == cExt } ) > 0
 
 
 // ============================================================
