@@ -195,6 +195,10 @@ Se la tua rete taglia a 60s, meglio un timeout breve:
 
 ```clipper
 LOCAL nTimeout := 25    ; 25s - sotto il taglio tipico
+
+DO WHILE Seconds() - nStart < nTimeout
+   ...
+ENDDO
 ```
 
 ### Notifica fine attesa con tipo

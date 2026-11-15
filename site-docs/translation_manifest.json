@@ -4,12 +4,12 @@
       "es_sha": "b202eb0c84841882c538919bc76489cfa32a7681",
       "translations": {
         "en": {
-          "sha": "b202eb0c84841882c538919bc76489cfa32a7681",
+          "sha": "be72e8befde5f2a74eeb6b14ed56d0d472546f92",
           "translated_at": "2026-07-16T15:45:26Z",
           "translator": "haiku-4.5"
         },
         "it": {
-          "sha": "01d77f7db79f477c1622c40c09a981ba98116731",
+          "sha": "3cfd4db28ef1599e7b0079c7888a5ce24b2bc36a",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -19,12 +19,12 @@
       "es_sha": "f15e92c106938aedeb4464e5568a49f7fbda9d39",
       "translations": {
         "en": {
-          "sha": "f15e92c106938aedeb4464e5568a49f7fbda9d39",
+          "sha": "87d04650a26d5ae523b5ac3f569e4c68f2450e9e",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "2c49db764c5235220bf944f4882dc217b3e9c9c0",
+          "sha": "a829f87e4b13e5f592129f0c735147677a7118d8",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -34,12 +34,12 @@
       "es_sha": "0b881838ef0cd3e6b21bca8a32823b081913a9b3",
       "translations": {
         "en": {
-          "sha": "0b881838ef0cd3e6b21bca8a32823b081913a9b3",
+          "sha": "734cd4597e7b2bcbcf86025e6c1e1f801a034a58",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "eb8577fe97da01a2106c58a1ab7e1437e95c3a76",
+          "sha": "39ba29a5dd912b5fcebcbc8a51200958d6ce0605",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -49,12 +49,12 @@
       "es_sha": "7f7a7487e07a3f638db0170273ab116b1f8f45b6",
       "translations": {
         "en": {
-          "sha": "7f7a7487e07a3f638db0170273ab116b1f8f45b6",
+          "sha": "320e5db8ddbc133ed6b1ba8ad963363456ae9f5c",
           "translated_at": "2026-07-31T06:57:19Z",
           "translator": "claude-sonnet-4-6"
         },
         "it": {
-          "sha": "0eafd47799cb2b0c9a0812ce18438cec7362921b",
+          "sha": "64bb5d8483370f5d4a66d015460b059444c95ded",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -64,12 +64,12 @@
       "es_sha": "77916424670d0899ba3d1a951e1aaa48b48b147b",
       "translations": {
         "en": {
-          "sha": "77916424670d0899ba3d1a951e1aaa48b48b147b",
+          "sha": "698ae420d58a54cf6a26d6b27c1fb1bf68e93e96",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "48edbffd29d0e6f0e2fc9e40e6e4c65aab48c1dd",
+          "sha": "8dc1abc7b9f1b8a3076485e28012a3c2a592e8a0",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -79,12 +79,12 @@
       "es_sha": "fedf1d81ffd43ba1c5d51d44314c8206acc34d54",
       "translations": {
         "en": {
-          "sha": "fedf1d81ffd43ba1c5d51d44314c8206acc34d54",
+          "sha": "982842268f0efb495b85c8791775238f2ef76075",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "9ad5c72a4d6bb474ebd61245013e2445d27ae4cb",
+          "sha": "3d0846a10294b069a5f7248c8f809dc7e4b13101",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -94,12 +94,12 @@
       "es_sha": "3251c9dab4b017f2d27ea9ee377d5bc3dd8d452a",
       "translations": {
         "en": {
-          "sha": "3251c9dab4b017f2d27ea9ee377d5bc3dd8d452a",
+          "sha": "93312240b4c102a8233f5aa01be253f576a943b0",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "bdb406faf9ce59835422d7bac32f4582feb4acc6",
+          "sha": "22eb247e1b90d32a6877177e25699cd172304979",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -109,12 +109,12 @@
       "es_sha": "3d8efcc9bfbbb2c05fd63d0f1d15559a5d46693b",
       "translations": {
         "en": {
-          "sha": "3d8efcc9bfbbb2c05fd63d0f1d15559a5d46693b",
+          "sha": "c6653985953ae1359613101771b2bd3fcd6e1d98",
           "translated_at": "2026-07-16T15:45:26Z",
           "translator": "haiku-4.5"
         },
         "it": {
-          "sha": "7df33db7d1efc69bb5cbf1a1e25968a3b22c3d42",
+          "sha": "a9ad89f9558669018fb035734986f016796dfe8a",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -124,12 +124,12 @@
       "es_sha": "24cf2d8281b22fa82d263b50ca245e72bc12f132",
       "translations": {
         "en": {
-          "sha": "24cf2d8281b22fa82d263b50ca245e72bc12f132",
+          "sha": "c7750b8f5d5a2528c4c1da7d2915aad5fcbaf507",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "62f139c133fc19b86331016b4ac5ca788c700887",
+          "sha": "3dd0405244c33c300d3847af827a8faa2171fd46",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -139,12 +139,12 @@
       "es_sha": "b015aa7df809716697cba00d6718a55d08939641",
       "translations": {
         "en": {
-          "sha": "b015aa7df809716697cba00d6718a55d08939641",
+          "sha": "a777ec6a3c7d577078473622d750446478cca3cc",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "930ff6ccfad0eb15ac6c33e6524c5b1065a7fb2d",
+          "sha": "033e427c0de18d7151936e0a2e52b8a6018a8f2b",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -154,12 +154,12 @@
       "es_sha": "ff3ca912ee1b8f76fde709ca671a7d42048510f5",
       "translations": {
         "en": {
-          "sha": "ff3ca912ee1b8f76fde709ca671a7d42048510f5",
+          "sha": "4b4e566d8b73eec04fe883d611aebe701893a527",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "b3a426dc3f234c45b9b1e307a24444c65a341276",
+          "sha": "e020f80e0cf64106e6708f6b23a9de68cf44f9a8",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -169,15 +169,15 @@
       "es_sha": "b803a4ef6887ab010667d62bc7759f879e8fe02a",
       "translations": {
         "en": {
-          "path": "hixstyle/response/headers.md",
-          "sha": "b803a4ef6887ab010667d62bc7759f879e8fe02a",
+          "sha": null,
           "translated_at": "2026-08-03T17:59:33Z",
           "translator": "haiku-4.5"
         },
         "it": {
-          "sha": "0d4293715c212b5744697673937c3b48d01cc8ae",
+          "sha": "b066035e36322f73d18ba3f2da7e5d39191af39d",
           "translated_at": "2026-08-09T12:08:34Z",
-          "translator": "minimax-m3"
+          "translator": "minimax-m3",
+          "path": "hixstyle/response/headers.md"
         }
       }
     },
@@ -185,12 +185,12 @@
       "es_sha": "8585a417a93458b33197d3ce2b72d75b5aca8b15",
       "translations": {
         "en": {
-          "sha": "8585a417a93458b33197d3ce2b72d75b5aca8b15",
+          "sha": "e5ba6e698154fdfa59d90d8d77abfa60363ef335",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "828497e4f5c11bea3dd04d3cf38f122ceccd7fdf",
+          "sha": "1a0465e6b77eb298dd033fea6e7cdf5e9b49cbb2",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -200,12 +200,12 @@
       "es_sha": "bab35a01503826e731f59059d18428de1d086f48",
       "translations": {
         "en": {
-          "sha": "bab35a01503826e731f59059d18428de1d086f48",
+          "sha": "a6cc501b5f51faa104b9e36c41c66c7ee627dc01",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "8bbfcba5c1c15fafc2b7b524752369691506b04f",
+          "sha": "ee195cc7c095256d000db0b99201a66f834ce484",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -215,34 +215,27 @@
       "es_sha": "63b56564cba378287aa4c236e64b1c1c26f8eab9",
       "translations": {
         "en": {
-          "sha": "63b56564cba378287aa4c236e64b1c1c26f8eab9",
+          "sha": "c2a6dadc8ad506cea96427d02c7f79af2c8283d5",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "4608165b50bd9cff572eb0c92e2af04845d61900",
+          "sha": "6efc38e012abcb584b49b2d9310792531c32050d",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
-      }
-    },
-    "hixstyle/response/plantillas.md": {
-      "es_sha": "3469a5aa9e9e80ca0022e3db338c6b51219cc3aa",
-      "translations": {
-        "en": {},
-        "it": {}
       }
     },
     "hixstyle/routes/routes.md": {
       "es_sha": "c18585a6ea50f9f5f4dbae19b636d20f5af8dab3",
       "translations": {
         "en": {
-          "sha": "c18585a6ea50f9f5f4dbae19b636d20f5af8dab3",
+          "sha": "820381c3a072edb62cd210c1ff006d2149d3f917",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "4701ffc68e54f456bc645c07f78c8d9a980fe0d8",
+          "sha": "981034722784332df335593a04bfcf4c9f1db8c0",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -252,12 +245,12 @@
       "es_sha": "28b9f324116bbec5ae751019b5ca8ab71120aa82",
       "translations": {
         "en": {
-          "sha": "28b9f324116bbec5ae751019b5ca8ab71120aa82",
+          "sha": "02d83124af5f77c9ca04c99b3a37cf4d69b7f946",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "bd4c1e854f5805ece866badc576b8f307c5e3222",
+          "sha": "5367eb3089281c15c4f9a7aa4433d6bb18350a74",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -267,12 +260,12 @@
       "es_sha": "f235a14b7be91d602f31790f327f9d18aa144b99",
       "translations": {
         "en": {
-          "sha": "f235a14b7be91d602f31790f327f9d18aa144b99",
+          "sha": "610a2ee03d5945b90b010ddd2d75c037b0c65fa0",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "709f9b37d4ca3b541b28e33595da79d9fcf34145",
+          "sha": "ddbf2fd914262a162976bb50b13e9c8a90af5a7b",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -282,12 +275,12 @@
       "es_sha": "484591c60ab511395beffe2a7b791e2eb2c0b117",
       "translations": {
         "en": {
-          "sha": "484591c60ab511395beffe2a7b791e2eb2c0b117",
+          "sha": "619b9b8ba620494a71b04c82289ac34397ac6dad",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "ad1387160fbb0837ce0af372b78d0f76bc287fa6",
+          "sha": "3abbcc50c3ff804fcfadf448694e31736e2565a8",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -297,12 +290,12 @@
       "es_sha": "0b0cf1fac867b1afdc169f712dc079bd4c556697",
       "translations": {
         "en": {
-          "sha": "0b0cf1fac867b1afdc169f712dc079bd4c556697",
+          "sha": "99f27f3b2d7317d24fe2762c83c569fb7f4faafb",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "ca7d05828e8fc9e9f55cf146e3f13ea6a331292b",
+          "sha": "d67f6e393c3711f783e3d6eb0e20edfa780181e4",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -312,12 +305,12 @@
       "es_sha": "14cddb7aff7d8eeedc62de76d0542a2de9e573b5",
       "translations": {
         "en": {
-          "sha": "14cddb7aff7d8eeedc62de76d0542a2de9e573b5",
+          "sha": "af71366034686963d1a9ba9c4d5ef37c872fff0b",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "3c7278566b8d19c434ccf5c219b3d2cee48abba8",
+          "sha": "8c8acf11ea0dd4009cf20971a59dd813fbbca702",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -327,12 +320,12 @@
       "es_sha": "9c20d139c228aae4e5ec3e08216875b89b477e79",
       "translations": {
         "en": {
-          "sha": "9c20d139c228aae4e5ec3e08216875b89b477e79",
+          "sha": "374ea403a03086eb0633daeddf004afee578f2c3",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "7e4864d529e395f498d3b1b108fc4b7a712086cd",
+          "sha": "22261b463afaf90e70efe808c276fb26f287a4d8",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -342,12 +335,12 @@
       "es_sha": "802dd2351be9564d64813e39361a89754a4ca940",
       "translations": {
         "en": {
-          "sha": "802dd2351be9564d64813e39361a89754a4ca940",
+          "sha": "1c9b561017193df6b8a21a4aec63d20407188705",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "f1bdf3293e3b45f104a1909587502621147b2a34",
+          "sha": "d7d4ad86bb8d1f2c394788c6f8359422a9a4dacd",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -357,12 +350,12 @@
       "es_sha": "9560cf2ee3408133d8eebf6d40dbf5c1b11a291f",
       "translations": {
         "en": {
-          "sha": "9560cf2ee3408133d8eebf6d40dbf5c1b11a291f",
+          "sha": "7c6a738ec4626ca87095ad78298d4b35066b151d",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "669c2b4e5af8af0716ba7bcefcb1299284a1dc10",
+          "sha": "4e4a7a5d3afec4caaa02f0cf306ec6619d0fa070",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -372,12 +365,12 @@
       "es_sha": "dd3449cc0f82b11bf7704c3fe5148187e9fb7cee",
       "translations": {
         "en": {
-          "sha": "dd3449cc0f82b11bf7704c3fe5148187e9fb7cee",
+          "sha": "7f16c483a54462b6e05ecfbd41eb1bf807db7828",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "57a4cc3d1b83d3a0c64f3ac3decb324f9aace00e",
+          "sha": "cd88e18180c551caf506d2b1da4a4c6f46172b28",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -387,27 +380,27 @@
       "es_sha": "96b6b9661258ebcae2e2d5dd8da4aa1bc678869d",
       "translations": {
         "en": {
-          "sha": "96b6b9661258ebcae2e2d5dd8da4aa1bc678869d",
+          "sha": "e2a9ade8917ae072f7112615e2b96e74abc3f137",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "12015593896c667755611fb08ece2fb780a577cb",
+          "sha": "ef404f27be4a7a23de72faedab8ff79a49f7ef83",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
       }
     },
     "hixstyle/views/directives.md": {
-      "es_sha": "7b3df63063bfef0af69cac1c199c1c3ef21782f2",
+      "es_sha": "003aaed556e5e29fc1fb25b6feb3f176b4bb2fc7",
       "translations": {
         "en": {
-          "sha": "7b3df63063bfef0af69cac1c199c1c3ef21782f2",
+          "sha": "65ccf3fab0544684baa0c8ca69ca8e1c75fbcbb1",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "eae4d379770d7d1676db43172a17d077d7067771",
+          "sha": "4e4597c83aa3c502a6eb29bd9338c764727688c8",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -417,12 +410,12 @@
       "es_sha": "c695d8c9e926642114b59dbb14f6a4909e83a4d2",
       "translations": {
         "en": {
-          "sha": "c695d8c9e926642114b59dbb14f6a4909e83a4d2",
+          "sha": "bd3abaeede341d485cd895ad4009120f9bf90843",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "ec6a2fb9085359aa8be1840ab4e49d7db590d517",
+          "sha": "6a98420d24a3f33462d31a295e6041121e4beb0b",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -432,12 +425,12 @@
       "es_sha": "58954d699431c32c303f76eaee52550669640ed5",
       "translations": {
         "en": {
-          "sha": "58954d699431c32c303f76eaee52550669640ed5",
+          "sha": "5f6fb0d0a6e996e71727dfc7f44d0d042194d73d",
           "translated_at": "2026-08-03T18:07:31Z",
           "translator": "haiku-4.5"
         },
         "it": {
-          "sha": "af7c73c3340b98b368006d8d9b036b0660b92790",
+          "sha": "3f96ce6a9627fe0e9acc7b25ebadfc7c4849d7d1",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -452,7 +445,7 @@
           "translator": "haiku-4.5"
         },
         "it": {
-          "sha": "95ed4c8aa077fa121ea410a977f68df81133d7cd",
+          "sha": "85b686374a7a04a91de5d38a9f37e91613733508",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -467,7 +460,7 @@
           "translator": "haiku-4.5"
         },
         "it": {
-          "sha": "591f8a39369bbda64d580d1361c0deebad4515cc",
+          "sha": "184071fe53b537bc7c23445a52dfdff365752653",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -482,7 +475,7 @@
           "translator": "haiku-4.5"
         },
         "it": {
-          "sha": "5f8f98e0ea69232bd3f0dd09a8551001e3100937",
+          "sha": "69b57adf6912a8cd68ce1d0ab542c6f439f09182",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -492,12 +485,12 @@
       "es_sha": "ed62450420f907306ec3de9c87a19c5f1e55afaf",
       "translations": {
         "en": {
-          "sha": "ed62450420f907306ec3de9c87a19c5f1e55afaf",
+          "sha": "fbca266fa027e62e07809497dfb600aaceeac800",
           "translated_at": "2026-08-03T18:07:32Z",
           "translator": "haiku-4.5"
         },
         "it": {
-          "sha": "d30c429816abaf749876c4f9ca86b06ae0ac8085",
+          "sha": "370b13448ce05cbf4d38b97505ba41d831de858e",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -507,12 +500,12 @@
       "es_sha": "ac2c5a7e57b4bdcf06bed0ce5d130621a3b8b949",
       "translations": {
         "en": {
-          "sha": "ac2c5a7e57b4bdcf06bed0ce5d130621a3b8b949",
+          "sha": "0f843302f0eb934a0e2b9f707e60467e2593d4e6",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "3f3f2cdf88215895b618221f9105346218335bfa",
+          "sha": "ac2c5a7e57b4bdcf06bed0ce5d130621a3b8b949",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -522,34 +515,27 @@
       "es_sha": "65f943b870f05dda46f23877e7f6aafa2ed6d49d",
       "translations": {
         "en": {
-          "sha": "65f943b870f05dda46f23877e7f6aafa2ed6d49d",
+          "sha": "4d0d24866b40f00822a4ff6350f351e7e10d4ee8",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "7502f10e29fd711cd9c0d1c0ffb92c9a53cfbd1a",
+          "sha": "bd1906acb563423653e3591a8b0d9597c5c14654",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
       }
     },
-    "intro/data-driven_old.md": {
-      "es_sha": "d9e4844de650f0d50099d27ad86d926245df785c",
-      "translations": {
-        "en": {},
-        "it": {}
-      }
-    },
     "intro/hixstyle.md": {
-      "es_sha": "38e9f0698d685026a8f104e29e69be17b405ce4a",
+      "es_sha": "4f3cd45f1f4a9b51475c8e2f0c36bf2f23974f59",
       "translations": {
         "en": {
-          "sha": "38e9f0698d685026a8f104e29e69be17b405ce4a",
+          "sha": "32accf5a5c557a33170f373f73f788986ad292e0",
           "translated_at": "2026-08-03T17:59:34Z",
           "translator": "haiku-4.5"
         },
         "it": {
-          "sha": "dcb962473da3abd8a4266d65cd08947428c9e0e9",
+          "sha": "0e467b020dbe53445899fa8206b56ba0c8c343ea",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -559,12 +545,12 @@
       "es_sha": "18890be34b74c0d0ffc9e54bb2c3e8931e77c44d",
       "translations": {
         "en": {
-          "sha": "18890be34b74c0d0ffc9e54bb2c3e8931e77c44d",
+          "sha": "5cd9c92c35530978c7177fe1acb4d89626063ce6",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "68718ab01d6a20063e57f76a3dd36466b2fa4764",
+          "sha": "76502a0ab37be9ec4b1ae18071f63559d2410849",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -574,27 +560,27 @@
       "es_sha": "7ad0e0db9be16d114aa2fd95ad416db6d417d7eb",
       "translations": {
         "en": {
-          "sha": "7ad0e0db9be16d114aa2fd95ad416db6d417d7eb",
+          "sha": "adb1a4e7f4abfef535233e6bb8013c3f590b55ae",
           "translated_at": "2026-08-03T17:59:34Z",
           "translator": "haiku-4.5"
         },
         "it": {
-          "sha": "3d57f9aa9674132db0516946a05d1731d1df1c3a",
+          "sha": "f4c90929d8c505f60a10937c4a65110a6e23b6ef",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
       }
     },
     "primeros-pasos/compile.md": {
-      "es_sha": "00fce1121ee8bd9cc21a31299decff8f6124dc02",
+      "es_sha": "42cf78294fd72475d775eb711129191df48e7dd9",
       "translations": {
         "en": {
-          "sha": "00fce1121ee8bd9cc21a31299decff8f6124dc02",
+          "sha": "b9d79eac15c708472877eb7e8f799670b5ffec8e",
           "translated_at": "2026-08-04T09:35:53Z",
           "translator": "haiku-4.5"
         },
         "it": {
-          "sha": "fb7292dde4892593b438b9a8c0383ec7976212b0",
+          "sha": "43fbf89f1058da7dcb2ed83d37c66aa66b22ea5d",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -604,34 +590,42 @@
       "es_sha": "ea83919fd853f47acae49974caa70eb6ba4e911e",
       "translations": {
         "en": {
-          "sha": "ea83919fd853f47acae49974caa70eb6ba4e911e",
+          "sha": "81f91a3db0c4fc372dee7d283c3a83ae6cb46de0",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "3047e2bda2858ee93d8671614c62ac189be0285d",
+          "sha": "024c2d3c731861bddc9332488685a94220aacc72",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
       }
     },
-    "primeros-pasos/iniciar-servidor.md": {
-      "es_sha": "318b11a854bf274bf3c6fe5daafc6d6e0633f06e",
+    "programacion/compile.md": {
+      "es_sha": "7af5731543491ef9b6ef0c039107f76d5e4eeb48",
       "translations": {
-        "en": {},
-        "it": {}
+        "en": {
+          "sha": "96f7634f730f8ad55773fb2fc8e9291691ac3b03",
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "bootstrap"
+        },
+        "it": {
+          "sha": "ba68018dc7cc91955964644b63b04c2df3db9d84",
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "minimax-m3"
+        }
       }
     },
     "programacion/error-handling.md": {
-      "es_sha": "5063adb32085fadf6318783af2f1aab9d4ee669d",
+      "es_sha": "05b5f968760726b4580bfd56510742d28020331a",
       "translations": {
         "en": {
-          "sha": "5063adb32085fadf6318783af2f1aab9d4ee669d",
+          "sha": "6a07a229e865b913beb8daf7a0d53de4d4b8d9b7",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "2fc1e15152c45c164c3fc6ae65623e68a38c974d",
+          "sha": "981299889fb5c824c02dd3592491ab7f75b2330e",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -641,27 +635,27 @@
       "es_sha": "ad9531ecdd0f9e40a92ffc9c5ba548a4edd4d18d",
       "translations": {
         "en": {
-          "sha": "ad9531ecdd0f9e40a92ffc9c5ba548a4edd4d18d",
+          "sha": "5d3e5a3faf2241de9a1f2fdfdc9d7a8788d9045e",
           "translated_at": "2026-07-16T15:45:26Z",
           "translator": "haiku-4.5"
         },
         "it": {
-          "sha": "e0c5b4bb23e3379ba58c5d8a016a72cf57379b8f",
+          "sha": "ec21c9643a556437c80ee777a9aa0ce079a2ec22",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
       }
     },
     "programacion/errorsys.md": {
-      "es_sha": "8233a466a4d1d524a440e236ade938b6b8ce318d",
+      "es_sha": "7b3bc52ca7654a24ae6548215a24c1dc49eaeb93",
       "translations": {
         "en": {
-          "sha": "8233a466a4d1d524a440e236ade938b6b8ce318d",
+          "sha": "dca23e66698c1bfc699a5458f5950280d9e78d0a",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "246e9ed4c5de189e35a1000ae46f54da81b5609a",
+          "sha": "37b5c00c33f3bd834574bf1eea0fab9c6da7e3b8",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -671,12 +665,12 @@
       "es_sha": "8e25af0ccc63469aee42371e963bfdae44674e75",
       "translations": {
         "en": {
-          "sha": "8e25af0ccc63469aee42371e963bfdae44674e75",
+          "sha": "a1646cf896d54d5cc62249a8fdb9f25122c8bfc0",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "e31ba46ac9c1e4efa533d560641a46f45c193109",
+          "sha": "39e12df08cbba643195b7b27052baca71bad1cf5",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -686,12 +680,12 @@
       "es_sha": "61b89d2c9dbd69e4f96b666fb21e4976fc11baca",
       "translations": {
         "en": {
-          "sha": "61b89d2c9dbd69e4f96b666fb21e4976fc11baca",
+          "sha": "f601c2000eba02fbabcd532d653a16c2ee8617a2",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "b009e6b9a2586caf2ee9cf22210cfb1682bba2df",
+          "sha": "a3e85759ea0f979f5cbbc61b113cef7606308545",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -701,12 +695,12 @@
       "es_sha": "f3dcd16111d7b9d0a5e172ab5f86e2f69b98b5d8",
       "translations": {
         "en": {
-          "sha": "f3dcd16111d7b9d0a5e172ab5f86e2f69b98b5d8",
+          "sha": "92886117b265d49fd6c2cdb1fce4b8d4db1f086b",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "69defd63f5252a50e5dbf302ca34bc8ae3e9d6a1",
+          "sha": "903f3bbb80603c3f8ea302a943979b5d47137c81",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -716,34 +710,27 @@
       "es_sha": "8f63a540a507ca81fd23eed6e6e94f3a81b3484e",
       "translations": {
         "en": {
-          "sha": "8f63a540a507ca81fd23eed6e6e94f3a81b3484e",
+          "sha": "1c8b0e91d88cecc6dba11ac3c6d90ab64a2eee32",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "5becc8ebab2a2611a3049d78f94cae2dc44b60cb",
+          "sha": "5f331d08d9f85a05f0e573ac9c14139c3fc498a0",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
-      }
-    },
-    "sistema/errores.md": {
-      "es_sha": "325a735ac60c14378de9f9325719a3b8a1ab3dc8",
-      "translations": {
-        "en": {},
-        "it": {}
       }
     },
     "sistema/hix-admin.md": {
       "es_sha": "6c7713b1145c28426fb2acd8bdd6258dd0109b5b",
       "translations": {
         "en": {
-          "sha": "6c7713b1145c28426fb2acd8bdd6258dd0109b5b",
+          "sha": "14e27a97a256c2ab773889e9bd74e61d9d8c98f7",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "629bdc0070180675fc3e1e3767651528a96de6fa",
+          "sha": "92b86f7fd2061e829b996e5c1eae35b8d4c4341c",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -753,12 +740,12 @@
       "es_sha": "6d5e3f05ec7e1a3570380b49dab62c6e1c0c7af3",
       "translations": {
         "en": {
-          "sha": "6d5e3f05ec7e1a3570380b49dab62c6e1c0c7af3",
+          "sha": "41785b8cf1343a795cbed790cd8d05359aba9b54",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "9ed6343897c7f7fb6c36e89eaa3aa346891a7720",
+          "sha": "bd62632c0446fa6c5ef7b35e610bd3b230075c95",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -768,12 +755,12 @@
       "es_sha": "3f98d6d293118a9fe47bc02c771050d8b88f20dd",
       "translations": {
         "en": {
-          "sha": "3f98d6d293118a9fe47bc02c771050d8b88f20dd",
+          "sha": "506241c98b8c9de01ec69f83e576b9014bff67ba",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "30d85846e9838a4bedc62122bfe812fca4cc8e9a",
+          "sha": "d87679003a180a41b4a56ca179ba76366890747d",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -783,12 +770,12 @@
       "es_sha": "8d1d8f94cacaddd8122a1e933be3dfca97f54e67",
       "translations": {
         "en": {
-          "sha": "8d1d8f94cacaddd8122a1e933be3dfca97f54e67",
+          "sha": "9dcfc1e5c6f4c0d0bb14ef11f40980d12422ed07",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "2cbcfa862b002a825836001c37d3607640a1c1f5",
+          "sha": "0d3888bab166094dbf97f839fa8d47b2120a98ca",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -798,12 +785,12 @@
       "es_sha": "d6749318bfd876929f9ce9201a2eb22853f25877",
       "translations": {
         "en": {
-          "sha": "d6749318bfd876929f9ce9201a2eb22853f25877",
+          "sha": "d5d153570384fc88034ce9bd1455d2635ae41b25",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "cee66f9b022bb1cf18e3f3538d44208be28dd8df",
+          "sha": "2b957ee7c47f25e15e972709e6f393ac7cf91eaa",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -813,12 +800,12 @@
       "es_sha": "6477c33e96dcb2f373d3d260abc185e7ea0c363c",
       "translations": {
         "en": {
-          "sha": "6477c33e96dcb2f373d3d260abc185e7ea0c363c",
+          "sha": "6ecbf2d558d32c401b03ded5c9ee3358ce841dbf",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "8395c637a21bb8091b5fdd10037cc0b2cc5309b5",
+          "sha": "0ae472cf48ac211115581d0601f9d1ae2731899c",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -828,12 +815,12 @@
       "es_sha": "5b1f0789cbf053552e431198a87e74603c40c9af",
       "translations": {
         "en": {
-          "sha": "5b1f0789cbf053552e431198a87e74603c40c9af",
+          "sha": "b5c5b6a73973ddbdeba7e373fa09ff25ff4f5e52",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "fdabab37278b590ba82ab4c53fda3eb9f3f444f1",
+          "sha": "e73d70556a1e73b673bb6eb51441360c6b42aa06",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
         }
@@ -843,14 +830,137 @@
       "es_sha": "37c53ff17751529b81669fae5cebbcd378b5796e",
       "translations": {
         "en": {
-          "sha": "37c53ff17751529b81669fae5cebbcd378b5796e",
+          "sha": "9e00cf445a43c93c5caa093d09b10e2d144a4e94",
           "translated_at": "2026-07-16T11:55:29Z",
           "translator": "bootstrap"
         },
         "it": {
-          "sha": "6428779e434af74e64506aec917bdf646bfd456c",
+          "sha": "c7ef76d5d78a2e2dae61ed31fbb5d9ac10736eb4",
           "translated_at": "2026-08-09T12:07:20Z",
           "translator": "minimax-m3"
+        }
+      }
+    },
+    "wdo/index.md": {
+      "es_sha": "c470e6defb7022b9c183cb150a99cacadee97e4e",
+      "translations": {
+        "en": {
+          "sha": "9f9f5bc3cb137fc1e6a380434d4692df06009601",
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "bootstrap"
+        },
+        "it": {
+          "sha": "c7771981064aada0e9aa6f2a0f2fb6bca930fbee",
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "minimax-m3"
+        }
+      }
+    },
+    "wdo/mysql/config.md": {
+      "es_sha": "57e6eeee8ef5a966a165db9924ffe67ffacafca2",
+      "translations": {
+        "en": {
+          "sha": "a29ead2ef4aea74b3a1241a0dc33acf23ced8b84",
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "bootstrap"
+        },
+        "it": {
+          "sha": "ed8c209689a75fefae4e5f5560e39ddec7006c02",
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "minimax-m3"
+        }
+      }
+    },
+    "wdo/mysql/index.md": {
+      "es_sha": "ae6c14b2b8e682513d3727c0f24995bd690db512",
+      "translations": {
+        "en": {
+          "sha": "82fde895d6ef975930798b416c385ba9e4748cbf",
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "bootstrap"
+        },
+        "it": {
+          "sha": "b1d4c01666d9cf27ae87f50b3689efa274176440",
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "minimax-m3"
+        }
+      }
+    },
+    "wdo/mysql/instalacion.md": {
+      "es_sha": "23115094d38413a80d0e1ee104bb69d42a53cdda",
+      "translations": {
+        "en": {
+          "sha": null,
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "bootstrap"
+        },
+        "it": {
+          "sha": "bee82d3ccccf30f179e392e5c15247f3b067671a",
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "minimax-m3",
+          "path": "wdo/mysql/installazione.md"
+        }
+      }
+    },
+    "wdo/mysql/prepared.md": {
+      "es_sha": "1cef5a466286962bdebcf76a40d46a9a61a572f3",
+      "translations": {
+        "en": {
+          "sha": "0a3f2ef4f45526f21dd96d6ae39a87ea7d35f20b",
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "bootstrap"
+        },
+        "it": {
+          "sha": "09230dffa2781f61bd4fcbe5c02fc63efbd49956",
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "minimax-m3"
+        }
+      }
+    },
+    "wdo/mysql/transacciones.md": {
+      "es_sha": "895485c4f802e206635dec3e091215e78bfa4921",
+      "translations": {
+        "en": {
+          "sha": null,
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "bootstrap"
+        },
+        "it": {
+          "sha": "e9e592aa5bb8c30d74fd95e0e6bcce6ccf2e7b8e",
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "minimax-m3",
+          "path": "wdo/mysql/transazioni.md"
+        }
+      }
+    },
+    "wdo/mysql/troubleshooting.md": {
+      "es_sha": "7b4c748f2758bbed649196426b20c913a9c7b48e",
+      "translations": {
+        "en": {
+          "sha": "17e7b7835afcc89a17649249149b3e16b6a8a5b7",
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "bootstrap"
+        },
+        "it": {
+          "sha": "2265244d0102143cfebf41bb9bd7c6f9c7659cbc",
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "minimax-m3"
+        }
+      }
+    },
+    "wdo/mysql/uso.md": {
+      "es_sha": "4febdeecc5fab33611abf3c247cd68e1ab591580",
+      "translations": {
+        "en": {
+          "sha": null,
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "bootstrap"
+        },
+        "it": {
+          "sha": "b45ecd325d8f52483edc174dc24c7a8f15b1af93",
+          "translated_at": "2026-08-09T12:07:20Z",
+          "translator": "minimax-m3",
+          "path": "wdo/mysql/utilizzo.md"
         }
       }
     }

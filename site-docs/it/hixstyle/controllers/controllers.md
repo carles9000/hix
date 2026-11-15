@@ -291,7 +291,7 @@ RETU UView( 'main.view.html', cName, hUser, cRoles )
 ## 2. Validazione
 
 Prima di elaborare qualsiasi dato, devi validarlo. HIX include un validator integrato
-con sintassi dichiarativa e formato esteso `{ "regole", "Etichetta", "default" }`.
+con sintassi dichiarativa e formato esteso `{ "rules", "Label", "default" }`.
 
 ### Formato esteso delle regole
 

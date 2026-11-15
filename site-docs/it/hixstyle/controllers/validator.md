@@ -288,7 +288,7 @@ oVal := UValidatePost(
 | `upper` | `Upper()` |
 | `lower` | `Lower()` |
 | `strip_tags` | Rimuove i tag HTML (`<tag>` → `""`) |
-| `slug` | Converte in slug URL-safe: `"Mio Titolo"` → `"mio-titolo"` |
+| `slug` | Converte in slug URL-safe: `"My Title"` → `"my-title"` |
 | `nl2br` | Converte le interruzioni di riga in `<br>` |
 | `escape` | Codifica i caratteri HTML (`<`, `>`, `&`, `"`) |
 | `abs` | Valore assoluto di un numero |
@@ -370,7 +370,7 @@ hSaved := oVal:Validated( { "name", "email", "age" } )
 | `oVal:Passes()` | `L` | `.T.` se non ci sono errori |
 | `oVal:Fails()` | `L` | `.T.` se ci sono errori |
 | `oVal:IsValid()` | `L` | Alias di `Passes()` |
-| `oVal:GetErrors()` | `H` | Hash `{ "field" => "messaggio" }` |
+| `oVal:GetErrors()` | `H` | Hash `{ "field" => "message" }` |
 | `oVal:GetFirstError()` | `C` | Messaggio del primo errore |
 | `oVal:GetErrorsJson()` | `C` | `GetErrors()` serializzato come JSON |
 | `oVal:GetErrorsTxt()` | `C` | Tabella HTML con gli errori |
