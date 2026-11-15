@@ -1,7 +1,7 @@
 # 🌐 CORS — Cross-Origin Resource Sharing
 
 Di default, il browser **blocca** il JavaScript su `https://app.com` dal
-`fetch()` verso `https://api.altrodominio.com`. Questa è la **Same-Origin Policy**, una difesa di base contro attacchi cross-site.
+`fetch()` verso `https://api.anotherdomain.com`. Questa è la **Same-Origin Policy**, una difesa di base contro attacchi cross-site.
 
 **CORS** è il meccanismo con cui il server dice al browser
 "sì, accetto richieste da questo origin, con questi metodi e questi header". Lo fa tramite alcuni header `Access-Control-*`.

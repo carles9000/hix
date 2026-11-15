@@ -7,7 +7,7 @@ controller come se fossero un data model moderno.
 
 Incapsula le meccaniche xBase (alias, `DbGoTo`, `DbSeek`, `Rlock`, `FieldGet`)
 dietro un'API orientata agli hash - i record entrano ed escono come
-dizionari `{ "field" => valore }`, pronti da passare a JSON, un
+dizionari `{ "field" => value }`, pronti da passare a JSON, un
 template, o un validator.
 
 ```
@@ -180,10 +180,10 @@ da mettere in un `<input value="...">`:
 
 | Tipo DBF | Risultato |
 |---|---|
-| `C`, `M` | `AllTrim(valore)` (opzionalmente UTF-8 se `lToUtf8`) |
-| `D` | `UDateToHtml( dValore )` → `"2026-06-26"` |
-| `N` | `Str( valore, len, dec )` |
-| `L` | `ULogicToHtmlChecked( valore )` → `"checked"` / `""` |
+| `C`, `M` | `AllTrim(value)` (opzionalmente UTF-8 se `lToUtf8`) |
+| `D` | `UDateToHtml( dValue )` → `"2026-06-26"` |
+| `N` | `Str( value, len, dec )` |
+| `L` | `ULogicToHtmlChecked( value )` → `"checked"` / `""` |
 
 > È la modalità che i controller usano per riempire i form HTML.
 
@@ -260,7 +260,7 @@ oDbf:Zap()                                 // svuota la tabella - ⚠️ esclusi
 ### Record vuoto per i form
 
 ```clipper
-hBlank := oDbf:Blank()              // hash con valori vuoti per tipo
+hBlank := oDbf:Blank()              // hash with empty values by type
 hBlank := oDbf:Blank( .T. )         // web string (per il form di creazione)
 ```
 

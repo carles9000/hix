@@ -201,7 +201,7 @@ Tutti i middleware predefiniti di HIX sono nella cartella `/src/mw`
 | | |
 |---|---|
 | **Descrizione** | Guardia di ruolo e operazioni granulari. Legge il ruolo richiesto dal `cScope` della route. Deve venire dopo un middleware che ha caricato l'utente (`MwIsAuth` o `MwRequireAuth`). |
-| **Funzione** | Compara `oCtx:cScope` (formato `"role"` o `"role:operazione"`) contro l'hash dei ruoli dell'utente. Accesso completo se il valore del ruolo è vuoto; granulare se elenca operazioni separate da `;`. Risponde con `403` se fallisce. |
+| **Funzione** | Compara `oCtx:cScope` (formato `"role"` o `"role:operation"`) contro l'hash dei ruoli dell'utente. Accesso completo se il valore del ruolo è vuoto; granulare se elenca operazioni separate da `;`. Risponde con `403` se fallisce. |
 | **Setup** | Tramite `config.json`: sezione `auth` → `roles_key` (default `"roles"`) |
 | **Factory** | Non applicabile — la differenza tra route si fa con il parametro `cScope` della route |
 | **Web** | Sì |

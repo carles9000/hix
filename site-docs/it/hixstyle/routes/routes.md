@@ -5,7 +5,7 @@
 Una route è l'associazione tra un pattern di URL, un metodo HTTP e l'action che deve essere eseguita
 quando arriva una request che corrisponde.
 
-Quando, ad esempio, specifichiamo nell'URL `https://mio_dominio/hello`, diciamo al server di eseguire
+Quando, ad esempio, specifichiamo nell'URL `https://my_domain/hello`, diciamo al server di eseguire
 un'action identificata come `hello`.
 
 Quando **HIX** riceve una request, il dispatcher attraversa le route registrate **in ordine di specificità**

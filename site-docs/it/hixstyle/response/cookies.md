@@ -1,6 +1,6 @@
 # 🍪 Cookie
 
-Un **cookie** è una piccola coppia `nome=valore` che il server invia al
+Un **cookie** è una piccola coppia `name=value` che il server invia al
 browser tramite `Set-Cookie`, e che il browser restituisce in ogni request successiva
 tramite `Cookie`. È il meccanismo di base per mantenere lo stato (sessioni, preferenze, autenticazione) tra request HTTP, che di per sé non hanno memoria.
 
@@ -70,7 +70,7 @@ URedirect( "/login" )
 HIX **aggiunge sempre** tre flag di default:
 
 ```
-Set-Cookie: nome=valore; Path=/; HttpOnly; SameSite=Lax
+Set-Cookie: name=value; Path=/; HttpOnly; SameSite=Lax
 ```
 
 | Flag | Cosa fa |

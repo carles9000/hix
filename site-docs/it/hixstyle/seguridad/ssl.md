@@ -197,8 +197,8 @@ USetCookie( "session_id", cSid, 3600 )
 
 | Sintomo | Causa |
 |---|---|
-| `SSL: cert_private non trovato` all'avvio | Path al `.key` scritto male o file mancante |
-| `SSL: cert_public non trovato` | Stessa cosa con il `.crt` |
+| `SSL: cert_private not found` all'avvio | Path al `.key` scritto male o file mancante |
+| `SSL: cert_public not found` | Stessa cosa con il `.crt` |
 | Browser: `NET::ERR_CERT_AUTHORITY_INVALID` | Certificato self-signed o CA non riconosciuta |
 | `ERR_CERT_DATE_INVALID` | Certificato scaduto - rinnovare con `certbot renew` |
 | `ERR_SSL_PROTOCOL_ERROR` | Il server non parla TLS ma il client ha richiesto `https://` |

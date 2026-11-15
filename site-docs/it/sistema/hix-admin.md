@@ -187,7 +187,7 @@ fa GET ogni 30 secondi.
 Utile per diagnosticare un problema in produzione senza toccare `hix.json`.
 Quando hai finito, disabilita di nuovo il trace per mantenere il log pulito.
 
-> 📚 Maggiori dettagli in [logger - trace per modulo](logger.md#trace-per-modulo).
+> 📚 Maggiori dettagli in [logger - trace per modulo](logger.md#tracciamento-per-modulo).
 
 ---
 
