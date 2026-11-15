@@ -11,12 +11,14 @@
 
 #DEFINE HIX_LOG_MODULE HIX_MOD_WORKER_HTTP
 #INCLUDE "hix_logger.ch"
+#include "hix_const.ch"
 
 FUNCTION HIX_WorkerHTTP( aJob )
 
-   LOCAL oIO, cIP
-   LOCAL nReqs      := 0
-   LOCAL lKeepAlive := .T.
+   LOCAL oIO, cIP, oSrv, cPeek, cTipo
+   LOCAL nReqs        := 0
+   LOCAL lKeepAlive   := .T.
+   LOCAL lStreamMode  := .F.   // este worker migró a stream via RespondStart
 
    // Path SSL: el accept loop pasó el socket raw; hacemos el handshake aquí
    // para no bloquear el accept loop durante el apretón de manos TLS.
@@ -25,12 +27,61 @@ FUNCTION HIX_WorkerHTTP( aJob )
 
       cIP := aJob[ 2 ]
       oIO := aJob[ 3 ]:CreateIO( aJob[ 1 ] )
+      oSrv := iif( Len( aJob ) >= 4, aJob[ 4 ], NIL )
 
       IF oIO:hSSLSession == NIL
 
          ld( "SSL handshake failed from " + cIP )
          oIO:Close()
          RETURN NIL
+
+      ENDIF
+
+      // [B1.W5] Post-handshake redispatch: en modo SSL el accept loop NO
+      // puede clasificar el protocolo (bytes cifrados) y despacha todo al
+      // pool HTTP. Aquí, ya con la sesión TLS establecida, hacemos peek de
+      // los bytes descifrados y re-encolamos al pool destino si el cliente
+      // pidió WS/LongPoll. Sin esto, N clientes WSS saturan el pool HTTP y
+      // dejan al usuario configurando pool_ws.workers en balde bajo TLS.
+      IF oSrv != NIL
+
+         cPeek := HIX_SocketPeekSSL( oIO, HIX_DEFAULT_PEEK_BYTES, HIX_DEFAULT_PEEK_MS )
+
+         IF cPeek != NIL
+
+            cTipo := HIX_DetectProtocol( cPeek )
+
+            DO CASE
+
+               CASE cTipo == HIX_CONN_WS
+
+                  IF oSrv:oPoolWS:Dispatch( { oIO, cIP } )
+
+                     RETURN NIL   // el pool WS es dueño de oIO ahora
+
+                  ENDIF
+
+                  lw( "SSL redispatch: pool WS full — 503 to " + cIP )
+                  HIX_ResponseRaw( oIO, '{"error":"Service Unavailable"}', "json", 503, .F. )
+                  oIO:Close()
+                  RETURN NIL
+
+               CASE cTipo == HIX_CONN_LONGPOLL
+
+                  IF oSrv:oPoolOtros:Dispatch( { oIO, cIP, cTipo } )
+
+                     RETURN NIL
+
+                  ENDIF
+
+                  lw( "SSL redispatch: pool Otros full — 503 to " + cIP )
+                  HIX_ResponseRaw( oIO, '{"error":"Service Unavailable"}', "json", 503, .F. )
+                  oIO:Close()
+                  RETURN NIL
+
+            ENDCASE
+
+         ENDIF
 
       ENDIF
 
@@ -44,6 +95,17 @@ FUNCTION HIX_WorkerHTTP( aJob )
 
    DO WHILE lKeepAlive
 
+      // Bail out immediately on shutdown so hb_threadJoin in
+      // pool:Stop() can return. Without this, a keep-alive worker
+      // keeps servicing polls from the client indefinitely and
+      // never checks the pool's stop flag.
+
+      IF ! HIX_ServerIsRunning()
+
+         EXIT
+
+      ENDIF
+
       nReqs++
 
       IF nReqs >= 100
@@ -52,7 +114,7 @@ FUNCTION HIX_WorkerHTTP( aJob )
 
       ENDIF
 
-      IF ! _HixHTTPProcessOne( oIO, cIP, @lKeepAlive )
+      IF ! _HixHTTPProcessOne( oIO, cIP, @lKeepAlive, @lStreamMode )
 
          EXIT
 
@@ -61,12 +123,19 @@ FUNCTION HIX_WorkerHTTP( aJob )
    ENDDO
 
    oIO:Close()
-   HIX_MetricDec( HIXM_ACTIVE_HTTP )
+
+   // Si RespondStart swappeó el contador (Dec HTTP + Inc OTROS), aquí toca
+   // Dec OTROS. Si no hubo stream, Dec HTTP normal.
+   IF lStreamMode
+      HIX_MetricDec( HIXM_ACTIVE_OTROS )
+   ELSE
+      HIX_MetricDec( HIXM_ACTIVE_HTTP  )
+   ENDIF
 
 RETURN NIL
 
 // ============================================================
-STATIC FUNCTION _HixHTTPProcessOne( oIO, cIP, lKeepAlive )
+STATIC FUNCTION _HixHTTPProcessOne( oIO, cIP, lKeepAlive, lStreamMode )
 
    LOCAL oReq, oError, bHandler
    LOCAL tBefore, nMs
@@ -85,6 +154,20 @@ STATIC FUNCTION _HixHTTPProcessOne( oIO, cIP, lKeepAlive )
 
    ENDIF
 
+   // A1.23 — Rechazar Content-Length > HIX_MAX_BODY_SIZE antes de que el
+   // handler intente leer el body. Emitimos 413 y cerramos keep-alive; el
+   // cliente ya envió (o va a enviar) los bytes, pero no los procesamos.
+   // [A2.11] Sumar cBodyPre al total: los bytes ya leídos con los headers
+   // también cuentan hacia el límite.
+   IF oReq:ContentLength() + Len( oReq:cBodyPre ) > HIX_MAX_BODY_SIZE
+
+      lw( "413 Payload Too Large: Content-Length=" + hb_ntos( oReq:ContentLength() ) + " prebuf=" + hb_ntos( Len( oReq:cBodyPre ) ) + " path=" + oReq:cPath )
+      HIX_ResponseRaw( oIO, hb_jsonEncode( { "error" => "Payload Too Large" } ), "json", 413, .F. )
+      lKeepAlive := .F.
+      RETURN .F.
+
+   ENDIF
+
    lKeepAlive := oReq:lKeepAlive
 
    IF ! _HixHostAllowed( oReq:Header( "host", "" ) )
@@ -95,9 +178,11 @@ STATIC FUNCTION _HixHTTPProcessOne( oIO, cIP, lKeepAlive )
 
    ENDIF
 
-   // WSS: WebSocket upgrade en conexión SSL (el peek no actuó)
+   // WebSocket upgrade fallback: el peek no detectó "upgrade: websocket"
+   // (cabecera fuera de los primeros peek_bytes, o RTT > peek_timeout_ms —
+   // típico detrás de Cloudflare/proxies). Aplica tanto a SSL como a plano.
 
-   IF oIO:lUseSSL .AND. Lower( oReq:Header( "upgrade" ) ) == "websocket"
+   IF Lower( oReq:Header( "upgrade" ) ) == "websocket"
 
       lKeepAlive := .F.
       HIX_HandleWSUpgrade( oReq, cIP )
@@ -107,38 +192,73 @@ STATIC FUNCTION _HixHTTPProcessOne( oIO, cIP, lKeepAlive )
 
    tBefore := hb_DateTime()
 
-   TRY
+   // [A2.09] TRY/FINALLY externo para garantizar cleanup del contexto TLS
+   // (s_oCurrentCtx y s_oRequest) por cualquier ruta de salida — incluido
+   // el drain body, métricas y anomaly recorder posteriores al handler.
+   // Sin esto, keep-alive reciclaba el hilo con el context del request
+   // anterior → helpers Ux*/HIX_GetContext devolvían datos stale.
 
-      HIX_RouteDispatch( oReq )
-   CATCH oError
-      le( "Handler error [" + oReq:cPath + "]: " + oError:Description + ' (' + oError:operation + ')'  )
-      HIX_Metric( HIXM_ERRORS )
-      bHandler := HIX_GetErrorHandler()
+   TRY
 
       TRY
 
-         IF bHandler != NIL
+         HIX_RouteDispatch( oReq )
+      CATCH oError
+         le( "Handler error [" + oReq:cPath + "]: " + oError:Description + ' (' + oError:operation + ')'  )
+         HIX_Metric( HIXM_ERRORS )
+         bHandler := HIX_GetErrorHandler()
 
-            Eval( bHandler, oError, oReq )
-         ELSE
-            HIX_ShowError( oError, oReq )
+         TRY
 
-         ENDIF
+            IF bHandler != NIL
 
-      CATCH
-         oReq:Respond( { "error" => _( 'ERR_INTERNAL_SERVER_ERROR' ) }, 500 )
+               Eval( bHandler, oError, oReq )
+            ELSE
+               HIX_ShowError( oError, oReq )
+
+            ENDIF
+
+         CATCH
+            oReq:Respond( { "error" => _( 'ERR_INTERNAL_SERVER_ERROR' ) }, 500 )
+
+         END
 
       END
 
+      // Drain any unread request body before recycling the keep-alive
+      // connection. Handlers may skip UBody()/UJson() (e.g. they only
+      // care about query params); those unread bytes would become garbage
+      // at the front of the next request on the same socket → 400 Bad
+      // Request from _HixHTTPProcessOne on the following iteration.
+      // ReadBody is idempotent (cached in ::cBody), so this is a no-op if
+      // the handler already consumed it.
+
+      // [A3.1.1] usar == en lugar de $ — el operador $ comprueba substring,
+      // no membership: "T" $ "POST,PUT,PATCH" → .T. (falso positivo).
+      IF oReq:lKeepAlive .AND. ;
+         ( oReq:cMethod == "POST" .OR. oReq:cMethod == "PUT" .OR. oReq:cMethod == "PATCH" )
+
+         oReq:ReadBody()
+
+      ENDIF
+
+      nMs := Int( ( hb_DateTime() - tBefore ) * 86400000 )
+      HIX_MetricTiming( nMs, oReq:cPath, oReq:lWasStream )
+
+      // Propagar al worker que este request migró a modo stream, para que
+      // el HIX_MetricDec final apunte al contador correcto (OTROS, no HTTP).
+      IF oReq:lWasStream
+         lStreamMode := .T.
+      ENDIF
+
+      HIX_AnomalyRecord( cIP, oReq:nResponseStatus )
+
+      lKeepAlive := oReq:lKeepAlive
+
+   FINALLY
+      HIX_SetContext( NIL )
+      HIX_SetRequest( NIL )
    END
-
-   nMs := Int( ( hb_DateTime() - tBefore ) * 86400000 )
-   HIX_MetricTiming( nMs, oReq:cPath )
-
-   HIX_AnomalyRecord( cIP, oReq:nResponseStatus )
-
-   lKeepAlive := oReq:lKeepAlive
-   HIX_SetContext( NIL )
 
 RETURN .T.
 

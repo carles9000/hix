@@ -138,6 +138,24 @@ FUNCTION UParam( cKey, xDef )
 
       ENDIF
 
+      // v2.4.3 — fallback a querystring si la ruta no declara :cKey como
+      // route param. Grid/paginación (?page=N, ?sort=col) pasaban invisibles
+      // a controllers que usan UParam como accesor único. Portado de
+      // lediz/enhance; UGet() sigue existiendo como accesor explícito.
+      hCopy := o:QueryParamsAll()
+
+      IF hb_IsHash( hCopy )
+
+         HB_HCaseMatch( hCopy, .F. )
+
+         IF hb_HHasKey( hCopy, cKey )
+
+            RETURN hCopy[ cKey ]
+
+         ENDIF
+
+      ENDIF
+
    ENDIF
 
    IF lDef
@@ -175,8 +193,16 @@ RETURN iif( o != NIL, o:ReadBody(), "" )
 FUNCTION UJson()
 
    LOCAL o := HIX_GetRequest()
+   LOCAL x
 
-RETURN iif( o != NIL, o:JsonBody(), NIL )
+   IF o == NIL ; RETURN NIL ; ENDIF
+
+   x := o:JsonBody()
+
+   // [A3.3.2] retornar NIL si fue un parse-error — body vacío sigue siendo {=>}
+   IF o:lJsonError ; RETURN NIL ; ENDIF
+
+RETURN x
 
 FUNCTION UContentType()
 
@@ -228,7 +254,7 @@ FUNCTION UIP()
 
    LOCAL o := HIX_GetRequest()
 
-RETURN iif( o != NIL, o:RealIP(), "" )
+RETURN iif( o != NIL, HIX_GetClientIP( o ), "" )
 
 FUNCTION UHost()
 
@@ -461,7 +487,8 @@ RETURN NIL
 // STREAMING (USendStream)
 // ------------------------------------------------------------
 
-// Start a Chunked Stream Response
+// Start a Chunked Stream Response -- returns .T. if headers were flushed
+// to the peer, .F. if the socket is already dead or no active request.
 FUNCTION USendStreamStart( cMime, nStatus, hExtra )
 
    LOCAL o := HIX_GetRequest()
@@ -470,39 +497,43 @@ FUNCTION USendStreamStart( cMime, nStatus, hExtra )
    hb_default( @nStatus, 200 )
    hb_default( @hExtra,  { => } )
 
-   IF o != NIL
+   IF o == NIL ; RETURN .F. ; ENDIF
 
-      o:RespondStart( cMime, nStatus, hExtra )
+RETURN o:RespondStart( cMime, nStatus, hExtra )
 
-   ENDIF
-
-RETURN NIL
-
-// Send a Single Chunk of Data
+// Send a Single Chunk of Data -- returns .F. as soon as the peer is gone.
+// Stream handlers MUST check the return so the worker frees itself: without
+// a timeout (stream: true) an ignored .F. leaks the worker forever.
 FUNCTION USendChunk( cData )
 
    LOCAL o := HIX_GetRequest()
 
-   IF o != NIL
+   IF o == NIL ; RETURN .F. ; ENDIF
 
-      o:RespondChunk( cData )
+RETURN o:RespondChunk( cData )
 
-   ENDIF
-
-RETURN NIL
-
-// End the Stream Response
+// End the Stream Response -- returns .T./.F. as with the other stream
+// helpers. A .F. here typically means the peer disconnected before the
+// terminator chunk; the caller can safely ignore it at cleanup time.
 FUNCTION USendStreamEnd()
 
    LOCAL o := HIX_GetRequest()
 
-   IF o != NIL
+   IF o == NIL ; RETURN .F. ; ENDIF
 
-      o:RespondEnd()
+RETURN o:RespondEnd()
 
-   ENDIF
+// Non-destructive peer liveness check for stream handlers.
+// Returns .T. if the peer is still connected, .F. if a FIN/RST has been
+// observed on the socket. SSL sessions currently degrade to .T. (see
+// THixIO:PeerAlive). Use as primary exit in SSE/long-poll loops.
+FUNCTION UPeerAlive()
 
-RETURN NIL
+   LOCAL o := HIX_GetRequest()
+
+   IF o == NIL ; RETURN .F. ; ENDIF
+
+RETURN o:PeerAlive()
 
 // ------------------------------------------------------------
 // UTILITIES AND ENVIRONMENT
@@ -596,6 +627,16 @@ FUNCTION USession( cKey, xDef )
    ENDIF
 
 RETURN HIX_Session( cKey, xDef )
+
+// USessionRotate() — rotate SID after login to prevent session fixation (A1.19).
+// Call after a successful authentication before USession():Save().
+FUNCTION USessionRotate()
+
+   LOCAL oCtx := UContext()
+
+   IF oCtx != NIL ; HIX_SessionRotate( oCtx ) ; ENDIF
+
+RETURN NIL
 
 // UJwt()        -> full JWT payload hash
 // UJwt(cKey)    -> claim value, NIL if not found
@@ -743,3 +784,74 @@ FUNCTION HIX_CloseDbfAreas( lForce )
    END
 
 RETURN .T.
+
+// -----------------------------------------------------------
+// [A2.12] HIX_TimeoutSec — convierte ms a segundos (double) con
+// floor de 1 ms para hb_mutexSubscribe. Evita que un timeout=0
+// se interprete como "bloqueante indefinido" (subscribe con
+// timeout NIL o <=0 espera hasta la señal, sin timeout real).
+// Uso: hb_mutexSubscribe( hMx, HIX_TimeoutSec( nMs ) ).
+// -----------------------------------------------------------
+FUNCTION HIX_TimeoutSec( nMs )
+
+   IF nMs == NIL .OR. nMs <= 0
+
+      RETURN 0.001
+
+   ENDIF
+
+RETURN nMs / 1000.0
+
+// -----------------------------------------------------------
+// [A3.1.7] HIX_PathNormalize — normalización canónica de path HTTP.
+// Backslash→slash, colapsa dobles barras, garantiza / inicial.
+// Usada en router (antes del match) y dispatcher (antes del
+// traversal-check) para que ambas vean el mismo path.
+// -----------------------------------------------------------
+FUNCTION HIX_PathNormalize( cPath )
+
+   IF ValType( cPath ) != "C"
+      RETURN "/"
+   ENDIF
+
+   cPath := StrTran( cPath, "\", "/" )
+
+   DO WHILE "//" $ cPath
+      cPath := StrTran( cPath, "//", "/" )
+   ENDDO
+
+   IF Empty( cPath ) .OR. Left( cPath, 1 ) != "/"
+      cPath := "/" + cPath
+   ENDIF
+
+RETURN cPath
+
+// --------------------------------------------------------------- //
+// [A4.14] HIX_ConstantEq — comparación de strings en tiempo constante.
+// Shared helper extraído de hix_jwt.prg (_HixConstantEq) y
+// hix_token.prg (_HixTokenConstantEq), que eran copias idénticas.
+// Itera toda la longitud sin cortocircuito para evitar timing oracle
+// en firmas HMAC (A1.07, A1.08). Early-exit si longitudes difieren
+// (A3.5.2) — firmas de distinto largo no son válidas por definición.
+// --------------------------------------------------------------- //
+FUNCTION HIX_ConstantEq( cA, cB )
+
+   LOCAL nLen, nDiff, nX
+
+   IF Len( cA ) != Len( cB )
+      RETURN .F.
+   ENDIF
+
+   nLen  := Len( cA )
+   nDiff := 0
+
+   FOR nX := 1 TO nLen
+
+      nDiff := hb_BitOr( nDiff, ;
+         hb_BitXor( Asc( SubStr( cA, nX, 1 ) ), ;
+                    Asc( SubStr( cB, nX, 1 ) ) ) )
+
+   NEXT
+
+RETURN nDiff == 0
+

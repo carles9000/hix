@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_test_session_file.prg
   Author.....: Charly 9000
   Created....: 2026-06-04
@@ -35,6 +35,7 @@ CLASS TMockRequest2
    METHOD Respond( xData, cMime, nStatus, hExtra )
    METHOD Header( cKey, xDef )
    METHOD Cookie( cName, xDef )
+   METHOD IsHttps() INLINE .F.
 ENDCLASS
 
 METHOD New( cPath, cMethod, cIP ) CLASS TMockRequest2
@@ -100,9 +101,9 @@ STATIC PROCEDURE _CleanDir( cDir )
    IF ! hb_DirExists( cDir ) ; RETURN ; ENDIF
    aFiles := Directory( cDir + hb_ps() + "*.*" )
    FOR EACH aEntry IN aFiles
-      FErase( cDir + hb_ps() + aEntry[1] )
+      HIX_SafeErase( cDir + hb_ps() + aEntry[1] )
    NEXT
-   hb_DirDelete( cDir )
+   HIX_SafeDirDelete( cDir )
 RETURN
 
 FUNCTION HIX_TestSessionFile_Run()

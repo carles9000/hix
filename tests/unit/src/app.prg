@@ -24,6 +24,11 @@ STATIC s_nActSeq    := 0
 STATIC s_nTLogCount := 0
 STATIC s_nTLogMax   := 1500
 
+#ifndef __PLATFORM__WINDOWS
+   REQUEST CURL_VERSION
+   REQUEST HPDF_VERSION_TEXT
+#endif
+
 FUNCTION Main( ... )
 
    LOCAL oServer
@@ -33,6 +38,12 @@ FUNCTION Main( ... )
    s_mtxRun    := hb_mutexCreate()
    s_mtxAct    := hb_mutexCreate()
 
+   // Tests operan a menudo en hb_DirTemp() (fuera de HIX_AppRoot()).
+   // Registrar para que HIX_Safe* acepte los borrados legítimos de
+   // los propios tests. La blacklist de sistema sigue vigente:
+   // hb_DirTemp() no puede resolver a c:\windows aunque intente.
+   HIX_SafeRegisterDir( hb_DirTemp() )
+
    // traces\ es el directorio unico de diagnostico de los tests: trazas
    // (_TLog), log del runner y logs que generan los propios tests. Si no
    // existe, hb_vfOpen() falla en silencio y se pierde todo el diagnostico.
@@ -40,13 +51,13 @@ FUNCTION Main( ... )
       hb_vfDirMake( hb_DirBase() + "traces" )
    ENDIF
 
-   s_cLogFile  := hb_DirBase() + "traces\hix.log"
-   s_cTestsLog := hb_DirBase() + "traces\tests_run.log"
+   s_cLogFile  := hb_DirBase() + "traces" + hb_ps() + "hix.log"
+   s_cTestsLog := hb_DirBase() + "traces" + hb_ps() + "tests_run.log"
    hb_FileDelete( s_cLogFile )
    hb_FileDelete( s_cTestsLog )
-   hb_FileDelete( hb_DirBase() + "traces\info.txt" )
-   hb_FileDelete( hb_DirBase() + "traces\console.txt" )
-   hb_FileDelete( hb_DirBase() + "traces\activity.log" )
+   hb_FileDelete( hb_DirBase() + "traces" + hb_ps() + "info.txt" )
+   hb_FileDelete( hb_DirBase() + "traces" + hb_ps() + "console.txt" )
+   hb_FileDelete( hb_DirBase() + "traces" + hb_ps() + "activity.log" )
    cSep := "=== RUN " + DToS( Date() ) + " " + Time() + " ===" + hb_eol()
    hb_MemoWrit( s_cTestsLog, cSep )
 
@@ -54,7 +65,7 @@ FUNCTION Main( ... )
 
    IF cArg == "--cli"
 
-      _RunCli()
+      _RunCli( iif( PCount() > 1, hb_PValue( 2 ), "" ) )
       RETURN NIL
 
    ENDIF
@@ -76,6 +87,10 @@ FUNCTION Main( ... )
    oServer:AddRouteGet( "api_reset",  "/api/reset",    {|| RouteApiReset()   } )
    oServer:AddRouteGet( "api_activity", "/api/activity", {|| RouteApiActivity() } )
    oServer:AddRoutePost( "api_tracedump", "/api/tracedump", {|| RouteApiTraceDump() } )
+   oServer:AddRouteGet( "api_info",    "/api/info",     {|| RouteApiInfo()    } )
+   // Verificación asistida por Claude — ejecuta un solo test y devuelve el hCtx.
+   oServer:AddRouteGet( "api_test_one", "/api/test/one",   {|| RouteApiTestOne()   } )
+   oServer:AddRouteGet( "api_test_audit", "/api/test/audit/:id", {|| RouteApiTestAudit() } )
 
    oServer:Start( .F. )
 
@@ -96,24 +111,37 @@ RETURN NIL
 // -------------------------------------------------------
 // CLI mode: run all tests, print summary, set ErrorLevel
 // -------------------------------------------------------
-STATIC PROCEDURE _RunCli()
+STATIC PROCEDURE _RunCli( cFilter )
 
    LOCAL aGroups := _TestGroups()
    LOCAL aGroup, aTest, hCtx, oErr
    LOCAL nTotal := 0, nPass := 0, nFail := 0
-   LOCAL cStatus
+   LOCAL nRun := 0
+   LOCAL cStatus, cKey, cFilterUp
+   LOCAL lAll
+
+   hb_default( @cFilter, "" )
+   lAll      := Empty( cFilter ) .OR. cFilter == "*"
+   cFilterUp := Upper( cFilter )
 
    HIX_LoggerInit( s_cLogFile, HIX_LOG_INFO, .T. )
    HIX_MetricsInit()
 
-   OutStd( "HIX Test Master — CLI mode" + hb_eol() )
+   OutStd( "HIX Test Master — CLI mode" + iif( lAll, "", " [filter=" + cFilter + "]" ) + hb_eol() )
    OutStd( Replicate( "-", 50 ) + hb_eol() )
 
    FOR EACH aGroup IN aGroups
 
       FOR EACH aTest IN aGroup[ 2 ]
 
-         OutStd( "  " + aGroup[ 1 ] + "/" + aTest[ 1 ] + " ... " )
+         cKey := aGroup[ 1 ] + "/" + aTest[ 1 ]
+
+         IF ! lAll .AND. ! ( cFilterUp $ Upper( cKey ) )
+            LOOP
+         ENDIF
+
+         nRun++
+         OutStd( "  " + cKey + " ... " )
          hCtx := NIL
 
          TRY
@@ -139,9 +167,24 @@ STATIC PROCEDURE _RunCli()
 
          OutStd( cStatus + hb_eol() )
 
+         // Temporary — dump failing assertions per test in CLI mode
+         IF hCtx != NIL .AND. hCtx[ "failed" ] > 0
+            AEval( hCtx[ "results" ], {| hRes | ;
+               iif( hRes[ "status" ] == "pass", NIL, ;
+                    OutStd( "     [FAIL] " + hRes[ "name" ] + " -- " + hb_ValToStr( hRes[ "msg" ] ) + hb_eol() ) ) } )
+         ENDIF
+
       NEXT
 
    NEXT
+
+   IF ! lAll .AND. nRun == 0
+      OutStd( Replicate( "-", 50 ) + hb_eol() )
+      OutStd( "No tests matched filter: " + cFilter + hb_eol() )
+      OutStd( "End test..." + hb_eol() )
+      ErrorLevel( 2 )
+      RETURN
+   ENDIF
 
    OutStd( Replicate( "-", 50 ) + hb_eol() )
    OutStd( hb_ntos( nTotal ) + " total | " + hb_ntos( nPass ) + " passed | " + hb_ntos( nFail ) + " failed" + hb_eol() )
@@ -238,6 +281,13 @@ FUNCTION RouteApiRun()
          _SseEvent( { "type" => "init", "count" => Len( aToRun ) } )
 
          FOR EACH aTest IN aToRun
+
+            IF ! HIX_ServerIsRunning()
+
+               _TLog( "RouteApiRun ABORT — server stopping" )
+               EXIT
+
+            ENDIF
 
             _SseEvent( { "type" => "running", "group" => aTest[ 1 ], "test" => aTest[ 2 ] } )
 
@@ -393,6 +443,108 @@ FUNCTION RouteApiTestLog()
    NEXT
 
    USendJson( { "file" => s_cTestsLog, "total" => nTotal, "lines" => aResult } )
+
+RETURN NIL
+
+// -------------------------------------------------------
+// GET /api/info — info del binario (compilador, OS, Harbour)
+// -------------------------------------------------------
+FUNCTION RouteApiInfo()
+
+   USendJson( { ;
+      "compiler" => hb_Compiler(), ;
+      "os"       => OS(),          ;
+      "harbour"  => Version(),     ;
+      "version"  => HIX_Version() + HIX_SubVersion() ;
+      } )
+
+RETURN NIL
+
+// -------------------------------------------------------
+// GET /api/test/one?name=<TestName>
+// Ejecuta un único test síncrono y devuelve el hCtx en JSON.
+// Uso: para verificación asistida por Claude via curl.
+// -------------------------------------------------------
+FUNCTION RouteApiTestOne()
+
+   LOCAL cName := UGet( "name", "" )
+   LOCAL aGroup, aTest, bBlock := NIL
+   LOCAL hCtx, oErr, oSavedReq
+
+   IF Empty( cName )
+      USendJson( { "error" => "missing 'name' query param" }, 400 )
+      RETURN NIL
+   ENDIF
+
+   FOR EACH aGroup IN _TestGroups()
+      FOR EACH aTest IN aGroup[ 2 ]
+         IF Lower( aTest[ 1 ] ) == Lower( cName )
+            bBlock := aTest[ 2 ]
+            EXIT
+         ENDIF
+      NEXT
+      IF bBlock != NIL ; EXIT ; ENDIF
+   NEXT
+
+   IF bBlock == NIL
+      USendJson( { "error" => "test '" + cName + "' not found" }, 404 )
+      RETURN NIL
+   ENDIF
+
+   // Los tests internos pueden invocar HIX_RouteDispatch() con TMockRequest,
+   // lo que pisa el thread-local del request activo. Guardamos y restauramos.
+   oSavedReq := HIX_GetRequest()
+
+   TRY
+      hCtx := Eval( bBlock )
+   CATCH oErr
+      HIX_SetRequest( oSavedReq )
+      USendJson( { "error" => "exception: " + oErr:description }, 500 )
+      RETURN NIL
+   END
+
+   HIX_SetRequest( oSavedReq )
+   USendJson( hCtx )
+
+RETURN NIL
+
+// -------------------------------------------------------
+// GET /api/test/audit/:id  →  mapea id (p.ej. "a0101") a
+// HIX_TestAudit_A0101_Run() y devuelve hCtx JSON.
+// -------------------------------------------------------
+FUNCTION RouteApiTestAudit()
+
+   LOCAL cId := Lower( UParam( "id", "" ) )
+   LOCAL cFn, hCtx, oErr, oSavedReq
+
+   IF Empty( cId )
+      USendJson( { "error" => "missing id" }, 400 )
+      RETURN NIL
+   ENDIF
+
+   cFn := "HIX_TestAudit_" + Upper( cId ) + "_Run"
+
+   // Los tests de auditoría usan TMockRequest → HIX_RouteDispatch(), lo que
+   // reemplaza el thread-local del request. Sin restaurar, USendJson(hCtx)
+   // escribiría al mock y el cliente HTTP recibe "Empty reply from server".
+   oSavedReq := HIX_GetRequest()
+
+   TRY
+      hCtx := hb_ExecFromArray( cFn, {} )
+   CATCH oErr
+      HIX_SetRequest( oSavedReq )
+      USendJson( { "error" => "audit test '" + cFn + "' failed or not linked: " + oErr:description }, 500 )
+      RETURN NIL
+   END
+
+   HIX_SetRequest( oSavedReq )
+
+   IF hCtx == NIL .OR. ValType( hCtx ) != "H"
+      USendJson( { "error" => "audit test '" + cFn + "' returned non-hash" }, 500 )
+      RETURN NIL
+   ENDIF
+
+   USendJson( hCtx )
 
 RETURN NIL
 
@@ -665,6 +817,16 @@ RETURN NIL
 FUNCTION HIX_TestPeer_Port()
 RETURN s_nPeerPort
 
+// Public entry point: guarantees the peer server is running (idempotent).
+// Needed by tests that run in --cli mode, where Main() does not
+// reach the _PeerStart line before delegating to _RunCli.
+FUNCTION HIX_TestPeer_Ensure()
+   IF s_oPeer == NIL
+      s_oPeer := _PeerStart( s_nPeerPort )
+      hb_idleSleep( 0.1 )   // give the listen thread a beat
+   ENDIF
+RETURN s_oPeer
+
 STATIC FUNCTION _PeerStart( nPort )
 
    LOCAL oSock
@@ -720,11 +882,12 @@ RETURN
 
 STATIC PROCEDURE _PeerServe( oSock )
 
-   LOCAL cBuf    := Space( 8192 )
+   LOCAL cBuf    := Space( 16384 )
    LOCAL nRead, cLine, cMethod, cPath, cQuery, cBody, cResp, nStatus, nMs, nQ, nSp
    LOCAL cCrLf   := Chr( 13 ) + Chr( 10 )
+   LOCAL cHeadersRaw, cReqBody, hHeaders, nSep, nCL, nExtra, cExtra
 
-   nRead := hb_socketRecv( oSock, @cBuf, 8192, 0, 3000 )
+   nRead := hb_socketRecv( oSock, @cBuf, 16384, 0, 3000 )
 
    IF nRead <= 0 ; hb_socketClose( oSock ) ; RETURN ; ENDIF
 
@@ -750,6 +913,31 @@ STATIC PROCEDURE _PeerServe( oSock )
 
    ENDIF
 
+   // Split headers / body
+   nSep     := At( cCrLf + cCrLf, cBuf )
+   IF nSep > 0
+      cHeadersRaw := Left( cBuf, nSep - 1 )
+      cReqBody    := SubStr( cBuf, nSep + 4 )
+   ELSE
+      cHeadersRaw := cBuf
+      cReqBody    := ""
+   ENDIF
+
+   hHeaders := _PParseHeaders( cHeadersRaw )
+
+   // If Content-Length says more than what we have, pull the rest
+   IF hb_HHasKey( hHeaders, "content-length" )
+      nCL    := Val( hHeaders[ "content-length" ] )
+      nExtra := nCL - Len( cReqBody )
+      DO WHILE nExtra > 0
+         cExtra := Space( nExtra )
+         nRead  := hb_socketRecv( oSock, @cExtra, nExtra, 0, 3000 )
+         IF nRead <= 0 ; EXIT ; ENDIF
+         cReqBody += Left( cExtra, nRead )
+         nExtra   -= nRead
+      ENDDO
+   ENDIF
+
    nStatus := 200
 
    DO CASE
@@ -757,7 +945,12 @@ STATIC PROCEDURE _PeerServe( oSock )
       CASE cPath == "/ping"
          cBody := hb_jsonEncode( { "ok" => .T., "port" => s_nPeerPort } )
       CASE cPath == "/echo"
-         cBody := hb_jsonEncode( { "method" => cMethod, "path" => cPath, "query" => cQuery } )
+         cBody := hb_jsonEncode( { ;
+            "method"  => cMethod, ;
+            "path"    => cPath,   ;
+            "query"   => cQuery,  ;
+            "headers" => hHeaders, ;
+            "body"    => cReqBody } )
       CASE cPath == "/slow"
          nMs := Val( _PQParam( cQuery, "ms", "100" ) )
 
@@ -765,6 +958,35 @@ STATIC PROCEDURE _PeerServe( oSock )
 
          hb_idleSleep( nMs / 1000 )
          cBody := hb_jsonEncode( { "waited" => nMs } )
+      CASE Left( cPath, 8 ) == "/status/"
+         nStatus := Val( SubStr( cPath, 9 ) )
+         IF nStatus < 100 .OR. nStatus > 599 ; nStatus := 200 ; ENDIF
+         cBody := hb_jsonEncode( { "status" => nStatus, "path" => cPath } )
+      CASE Left( cPath, 6 ) == "/file/"
+         // Serve N bytes of deterministic content: 'X' repeated N times.
+         // Clamped at 1 MiB to protect the test peer.
+         nMs := Val( SubStr( cPath, 7 ) )
+         IF nMs < 0        ; nMs := 0        ; ENDIF
+         IF nMs > 1048576  ; nMs := 1048576  ; ENDIF
+         cBody := Replicate( "X", nMs )
+         // Skip default JSON headers below by short-circuiting: build
+         // response inline with content-type octet-stream.
+         cResp  := "HTTP/1.0 " + hb_ntos( nStatus ) + " OK"  + cCrLf
+         cResp  += "Content-Type: application/octet-stream"    + cCrLf
+         cResp  += "Content-Length: " + hb_ntos( Len( cBody ) ) + cCrLf
+         cResp  += "Connection: close" + cCrLf + cCrLf
+         cResp  += cBody
+         hb_socketSend( oSock, cResp, Len( cResp ), 0, 3000 )
+         hb_socketClose( oSock )
+         RETURN
+      CASE cPath == "/upload"
+         // Accept any verb, return size + first 16 + last 16 bytes so
+         // tests can verify byte-for-byte transport.
+         cBody := hb_jsonEncode( { ;
+            "method" => cMethod, ;
+            "size"   => Len( cReqBody ), ;
+            "first"  => Left( cReqBody, 16 ), ;
+            "last"   => Right( cReqBody, 16 ) } )
       OTHERWISE
          nStatus := 404
          cBody   := hb_jsonEncode( { "error" => "not found" } )
@@ -781,6 +1003,26 @@ STATIC PROCEDURE _PeerServe( oSock )
    hb_socketClose( oSock )
 
 RETURN
+
+STATIC FUNCTION _PParseHeaders( cRaw )
+
+   LOCAL hRet := { => }
+   LOCAL aLines, cLine, nCol, i
+
+   HB_HCaseMatch( hRet, .F. )
+
+   aLines := hb_ATokens( cRaw, Chr( 13 ) + Chr( 10 ) )
+   FOR i := 2 TO Len( aLines )   // skip request-line
+      cLine := aLines[ i ]
+      IF Empty( cLine ) ; LOOP ; ENDIF
+      nCol := At( ":", cLine )
+      IF nCol > 0
+         hRet[ Lower( AllTrim( Left( cLine, nCol - 1 ) ) ) ] := ;
+            AllTrim( SubStr( cLine, nCol + 1 ) )
+      ENDIF
+   NEXT
+
+RETURN hRet
 
 STATIC FUNCTION _PQParam( cQuery, cKey, cDef )
 
@@ -821,6 +1063,7 @@ RETURN { ;
       } }, ;
       { "Routing", { ;
       { "Router",        {|| HIX_TestRouter_Run()        } }, ;
+      { "RouteStream",   {|| HIX_TestRouteStream_Run()   } }, ;
       { "Dispatcher",    {|| HIX_TestDispatcher_Run()    } }, ;
       { "Helpers",       {|| HIX_TestHelpers_Run()       } }, ;
       { "Request",       {|| HIX_TestRequest_Run()       } }, ;
@@ -844,11 +1087,12 @@ RETURN { ;
       { "Csrf",         {|| HIX_TestCsrf_Run()        } }, ;
       { "Keys",         {|| HIX_TestKeys_Run()        } }, ;
       { "Permissions",  {|| HIX_TestPermissions_Run() } }, ;
-      { "Pentest",      {|| HIX_TestSecurity_Run()    } }  ;
+      { "Pentest (15sec aprox)",      {|| HIX_TestSecurity_Run()    } }  ;
       } }, ;
       { "Middleware", { ;
       { "MW-Built-In", {|| HIX_TestMw_Run()          } }, ;
       { "MwAutoApply", {|| HIX_TestMwAutoApply_Run() } }, ;
+      { "LoaderSession", {|| HIX_TestLoaderSession_Run() } }, ;
       { "MwFlush",     {|| HIX_TestMwFlush_Run()     } }, ;
       { "MwSystem",    {|| HIX_TestMwSystem_Run()    } }, ;
       { "Flash",       {|| HIX_TestFlash_Run()       } }, ;
@@ -856,10 +1100,13 @@ RETURN { ;
       } }, ;
       { "Transport", { ;
       { "WebSocket", {|| HIX_TestWebSocket_Run() } }, ;
+      { "WsDetector", {|| HIX_TestWsDetector_Run() } }, ;
       { "WSS",       {|| HIX_TestWSS_Run()       } }, ;
       { "SSL",       {|| HIX_TestSSL_Run()       } }, ;
       { "LongPoll",  {|| HIX_TestLongPoll_Run()  } }, ;
-      { "SSE",       {|| HIX_TestSSE_Run()        } }, ;
+      { "SSE",           {|| HIX_TestSSE_Run()                     } }, ;
+      { "USendChunkPro", {|| HIX_TestUSendChunkPropagate_Run()      } }, ;
+      { "PeerAlive",     {|| HIX_TestPeerAlive_Run()                 } }, ;
       { "Chunked",   {|| HIX_TestChunked_Run()   } }, ;
       { "Multipart", {|| HIX_TestMultipart_Run() } }, ;
       { "Gzip",      {|| HIX_TestGzip_Run()      } }  ;
@@ -873,6 +1120,7 @@ RETURN { ;
       } }, ;
       { "Views & Exec", { ;
       { "ExecutePrg",   {|| HIX_TestExecutePrg_Run() } }, ;
+      { "ExecuteHrb",   {|| HIX_TestExecuteHrb_Run() } }, ;
       { "Views",        {|| HIX_TestViews_Run()         } }, ;
       { "ViewPerf",     {|| HIX_TestViewPerf_Run()         } }, ;
       { "VCacheMetrics", {|| HIX_TestVCacheMetrics_Run()  } }, ;
@@ -885,5 +1133,101 @@ RETURN { ;
       { "Echo",   {|| HIX_TestEcho_Run()   } }, ;
       { "Abort",  {|| HIX_TestAbort_Run()  } }, ;
       { "Zombie", {|| HIX_TestZombie_Run() } }  ;
+      } }, ;
+      { "Extras", { ;
+      { "UCurl", {|| HIX_TestUCurl_Run() } }  ;
+      } }, ;
+      { "Audit", { ;
+      { "A0101 macro-eval router",     {|| HIX_TestAudit_A0101_Run() } }, ;
+      { "A0102 path traversal decode",  {|| HIX_TestAudit_A0102_Run() } }, ;
+      { "A0103 symlink escape",         {|| HIX_TestAudit_A0103_Run() } }, ;
+      { "A0104 multipart filename",     {|| HIX_TestAudit_A0104_Run() } }, ;
+      { "A0105 header injection",       {|| HIX_TestAudit_A0105_Run() } }, ;
+      { "A0106 status clamp",           {|| HIX_TestAudit_A0106_Run() } }, ;
+      { "A0107 jwt timing",             {|| HIX_TestAudit_A0107_Run() } }, ;
+      { "A0108 token timing",           {|| HIX_TestAudit_A0108_Run() } }, ;
+      { "A0109 jwt alg none",           {|| HIX_TestAudit_A0109_Run() } }, ;
+      { "A0110 jwt claims binding",     {|| HIX_TestAudit_A0110_Run() } }, ;
+      { "A0111 session sid entropy",    {|| HIX_TestAudit_A0111_Run() } }, ;
+      { "A0112 token gen rng",          {|| HIX_TestAudit_A0112_Run() } }, ;
+      { "A0113 xff trust list",         {|| HIX_TestAudit_A0113_Run() } }, ;
+      { "A0114 ratelimit anomaly ip",   {|| HIX_TestAudit_A0114_Run() } }, ;
+      { "A0115 admin panel bypass",     {|| HIX_TestAudit_A0115_Run() } }, ;
+      { "A0116 hardcoded secrets",      {|| HIX_TestAudit_A0116_Run() } }, ;
+      { "A0117 regex redos guard",      {|| HIX_TestAudit_A0117_Run() } }, ;
+      { "A0118 session file hmac",      {|| HIX_TestAudit_A0118_Run() } }, ;
+      { "A0119 session fixation",       {|| HIX_TestAudit_A0119_Run() } }, ;
+      { "A0120 gc toctou",              {|| HIX_TestAudit_A0120_Run() } }, ;
+      { "A0121 xss error page",         {|| HIX_TestAudit_A0121_Run() } }, ;
+      { "A0122 slowloris deadline",     {|| HIX_TestAudit_A0122_Run() } }, ;
+      { "A0123 body size limit",        {|| HIX_TestAudit_A0123_Run() } }, ;
+      { "A0124 json depth guard",       {|| HIX_TestAudit_A0124_Run() } }, ;
+      { "A0125 route regex escape",     {|| HIX_TestAudit_A0125_Run() } }, ;
+      { "A0127 view expr curly guard",  {|| HIX_TestAudit_A0127_Run() } }, ;
+      { "A0128 html encode robust",     {|| HIX_TestAudit_A0128_Run() } }, ;
+      { "A0126 thread join detach",     {|| HIX_TestAudit_A0126_Run() } }, ;
+      { "A0201 server globals mutex",   {|| HIX_TestAudit_A0201_Run() } }, ;
+      { "A0202 pool shutdown timeout",  {|| HIX_TestAudit_A0202_Run() } }, ;
+      { "A0203 ws conn mutex",          {|| HIX_TestAudit_A0203_Run() } }, ;
+      { "A0204 ws callbacks try/catch", {|| HIX_TestAudit_A0204_Run() } }, ;
+      { "A0205 ws mutex lazy race",     {|| HIX_TestAudit_A0205_Run() } }, ;
+      { "A0206 route disp lazy dcl",    {|| HIX_TestAudit_A0206_Run() } }, ;
+      { "A0207 err log seq race",       {|| HIX_TestAudit_A0207_Run() } }, ;
+      { "A0208 logger exception safety",{|| HIX_TestAudit_A0208_Run() } }, ;
+      { "A0209 dbf alias thread aff",   {|| HIX_TestAudit_A0209_Run() } }, ;
+      { "A0210 worker http ctx cleanup",{|| HIX_TestAudit_A0210_Run() } }, ;
+      { "A0211 body bound precount",    {|| HIX_TestAudit_A0211_Run() } }, ;
+      { "A0212 mutex timeout consist",  {|| HIX_TestAudit_A0212_Run() } }, ;
+      { "A0213 io write backoff",       {|| HIX_TestAudit_A0213_Run() } }, ;
+      { "A03101 method substring match",{|| HIX_TestAudit_A03101_Run() } }, ;
+      { "A03102 404 context loss",      {|| HIX_TestAudit_A03102_Run() } }, ;
+      { "A03103-5 router+304 fixes",    {|| HIX_TestAudit_A03103_Run() } }, ;
+      { "A03106 public fallback asymm", {|| HIX_TestAudit_A03106_Run() } }, ;
+      { "A03107 path norm dedup",       {|| HIX_TestAudit_A03107_Run() } }, ;
+      { "A03201 cors wildcard+auth",    {|| HIX_TestAudit_A03201_Run() } }, ;
+      { "A03202 firewall ipv6 scope",   {|| HIX_TestAudit_A03202_Run() } }, ;
+      { "A03203 ratelimit sliding win", {|| HIX_TestAudit_A03203_Run() } }, ;
+      { "A03204 anomaly static race",   {|| HIX_TestAudit_A03204_Run() } }, ;
+      { "A03302 json parseerror masked", {|| HIX_TestAudit_A03302_Run() } }, ;
+      { "A03303 cookie rfc6265 quoted",  {|| HIX_TestAudit_A03303_Run() } }, ;
+      { "A03304 setcookie injection san", {|| HIX_TestAudit_A03304_Run() } }, ;
+      { "A03305 cookie case sensitivity", {|| HIX_TestAudit_A03305_Run() } }, ;
+      { "A03306 urldecode nullbyte",      {|| HIX_TestAudit_A03306_Run() } }, ;
+      { "A03307 validate macro cache",    {|| HIX_TestAudit_A03307_Run() } }, ;
+      { "A03308 replacevars regex escape", {|| HIX_TestAudit_A03308_Run() } }, ;
+      { "A03401 loadconfig cache bypass",  {|| HIX_TestAudit_A03401_Run() } }, ;
+      { "A03402 config corrupt json warn", {|| HIX_TestAudit_A03402_Run() } }, ;
+      { "A03403 admin password hmac",      {|| HIX_TestAudit_A03403_Run() } }, ;
+      { "A03405 loader mutex race",         {|| HIX_TestAudit_A03405_Run() } }, ;
+      { "A03406 loader hrb stale hash",     {|| HIX_TestAudit_A03406_Run() } }, ;
+      { "A03407 loader dep cycle limit",    {|| HIX_TestAudit_A03407_Run() } }, ;
+      { "A03408 pool lock timeout",          {|| HIX_TestAudit_A03408_Run() } }, ;
+      { "A03409 pool max size dos",          {|| HIX_TestAudit_A03409_Run() } }, ;
+      { "A03410 dbf update rlock finally",   {|| HIX_TestAudit_A03410_Run() } }, ;
+      { "A03411 dbf rlock spinlock sleep",   {|| HIX_TestAudit_A03411_Run() } }, ;
+      { "A03501 metrics inc hb_hgetdef",     {|| HIX_TestAudit_A03501_Run() } }, ;
+      { "A03502 constanteq length precheck", {|| HIX_TestAudit_A03502_Run() } }, ;
+      { "A04012 trailing slash route match", {|| HIX_TestAudit_A04012_Run() } }, ;
+      { "A04013 cookie secure flag https",   {|| HIX_TestAudit_A04013_Run() } }, ;
+      { "A04014 constanteq shared helper",   {|| HIX_TestAudit_A04014_Run() } }, ;
+      { "SafeFs root guard",                 {|| HIX_TestSafeFs_Run()      } }, ;
+      { "B1R1 routes read no lock",          {|| HIX_TestAudit_B1R1_Run()  } }, ;
+      { "B1R2 reload atomic swap no 404",   {|| HIX_TestAudit_B1R2_Run()  } }, ;
+      { "B1R3 respond double call guard",   {|| HIX_TestAudit_B1R3_Run()  } }, ;
+      { "B1R4 sse conn mutex broadcast",    {|| HIX_TestAudit_B1R4_Run()  } }, ;
+      { "B1R5 init procedure lazy mutex",   {|| HIX_TestAudit_B1R5_Run()  } }, ;
+      { "B1W1 ws ctrl frames conn mutex",   {|| HIX_TestAudit_B1W1_Run()  } }, ;
+      { "B1W61 ws large frame ext len",     {|| HIX_TestAudit_B1W61_Run() } }, ;
+      { "B1W63 ws ping config from pool",   {|| HIX_TestAudit_B1W63_Run() } }, ;
+      { "B1W3 ws cleanup on frame loop exc", {|| HIX_TestAudit_B1W3_Run()  } }, ;
+      { "B1W4 ws fin sets lconnclosed",      {|| HIX_TestAudit_B1W4_Run()  } }, ;
+      { "B1S4 session store init procedure", {|| HIX_TestAudit_B1S4_Run()  } }, ;
+      { "B1S1 session hash isolated per ctx",{|| HIX_TestAudit_B1S1_Run()  } }, ;
+      { "B1S2 session file atomic write",    {|| HIX_TestAudit_B1S2_Run()  } }, ;
+      { "B1S3 session gc hmac recheck",      {|| HIX_TestAudit_B1S3_Run()  } }, ;
+      { "B1W2 ssl mutex per conn serialize", {|| HIX_TestAudit_B1W2_Run()  } }, ;
+      { "B1W62 ws continuation reassembly",  {|| HIX_TestAudit_B1W62_Run() } }, ;
+      { "B1W5 wss pool segregation",         {|| HIX_TestAudit_B1W5_Run()  } }, ;
+      { "B1A1516 session no hardcoded key",  {|| HIX_TestAudit_B1A1516_Run() } }  ;
       } }  ;
       }

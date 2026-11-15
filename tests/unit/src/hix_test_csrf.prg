@@ -32,6 +32,7 @@ FUNCTION HIX_TestCsrf_Run()
    _TestCsrfTokenMakeValid( hCtx )
    _TestCsrfToHtml(      hCtx )
    _TestCsrfMiddleware(  hCtx )
+   _TestCsrfBinding(     hCtx )
 RETURN hCtx
 
 STATIC PROCEDURE _TestCsrfRandom( hCtx )
@@ -113,4 +114,75 @@ STATIC PROCEDURE _TestCsrfMiddleware( hCtx )
    oReq := aRC[1] ; oCtx := aRC[2]
    HIX_MwCsrf( oCtx )
    HixTU_Check( hCtx, oReq:nStatus == 500, "CSRF T22: sin session -> 500",      "500", hb_NToS( oReq:nStatus ) )
+RETURN
+
+// ============================================================
+// v2.4.3 Fix 6 — CSRF token binding a sesión.
+// ============================================================
+STATIC FUNCTION _CsrfCtxForSid( cSid )
+   LOCAL oReq, oCtx
+   oReq := TMockRequest():New( "/", "POST" )
+   oCtx := THixContext():New( oReq )
+   oCtx:hData[ "_sid" ] := cSid
+   oReq:hData[ "_ctx" ] := oCtx
+   HIX_SetRequest( oReq )
+   HIX_SetContext( oCtx )
+RETURN oCtx
+
+STATIC PROCEDURE _TestCsrfBinding( hCtx )
+
+   LOCAL oCtxA, oCtxB, cTokA, cTokStateless, cTokForged, cPayload, aParts
+   LOCAL cNewPayload, cNewSig, cBadToken
+
+   // --- T23: sin sesión activa, HIX_CsrfBound devuelve .T. (skip stateless) ---
+   HIX_SetContext( NIL )
+   HIX_SetRequest( NIL )
+   cTokStateless := HIX_CsrfMakeToken( "anon-data" )
+   HixTU_Check( hCtx, HIX_CsrfBound( cTokStateless ), ;
+      "CSRF T23: HIX_CsrfBound sin sesion -> .T. (skip)", ".T.", ;
+      hb_CStr( HIX_CsrfBound( cTokStateless ) ) )
+
+   // --- T24: mint y validate en la misma sesión -> .T. ---
+   oCtxA := _CsrfCtxForSid( "SID-SESSION-A" )
+   cTokA := HIX_CsrfMakeToken()   // sin cData -> toma _sid del contexto
+   HixTU_Check( hCtx, HIX_CsrfBound( cTokA ), ;
+      "CSRF T24: mint+validate en sesion A -> .T.", ".T.", ;
+      hb_CStr( HIX_CsrfBound( cTokA ) ) )
+
+   // --- T25: token de sesión A validado desde sesión B -> .F. (regression) ---
+   oCtxB := _CsrfCtxForSid( "SID-SESSION-B" )
+   HixTU_Check( hCtx, ! HIX_CsrfBound( cTokA ), ;
+      "CSRF T25: token sesion A rechazado en sesion B (replay)", ".F.", ;
+      hb_CStr( HIX_CsrfBound( cTokA ) ) )
+
+   // --- T26: payload malformado (una sola parte sin "|") -> .F. ---
+   // Base64 de "singlepart" sin "|" + firma sintética
+   cBadToken := hb_base64Encode( "singlepart" ) + ".fake-sig"
+   HixTU_Check( hCtx, ! HIX_CsrfBound( cBadToken ), ;
+      "CSRF T26: payload sin '|' rechazado", ".F.", hb_CStr( HIX_CsrfBound( cBadToken ) ) )
+
+   // --- T27: token con base pero sin "." (una sola parte) -> .F. ---
+   HixTU_Check( hCtx, ! HIX_CsrfBound( "nopartshere" ), ;
+      "CSRF T27: token sin '.' rechazado", ".F.", ;
+      hb_CStr( HIX_CsrfBound( "nopartshere" ) ) )
+
+   // --- T28: reencadenar payload con SID ajeno pero firma del token original
+   //          sigue rechazándose por HIX_CsrfBound (verifica SID antes de firma).
+   HIX_SetContext( oCtxA )   // sesión A activa de nuevo
+   aParts   := hb_ATokens( cTokA, "." )
+   cPayload := hb_base64Decode( aParts[ 1 ] )
+   // Sustituir SID-SESSION-A por SID-SESSION-B dentro del payload crudo
+   cNewPayload := StrTran( cPayload, "SID-SESSION-A", "SID-SESSION-B" )
+   cNewSig     := aParts[ 2 ]   // firma del original (no coincide con nuevo payload)
+   cTokForged  := hb_base64Encode( cNewPayload ) + "." + cNewSig
+
+   HIX_SetContext( oCtxB )   // ahora estamos en sesión B
+   HixTU_Check( hCtx, ! HIX_CsrfBound( cTokForged ) .OR. ! HIX_CsrfValidToken( cTokForged ), ;
+      "CSRF T28: token forged con SID-B pero firma de A -> rechazo (bound o firma)", ".F.", ;
+      hb_CStr( HIX_CsrfBound( cTokForged ) .AND. HIX_CsrfValidToken( cTokForged ) ) )
+
+   // Cleanup
+   HIX_SetContext( NIL )
+   HIX_SetRequest( NIL )
+
 RETURN

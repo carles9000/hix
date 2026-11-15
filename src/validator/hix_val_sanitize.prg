@@ -80,31 +80,74 @@ FUNCTION HIX_ValSanitize( cFormat, uValue )
 RETURN uValue
 
 
+// [A4.08] Strip HTML tags handling:
+//   - quoted attributes (> inside "..." or '...' does not end the tag)
+//   - HTML comments <!-- ... -->
 STATIC FUNCTION _ValStripTags( cStr )
 
-   LOCAL cOut  := ""
-   LOCAL lTag  := .F.
-   LOCAL i, c
+   LOCAL cOut   := ""
+   LOCAL lTag   := .F.
+   LOCAL lCmt   := .F.
+   LOCAL cQuote := ""
+   LOCAL i, c, nLen
 
-   FOR i := 1 TO Len( cStr )
+   nLen := Len( cStr )
+   i    := 1
+
+   DO WHILE i <= nLen
 
       c := SubStr( cStr, i, 1 )
 
-      IF c == "<"
+      IF lCmt
 
-         lTag := .T.
-      ELSEIF c == ">"
-         lTag := .F.
-      ELSEIF ! lTag
-         cOut += c
+         IF SubStr( cStr, i, 3 ) == "-->"
+            lCmt := .F.
+            i    += 3
+         ELSE
+            i++
+         ENDIF
+         LOOP
+
+      ELSEIF lTag
+
+         IF ! Empty( cQuote )
+            IF c == cQuote
+               cQuote := ""
+            ENDIF
+         ELSEIF c == '"' .OR. c == "'"
+            cQuote := c
+         ELSEIF c == ">"
+            lTag := .F.
+         ENDIF
+         i++
+         LOOP
+
+      ELSE
+
+         IF c == "<"
+            IF SubStr( cStr, i, 4 ) == "<!--"
+               lCmt := .T.
+               i    += 4
+            ELSE
+               lTag := .T.
+               i++
+            ENDIF
+            LOOP
+         ELSE
+            cOut += c
+         ENDIF
 
       ENDIF
 
-   NEXT
+      i++
+
+   ENDDO
 
 RETURN cOut
 
 
+// [A4.09] Slug strips non-ASCII chars (e.g. "café" -> "caf"). Documented
+//         design choice: caller must transliterate before calling if needed.
 STATIC FUNCTION _ValSlug( cStr )
 
    LOCAL cOut := Lower( AllTrim( cStr ) )

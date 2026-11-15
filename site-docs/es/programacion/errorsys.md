@@ -88,6 +88,59 @@ Si observas la linea `{!! _w( hError ) !!}` mostrara todo el contenido del hash
 
 ---
 
+## Cargo extendido para errores de vista
+
+Cuando el error que llega a `errorsys` nace del **motor de vistas** (compile
+fallido en `@prg`, directiva mal formada, template roto), HIX enriquece
+`hError["cargo"]` con el diagnóstico completo del subsistema `HIX_Compile*`.
+Esto es nuevo desde v2.4.0 — útil para mostrar en el template la línea
+real del HTML con contexto.
+
+Claves disponibles bajo `hError["cargo"]`:
+
+| Clave        | Contenido                                                  |
+|--------------|------------------------------------------------------------|
+| `hCompile`   | Hash entero del diagnóstico — `{ ok, phase, hrb, err, diagnostics, preambleLines }` |
+| `line`       | **Línea en el HTML del template** (ya mapeada por `aLineMap`, no la línea en el `.prg` transpilado) |
+| `line_code`  | Snippet exacto de la línea que falló                       |
+| `aCode`      | Array con las líneas de contexto (anterior + culpable + siguiente) |
+| `view_code`  | Código HIX de categoría de error (9001 parser, 9002 transpile, 9004 execute, 9006 prg transpiled, 9010 load, 9011 load, 9009 recursion) |
+| `module`     | Módulo que lo originó (`hix_view_transpile`, `hix_view`, etc.) |
+| `process`    | Subsistema legible (`Transpile`, `Execute`, `Prg transpiled`, `Load`...) |
+
+Dentro de `hCompile["err"]` el shape es canónico:
+
+```
+{ kind, severity, code, description, file, line, lineCode }
+```
+
+Si la fuente del error es runtime (no compile), `err` añade además
+`operation, args, subsystem, genCode, subCode, osCode, filename, stack, aStack`.
+
+### Ejemplo — mostrar la línea culpable en el template
+
+```html
+@args hError
+
+@if ! Empty( hError["cargo"] ) .AND. hb_HHasKey( hError["cargo"], "hCompile" )
+   <h2 class="text-danger">Fallo del motor de vistas</h2>
+   <p><strong>Fase:</strong> {{ hError["cargo"]["hCompile"]["phase"] }}</p>
+   <p><strong>Línea del template:</strong> {{ hb_NToS(hError["cargo"]["line"]) }}</p>
+   <pre class="bg-light p-3">{{ hError["cargo"]["line_code"] }}</pre>
+@endif
+```
+
+### Nota sobre `operation`
+
+El campo `hError["operation"]` para errores de vista ya no empieza por el
+prefijo `"line:"` (formato legacy anterior a v2.4.0). Hoy es `"line N"`
+puramente informativo. La **fuente oficial** del número de línea es
+`hError["cargo"]["line"]` — un número Harbour listo para usar con
+`hb_NToS()`. Si tu template custom todavía parsea `"line:"`, cambia a
+leer `cargo["line"]` directamente.
+
+---
+
 
 ## `www/errors/error_XXX.html` - páginas HTTP estáticas
 

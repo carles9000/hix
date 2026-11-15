@@ -110,12 +110,23 @@ FUNCTION HIX_ConfigAppDefaults()
 
    hDef[ "dbf" ]  := { "rddname" => "DBFCDX" }
 
-   hDef[ "keys" ] := { ;
-      "csrf"     => "H!x@CSRF@2026",    ;
-      "jwt"      => "H!x@JWT@2026",     ;
-      "session"  => "H!x@SESSION@2026", ;
-      "token"    => "H!x@TOKEN@2026",   ;
-      "resource" => "H!x@RES@2026"      }
+   // v2.4.3 — NO "keys" aquí. config.json vive bajo paths.root y es un
+   // vector de fuga por disco (git, backup/deploy tar-zip, otros procesos
+   // locales) incluso cuando v2.4.1 cerró el acceso HTTP vía dispatcher
+   // ACL. Las claves ahora provienen de:
+   //   1. HIX_KeySet() en el bootstrap de la app (env vars o fichero
+   //      fuera del docroot) — autoridad máxima.
+   //   2. config.json > "keys" si ya existe (apps legacy pre-v2.4.3)
+   //      — se respeta pero no se mintea.
+   //   3. Generación en memoria por HIX_KeysLoadFromAppConfig() cuando
+   //      los dos anteriores no cubren los slots core (csrf, jwt,
+   //      session, token, resource). Emite WARN: tokens/sesiones mueren
+   //      con el proceso.
+   // Nunca persistir secretos bajo paths.root.
+
+   //  Empty databases section so backfill (HIX_ConfigAppMerge) adds it to
+   //  projects predating v2.3.01 without wiping existing pool entries.
+   hDef[ "databases" ] := { => }
 
 RETURN hDef
 

@@ -1,0 +1,37 @@
+#include "winres.h"
+
+hix ICON "resources/images/hix.ico"
+
+// Estructura de Versión compatible con 64 bits
+1 VERSIONINFO
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName",      "\0"
+            VALUE "FileDescription",  "HIX Harbour Web Server\0"
+            VALUE "FileVersion",      "1.2\0"
+            VALUE "InternalName",     "hix\0"
+            VALUE "LegalCopyright",   "Copyright (c) 2025-2026\0"
+            VALUE "OriginalFilename", "hix_app.exe\0"
+            VALUE "ProductName",      "Created by Charly Aubia\0"
+            VALUE "ProductVersion",   "1.2\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END

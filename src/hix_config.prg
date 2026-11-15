@@ -18,6 +18,7 @@
                Copyright (c) 2026 Carles Aubia Floresví - HIX Server Project
  -----------------------------------------------------------*/
 #INCLUDE 'error.ch'
+#INCLUDE 'hix_logger.ch'
 
 STATIC s_hConfig := { => }
 
@@ -85,7 +86,7 @@ FUNCTION HIX_LoadConfig( cFile, lForce )
 
    LOCAL hCfg := { => }
    LOCAL cRaw, nHeader, cMacIni, cMacEnd
-   LOCAL lExplicit := ( PCount() >= 1 .AND. cFile != NIL )
+   LOCAL lExplicit := ( PCount() >= 1 .AND. ValType( cFile ) == "C" )  // [A3.4.1] != NIL fails with SET EXACT OFF
 
    hb_default( @cFile,  HIX_FileConfig() )
    hb_default( @lForce, .F. )
@@ -133,7 +134,9 @@ FUNCTION HIX_LoadConfig( cFile, lForce )
 
    IF ! hb_IsHash( hCfg )
 
-// Corrupt JSON: rebuild from defaults so the server stays alive.
+// [A3.4.2] Corrupt JSON: warn operator before overwriting with defaults.
+      le( "HIX_LoadConfig: JSON invalido en '" + cFile + "'" )
+      lw( "HIX_LoadConfig: restaurando defaults y sobreescribiendo '" + cFile + "'" )
       hCfg := HIX_InitDefault()
       HIX_SetConfig( hCfg )
       HIX_SaveConfig( hCfg, cFile )

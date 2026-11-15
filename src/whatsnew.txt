@@ -1,0 +1,90 @@
+2.4.3  SECURITY HARDENING — 7 fixes: session crypt, UParam QS, TLS scheme,
+       keys precedence, no secrets in config.json, CSRF session-bound,
+       ACL ext/dotfile blacklist. 2231/2231. See changes/2.4.3.md.
+2.4.2  BUG FIX — rutas con acción .hrb perdían la petición: ExecuteHrb y
+       _HixExecWithTimeout borraban el THREAD STATIC con NIL. Rename hix_* 
+       en src/compile/.
+2.4.1  SECURITY FIX — hixstyle root ACL leak (config.json served from root).
+       _HixCheckACL now 403s root when aAllowDirs != NIL. Breaking:
+       hixstyle apps must register explicit "/" route. See changes/2.4.1.md.
+2.4.0  HIX_Compile* unified — single compile path across dispatcher, loaders,
+       mw and view engine (hash { ok, hrb, err, phase, diagnostics }).
+       Breaking: HIX_CompileFile/UGetPPRules/#XCOMMAND VIEW gone. See changes/2.4.0.md.
+2.3.11 Split examples/wdo/ per driver — mysql/ and sqlite3/ ship
+       as self-contained HIX projects (own app.hbp, hix.json, www).
+       Isolates runtime deps: SQLite3 needs no DLL at all.
+2.3.10 Move /dll to /resources/dll. Updated all references in
+       site-docs (es/en/it), examples and tests (18 files).
+2.3.09 WDO pool leak fix on dead Ping over wait_timeout: _Borrowed pre-Ping,
+       TRY/CATCH, auto-release on thread exit via _HixThreadExec.
+       Suite 2148/2149 (SSL cert pre-exist). See changes/2.3.09.md.
+2.3.08 WDO MySql pool leak fix under dispatcher timeout: OPT_READ/WRITE/
+       CONNECT_TIMEOUT in Open() + read_timeout_s/connect_timeout_s/debug
+       keys in databases.<pool>. See changes/2.3.08.md.
+2.3.07 WDO_ReleaseAllThread() conectada al dispatcher (fix saturación pool
+       MySQL). TRY/CATCH/FINALLY en controllers Hi. Pool stats widget en
+       bench (300ms). Logging via _l(). Q5 ±5sec, ms→s ≥1000ms.
+2.3.06 WDO MySql docs+examples: employees DB, site-docs ES/EN/IT
+       (7 pages x3), lAbortOnFail default .T., DLL error simplificado,
+       old_version eliminado. Cierre ciclo WDO MySQL.
+2.3.05 WDO MySql: per-OS-thread init guard. ThreadInitOnce() llama
+       mysql_thread_init idempotente desde mysql_query y stmt_execute
+       (THREAD STATIC). Suite 214/214 green on msvc64, mingw64, Linux.
+2.3.04 WDO MySql: Alt A SELECT fetch binario. WDO_MySqlStmtBin expone
+       Fetch/Fetch_Assoc/FetchAll/FCount/Count/DbStruct via metadata +
+       store_result + bind_result + fetch. Suite 214/214 green.
+2.3.03 WDO MySql: Alt A binary prepared statements. WDO_MySqlStmtBin
+       sobre mysql_stmt_* via hb_DynCall; PrepareBin(cSql[,lBinary]);
+       BindLong 64 KB chunks; NUL preserved. Suite 204/204 green.
+2.3.02 WDO: opt-in metrics registry (sets.wdo_metrics=true) parallel
+       to HIX_Metric*. WDO_DefaultErrorHandler shipped in-lib for
+       "berror": "WDO_DefaultErrorHandler" out-of-the-box.
+2.3.01 WDO declarative pools: HIX_InitPoolsFromConfig reads "databases"
+       in www/config.json; multi-pool, "dll" override, "berror" as
+       function-name string. Suite 145/145 green.
+2.3.00 WDO MySql server-side prepared statements (Alt B): Prepare/BindParam/
+       Execute over PREPARE/SET @pN/EXECUTE/DEALLOCATE, `?` and `:name`
+       placeholders. Suite 133/133 on msvc64, mingw64 and Linux gcc.
+2.2.05 WDO pool: per-request bError override no longer persists in the
+       slot; Release restores the factory-injected handler automatically,
+       reconnect path re-injects it. Suite 117/117 green.
+2.2.04 WDO pool: WDO_InitPoolMySql accepts bError; every pooled
+       connection gets an app-wide error handler; bError migrated
+       from CLASSDATA to DATA. Suite 116/116 green.
+2.2.03 WDO v2: MySQL Conn+Stmt split, transactions and pool
+       (WDO_Get / dispatcher auto-release). Unified test 110/110
+       green on msvc64, mingw64 and Linux gcc.
+2.2.02 View engine: runtime preamble auto-injected in @prg (? ?? TRY/CATCH
+       work out of box). Output goes to per-thread UEchoBlock buffer,
+       stitched into __cOut at the exact @prg position.
+2.2.01 Independent-audit remediation: routing, sessions and WebSocket
+       hardening (17 fixes across R1-R5, S1-S4, W1-W6.3 and A1.15/16);
+       suite 2155/2155 green (see changes/2.2.1.md).
+2.2    Audit Edition: lib purity (zero HIX_Test* in production build),
+       black-box test rewrites, global config isolation fix, sticky
+       test dashboard header + OS badge + fixed footer (see changes/2.2.md).
+2.1.07 Full audit closure of lib_hix: 86/87 findings executed, 1 n/a.
+       Security, concurrency, bug and fragility fixes across the stack;
+       test suite 2092/2092 green (see changes/2.1.07.md).
+2.1.06 Audit fixes A4.03-A4.09: router hash lookup O(1), WriteChunk
+       fragmentation, directive-depth cap, view cache by mtime+MD5,
+       transpile/sanitize/slug hardening (see changes/2.1.06.md).
+2.1.05 Fix large-upload hang over Cloudflare Tunnel: loop socket recv until
+       Content-Length filled, drain oversized bodies before responding
+       (see changes/2.1.05.md).
+2.1.04 Isolate SSE/WS timing into their own metric buckets and redesign
+       the /server-info panel with per-protocol boxes (see changes/2.1.04.md).
+2.1.03 Reliable peer close detection for long streams via non-destructive
+       recv MSG_PEEK (UPeerAlive helper). See changes/2.1.03.md.
+2.1.02 Streaming send helpers now return peer-alive status and routes gain
+       a "stream" flag with its own exec timeout. See changes/2.1.02.md.
+2.1.01 Fix WebSocket upgrade behind Cloudflare / reverse proxy by bumping
+       detector peek defaults and promoting WS on plain TCP. See changes/2.1.01.md.
+2.1    Add go_lib_gcc.sh for linux version
+       Solved exit server hang linux
+2.0.05 Change order include path. First HB_INCLUDE if it exist 
+2.0.04 Add app path to show init screen
+       Add go_lib_gcc.bat
+2.0.03 Add app name to show init screen
+2.0.02 Add mingw64 script
+2.0.01 Force link __MVPRIVATE

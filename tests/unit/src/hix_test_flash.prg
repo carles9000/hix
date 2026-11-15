@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_test_flash.prg
   Author.....: Charly 9000
   Created....: 2026-06-04
@@ -32,9 +32,9 @@ STATIC PROCEDURE _CleanDir( cDir )
    ENDIF
    aFiles := Directory( cDir + hb_ps() + "*.*" )
    FOR EACH aEntry IN aFiles
-      FErase( cDir + hb_ps() + aEntry[1] )
+      HIX_SafeErase( cDir + hb_ps() + aEntry[1] )
    NEXT
-   hb_DirDelete( cDir )
+   HIX_SafeDirDelete( cDir )
 RETURN
 
 FUNCTION HIX_TestFlash_Run()

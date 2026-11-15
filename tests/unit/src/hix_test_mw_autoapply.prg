@@ -29,8 +29,8 @@ STATIC PROCEDURE _CleanupMwDir()
    LOCAL cDir, cFile
    cDir  := _MwDir()
    cFile := cDir + hb_ps() + "config.json"
-   IF hb_FileExists( cFile ) ; hb_vfErase( cFile ) ; ENDIF
-   hb_vfDirRemove( cDir )
+   IF hb_FileExists( cFile ) ; HIX_SafeErase( cFile ) ; ENDIF
+   HIX_SafeDirDelete( cDir )
 RETURN
 
 FUNCTION HIX_TestMwAutoApply_Run()

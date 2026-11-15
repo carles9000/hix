@@ -5,14 +5,14 @@
   Description: HIX Web Server main entry point                
  -----------------------------------------------------------*/
 
-REQUEST DBFCDX 
+REQUEST DBFCDX
 
 FUNCTION Main()
 
    LOCAL oServer := THixServer():New()
-   
-      RddSetDefault( 'DBFCDX' )
+
+   RddSetDefault( 'DBFCDX' )
 
    oServer:Start()
-   
+
 RETURN NIL

@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_test_mw_system.prg
   Author.....: Charly 9000
   Created....: 2026-06-04
@@ -285,7 +285,7 @@ STATIC PROCEDURE _MwsMaintenance( hCtx )
    oCtx := THixContext():New( oReq )
    HixTU_Check( hCtx, HIX_MwMaintenance( oCtx ), "MwSys: Maint toggle off pasa", ".T.", ".F." )
    cLockFile := hb_DirTemp() + "hix_tm_maint.lock"
-   IF File( cLockFile ) ; FErase( cLockFile ) ; ENDIF
+   IF File( cLockFile ) ; HIX_SafeErase( cLockFile ) ; ENDIF
    HIX_MwMaintenanceSetup( .F., cLockFile )
    oReq := TMockRequest():New()
    oCtx := THixContext():New( oReq )
@@ -296,7 +296,7 @@ STATIC PROCEDURE _MwsMaintenance( hCtx )
    lOk  := HIX_MwMaintenance( oCtx )
    HixTU_Check( hCtx, ! lOk,               "MwSys: Maint file present -> 503", ".F.", hb_CStr( lOk ) )
    HixTU_Check( hCtx, oReq:nStatus == 503, "MwSys: Maint file 503",           "503", hb_NToS( oReq:nStatus ) )
-   IF File( cLockFile ) ; FErase( cLockFile ) ; ENDIF
+   IF File( cLockFile ) ; HIX_SafeErase( cLockFile ) ; ENDIF
    HIX_MwMaintenanceSetup( .F., "" )
    oReq := TMockRequest():New()
    oCtx := THixContext():New( oReq )

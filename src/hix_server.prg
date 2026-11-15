@@ -2,14 +2,13 @@
   File ......: hix_server.prg
   Author.....: Carles Aubia Floresvi (Charly 9000)
   Created....: 2026-04-21
-  Description: THixServer — TCP accept loop, three worker pools
-               (HTTP/WS/Others) and server lifecycle.
+  Description: THixServer - Harbour Web Server
   License....: This Source Code Form is subject to the terms of the
                Mozilla Public License, v. 2.0. (https://mozilla.org/MPL/2.0/).
                Copyright (c) 2026 Carles Aubia Floresví - HIX Server Project
  -----------------------------------------------------------*/
-#DEFINE HIX_VERSION_SERVER                "2.0"
-#DEFINE HIX_SUBVERSION_SERVER             ".04"
+#DEFINE HIX_VERSION_SERVER                "2.4"
+#DEFINE HIX_SUBVERSION_SERVER             ".3"
 #DEFINE HIX_LOG_MODULE HIX_MOD_SERVER
 #DEFINE SW_SHOW                              5
 
@@ -26,6 +25,14 @@ STATIC slProxied       := .F.
 STATIC snServerCount   := 0   // # instancias New() — la 1a posee globales, el resto no
 STATIC sbLifecycle     := NIL // hook global {|cState, cLabel| ...} — nil = deshabilitado
 STATIC slDormantHixstyle := .F. // www/config.json existe pero hixstyle.enabled=false
+
+// A2.01 — mutex de proceso que sincroniza el acceso a las 4 STATIC de lifecycle.
+// Creado single-threaded en INIT PROCEDURE (antes de main → antes de spawn de workers).
+STATIC shServerMutex := NIL
+
+INIT PROCEDURE _HixServerBoot()
+   shServerMutex := hb_mutexCreate()
+RETURN
 
 
 CLASS THixServer
@@ -66,11 +73,11 @@ CLASS THixServer
    METHOD SetFirewall( cFilter, cMode )
 
    // ---- API de rutas ----
-   METHOD AddRoute( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo )
-   METHOD AddRouteGet(    cName, cPattern, bAction, cMw, cScope, uCargo )
-   METHOD AddRoutePost(   cName, cPattern, bAction, cMw, cScope, uCargo )
-   METHOD AddRoutePut(    cName, cPattern, bAction, cMw, cScope, uCargo )
-   METHOD AddRouteDelete( cName, cPattern, bAction, cMw, cScope, uCargo )
+   METHOD AddRoute( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, lStream )
+   METHOD AddRouteGet(    cName, cPattern, bAction, cMw, cScope, uCargo, lStream )
+   METHOD AddRoutePost(   cName, cPattern, bAction, cMw, cScope, uCargo, lStream )
+   METHOD AddRoutePut(    cName, cPattern, bAction, cMw, cScope, uCargo, lStream )
+   METHOD AddRouteDelete( cName, cPattern, bAction, cMw, cScope, uCargo, lStream )
    METHOD DeleteRoute( cName )
    METHOD AddRouteGroup( cPrefix, cMw, cScope, bBlock )
    METHOD SetRouteHandler( cEvent, bAction )
@@ -172,7 +179,7 @@ METHOD Start( lModal ) CLASS THixServer
    
    hb_default( @lModal, .t. )
 
-   slStopRequested := .F.
+   _HixServerSetStopRequested( .F. )
 
    _LC( "start", "Init server..." )
 
@@ -225,6 +232,10 @@ METHOD Start( lModal ) CLASS THixServer
       HIX_KeysLoadFromAppConfig()
 
       HIX_LoadMiddleware()
+
+      //  Auto-init WDO connection pools declared under "databases" in
+      //  config.json. Aborts startup if any declared pool fails to open.
+      HIX_InitPoolsFromConfig()
 
    ENDIF
 
@@ -319,6 +330,7 @@ METHOD Stop() CLASS THixServer
 
       IF ::lOwnsGlobals
 
+         WDO_MetricsClose()
          HIX_MetricsClose()
          HIX_AccessLogClose()
          HIX_ErrorLogClose()
@@ -347,7 +359,7 @@ METHOD Stop() CLASS THixServer
 
    IF ::lOwnsGlobals
 
-      slStopRequested := .T.
+      _HixServerSetStopRequested( .T. )
 
    ENDIF
 
@@ -369,11 +381,13 @@ METHOD Stop() CLASS THixServer
 
    _LC( "stop", "Stopping pools..." )
    nT0 := hb_MilliSeconds()
+   HIX_EndPoolsFromConfig()
    ::_DestroyPools()
    _LC( "stop", "Pools stopped (" + _FmtElapsed( nT0 ) + ")" )
 
    IF ::lOwnsGlobals
 
+      WDO_MetricsClose()
       HIX_MetricsClose()
       HIX_AccessLogClose()
       HIX_ErrorLogClose()
@@ -382,8 +396,6 @@ METHOD Stop() CLASS THixServer
    ENDIF
 
    _LC( "off", "Server Off" )
-
-
 
    IF ::lShowInfo .AND. ValType( ::bPostEnd ) == 'B'
 
@@ -424,7 +436,7 @@ METHOD _Init() CLASS THixServer
 
    ENDIF
 
-   slProxied := UConfig( "server", "mode", HIX_MODE_STANDALONE ) == HIX_MODE_PROXIED
+   _HixServerSetProxied( UConfig( "server", "mode", HIX_MODE_STANDALONE ) == HIX_MODE_PROXIED )
 
    IF ::lOwnsGlobals
 
@@ -455,6 +467,8 @@ METHOD _Init() CLASS THixServer
          " file=" + UConfig( "access_log", "file", "access.log" ) )
       HIX_MetricsInit()
       HIX_BootLogAdd( "server", "init", .T., "metrics" )
+
+      _HixStartWdoMetrics()
 
    ENDIF
 
@@ -621,7 +635,9 @@ METHOD _AcceptLoop() CLASS THixServer
 
    DO WHILE ::lRunning
 
-      hConn := hb_socketAccept( ::hSocket, @aAddr, 1000 )
+      // A2.01 — accept con timeout corto (100 ms) para que la señal de
+      // stop propague en < 200 ms tras HIX_ServerRequestStop().
+      hConn := hb_socketAccept( ::hSocket, @aAddr, 100 )
 
       IF Empty( hConn )
 
@@ -631,7 +647,7 @@ METHOD _AcceptLoop() CLASS THixServer
 
          ENDIF
 
-         IF slStopRequested
+         IF _HixServerStopRequested()
 
             EXIT
 
@@ -655,8 +671,10 @@ METHOD _AcceptLoop() CLASS THixServer
 
       IF lSSL
 
-         // SSL: handshake en el worker para no bloquear el accept loop
-         lOk := ::oPoolHTTP:Dispatch( { hConn, cIP, ::oSrvSocket } )
+         // SSL: handshake en el worker para no bloquear el accept loop.
+         // [B1.W5] pasamos Self para que el worker HTTP pueda re-despachar
+         // a oPoolWS / oPoolOtros tras clasificar el protocolo post-TLS.
+         lOk := ::oPoolHTTP:Dispatch( { hConn, cIP, ::oSrvSocket, Self } )
 
          IF ! lOk
 
@@ -738,7 +756,8 @@ METHOD _FlushRouteQueue() CLASS THixServer
       DO CASE
 
          CASE aItem[ 1 ] == "route"
-            HIX_RouteAdd( aItem[ 2 ], aItem[ 3 ], aItem[ 4 ], aItem[ 5 ], aItem[ 6 ], aItem[ 7 ], aItem[ 8 ] )
+            HIX_RouteAdd( aItem[ 2 ], aItem[ 3 ], aItem[ 4 ], aItem[ 5 ], aItem[ 6 ], aItem[ 7 ], aItem[ 8 ], .F., ;
+               iif( Len( aItem ) >= 9, aItem[ 9 ], .F. ) )
          CASE aItem[ 1 ] == "group"
             HIX_RouteGroup( aItem[ 2 ], aItem[ 3 ], aItem[ 4 ], aItem[ 5 ], Self )
 
@@ -753,11 +772,12 @@ RETURN Self
 // ============================================================
 // API de rutas — encolan si el router no está listo, o añaden directamente
 // ============================================================
-METHOD AddRoute( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo ) CLASS THixServer
+METHOD AddRoute( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, lStream ) CLASS THixServer
 
    hb_default( @cMethod, "*" )
    hb_default( @cMw,     ""  )
    hb_default( @cScope,  ""  )
+   hb_default( @lStream, .F. )
 
    IF ValType( bAction ) == "C" .AND. HIX_IsFilePath( bAction )
 
@@ -769,9 +789,9 @@ METHOD AddRoute( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo ) CLASS 
 
    IF HIX_RoutesIsInit()
 
-      HIX_RouteAdd( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo )
+      HIX_RouteAdd( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, .F., lStream )
    ELSE
-      AAdd( ::aRouteQueue, { "route", cName, cPattern, bAction, cMethod, cMw, cScope, uCargo } )
+      AAdd( ::aRouteQueue, { "route", cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, lStream } )
 
    ENDIF
 
@@ -893,17 +913,17 @@ METHOD ShowRoutePermissions() CLASS THixServer
 
 RETURN Self
 
-METHOD AddRouteGet( cName, cPattern, bAction, cMw, cScope, uCargo ) CLASS THixServer
-RETURN ::AddRoute( cName, cPattern, bAction, "GET",    cMw, cScope, uCargo )
+METHOD AddRouteGet( cName, cPattern, bAction, cMw, cScope, uCargo, lStream ) CLASS THixServer
+RETURN ::AddRoute( cName, cPattern, bAction, "GET",    cMw, cScope, uCargo, lStream )
 
-METHOD AddRoutePost( cName, cPattern, bAction, cMw, cScope, uCargo ) CLASS THixServer
-RETURN ::AddRoute( cName, cPattern, bAction, "POST",   cMw, cScope, uCargo )
+METHOD AddRoutePost( cName, cPattern, bAction, cMw, cScope, uCargo, lStream ) CLASS THixServer
+RETURN ::AddRoute( cName, cPattern, bAction, "POST",   cMw, cScope, uCargo, lStream )
 
-METHOD AddRoutePut( cName, cPattern, bAction, cMw, cScope, uCargo ) CLASS THixServer
-RETURN ::AddRoute( cName, cPattern, bAction, "PUT",    cMw, cScope, uCargo )
+METHOD AddRoutePut( cName, cPattern, bAction, cMw, cScope, uCargo, lStream ) CLASS THixServer
+RETURN ::AddRoute( cName, cPattern, bAction, "PUT",    cMw, cScope, uCargo, lStream )
 
-METHOD AddRouteDelete( cName, cPattern, bAction, cMw, cScope, uCargo ) CLASS THixServer
-RETURN ::AddRoute( cName, cPattern, bAction, "DELETE", cMw, cScope, uCargo )
+METHOD AddRouteDelete( cName, cPattern, bAction, cMw, cScope, uCargo, lStream ) CLASS THixServer
+RETURN ::AddRoute( cName, cPattern, bAction, "DELETE", cMw, cScope, uCargo, lStream )
 
 METHOD DeleteRoute( cName ) CLASS THixServer
 
@@ -957,6 +977,7 @@ STATIC FUNCTION ShowInit( oSrv )
    LOCAL cTitle   := "Hix server vrs. " + HIX_VERSION_SERVER + HIX_SUBVERSION_SERVER + " => Running on " + cDomain
    LOCAL cLang    := hb_oemtoansi(hb_langName()) + ', ' + hb_SetCodePage() + '/' + hb_cdpUniID( hb_SetCodePage() )
    LOCAL nRow, cI := ''
+   LOCAL hWdoInfo
    
    if nPort <> 80 
       cTitle += ':' + ltrim(str(nPort))
@@ -1005,11 +1026,18 @@ STATIC FUNCTION ShowInit( oSrv )
    HIX_Info( @nRow, 'Version HIX'			, 'HIX ' + HIX_VERSION_SERVER + HIX_SUBVERSION_SERVER + ' ' + HIX_DATECOMPILE() )
 	HIX_Info( @nRow, 'Version Harbour'		, VERSION() + ' / ' + HB_BUILDDATE() )
 	HIX_Info( @nRow, 'Version OpenSSL' 	, SSLEAY_VERSION( HB_SSLEAY_VERSION ) )
-	HIX_Info( @nRow, 'Version Curl'    	, Curl_version() )
-	HIX_Info( @nRow, 'Version HaruPdf' 	, HPDF_VERSION_TEXT() )
+	HIX_Info( @nRow, 'Version Curl'    	, HIX_OptFunc( "CURL_VERSION",      "n/a (hbcurl not linked)" ) )
+	HIX_Info( @nRow, 'Version HaruPdf' 	, HIX_OptFunc( "HPDF_VERSION_TEXT", "n/a (hbhpdf not linked)" ) )
 	HIX_Info( @nRow, 'Version Compiler'	, HB_COMPILER() )
 	HIX_Info( @nRow, 'RDD List' 			   , cI )
 	HIX_Info( @nRow, 'RDD Default'        , RddSetDefault() )
+	IF ! Empty( WDO_Loaded() )
+	   HIX_Info( @nRow, 'WDO Loaded'      , WDO_Loaded() )
+	   hWdoInfo := WDO_InfoList()
+	   FOR EACH cI IN hb_HKeys( hWdoInfo )
+	      HIX_Info( @nRow, cI             , hWdoInfo[ cI ] )
+	   NEXT
+	ENDIF
 	HIX_Info( @nRow, 'Language/Codepage' 	, cLang )
    
 	nRow++
@@ -1068,6 +1096,24 @@ FUNCTION HIX_Navigator()
 RETURN NIL
 
 
+// ============================================================
+// HIX_OptFunc — call an optional Harbour function by name.
+// Returns cFallback if the function is not linked. Used to keep
+// the boot banner rendering when optional contribs (hbcurl,
+// hbhpdf) are absent.
+// ============================================================
+FUNCTION HIX_OptFunc( cName, cFallback )
+
+   LOCAL xResult
+
+   BEGIN SEQUENCE WITH {|oErr| Break( oErr ) }
+      xResult := Do( cName )
+   RECOVER
+      xResult := cFallback
+   END SEQUENCE
+
+RETURN xResult
+
 FUNCTION HIX_Version() ; RETU HIX_VERSION_SERVER
 FUNCTION HIX_SubVersion() ; RETU HIX_SUBVERSION_SERVER
 
@@ -1101,6 +1147,32 @@ RETURN cOut
 
 // Construye la ruta de un log a partir de paths.log + nombre.
 // Si cFile ya contiene separador (path explicito) se devuelve tal cual.
+//  Opt-in WDO metrics via www/config.json → sets.wdo_metrics=true.
+//  Zero overhead when disabled (WDO_Metric* fast-path bails on soMetrics==NIL).
+STATIC FUNCTION _HixStartWdoMetrics()
+
+   LOCAL hSets
+   LOCAL lEnabled := .F.
+   LOCAL nTopN
+
+   hSets := HIX_ConfigApp( "sets", NIL )
+
+   IF HB_ISHASH( hSets )
+      lEnabled := hb_HGetDef( hSets, "wdo_metrics", .F. )
+   ENDIF
+
+   IF ! lEnabled
+      RETURN NIL
+   ENDIF
+
+   nTopN := hb_HGetDef( hSets, "wdo_metrics_top_n", 10 )
+   WDO_MetricsSetTopN( nTopN )
+   WDO_MetricsInit()
+   HIX_BootLogAdd( "server", "init", .T., "wdo_metrics top_n=" + hb_NToS( nTopN ) )
+
+RETURN NIL
+
+
 STATIC FUNCTION _HixLogPath( cFile )
 
    LOCAL cDir
@@ -1167,8 +1239,9 @@ RETURN hb_LeftEq( cPath, "/hix-" )
 STATIC FUNCTION _HixCheckDormantHixstyle()
 
    LOCAL cRoot, cCfg
+   LOCAL lDormant := .F.
 
-   slDormantHixstyle := .F.
+   _HixServerSetDormantHixstyle( .F. )
 
    IF UConfig( "hixstyle", "enabled", .F. )
 
@@ -1181,14 +1254,15 @@ STATIC FUNCTION _HixCheckDormantHixstyle()
 
    IF hb_FileExists( cCfg )
 
-      slDormantHixstyle := .T.
+      lDormant := .T.
+      _HixServerSetDormantHixstyle( .T. )
       lw( _( "HIXSTYLE_DORMANT_WARN", cCfg ) )
       HIX_BootLogAdd( "server", "hixstyle", .F., "dormant", ;
          _( "HIXSTYLE_DORMANT_LOG" ) )
 
    ENDIF
 
-RETURN slDormantHixstyle
+RETURN lDormant
 
 // ============================================================
 // HIX_HixstyleDormant -- .T. si el arranque detecto www/config.json
@@ -1196,7 +1270,7 @@ RETURN slDormantHixstyle
 // pintar un hint amistoso en 403 (solo en app.env=dev).
 // ============================================================
 FUNCTION HIX_HixstyleDormant()
-RETURN slDormantHixstyle
+RETURN _HixServerDormantHixstyle()
 
 static function HIX_Info( nRow, cCode, cValue, nCol )
 
@@ -1215,7 +1289,7 @@ retu nil
 
 FUNCTION HIX_ServerRequestStop()
 
-   slStopRequested := .T.
+   _HixServerSetStopRequested( .T. )
 
 RETURN NIL
 
@@ -1224,17 +1298,21 @@ RETURN NIL
 // Se aplica a todos los servers del proceso (principal + sub-servers).
 FUNCTION HIX_SetLifecycleHook( bBlock )
 
-   sbLifecycle := bBlock
+   _HixServerSetLifecycle( bBlock )
 
 RETURN NIL
 
 STATIC PROCEDURE _LC( cState, cLabel )
 
-   IF sbLifecycle != NIL
+   LOCAL bHook := _HixServerLifecycle()
+
+   // Eval FUERA del lock — evita deadlock si el hook llama a HIX_ServerIsRunning
+   // u otro getter que también toma shServerMutex.
+   IF bHook != NIL
 
       TRY
 
-         Eval( sbLifecycle, cState, cLabel )
+         Eval( bHook, cState, cLabel )
       CATCH
 
       END
@@ -1257,43 +1335,137 @@ STATIC FUNCTION _FmtElapsed( nT0 )
 RETURN LTrim( Str( nMs / 1000, 0, 1 ) ) + "s"
 
 FUNCTION HIX_ServerIsRunning()
-RETURN ! slStopRequested
+RETURN ! _HixServerStopRequested()
 
 FUNCTION HIX_IsProxied()
-RETURN slProxied
+RETURN _HixServerProxied()
+
+// ============================================================
+// A2.01 — Getters/setters sincronizados de STATIC lifecycle.
+// Todos toman shServerMutex antes de leer/escribir. El getter de
+// sbLifecycle devuelve el codeblock (o NIL); el caller evalua fuera
+// del lock para evitar deadlock por reentrada.
+// ============================================================
+STATIC FUNCTION _HixServerStopRequested()
+   LOCAL lVal
+   hb_mutexLock( shServerMutex )
+   lVal := slStopRequested
+   hb_mutexUnlock( shServerMutex )
+RETURN lVal
+
+STATIC PROCEDURE _HixServerSetStopRequested( lVal )
+   hb_mutexLock( shServerMutex )
+   slStopRequested := lVal
+   hb_mutexUnlock( shServerMutex )
+RETURN
+
+STATIC FUNCTION _HixServerProxied()
+   LOCAL lVal
+   hb_mutexLock( shServerMutex )
+   lVal := slProxied
+   hb_mutexUnlock( shServerMutex )
+RETURN lVal
+
+STATIC PROCEDURE _HixServerSetProxied( lVal )
+   hb_mutexLock( shServerMutex )
+   slProxied := lVal
+   hb_mutexUnlock( shServerMutex )
+RETURN
+
+STATIC FUNCTION _HixServerLifecycle()
+   LOCAL bHook
+   hb_mutexLock( shServerMutex )
+   bHook := sbLifecycle
+   hb_mutexUnlock( shServerMutex )
+RETURN bHook
+
+STATIC PROCEDURE _HixServerSetLifecycle( bHook )
+   hb_mutexLock( shServerMutex )
+   sbLifecycle := bHook
+   hb_mutexUnlock( shServerMutex )
+RETURN
+
+STATIC FUNCTION _HixServerDormantHixstyle()
+   LOCAL lVal
+   hb_mutexLock( shServerMutex )
+   lVal := slDormantHixstyle
+   hb_mutexUnlock( shServerMutex )
+RETURN lVal
+
+STATIC PROCEDURE _HixServerSetDormantHixstyle( lVal )
+   hb_mutexLock( shServerMutex )
+   slDormantHixstyle := lVal
+   hb_mutexUnlock( shServerMutex )
+RETURN
+
+// ============================================================
+// Test hooks A2.01 — wrappers publicos para invocar los helpers
+// STATIC desde tests unitarios (no forman parte del API publico).
+// ============================================================
+FUNCTION HIX_ServerStopRequestedForTest()
+RETURN _HixServerStopRequested()
+
+FUNCTION HIX_ServerProxiedForTest()
+RETURN _HixServerProxied()
+
+FUNCTION HIX_ServerDormantHixstyleForTest()
+RETURN _HixServerDormantHixstyle()
+
+FUNCTION HIX_ServerSetDormantHixstyleForTest( lVal )
+   _HixServerSetDormantHixstyle( lVal )
+RETURN NIL
+
+FUNCTION HIX_ServerLifecycleForTest()
+RETURN _HixServerLifecycle()
+
+FUNCTION HIX_ServerMutexReadyForTest()
+RETURN shServerMutex != NIL
+
+FUNCTION HIX_ServerRequestStopClearForTest()
+   _HixServerSetStopRequested( .F. )
+RETURN NIL
+
+FUNCTION HIX_LifecycleEmitForTest( cState, cLabel )
+   _LC( cState, cLabel )
+RETURN NIL
 
 // --------------------------------------------------------- //
 
-#pragma BEGINDUMP 
+#pragma BEGINDUMP
 
-#include <Windows.h>
+#include <string.h>
+#include <stdio.h>
 #include <hbapi.h>
 #include <hbapiitm.h>
 
+#ifdef _MSC_VER
+#pragma warning( disable : 4996 )
+#endif
+
 HB_FUNC( HIX_DATECOMPILE )
 {
-   char *pszVersion = (char *) hb_xgrab( 80 );
-   char szDate[12] = {0}, szTime[9] = {0};
-   int year, month = 0, day, hour, minute;
-   const char *months[] = {
+   char * pszVersion = ( char * ) hb_xgrab( 80 );
+   char szDate[ 12 ] = { 0 }, szTime[ 9 ] = { 0 };
+   int year = 0, month = 0, day = 0, hour = 0, minute = 0;
+   const char * months[] = {
       "Jan", "Feb", "Mar", "Apr", "May", "Jun",
       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
    };
 
-   strncpy_s( szDate, sizeof(szDate), __DATE__, _TRUNCATE );
-   strncpy_s( szTime, sizeof(szTime), __TIME__, _TRUNCATE );
+   memcpy( szDate, __DATE__, sizeof( szDate ) - 1 );
+   memcpy( szTime, __TIME__, sizeof( szTime ) - 1 );
 
-   sscanf_s( szDate + 7, "%d", &year );
-   sscanf_s( szDate + 4, "%d", &day );
+   sscanf( szDate + 7, "%d", &year );
+   sscanf( szDate + 4, "%d", &day );
 
    for( month = 0; month < 12; ++month )
    {
-      if( strncmp( szDate, months[month], 3 ) == 0 )
+      if( strncmp( szDate, months[ month ], 3 ) == 0 )
          break;
    }
    month += 1;
 
-   sscanf_s( szTime, "%d:%d", &hour, &minute );
+   sscanf( szTime, "%d:%d", &hour, &minute );
 
    hb_snprintf( pszVersion, 80, "(r%02d%02d%02d%02d%02d)", year % 100, month, day, hour, minute );
 

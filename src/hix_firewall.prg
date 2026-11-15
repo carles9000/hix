@@ -89,8 +89,19 @@ RETURN ! lInRanges
 FUNCTION HIX_IPAddr2Num( cIP )
 
    LOCAL aMatch, nI, nIp, aWords, nHext, nWordIdx
-   LOCAL n1, n2, n3, n4, cFullHex
+   LOCAL n1, n2, n3, n4, cFullHex, nAt
    LOCAL cRegexIPv4 := "^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$"
+
+   // [A3.2.2] normalizar formato IPv6 antes de parsear:
+   // - scope ID: fe80::1%eth0 → fe80::1  (bypass por _HixFwHexToNum parando en %)
+   // - URI brackets: [::1] → ::1  (formato RFC 2732 en URLs)
+   nAt := At( "%", cIP )
+   IF nAt > 1
+      cIP := Left( cIP, nAt - 1 )
+   ENDIF
+   IF Left( cIP, 1 ) == "[" .AND. Right( cIP, 1 ) == "]"
+      cIP := SubStr( cIP, 2, Len( cIP ) - 2 )
+   ENDIF
 
    aMatch := hb_regex( cRegexIPv4, cIP )
 

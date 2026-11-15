@@ -615,33 +615,38 @@ METHOD Update( nRecno, hFields, cError ) CLASS HIX_DBF
 
    IF ::Rlock()
 
-
       lUpdate := .T.
 
       HB_HCaseMatch( hFields, .F. )
 
-      FOR n :=  1 TO len( hFields )
+      // [A3.4.10] FINALLY garantiza DbUnlock aunque FieldPut/ThrowError lance
+      TRY
 
+         FOR n :=  1 TO len( hFields )
 
-         h := HB_HPairAt( hFields, n )
+            h := HB_HPairAt( hFields, n )
 
-         nPos := ( ::cAlias )->( FieldPos( h[ 1 ] ) )
+            nPos := ( ::cAlias )->( FieldPos( h[ 1 ] ) )
 
+            TRY
 
-         try
+               ( ::cAlias )->( Fieldput( nPos, h[ 2 ] ) )
 
-            ( ::cAlias )->( Fieldput( nPos, h[ 2 ] ) )
+            CATCH oError
 
-         catch oError
+               ::THROWERROR( oError )
 
-            ::THROWERROR( oError )
+            END
 
-         END
+         NEXT
 
-      NEXT
+         ( ::cAlias )->( DbCommit() )
 
-      ( ::cAlias )->( DbCommit() )
-      ( ::cAlias )->( DbUnlock() )
+      FINALLY
+
+         ( ::cAlias )->( DbUnlock() )
+
+      END
 
    ELSE
       cError := _( 'DBF_ERR_LOCK' )
@@ -674,7 +679,7 @@ METHOD Insert( hFields, cError, nRecno  ) CLASS HIX_DBF
 
 METHOD NewAlias( cAlias ) CLASS HIX_DBF
 
-   LOCAL cNewAlias, nArea := 1
+   LOCAL cNewAlias, cThreadTag, nArea := 1
 
    IF Empty( cAlias )
 
@@ -682,7 +687,16 @@ METHOD NewAlias( cAlias ) CLASS HIX_DBF
 
    ENDIF
 
-   WHILE Select( cNewAlias := ( cAlias + ;
+   // [A2.09] Prefijar con id de thread (6 hex, low bits) para hacer
+   // aliases globalmente unicos entre workareas de distintos hilos.
+   // Los workareas ya son thread-local en Harbour MT, pero este cambio
+   // elimina ambiguedad en diagnostico, trazas y codigo productivo que
+   // asume unicidad global. El WHILE-Select sigue como salvaguarda por
+   // si por colision hex el alias ya existiera en este thread.
+   cThreadTag := PadL( hb_NumToHex( hb_threadID() ), 6, "0" )
+   cThreadTag := Right( cThreadTag, 6 )
+
+   WHILE Select( cNewAlias := ( cAlias + cThreadTag + "_" + ;
          StrZero( nArea++, 3 ) ) ) != 0
 
    END
@@ -824,7 +838,8 @@ METHOD FieldPut( ncField, uValue ) CLASS HIX_DBF
 
 METHOD RLock( xIdentidad ) CLASS HIX_DBF
 
-   LOCAL nlapsus := 0
+   // [A3.4.11] Inicializar nLapsus con el timeout completo (0 hacia siempre EXIT en 1a iter)
+   LOCAL nLapsus := ::nTime
    LOCAL lRlock  := .F.
    LOCAL nIni
 
@@ -840,13 +855,15 @@ METHOD RLock( xIdentidad ) CLASS HIX_DBF
 
       lRlock := ( ::cAlias )->( DbRlock( xIdentidad ) )
 
-      IF !Neterr() .OR. ( nLapsus == 0 )
-
+      IF ! Neterr()
          EXIT
-
       ENDIF
 
-      nLapsus := ::nTime - ( seconds() - nIni )
+      nLapsus := ::nTime - ( Seconds() - nIni )
+
+      IF nLapsus > 0
+         hb_idleSleep( 0.001 )   // [A3.4.11] evitar spinlock 100% CPU bajo contention
+      ENDIF
 
    END
 

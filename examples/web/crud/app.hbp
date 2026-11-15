@@ -1,58 +1,34 @@
+# ============================================================
+# app.hbp — Example HIX CRUD app
+# ============================================================
+
 -n
 -w1
 -es2
 -inc
 -head=full
 -mt
--ic:\hix.project\hix.pro\src\include
--workdir=.hbmk/${hb_compiler}
+-workdir=.hbmk/${hb_compiler}/app
 
 -hbexe
 -oapp
 
 # Main
 src/app.prg
-src/appconfig.prg
-src/appmiddleware.prg
-
 
 # Resources file
 {msvc64}app.res
 {mingw64}app.rc
 
 
-# Libs
--L${hix}
--lhix_server
+{win}${hix}\hix_server.hbx
+{win}c:\harbour\include\harbour.hbx
+{win}c:\harbour\contrib\hbcurl\hbcurl.hbx
+{win}c:\harbour\contrib\hbhpdf\hbhpdf.hbx
 
-${hix}\hix_server.hbx
-c:\harbour\include\harbour.hbx
+{unix}${hix}/hix_server.hbx
+{unix}${hb_inc}/harbour.hbx
+{unix}${hb_root}/contrib/hbcurl/hbcurl.hbx
+{unix}${hb_root}/contrib/hbhpdf/hbhpdf.hbx
 
-# OpensSSL
--lhbssl
--lhbssls
-{msvc64}-llibcrypto-4-x64
-{msvc64}-llibssl-4-x64
-{mingw64}-ldflag=-l:libcrypto-4-x64.dll
-{mingw64}-ldflag=-l:libssl-4-x64.dll
-
-# Curl
-{msvc64}-lhbcurl
-{msvc64}-llibcurl-x64
-{mingw64}-lhbcurl
-{mingw64}-ldflag=-l:libcurl-x64.dll
-
-# PDF
-{msvc64}hbhpdf.hbc
-{mingw64}-lhbhpdf
-{mingw64}-llibhpdf
-{mingw64}-lpng
-
-# WAPI_OutputDebugString()
--lhbwin
--lxhb
--lhbct
-
-{msvc64}-ldflag=/NODEFAULTLIB:libucrt
-{msvc64}-ldflag=/NODEFAULTLIB:msvcrt
-{msvc64}-lucrt
+${hix}/hix_server.hbc

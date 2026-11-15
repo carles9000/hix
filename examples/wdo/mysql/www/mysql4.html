@@ -1,0 +1,82 @@
+@view 'header.html', 'WDO MySql', 'Prepare + loop — bulk insert reusing the same statement'
+
+@prg
+
+   //  ------------------------------------------------------------
+   //  Canonical re-Execute pattern: Prepare once, Execute N times
+   //  with different values. The server parses the SQL only once
+   //  and each iteration only sends SET @pN + EXECUTE.
+   //
+   //  A temporary table keeps the example idempotent: every refresh
+   //  starts clean and displays the 20 inserted rows.
+   //  ------------------------------------------------------------
+
+   LOCAL oConn := WDO_Get( "MYSQL" )
+   LOCAL oStmt, aRows, i, nT0, nElapsed
+   LOCAL cTbl  := "hix_demo_bulk"
+   LOCAL nRows := 20
+
+   IF oConn == NIL
+      ? 'Error: pool not registered or Acquire timeout'
+      RETU NIL
+   ENDIF
+
+   //  1) Clean table
+   oConn:Exec( "DROP TABLE IF EXISTS " + cTbl )
+   oConn:Exec( "CREATE TABLE " + cTbl + " ( " + ;
+               "  id     INT AUTO_INCREMENT PRIMARY KEY, " + ;
+               "  name   VARCHAR(60), " + ;
+               "  score  INT, " + ;
+               "  note   VARCHAR(120) )" )
+
+   //  2) Prepare once
+   oStmt := oConn:Prepare( "INSERT INTO " + cTbl + " (name, score, note) " + ;
+                           "VALUES (?, ?, ?)" )
+
+   IF oStmt:lError
+      ? '<b>Prepare error:</b> ' + oStmt:cError
+      oStmt:Free()
+      oConn:Close()
+      RETU NIL
+   ENDIF
+
+   ?? '<h3>1) Bulk insert — <code>' + hb_NToS( nRows ) + '</code> Execute calls on the same Prepare</h3>'
+
+   //  3) Loop: only BindParam + Execute change each iteration
+   nT0 := hb_MilliSeconds()
+
+   FOR i := 1 TO nRows
+      oStmt:BindParam( 1, "user_" + StrZero( i, 3 ),       "s" )
+      oStmt:BindParam( 2, 100 + ( i * 3 ),                  "i" )
+      oStmt:BindParam( 3, "row generated at " + Time(),     "s" )
+      oStmt:Execute()
+
+      IF oStmt:lError
+         ? '<b>Execute error #' + hb_NToS( i ) + ':</b> ' + oStmt:cError
+         EXIT
+      ENDIF
+   NEXT
+
+   nElapsed := hb_MilliSeconds() - nT0
+
+   oStmt:Free()      // DEALLOCATE PREPARE on the server
+
+   ? '<pre>' + hb_NToS( nRows ) + ' rows inserted in ' + ;
+     hb_NToS( nElapsed ) + ' ms  (' + ;
+     hb_NToS( Int( ( nRows * 1000 ) / Max( nElapsed, 1 ) ) ) + ' rows/s)</pre>'
+
+   //  4) Visual verification of the resulting table
+   ?? '<h3>2) Contents of <code>' + cTbl + '</code></h3>'
+
+   oStmt := oConn:Query( "SELECT id, name, score, note FROM " + cTbl + " ORDER BY id" )
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+
+   ?? oConn:View( aRows,, 'Bulk insert result' )
+
+   //  5) Cleanup
+   oConn:Exec( "DROP TABLE IF EXISTS " + cTbl )
+
+   oConn:Close()
+
+@endprg

@@ -42,11 +42,15 @@ RETURN NIL
 STATIC FUNCTION _ViewCacheGet( cKey, cFile )
 
    LOCAL hEntry, tNow, tCached, oHrb, nEntries, nBytes, lHit
+   LOCAL cMd5Now   // [A4.06] hash de contenido para invalidacion sub-ms
 
    IF s_hViewMtx == NIL ; RETURN NIL ; ENDIF
 
-   lHit := .F.
-   tNow := hb_vfTimeGet( cFile )
+   lHit    := .F.
+   tNow    := hb_vfTimeGet( cFile )
+   // Leer y hashear fuera del lock (I/O pesado)
+   cMd5Now := hb_MD5( hb_MemoRead( cFile ) )
+
    hb_mutexLock( s_hViewMtx )
 
    IF hb_HHasKey( s_hViewCache, cKey )
@@ -54,7 +58,9 @@ STATIC FUNCTION _ViewCacheGet( cKey, cFile )
       hEntry  := s_hViewCache[ cKey ]
       tCached := hEntry[ "mtime" ]
 
-      IF tNow == tCached
+      // [A4.06] mtime Y md5 deben coincidir: dos writes en el mismo ms
+      //         tienen el mismo mtime pero distinto hash de contenido.
+      IF tNow == tCached .AND. cMd5Now == hEntry[ "md5" ]
 
          oHrb := hEntry[ "hrb" ]
          lHit := .T.
@@ -90,7 +96,9 @@ STATIC FUNCTION _ViewCachePut( cKey, oHrb, cFile )
    IF s_hViewMtx == NIL ; RETURN NIL ; ENDIF
 
    hb_mutexLock( s_hViewMtx )
-   s_hViewCache[ cKey ] := { "hrb" => oHrb, "mtime" => hb_vfTimeGet( cFile ) }
+   // [A4.06] Guardar mtime + md5 para invalidacion correcta sub-ms
+   s_hViewCache[ cKey ] := { "hrb" => oHrb, "mtime" => hb_vfTimeGet( cFile ), ;
+                              "md5" => hb_MD5( hb_MemoRead( cFile ) ) }
    s_nVCacheBytes       += Len( oHrb )
    nEntries := Len( s_hViewCache )
    nBytes   := s_nVCacheBytes

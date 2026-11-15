@@ -16,6 +16,12 @@ STATIC s_nDefaultTimeout := 30
 STATIC s_hBusMutex       := NIL
 STATIC s_hBus            := NIL   // hash: cChannel -> array de hMx
 
+// INIT PROCEDURE — inicializa mutex y bus antes de cualquier worker (B1.R5).
+INIT PROCEDURE _HixLpGlobalInit()
+   s_hBusMutex := hb_mutexCreate()
+   s_hBus      := hb_Hash()
+RETURN
+
 // ------------------------------------------------------------
 FUNCTION HIX_LongPollSetup( nTimeoutSec )
 
@@ -125,7 +131,9 @@ FUNCTION _HixLpWait( cChannel, nTimeoutSec )
    hb_mutexUnlock( s_hBusMutex )
 
    hb_mutexLock( hMx )
-   lGot := hb_mutexSubscribe( hMx, nTimeoutSec, @xData )
+   // [A2.12] pasar por HIX_TimeoutSec — floor de 1ms evita subscribe
+   // bloqueante si el caller manda 0 segundos.
+   lGot := hb_mutexSubscribe( hMx, HIX_TimeoutSec( nTimeoutSec * 1000 ), @xData )
    hb_mutexUnlock( hMx )
 
    hb_mutexLock( s_hBusMutex )
@@ -136,14 +144,7 @@ RETURN { lGot, xData }
 
 // ------------------------------------------------------------
 STATIC FUNCTION _HixLpInit()
-
-   IF s_hBusMutex == NIL
-
-      s_hBusMutex := hb_mutexCreate()
-      s_hBus      := hb_Hash()
-
-   ENDIF
-
+   // No-op: INIT PROCEDURE _HixLpGlobalInit ya garantiza la inicialización (B1.R5)
 RETURN NIL
 
 // Eliminar hMx del array del canal (llamar con s_hBusMutex bloqueado)

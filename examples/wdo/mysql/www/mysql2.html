@@ -1,0 +1,109 @@
+@view 'header.html', 'WDO MySql', 'Query example'
+
+@prg
+
+   LOCAL o := WDO_MySql():New( "localhost", "harbour", "hb1234", "employees", 3306, .F. )
+   LOCAL oStmt, oRs, aSt, aData, n
+
+   o:bError := {| oErr | MyError( oErr ) }
+
+   o:Open()
+
+
+   ?? "<b>==> Generate error</b>"
+   ?  "<b>==> Query( 'select * from ZZZ ') </b>"
+
+   oStmt := o:Query( "select * from zzz " )
+
+   IF oStmt != NIL .AND. ! oStmt:lError
+      oStmt:Free()
+   ENDIF
+
+   ?? "<hr><b>==> Fetch_Assoc  Query( 'select emp_no, first_name, last_name, gender, hire_date from employees where hire_date &gt; ''2000-01-01'' limit 10 ')</b>"
+   ?? "<pre>"
+
+   oStmt := o:Query( "select emp_no, first_name, last_name, gender, hire_date from employees where hire_date > '2000-01-01' limit 10" )
+
+   IF oStmt != NIL .AND. ! oStmt:lError
+
+      DO WHILE ! Empty( oRs := oStmt:Fetch_Assoc() )
+
+         ? oRs[ 'emp_no' ], oRs[ 'first_name' ], oRs[ 'last_name' ] + ;
+           '  (' + oRs[ 'gender' ] + ', hired ' + oRs[ 'hire_date' ] + ')'           
+      ENDDO
+
+      oStmt:Free()
+
+   ENDIF
+
+   ?? "</pre>"
+
+   ? "<hr><b>==> DbStruct()</b>"
+
+   oStmt := o:Query( "select * from employees limit 1" )
+
+   IF oStmt != NIL .AND. ! oStmt:lError
+
+      aSt := oStmt:DbStruct()
+      
+      ?? o:View( aSt, { 'Field', 'Type', 'Len', 'Dec' } )
+
+      oStmt:Free()
+
+   ENDIF
+
+   ? "<hr><b>==> FetchAll Query( 'select emp_no, first_name, last_name, gender, hire_date from employees where hire_date &gt; ''2000-01-01'' limit 10') </b>"
+
+   oStmt := o:Query( "select emp_no, first_name, last_name, gender, hire_date from employees where hire_date > '2000-01-01' limit 10" )
+
+   IF oStmt != NIL .AND. ! oStmt:lError
+
+      aData := oStmt:FetchAll( .T. )
+
+      oStmt:Free()
+
+      ?? o:View( aData,, 'Employees hired after 2000' )
+
+   ENDIF
+
+
+   o:End()
+
+
+FUNCTION MyError( oErr )
+
+   LOCAL cHtml := ''
+
+   BLOCK TO cHtml PARAMS oErr
+      <br>
+      <style>
+         .mybox {
+            background-color:lightgray;
+            border:1px solid gray;
+            padding:20px;
+            box-shadow: 5px 5px 5px gray;
+            border-radius: 10px;
+            margin: 10px;         
+         }
+         
+         h6 { 
+            text-align: right;
+            margin: 0;
+            font-style: italic;
+         }
+      </style>
+      <div class="mybox">
+      <h3><b>My Errorsys handler...</b></h3>
+      <h4><$ oErr:description $></h4>
+      <h5>Operation: <$ oErr:operation $></h5>
+      <h5>Subsystem: <$ oErr:subSystem $> — SubCode: <$ hb_NToS(oErr:subCode) $></h5>
+      <hr>
+      <h6>Log: <$ dtoc(date()) + ' ' + time() $></h6>
+      </div>
+   ENDTEXT
+
+   ?? cHtml
+
+RETU nil
+
+@endprg

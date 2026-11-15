@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>	
+   <meta charset='utf-8'>
+   <title>HIX</title>  
+   <link rel='shortcut icon' type='image/png' href='https://raw.githubusercontent.com/carles9000/hix/refs/heads/main/resources/images/hix.ico' />
+   <link href="https://fonts.googleapis.com/css2?family=BBH+Sans+Bartle&family=Saira+Stencil+One&display=swap" rel="stylesheet">  
+   
+	<link rel="stylesheet" href="/public/css/logo.css">	
+</head>
+   <style>
+       html, body {
+         margin: 0;
+         padding: 0;
+         height: 100%;      
+         font-family: 'Saira Stencil One', sans-serif;         
+       }
+       
+       p { 
+         font-size: 10rem; 
+         text-shadow: 2px 2px 4px rgb(0 0 0);
+         cursor: pointer;
+         display: inline-block;
+         transform-origin: center;
+         animation: heartbeat 2.4s ease-in-out infinite;
+       }
+
+       @keyframes heartbeat {
+          0%   { transform: scale(1);    }
+          14%  { transform: scale(1.09); }
+          28%  { transform: scale(1);    }
+          42%  { transform: scale(1.06); }
+          60%  { transform: scale(1);    }
+          100% { transform: scale(1);    }
+       }
+
+       @media (prefers-reduced-motion: reduce) {
+          p { animation: none; }
+       }
+   </style>
+
+<body>    
+
+   <!--<a href="main"><img src="/public/images/hix.png" alt="Hix logo"></a>-->
+    
+   <p onclick="window.location.replace('/main')">HIX</p>
+
+</body>
+</html>

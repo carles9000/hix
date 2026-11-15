@@ -33,6 +33,7 @@ CLASS THixWsConn
    DATA cIP    INIT ""
    DATA oIO    INIT NIL
    DATA lClosed INIT .F.
+   DATA oMutex  INIT NIL   // audit A2.03 — protege lClosed + oIO
 
    METHOD New( oIO, cIP )
    METHOD Send( cData )
@@ -43,12 +44,16 @@ ENDCLASS
 
 METHOD New( oIO, cIP ) CLASS THixWsConn
 
-   ::oIO  := oIO
-   ::cIP  := cIP
+   ::oIO    := oIO
+   ::cIP    := cIP
+   ::oMutex := hb_mutexCreate()
 
 RETURN Self
 
+// Audit A2.03 — lock-check-write bajo mutex evita race con Close.
 METHOD Send( cData ) CLASS THixWsConn
+
+   hb_mutexLock( ::oMutex )
 
    IF ! ::lClosed
 
@@ -56,9 +61,13 @@ METHOD Send( cData ) CLASS THixWsConn
 
    ENDIF
 
+   hb_mutexUnlock( ::oMutex )
+
 RETURN Self
 
 METHOD SendBinary( cData ) CLASS THixWsConn
+
+   hb_mutexLock( ::oMutex )
 
    IF ! ::lClosed
 
@@ -66,9 +75,13 @@ METHOD SendBinary( cData ) CLASS THixWsConn
 
    ENDIF
 
+   hb_mutexUnlock( ::oMutex )
+
 RETURN Self
 
 METHOD Close() CLASS THixWsConn
+
+   hb_mutexLock( ::oMutex )
 
    IF ! ::lClosed
 
@@ -77,18 +90,24 @@ METHOD Close() CLASS THixWsConn
 
    ENDIF
 
+   hb_mutexUnlock( ::oMutex )
+
 RETURN Self
 
 // ============================================================
 // Registro global de callbacks WS
 // ============================================================
+
+// Audit A2.05 — mutex creado eager al arranque del proceso via
+// INIT PROCEDURE (main thread, antes de cualquier worker). Elimina el
+// lazy init con doble-write race de las versiones anteriores.
+INIT PROCEDURE _HixWsInit()
+
+   shMutexCb := hb_mutexCreate()
+
+RETURN
+
 FUNCTION HIX_WsSetCallbacks( bConnect, bMessage, bClose )
-
-   IF shMutexCb == NIL
-
-      shMutexCb := hb_mutexCreate()
-
-   ENDIF
 
    hb_mutexLock( shMutexCb )
    sbOnConnect := bConnect
@@ -102,17 +121,16 @@ STATIC FUNCTION _HixWsCallbacks()
 
    LOCAL aR
 
-   IF shMutexCb == NIL
-
-      RETURN { NIL, NIL, NIL }
-
-   ENDIF
-
    hb_mutexLock( shMutexCb )
    aR := { sbOnConnect, sbOnMessage, sbOnClose }
    hb_mutexUnlock( shMutexCb )
 
 RETURN aR
+
+// Public wrapper para tests A2.05 — snapshot atomico del estado de
+// callbacks WS. Aisla la STATIC _HixWsCallbacks para pruebas unitarias.
+FUNCTION HIX_WsGetCallbacks()
+RETURN _HixWsCallbacks()
 
 // ============================================================
 // HIX_WorkerWS — entry point desde pool WS (sin SSL / peek detectado)
@@ -149,7 +167,7 @@ RETURN NIL
 // ============================================================
 FUNCTION HIX_HandleWSUpgrade( oReq, cIP )
 
-   LOCAL oConn, aCb
+   LOCAL oConn, aCb, oError
 
    HIX_Metric( HIXM_ACTIVE_WS )
 
@@ -166,21 +184,23 @@ FUNCTION HIX_HandleWSUpgrade( oReq, cIP )
 
    l( _( "WS_CONNECTED", cIP ) )
 
-   IF aCb[ 1 ] != NIL
+   // Audit A2.04 — HIX_WsSafeEval envuelve cada callback en TRY/CATCH:
+   // un throw del handler de usuario NO debe abortar el cleanup
+   // (Close + MetricDec). Sin esto, un fallo en bOnConnect deja el
+   // socket colgado y active_ws envenenado.
+   HIX_WsSafeEval( aCb[ 1 ], { oConn }, "bOnConnect", cIP )
 
-      Eval( aCb[ 1 ], oConn )
-
-   ENDIF
-
-   _HixWSFrameLoop( oConn, aCb[ 2 ] )
+   // [B1.W3] TRY/CATCH garantiza bOnClose + MetricDec incluso si
+   // hb_socketGetFD(NIL) u otra excepción aborta el frame loop.
+   TRY
+      _HixWSFrameLoop( oConn, aCb[ 2 ] )
+   CATCH oError
+      le( "WS frame loop exception [" + cIP + "]: " + oError:description )
+   END
 
    l( _( "WS_DISCONNECTED", cIP ) )
 
-   IF aCb[ 3 ] != NIL
-
-      Eval( aCb[ 3 ], oConn )
-
-   ENDIF
+   HIX_WsSafeEval( aCb[ 3 ], { oConn }, "bOnClose", cIP )
 
    oConn:Close()
    HIX_MetricDec( HIXM_ACTIVE_WS )
@@ -216,13 +236,21 @@ RETURN oReq:oIO:Write( cResp )
 STATIC FUNCTION _HixWSFrameLoop( oConn, bOnMessage )
 
    LOCAL cFrame, nOpcode, lFin, cPayload
-   LOCAL lActive    := .T.
-   LOCAL oIO        := oConn:oIO
-   LOCAL cIP        := oConn:cIP
-   LOCAL nIdle      := 0
-   LOCAL lPingSent  := .F.
+   LOCAL lActive      := .T.
+   LOCAL oIO          := oConn:oIO
+   LOCAL cIP          := oConn:cIP
+   LOCAL nIdle        := 0
+   LOCAL lPingSent    := .F.
+   LOCAL tFrame
+   // [B1.W6.2] estado de fragmentación — RFC 6455 §5.4
+   LOCAL nFragOpcode := 0     // 0 = no fragmentando; WS_OP_TEXT/BINARY si activo
+   LOCAL cFragBuffer := ""
+   // [B1.W6.3] leer ping_interval_s / ping_timeout_s de pool_ws en config
+   LOCAL hPoolWs      := HIX_GetConfig( "pool_ws" )
+   LOCAL nPingInterval := hb_HGetDef( hPoolWs, "ping_interval_s", 30 )
+   LOCAL nPingTimeout  := hb_HGetDef( hPoolWs, "ping_timeout_s",  10 )
 
-   ld( "[WS] CONNECT fd=" + hb_NToS( hb_socketGetFD( oIO:hSocket ) ) + " ip=" + cIP )
+   ld( "[WS] CONNECT fd=" + hb_NToS( iif( oIO:hSocket != NIL, hb_socketGetFD( oIO:hSocket ), -1 ) ) + " ip=" + cIP )
 
    DO WHILE lActive
 
@@ -232,7 +260,7 @@ STATIC FUNCTION _HixWSFrameLoop( oConn, bOnMessage )
 
          IF oIO:lConnClosed
 
-            ld( "[WS] EXIT lConnClosed fd=" + hb_NToS( hb_socketGetFD( oIO:hSocket ) ) + " nIdle=" + hb_NToS( nIdle ) )
+            ld( "[WS] EXIT lConnClosed fd=" + hb_NToS( iif( oIO:hSocket != NIL, hb_socketGetFD( oIO:hSocket ), -1 ) ) + " nIdle=" + hb_NToS( nIdle ) )
             EXIT
 
          ENDIF
@@ -241,17 +269,17 @@ STATIC FUNCTION _HixWSFrameLoop( oConn, bOnMessage )
 
          IF lPingSent
 
-            IF nIdle > 10
+            IF nIdle > nPingTimeout
 
                ld( "WS: ping timeout - " + cIP )
                EXIT
 
             ENDIF
 
-         ELSEIF nIdle >= 30
-            ld( "[WS] SEND PING fd=" + hb_NToS( hb_socketGetFD( oIO:hSocket ) ) + " nIdle=" + hb_NToS( nIdle ) )
+         ELSEIF nIdle >= nPingInterval
+            ld( "[WS] SEND PING fd=" + hb_NToS( iif( oIO:hSocket != NIL, hb_socketGetFD( oIO:hSocket ), -1 ) ) + " nIdle=" + hb_NToS( nIdle ) )
 
-            IF ! _HixWSSendPing( oIO )
+            IF ! _HixWSSendPing( oConn )
 
                EXIT
 
@@ -278,26 +306,81 @@ STATIC FUNCTION _HixWSFrameLoop( oConn, bOnMessage )
       DO CASE
 
          CASE nOpcode == WS_OP_CLOSE
-            ld( "[WS] RECV CLOSE fd=" + hb_NToS( hb_socketGetFD( oIO:hSocket ) ) )
-            _HixWSSendClose( oIO )
-            ld( "[WS] SEND CLOSE fd=" + hb_NToS( hb_socketGetFD( oIO:hSocket ) ) )
+            // [B1.W6.2] frames de control NO pueden fragmentarse (FIN debe ser 1)
+            IF ! lFin
+               ld( "WS: fragmented control frame (CLOSE) — protocol error" )
+               _HixWSSendClose( oConn )
+               lActive := .F.
+               LOOP
+            ENDIF
+            ld( "[WS] RECV CLOSE fd=" + hb_NToS( iif( oIO:hSocket != NIL, hb_socketGetFD( oIO:hSocket ), -1 ) ) )
+            _HixWSSendClose( oConn )
+            ld( "[WS] SEND CLOSE fd=" + hb_NToS( iif( oIO:hSocket != NIL, hb_socketGetFD( oIO:hSocket ), -1 ) ) )
             lActive := .F.
          CASE nOpcode == WS_OP_PING
-            _HixWSSendPong( oIO, cPayload )
+            IF ! lFin
+               ld( "WS: fragmented control frame (PING) — protocol error" )
+               _HixWSSendClose( oConn )
+               lActive := .F.
+               LOOP
+            ENDIF
+            _HixWSSendPong( oConn, cPayload )
          CASE nOpcode == WS_OP_PONG
+            IF ! lFin
+               ld( "WS: fragmented control frame (PONG) — protocol error" )
+               _HixWSSendClose( oConn )
+               lActive := .F.
+               LOOP
+            ENDIF
             ld( "WS: pong from " + cIP )
          CASE nOpcode == WS_OP_TEXT .OR. nOpcode == WS_OP_BINARY
-            ld( "WS: data " + hb_NToS( Len( cPayload ) ) + "B from " + cIP )
-            HIX_Metric( HIXM_BYTES_IN, Len( cPayload ) )
-
-         IF bOnMessage != NIL
-
-            Eval( bOnMessage, oConn, cPayload, nOpcode )
-
+            // [B1.W6.2] nuevo mensaje: no puede llegar mientras hay fragmentación abierta
+            IF nFragOpcode != 0
+               ld( "WS: new data frame while fragmenting — protocol error" )
+               _HixWSSendClose( oConn )
+               lActive := .F.
+               LOOP
             ENDIF
-
+            IF lFin
+               ld( "WS: data " + hb_NToS( Len( cPayload ) ) + "B from " + cIP )
+               HIX_Metric( HIXM_BYTES_IN, Len( cPayload ) )
+               tFrame := hb_DateTime()
+               HIX_WsSafeEval( bOnMessage, { oConn, cPayload, nOpcode }, "bOnMessage", cIP )
+               HIX_MetricWsTiming( Int( ( hb_DateTime() - tFrame ) * 86400000 ) )
+            ELSE
+               // primer fragmento — abrir buffer
+               nFragOpcode := nOpcode
+               cFragBuffer := cPayload
+               HIX_Metric( HIXM_BYTES_IN, Len( cPayload ) )
+            ENDIF
+         CASE nOpcode == WS_OP_CONTINUATION
+            // [B1.W6.2] continuación sólo válida tras un data frame FIN=0
+            IF nFragOpcode == 0
+               ld( "WS: continuation without initial frame — protocol error" )
+               _HixWSSendClose( oConn )
+               lActive := .F.
+               LOOP
+            ENDIF
+            IF Len( cFragBuffer ) + Len( cPayload ) > HIX_WS_MAX_FRAME_SIZE
+               ld( "WS: fragmented message exceeds max size — rechazado" )
+               _HixWSSendClose( oConn )
+               lActive := .F.
+               LOOP
+            ENDIF
+            cFragBuffer += cPayload
+            HIX_Metric( HIXM_BYTES_IN, Len( cPayload ) )
+            IF lFin
+               ld( "WS: reassembled " + hb_NToS( Len( cFragBuffer ) ) + "B from " + cIP )
+               tFrame := hb_DateTime()
+               HIX_WsSafeEval( bOnMessage, { oConn, cFragBuffer, nFragOpcode }, "bOnMessage", cIP )
+               HIX_MetricWsTiming( Int( ( hb_DateTime() - tFrame ) * 86400000 ) )
+               nFragOpcode := 0
+               cFragBuffer := ""
+            ENDIF
          OTHERWISE
             ld( "WS: unknown opcode " + hb_NToS( nOpcode ) )
+            _HixWSSendClose( oConn )
+            lActive := .F.
 
       ENDCASE
 
@@ -328,8 +411,21 @@ STATIC FUNCTION _HixWSDecodeFrame( oIO, cHeader2, nOpcode, lFin, cPayload )
 
       nPayloadLen := Asc( SubStr( cExtLen, 1, 1 ) ) * 256 + Asc( SubStr( cExtLen, 2, 1 ) )
    ELSEIF nPayloadLen == 127
-      ld( "WS: oversized frame" )
-      RETURN .F.
+      // [B1.W6.1] leer los 8 bytes de longitud extendida — RFC 6455 §5.2
+      cExtLen := oIO:Read( 8, 5000 )
+      IF cExtLen == NIL ; RETURN .F. ; ENDIF
+      // Soportamos hasta 2^32-1 (4 GB); los 4 bytes altos deben ser 0
+      IF Asc( SubStr( cExtLen, 1, 1 ) ) != 0 .OR. ;
+         Asc( SubStr( cExtLen, 2, 1 ) ) != 0 .OR. ;
+         Asc( SubStr( cExtLen, 3, 1 ) ) != 0 .OR. ;
+         Asc( SubStr( cExtLen, 4, 1 ) ) != 0
+         ld( "WS: frame length > 4 GB — rechazado" )
+         RETURN .F.
+      ENDIF
+      nPayloadLen := Asc( SubStr( cExtLen, 5, 1 ) ) * 16777216 + ;
+                     Asc( SubStr( cExtLen, 6, 1 ) ) * 65536    + ;
+                     Asc( SubStr( cExtLen, 7, 1 ) ) * 256      + ;
+                     Asc( SubStr( cExtLen, 8, 1 ) )
 
    ENDIF
 
@@ -377,6 +473,41 @@ STATIC FUNCTION _HixWSDecodeFrame( oIO, cHeader2, nOpcode, lFin, cPayload )
 
 RETURN .T.
 
+// [B1.W6.2] wrappers públicos para tests: permiten alimentar frames simulados
+// al bucle real sin abrir socket. También expone build de frame client-side
+// (con máscara) para que los tests puedan generar tráfico de entrada válido.
+FUNCTION HIX_WSTestRunFrameLoop( oConn, bOnMessage )
+RETURN _HixWSFrameLoop( oConn, bOnMessage )
+
+FUNCTION HIX_WSTestBuildClientFrame( nOpcode, lFin, cPayload )
+   LOCAL cFrame, nLen, b1, cMask, i, c
+   hb_default( @cPayload, "" )
+   hb_default( @lFin, .T. )
+   nLen := Len( cPayload )
+   b1   := iif( lFin, 0x80, 0x00 ) + hb_bitAnd( nOpcode, 0x0F )
+   cFrame := Chr( b1 )
+   // MASK bit + length (cliente SIEMPRE enmascara — RFC 6455 §5.3)
+   IF nLen < 126
+      cFrame += Chr( 0x80 + nLen )
+   ELSEIF nLen < 65536
+      cFrame += Chr( 0x80 + 126 ) + Chr( Int( nLen / 256 ) ) + Chr( nLen % 256 )
+   ELSE
+      cFrame += Chr( 0x80 + 127 ) + ;
+         Chr(0) + Chr(0) + Chr(0) + Chr(0) + ;
+         Chr( Int( nLen / 16777216 ) % 256 ) + ;
+         Chr( Int( nLen / 65536    ) % 256 ) + ;
+         Chr( Int( nLen / 256      ) % 256 ) + ;
+         Chr(       nLen              % 256 )
+   ENDIF
+   // máscara determinista (test-only) para poder reproducir bit a bit
+   cMask := Chr( 0xA1 ) + Chr( 0xB2 ) + Chr( 0xC3 ) + Chr( 0xD4 )
+   cFrame += cMask
+   FOR i := 1 TO nLen
+      c := hb_bitXor( Asc( SubStr( cPayload, i, 1 ) ), Asc( SubStr( cMask, ( ( i - 1 ) % 4 ) + 1, 1 ) ) )
+      cFrame += Chr( c )
+   NEXT
+RETURN cFrame
+
 STATIC FUNCTION _HixWSBuildFrame( nOpcode, cPayload )
 
    LOCAL cFrame, nLen
@@ -391,27 +522,90 @@ STATIC FUNCTION _HixWSBuildFrame( nOpcode, cPayload )
    ELSEIF nLen < 65536
       cFrame += Chr( 126 ) + Chr( Int( nLen / 256 ) ) + Chr( nLen % 256 )
 
+   ELSE
+      // [B1.W6.1] payload >= 65536 — código 127 + 8 bytes big-endian (RFC 6455 §5.2)
+      cFrame += Chr( 127 ) + ;
+         Chr(0) + Chr(0) + Chr(0) + Chr(0) + ;
+         Chr( Int( nLen / 16777216 ) % 256 ) + ;
+         Chr( Int( nLen / 65536    ) % 256 ) + ;
+         Chr( Int( nLen / 256      ) % 256 ) + ;
+         Chr(       nLen              % 256 )
+
    ENDIF
 
    cFrame += cPayload
 
 RETURN cFrame
 
-STATIC FUNCTION _HixWSSendPing( oIO )
-RETURN oIO:Write( _HixWSBuildFrame( WS_OP_PING, "" ) )
+// [B1.W1] frames de control bajo oConn:oMutex — simétrico a Send/Close (A2.03)
+STATIC FUNCTION _HixWSSendPing( oConn )
+   LOCAL lOk := .F.
+   hb_mutexLock( oConn:oMutex )
+   IF ! oConn:lClosed
+      lOk := oConn:oIO:Write( _HixWSBuildFrame( WS_OP_PING, "" ) )
+   ENDIF
+   hb_mutexUnlock( oConn:oMutex )
+RETURN lOk
 
-STATIC FUNCTION _HixWSSendPong( oIO, cPayload )
-
-   oIO:Write( _HixWSBuildFrame( WS_OP_PONG, cPayload ) )
-
+STATIC FUNCTION _HixWSSendPong( oConn, cPayload )
+   hb_mutexLock( oConn:oMutex )
+   IF ! oConn:lClosed
+      oConn:oIO:Write( _HixWSBuildFrame( WS_OP_PONG, cPayload ) )
+   ENDIF
+   hb_mutexUnlock( oConn:oMutex )
 RETURN NIL
 
-STATIC FUNCTION _HixWSSendClose( oIO )
-
-   oIO:Write( _HixWSBuildFrame( WS_OP_CLOSE, "" ) )
-
+STATIC FUNCTION _HixWSSendClose( oConn )
+   hb_mutexLock( oConn:oMutex )
+   IF ! oConn:lClosed
+      oConn:oIO:Write( _HixWSBuildFrame( WS_OP_CLOSE, "" ) )
+   ENDIF
+   hb_mutexUnlock( oConn:oMutex )
 RETURN NIL
 
 // Public wrapper so unit tests can verify frame byte encoding
 FUNCTION HIX_WsBuildFrame( nOpcode, cPayload )
 RETURN _HixWSBuildFrame( nOpcode, cPayload )
+
+// ============================================================
+// Audit A2.04 — envuelve un callback WS en TRY/CATCH.
+// Un throw del handler de usuario NO debe abortar el cleanup
+// (Close + MetricDec) ni romper el frame loop.
+//   bCb   : codeblock del handler (o NIL — no-op).
+//   aArgs : array de argumentos a pasar al codeblock.
+//   cKind : etiqueta para el log ("bOnConnect"/"bOnMessage"/"bOnClose").
+//   cIP   : IP del peer, para el log.
+// Retorna .T. si el eval terminó limpio; .F. si CATCH atrapó excepción.
+// ============================================================
+FUNCTION HIX_WsSafeEval( bCb, aArgs, cKind, cIP )
+
+   LOCAL oError
+
+   IF bCb == NIL
+
+      RETURN .T.
+
+   ENDIF
+
+   TRY
+
+      DO CASE
+      CASE Len( aArgs ) == 1
+         Eval( bCb, aArgs[ 1 ] )
+      CASE Len( aArgs ) == 2
+         Eval( bCb, aArgs[ 1 ], aArgs[ 2 ] )
+      CASE Len( aArgs ) == 3
+         Eval( bCb, aArgs[ 1 ], aArgs[ 2 ], aArgs[ 3 ] )
+      OTHERWISE
+         Eval( bCb )
+      ENDCASE
+
+   CATCH oError
+
+      le( "WS " + cKind + " error [" + cIP + "]: " + oError:description )
+      HIX_Metric( HIXM_WS_CB_ERRORS )
+      RETURN .F.
+
+   END
+
+RETURN .T.

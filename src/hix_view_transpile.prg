@@ -387,7 +387,7 @@ METHOD ReplaceVars( cExpr, lIsHrb ) CLASS Hix_Transpile
 
       IF hb_At( Lower( cVarName ), cLower ) > 0
 
-         cExpr := hb_RegExReplace( "(?i)\b" + cVarName + "\b", cExpr, '__oPar:' + cVarName )
+         cExpr := hb_RegExReplace( "(?i)\b" + _HixRegExEscape( cVarName ) + "\b", cExpr, '__oPar:' + cVarName )
 
       ENDIF
 
@@ -401,7 +401,7 @@ METHOD ReplaceVars( cExpr, lIsHrb ) CLASS Hix_Transpile
 
       IF hb_At( Lower( cVarName ), cLower ) > 0
 
-         cExpr := hb_RegExReplace( "(?i)\b" + cVarName + "\b", cExpr, '__oPar:' + cVarName )
+         cExpr := hb_RegExReplace( "(?i)\b" + _HixRegExEscape( cVarName ) + "\b", cExpr, '__oPar:' + cVarName )
 
       ENDIF
 
@@ -436,10 +436,25 @@ METHOD TranspileValidExpression( cExpr, aLine ) CLASS Hix_Transpile
 
    ENDIF
 
+   // A1.27 — El operador `&()` de Harbour parsea y **evalúa** la expresión
+   // externa. Si `cExpr` contiene `}` no balanceado, escapa el wrapper
+   // `{|| … }` y el parser puede acabar evaluando algo distinto de una
+   // definición de codeblock (potencialmente con side effects).
+   // `hb_macroBlock()` toma el string directamente como cuerpo de bloque,
+   // sin la fase de "evaluar como expresión externa". Además rechazamos
+   // curly braces no balanceados en `cExpr` para no permitir escape del
+   // wrapper.
+   IF ! _HixExprCurlyBalanced( cExpr )
+      oErrView := HIX_ErrorView( NIL, 9002, ;
+         "Unbalanced curly braces in expression", nLine, UHtmlEncode( cExpr ), "hix_view_transpile" )
+      oErrView:cargo[ "aCode" ] := ::aRawSource
+      HIX_Throw( oErrView )
+   ENDIF
+
    TRY
 
 // Valida sintaxis, no chequea existencia en runtime
-      bCode  := &( '{|| ' + cExpr + '}' )
+      bCode  := hb_macroBlock( '{|| ' + cExpr + '}' )
       lValid := .T.
       ::hExpression_Cached[ cExpr ] := .T.
 
@@ -477,6 +492,8 @@ METHOD BuildPRG() CLASS Hix_Transpile
    LOCAL oErrorView, nLine
    LOCAL z, nStartLineBlock
    LOCAL aPair
+   LOCAL nP
+   LOCAL hCmp
 
    aLines := {}
 
@@ -485,6 +502,9 @@ METHOD BuildPRG() CLASS Hix_Transpile
    ::ToMap( 0, "FUNCTION Hix_Template" )
 
    AAdd( aBodyParts, "   LOCAL __cOut := ''" + hb_eol() )
+   ::ToMap( 0 )
+
+   AAdd( aBodyParts, "   LOCAL __cRet := ''" + hb_eol() )
    ::ToMap( 0 )
 
    AAdd( aBodyParts, "   PRIVATE __oPar := oPar" + hb_eol() )
@@ -569,67 +589,43 @@ METHOD BuildPRG() CLASS Hix_Transpile
       ::_t( '>> Compile block @prg ' + ltrim( str( i ) ) )
 
       cBlock := "static function __block" + AllTrim( Str( i ) ) + "( __oPar )" + chr( 10 )
+      cBlock += _HixViewPrgPreamble()
       cBlock += ::ReplaceVars( ::aPrgBlocks[ i ][ 2 ], .T. )
 
-      TRY
+      // Compile the @prg block in isolation to catch syntax errors with the
+      // user's own line references. No HIX preamble — views have their own
+      // runtime macros via _HixViewPrgPreamble already prepended to cBlock.
+      hCmp := HIX_CompileCode( cBlock, { "opts" => { "preamble" => .F. } }, "block.prg", "-n", "-q2" )
 
-         oTest := hb_CompileFromBuf( cBlock, .T., "-n", "-q2" )
-      CATCH oError
-
-         IF !empty( oError:cargo )
-
-            _t( 'Trenco!' )
-
-            IF !empty( oError:operation )
-
-               IF substr( oError:operation, 1, 5 ) == 'line:'
-
-                  nLine := Val( substr( oError:operation, 6 ) )
-                  oError:procline := nLine
-
-               ENDIF
-
-            ENDIF
-
-            break oError
-
-         ENDIF
+      IF ! hCmp[ "ok" ]
 
          ::_t( '>> Transpile:BuildPrg() Error 9005' )
-         ::_t( '>> Description: ' + oError:description )
-         ::_t( '>> Operation: ' + oError:operation )
+         ::_t( '>> Description: ' + hCmp[ "err" ][ "description" ] )
 
          aLines := hb_atokens( cBlock, Chr( 10 ) )
 
-// Primera linea eliminarem: "static function __blockxxx"
+// Primera linea + preamble runtime → limpiar del listado de codigo del error
          aLines[ 1 ] := ''
+         FOR nP := 1 TO _HixViewPrgPreambleLines()
+            IF ( 1 + nP ) <= Len( aLines )
+               aLines[ 1 + nP ] := ''
+            ENDIF
+         NEXT
 
-
-         oErrorView := HIX_ErrorView( oError, 9005, NIL, NIL, NIL, "hix_view_transpile" )
+         oErrorView := HIX_ErrorViewFromHash( hCmp[ "err" ], 9005, "hix_view_transpile" )
          oErrorView:cargo[ "aCode" ] := aLines
 
-         IF ! Empty( oError:operation )
-
-            IF SubStr( oError:operation, 1, 5 ) == 'line:'
-
-               nLine := Val( SubStr( oError:operation, 6 ) )
-
-               IF Len( aLines ) > 0 .AND. nLine <= Len( aLines )
-
-                  oErrorView:cargo[ "line"      ] := nLine
-                  oErrorView:cargo[ "line_code" ] := aLines[ nLine ]
-
-               ENDIF
-
-            ENDIF
-
+         nLine := hCmp[ "err" ][ "line" ]
+         IF nLine > 0 .AND. nLine <= Len( aLines )
+            oErrorView:cargo[ "line_code" ] := aLines[ nLine ]
          ENDIF
 
          break oErrorView
-
          RETURN NIL
 
-      END
+      ENDIF
+
+      oTest := hCmp[ "hrb" ]
 
    NEXT
 
@@ -648,6 +644,11 @@ METHOD BuildPRG() CLASS Hix_Transpile
       ::ToMap( nStartLineBlock, "function __block" + AllTrim( Str( i ) ) + "()" )
 
       nStartLineBlock++
+
+      AAdd( aBodyParts, _HixViewPrgPreamble() )
+      FOR nP := 1 TO _HixViewPrgPreambleLines()
+         ::ToMap( 0, "<preamble>" )
+      NEXT
 
       aCode := hb_atokens( ::ReplaceVars( ::aPrgBlocks[ i ][ 2 ], .T. ), Chr( 10 ) )
 
@@ -675,58 +676,32 @@ METHOD BuildPRG() CLASS Hix_Transpile
 
    ::_t( '>> Compiling Transpile...' )
 
-   TRY
+   // Compile the fully transpiled .prg with no HIX preamble — the view engine
+   // assembles its own macros in cTranspiledPRG. The compile line from
+   // diagnostics indexes aLineMap to recover the original HTML template line.
+   hCmp := HIX_CompileCode( ::cTranspiledPRG, { "opts" => { "preamble" => .F. } }, "view.prg", "-n", "-q2" )
 
-      oHrb := hb_CompileFromBuf( ::cTranspiledPRG, .T., "-n", "-q2" )
-   CATCH oError
-
-      IF !empty( oError:cargo )
-
-         IF !empty( oError:operation )
-
-            IF substr( oError:operation, 1, 5 ) == 'line:'
-
-               nLine := Val( substr( oError:operation, 6 ) )
-               oError:procline := nLine
-
-            ENDIF
-
-         ENDIF
-
-         break oError
-
-      ENDIF
+   IF ! hCmp[ "ok" ]
 
       ::_t( '>> Transpile:BuildPrg() Error 9006' )
+      // [A4.07] No logear cTranspiledPRG — filtraria el codigo fuente generado al log
 
-      ::_t( ::cTranspiledPRG )
+      oErrorView := HIX_ErrorViewFromHash( hCmp[ "err" ], 9006, "hix_view_transpile" )
 
-      oErrorView := HIX_ErrorView( oError, 9006, NIL, NIL, NIL, "hix_view_transpile" )
-
-      IF ! Empty( oError:operation )
-
-         IF SubStr( oError:operation, 1, 5 ) == 'line:'
-
-            nLine := Val( SubStr( oError:operation, 6 ) )
-
-            IF nLine > 0 .AND. nLine <= Len( ::aLineMap )
-
-               oErrorView:cargo[ "line"       ] := ::aLineMap[ nLine ][ 1 ]
-               oErrorView:cargo[ "line_code"  ] := ::aLineMap[ nLine ][ 2 ]
-               oErrorView:cargo[ "line_index" ] := nLine
-               oErrorView:cargo[ "aCode"      ] := ::aLineMap
-
-            ENDIF
-
-         ENDIF
-
+      nLine := hCmp[ "err" ][ "line" ]
+      IF nLine > 0 .AND. nLine <= Len( ::aLineMap )
+         oErrorView:cargo[ "line"       ] := ::aLineMap[ nLine ][ 1 ]
+         oErrorView:cargo[ "line_code"  ] := ::aLineMap[ nLine ][ 2 ]
+         oErrorView:cargo[ "line_index" ] := nLine
+         oErrorView:cargo[ "aCode"      ] := ::aLineMap
       ENDIF
 
       break oErrorView
-
       RETURN NIL
 
-   END
+   ENDIF
+
+   oHrb := hCmp[ "hrb" ]
 
    ::_t( 'Transpiled file compiled Ok ' )
 
@@ -842,7 +817,9 @@ METHOD ProcHrb( aLine, aBodyParts ) CLASS Hix_Transpile
          AAdd( aBodyParts, "   NEXT" + hb_eol() )
 
       CASE cFirst == "@prg"
-         AAdd( aBodyParts, "   __cOut += UStr( __" + cRest + "() )" + hb_eol() )
+         AAdd( aBodyParts, "   UEchoBlockClear()" + hb_eol() )
+         AAdd( aBodyParts, "   __cRet := UStr( __" + cRest + "() )" + hb_eol() )
+         AAdd( aBodyParts, "   __cOut += UEchoBlockFlush() + __cRet" + hb_eol() )
 
       CASE cFirst == "@view"
 
@@ -1247,5 +1224,91 @@ METHOD _t( ... ) CLASS Hix_Transpile
 
 RETURN NIL
 
+// [A3.3.8] Escapa metacaracteres PCRE en cStr para uso seguro en patrones regex.
+// Sin esto, interpolar un valor de usuario en "(?i)\b" + cValue + "\b" puede
+// romper el patrón si cValue contiene '.', '(', '[', etc.
+STATIC FUNCTION _HixRegExEscape( cStr )
+   LOCAL cResult := ""
+   LOCAL i, cCh
+   LOCAL cMeta := "\.^$*+?{}[]|()"
+   FOR i := 1 TO Len( cStr )
+      cCh := SubStr( cStr, i, 1 )
+      IF cCh $ cMeta
+         cResult += "\" + cCh
+      ELSE
+         cResult += cCh
+      ENDIF
+   NEXT
+RETURN cResult
+
+FUNCTION HIX_RegExEscape( cStr )
+RETURN _HixRegExEscape( cStr )
+
 // -------------------------------------------------------------
+// A1.27 — Comprueba que `{` y `}` estén balanceados en la expresión.
+// Ignora contenido dentro de strings (comillas simples/dobles). Se
+// usa para prevenir escape del wrapper `{|| … }` al validar expresiones
+// de vistas. Cualquier `}` que cierre por debajo de 0 significa que
+// el usuario está intentando romper la envoltura del codeblock.
+// -------------------------------------------------------------
+STATIC FUNCTION _HixExprCurlyBalanced( cExpr )
+
+   LOCAL nLen  := Len( cExpr )
+   LOCAL i     := 0
+   LOCAL cCh
+   LOCAL nDepth := 0
+   LOCAL cInStr := ""
+
+   DO WHILE ++i <= nLen
+
+      cCh := SubStr( cExpr, i, 1 )
+
+      IF ! Empty( cInStr )
+         IF cCh == cInStr ; cInStr := "" ; ENDIF
+      ELSEIF cCh == '"' .OR. cCh == "'"
+         cInStr := cCh
+      ELSEIF cCh == "{"
+         nDepth++
+      ELSEIF cCh == "}"
+         nDepth--
+         IF nDepth < 0 ; RETURN .F. ; ENDIF
+      ENDIF
+
+   ENDDO
+
+RETURN nDepth == 0
+
+// Test hook público
+FUNCTION HIX_ExprCurlyBalancedForTest( cExpr )
+RETURN _HixExprCurlyBalanced( cExpr )
+
+// -------------------------------------------------------------
+// Preambulo runtime que se inyecta en cada bloque @prg antes de
+// compilar/emitir el codigo del usuario. Aqui centralizas los
+// #xcommand y #xtranslate que quieres disponibles por defecto
+// dentro de cualquier @prg…@endprg de una vista.
+//
+// Si añades o quitas lineas, ajusta _HixViewPrgPreambleLines().
+// -------------------------------------------------------------
+STATIC FUNCTION _HixViewPrgPreamble()
+
+   LOCAL cPre := ""
+
+   BLOCK TO cPre 
+      
+      #xcommand ?  [<explist,...>] => UEchoBlock( '<br>' [,<explist>] )
+      #xcommand ?? [<explist,...>] => UEchoBlock( [<explist>] )
+      #xcommand TRY  => BEGIN SEQUENCE WITH {| oErr | Break( oErr ) }
+      #xcommand CATCH [<!oErr!>] => RECOVER [USING <oErr>] <-oErr->
+      #xcommand FINALLY => ALWAYS
+      #xtranslate Throw( <oErr> ) => ( Eval( ErrorBlock(), <oErr> ), Break( <oErr> ) )
+      #xcommand BLOCK <into:TO,INTO> <o> [RAW] => #pragma __cstream|<o> += %s
+      #xcommand BLOCK <into:TO,INTO> <o> [RAW] [ PARAMS [<v1>] [,<vn>] ] => #pragma __cstream|<o>+= HIX_Block( %s [,<(v1)>][+","+<(vn)>] [, @<v1>][, @<vn>] ) 
+   ENDTEXT  
+
+RETURN cPre
+
+STATIC FUNCTION _HixViewPrgPreambleLines()
+
+RETURN MLCount( _HixViewPrgPreamble() )
 

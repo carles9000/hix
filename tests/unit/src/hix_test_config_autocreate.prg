@@ -75,7 +75,7 @@ STATIC PROCEDURE _Autocreate( hCtx )
    LOCAL cFile := _TmpFile()
    LOCAL cRaw, hDisk, lOk
 
-   IF File( cFile ) ; FErase( cFile ) ; ENDIF
+   IF File( cFile ) ; HIX_SafeErase( cFile ) ; ENDIF
 
    HIX_ConfigAppReset( HIX_ConfigAppDefaults() )
    lOk := HIX_ConfigAppSave( cFile )
@@ -95,7 +95,7 @@ STATIC PROCEDURE _Autocreate( hCtx )
 
       HixTU_Check( hCtx, .F., "Autocreate: JSON decode", "hash", "parse-error" )
 
-      IF File( cFile ) ; FErase( cFile ) ; ENDIF
+      IF File( cFile ) ; HIX_SafeErase( cFile ) ; ENDIF
 
       RETURN
 
@@ -113,7 +113,7 @@ STATIC PROCEDURE _Autocreate( hCtx )
    HixTU_Check( hCtx, hDisk[ "dbf" ][ "rddname" ] == "DBFCDX", ;
       "Autocreate: dbf.rddname default", "DBFCDX", hb_CStr( hDisk[ "dbf" ][ "rddname" ] ) )
 
-   IF File( cFile ) ; FErase( cFile ) ; ENDIF
+   IF File( cFile ) ; HIX_SafeErase( cFile ) ; ENDIF
 
 RETURN
 
@@ -125,7 +125,7 @@ STATIC PROCEDURE _RoundTrip( hCtx )
    LOCAL cFile := _TmpFile()
    LOCAL xSets
 
-   IF File( cFile ) ; FErase( cFile ) ; ENDIF
+   IF File( cFile ) ; HIX_SafeErase( cFile ) ; ENDIF
 
    HIX_ConfigAppReset( HIX_ConfigAppDefaults() )
    HIX_ConfigAppSet( "sets", { "language" => "ES", "decimals" => 4 } )
@@ -147,7 +147,7 @@ STATIC PROCEDURE _RoundTrip( hCtx )
    HixTU_Check( hCtx, xSets[ "decimals" ] == 4, ;
       "RoundTrip: decimals persisted", "4", hb_CStr( xSets[ "decimals" ] ) )
 
-   IF File( cFile ) ; FErase( cFile ) ; ENDIF
+   IF File( cFile ) ; HIX_SafeErase( cFile ) ; ENDIF
 
 RETURN
 
@@ -191,7 +191,7 @@ STATIC PROCEDURE _Backfill( hCtx )
    LOCAL cFile := _TmpFile()
    LOCAL nAdded
 
-   IF File( cFile ) ; FErase( cFile ) ; ENDIF
+   IF File( cFile ) ; HIX_SafeErase( cFile ) ; ENDIF
 
    hb_MemoWrit( cFile, '{ "sets": { "language": "FR" } }' )
 
@@ -212,6 +212,6 @@ STATIC PROCEDURE _Backfill( hCtx )
    HixTU_Check( hCtx, nAdded > 0, ;
       "Backfill: merge added keys", ">0", hb_ntos( nAdded ) )
 
-   IF File( cFile ) ; FErase( cFile ) ; ENDIF
+   IF File( cFile ) ; HIX_SafeErase( cFile ) ; ENDIF
 
 RETURN

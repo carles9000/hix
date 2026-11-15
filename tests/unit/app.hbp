@@ -4,7 +4,7 @@
 -inc
 -head=full
 -mt
--ic:\hix.pro\src\include
+-i${hix}/src/include
 -workdir=.hbmk/${hb_compiler}
 
 -hbexe
@@ -29,6 +29,7 @@ src/hix_test_view_code_err.prg
 src/hix_test_view_cross_hrb.prg
 src/hix_test_view_errors.prg
 src/hix_test_websocket.prg
+src/hix_test_ws_detector.prg
 src/hix_test_wss.prg
 src/hix_test_accept.prg
 src/hix_test_auth_session.prg
@@ -40,10 +41,13 @@ src/hix_test_dispatcher.prg
 src/hix_test_echo.prg
 src/hix_test_error.prg
 src/hix_test_executeprg.prg
+src/hix_test_executehrb.prg
 src/hix_test_firewall.prg
 src/hix_test_flash.prg
 src/hix_test_gzip.prg
 src/hix_test_helpers.prg
+src/hix_test_usendchunk_propagate.prg
+src/hix_test_peer_alive.prg
 src/hix_test_hixstyle_acl.prg
 src/hix_test_hixstyle_harbour_sets.prg
 src/hix_test_ip.prg
@@ -51,6 +55,7 @@ src/hix_test_jwt.prg
 src/hix_test_jwt_scope.prg
 src/hix_test_keys.prg
 src/hix_test_load_routes.prg
+src/hix_test_loader_session.prg
 src/hix_test_multipart.prg
 src/hix_test_new_overrides.prg
 src/hix_test_mw.prg
@@ -66,6 +71,7 @@ src/hix_test_proxied.prg
 src/hix_test_proxy.prg
 src/hix_test_resource.prg
 src/hix_test_router.prg
+src/hix_test_route_stream.prg
 src/hix_test_session.prg
 src/hix_test_session_file.prg
 src/hix_test_user_hooks.prg
@@ -73,21 +79,36 @@ src/hix_test_validator.prg
 src/hix_test_zombie.prg
 src/hix_test_security_client.prg
 src/hix_test_security.prg
+src/hix_test_ucurl.prg
+
+# Audit remediation tests (docs/auditoria/2026-09-13_*.md)
+src/hix_test_audit.prg
+src/hix_test_safe_fs.prg
 
 # Libs
--L${hix}
+-L${hix}/lib/${hb_compiler}
 -lhix_server
 
-${hix}\hix_server.hbx
-c:\harbour\include\harbour.hbx
+# Contrib deps — needed on Linux to resolve hbssl.ch include AND
+# to pull -lssl / -lcrypto at link time. Guarded {unix} because on
+# Windows the SSL libraries have platform-specific names (already
+# declared below via -llibssl-4-x64 / -llibcrypto-4-x64).
+{unix}hbssl.hbc
 
-# OpensSSL
+# .hbx paths are Windows-absolute; on Linux hbmk2 resolves symbols
+# from the built libraries directly, so no .hbx hint is needed.
+{win}${hix}\hix_server.hbx
+{win}c:\harbour\include\harbour.hbx
+
+# OpenSSL
 -lhbssl
--lhbssls
+{win}-lhbssls
 {msvc64}-llibcrypto-4-x64
 {msvc64}-llibssl-4-x64
 {mingw64}-ldflag=-l:libcrypto-4-x64.dll
 {mingw64}-ldflag=-l:libssl-4-x64.dll
+{unix}-lssl
+{unix}-lcrypto
 
 
 # Curl
@@ -95,16 +116,22 @@ c:\harbour\include\harbour.hbx
 {msvc64}-llibcurl-x64
 {mingw64}-lhbcurl
 {mingw64}-ldflag=-l:libcurl-x64.dll
+{unix}hbcurl.hbc
 
+
+
+# SQLite3 (WDO driver — lib references hbsqlit3 symbols)
+hbsqlit3.hbc
 
 # PDF
 {msvc64}hbhpdf.hbc
 {mingw64}-lhbhpdf
 {mingw64}-llibhpdf
 {mingw64}-lpng
+{unix}hbhpdf.hbc
 
-# WAPI_OutputDebugString()
--lhbwin
+# WAPI_OutputDebugString() — Windows-only
+{win}-lhbwin
 -lxhb
 -lhbct
 

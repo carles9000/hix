@@ -13,21 +13,20 @@
 
 #include "hbclass.ch"
 
-
 PROCEDURE Main()
 
-   LOCAL oServer
-
-   oServer := THixServer():New()
+   LOCAL oServer := THixServer():New()
+   
+      // In HIXSTYLE mode, the root folder is protected.
+      // Our application test is located within the /test folder,
+      // and we need to enable it to be run directly from our
+      // browser: http://localhost/test/index.html
+      
+         oServer:AllowDir( "test", .F. )
+         
+      // ---------------------------------------------------------   
 
    oServer:Start()
 
-   DO WHILE oServer:lRunning
-      IF Inkey( 1 ) == 27
-         EXIT
-      ENDIF
-   ENDDO
-
-   oServer:Stop()
-
 RETURN
+

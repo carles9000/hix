@@ -6,7 +6,7 @@
   "server":
   {
     "host": "localhost",
-    "port": 80,
+    "port": 8080,
     "maxconn": 1024,
     "timeout": 30,
     "name": "My Server",
@@ -19,7 +19,8 @@
     "gzip": true,
     "gzip_min_size": 2048,
     "autostart": true,
-    "exec_timeout_ms": 30000
+    "exec_timeout_ms": 30000,
+    "stream_exec_timeout_ms": 0
   },
   "paths":
   {

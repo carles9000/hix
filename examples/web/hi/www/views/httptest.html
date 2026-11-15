@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	@view 'common/header.html'
+
+   <link href='/public/css/main.css' rel='stylesheet'>
+
+</head>
+
+<body>
+
+	<!-- Navbar -->
+
+	@view 'common/navbar.html'
+
+   <!-- body has 60px top/bottom margin (main.css): that is the room taken by both fixed navbars -->
+
+   <main class="container-fluid mycontainer d-flex flex-column"
+         style="height:calc(100vh - 120px);height:calc(100dvh - 120px)">
+
+      <div class="d-flex align-items-center justify-content-between mb-3 flex-shrink-0">
+         <h4 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>HTTP verbs test</h4>
+      </div>
+
+      <pre id="output" class="bg-dark text-light p-3 rounded flex-grow-1 mb-0"
+           style="min-height:0;overflow:auto;font-size:.85rem">—</pre>
+
+   </main>
+
+	<!-- Bottom nav -->
+
+   <nav class="navbar navbar-dark bg-dark fixed-bottom p-0">
+      <div class="d-flex w-100" role="group" aria-label="Bottom navigation">
+         <a href="/main" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0">
+            <i class="bi bi-box-arrow-left"></i><span class="btn-lbl">Back</span>
+         </a>
+         <button id="btnRun" type="button" class="btn btn-dark rounded-0 py-2 w-25 flex-grow-0 flex-shrink-0" onclick="runAll()">
+            <i class="bi bi-play-fill"></i><span class="btn-lbl">Run</span>
+         </button>
+      </div>
+   </nav>
+
+<script>
+
+   // Request battery: every entry is one HTTP call.
+   // exp = expected status code (4xx entries are deliberate negative cases)
+
+   const TESTS = [
+      { m: 'GET',     url: '/api/verbs?a=1&b=2', exp: 200 },
+      { m: 'POST',    url: '/api/verbs', exp: 201, body: { id: 1, name: 'hix' } },
+      { m: 'PUT',     url: '/api/verbs', exp: 200, body: { id: 1, name: 'hix2' } },
+      { m: 'PATCH',   url: '/api/verbs', exp: 200, body: { name: 'patched' } },
+      { m: 'DELETE',  url: '/api/verbs?id=1',     exp: 200 },
+      { m: 'OPTIONS', url: '/api/verbs',          exp: 200 },
+      { m: 'HEAD',    url: '/api/verbs',          exp: 200 },
+      { m: 'GET',     url: '/api/ping',           exp: 200 },
+      { m: 'POST',    url: '/api/ping',           exp: 405 },   // verb not allowed on that route
+      { m: 'GET',     url: '/nope',               exp: 404 },   // route not found
+      { m: 'GET',     url: '/api/nope',           exp: 403 }    // blocked by the ACL whitelist
+   ];
+
+   const out = document.getElementById( 'output' );
+
+   // Log palette
+   const C = {
+      info : '#6ea8fe',   // blue   — headers and summary
+      sent : '#ffda6a',   // yellow — request line
+      recv : '#75e08b',   // green  — status as expected
+      warn : '#fd9843',   // orange — expected 4xx
+      dim  : '#8a94a6',   // grey   — response detail
+      err  : '#ea868f'    // red    — unexpected status / network error
+   };
+
+   const esc = s => String( s ).replace( /&/g, '&amp;' ).replace( /</g, '&lt;' );
+
+   function log( txt, color ) {
+      out.innerHTML += `<span style="color:${color || C.info}">${esc( txt )}</span>\n`;
+      out.scrollTop = out.scrollHeight;
+   }
+
+   // Collapse a response body into a single short line
+   function brief( txt ) {
+      const s = String( txt ).replace( /\s+/g, ' ' ).trim();
+      if ( s === '' ) return '(empty)';
+      return s.length > 90 ? s.slice( 0, 90 ) + '…' : s;
+   }
+
+   async function runOne( n, t ) {
+
+      const t0   = performance.now();
+      const opt  = { method: t.m };
+      let   code = '---';
+      let   note = '';
+      let   ok   = false;
+
+      if ( t.body ) {
+         opt.headers = { 'Content-Type': 'application/json' };
+         opt.body    = JSON.stringify( t.body );
+      }
+
+      try {
+
+         const res = await fetch( t.url, opt );
+
+         code = res.status;
+         ok   = ( code === t.exp );
+
+         if ( t.m === 'OPTIONS' ) {
+            const allow = res.headers.get( 'Allow' );
+            note = allow ? 'Allow: ' + allow : brief( await res.text() );
+         } else if ( t.m === 'HEAD' ) {
+            note = 'no body — Content-Type: ' + ( res.headers.get( 'Content-Type' ) || '—' );
+         } else {
+            note = brief( await res.text() );
+         }
+
+      } catch ( err ) {
+         note = 'network error — ' + err;
+      }
+
+      const ms  = Math.round( performance.now() - t0 );
+      const col = ! ok ? C.err : ( t.exp >= 400 ? C.warn : C.recv );
+      const tag = ok ? ( t.exp >= 400 ? 'expected ' + t.exp : 'OK' )
+                     : 'FAIL — expected ' + t.exp;
+
+      log( `#${String( n ).padStart( 2, '0' )} ` +
+           `${t.m.padEnd( 8 )} ${t.url.padEnd( 24 )} ` +
+           `${String( code ).padStart( 3 )} ${String( ms ).padStart( 5 )} ms   ${tag}`, col );
+
+      log( `             ${note}`, C.dim );
+
+      return ok;
+   }
+
+   async function runAll() {
+
+      const btn = document.getElementById( 'btnRun' );
+      const t0  = performance.now();
+      let   nOk = 0;
+
+      btn.disabled  = true;
+      out.innerHTML = '';
+
+      log( `Target ${location.origin}`, C.info );
+      log( `${TESTS.length} requests, sequential\n`, C.info );
+
+      for ( let i = 0; i < TESTS.length; i++ ) {
+         if ( await runOne( i + 1, TESTS[ i ] ) ) nOk++;
+      }
+
+      log( `\n${nOk}/${TESTS.length} ok — total ${Math.round( performance.now() - t0 )} ms`,
+           nOk === TESTS.length ? C.recv : C.err );
+
+      btn.disabled = false;
+   }
+
+</script>
+
+</body>
+
+</html>

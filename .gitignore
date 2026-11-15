@@ -8,7 +8,13 @@
 *.exe
 *.lib
 
-# MkDocs generated site (published to gh-pages by CI)
-site/
+# WDO MySQL/MariaDB runtime DLLs — force-include
+!resources/wdo/mysql/dll/*.dll
+
+# Local commit helpers (no versionados)
+_commit.txt
+go_commit.bat
+
+
 
 

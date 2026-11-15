@@ -96,9 +96,9 @@ STATIC FUNCTION HIX_Trace_Out( cOut, ... )
 
          // Compensacion del offset del preamble para funciones cargadas
          // via hb_hrbLoad (loaders/*.prg). Harbour ignora #line, asi que
-         // restamos aqui las lineas que _HixPreamble antepone al codigo.
+         // restamos aqui las lineas que HIX_CompilePreamble antepone al codigo.
          IF HIX_LoaderIsUserFunc( cCaller )
-            nLine := Max( nLine - HIX_PreambleLines(), 1 )
+            nLine := Max( nLine - HIX_CompilePreambleLines(), 1 )
          ENDIF
 
          cLine += cCaller + ' (' + ltrim( str( nLine ) ) + ') '

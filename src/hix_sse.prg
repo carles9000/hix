@@ -14,12 +14,19 @@
 STATIC s_hSseMutex := NIL
 STATIC s_hSseBus   := NIL   // hash: cChannel -> array de THixSseConn
 
+// INIT PROCEDURE — inicializa mutex y bus antes de cualquier worker (B1.R5).
+INIT PROCEDURE _HixSseGlobalInit()
+   s_hSseMutex := hb_mutexCreate()
+   s_hSseBus   := hb_Hash()
+RETURN
+
 CLASS THixSseConn
 
    DATA oIO
    DATA cChannel
    DATA nLastId  INIT 0
    DATA lActive  INIT .T.
+   DATA oMutex   INIT NIL   // B1.R4: lock por conexión (broadcast vs keepalive)
 
 ENDCLASS
 
@@ -76,6 +83,8 @@ FUNCTION HIX_SseBroadcast( cChannel, cData, cEvent, nId )
 
       oConn := aList[ i ]
 
+      hb_mutexLock( oConn:oMutex )
+
       IF oConn:lActive
 
          IF oConn:oIO:Write( cFrame )
@@ -93,6 +102,8 @@ FUNCTION HIX_SseBroadcast( cChannel, cData, cEvent, nId )
          ENDIF
 
       ENDIF
+
+      hb_mutexUnlock( oConn:oMutex )
 
    NEXT
 
@@ -145,6 +156,7 @@ FUNCTION _HixSseRegister( oIO, cChannel, nLastId )
    oConn:oIO      := oIO
    oConn:cChannel := cChannel
    oConn:nLastId  := nLastId
+   oConn:oMutex   := hb_mutexCreate()
    hb_mutexLock( s_hSseMutex )
 
    IF ! hb_hHasKey( s_hSseBus, cChannel )
@@ -188,12 +200,5 @@ FUNCTION _HixSseUnregister( oConn )
 RETURN NIL
 
 STATIC FUNCTION _HixSseInit()
-
-   IF s_hSseMutex == NIL
-
-      s_hSseMutex := hb_mutexCreate()
-      s_hSseBus   := hb_Hash()
-
-   ENDIF
-
+   // No-op: INIT PROCEDURE _HixSseGlobalInit ya garantiza la inicialización (B1.R5)
 RETURN NIL

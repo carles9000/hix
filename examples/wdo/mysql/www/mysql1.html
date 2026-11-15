@@ -1,0 +1,20 @@
+@view 'header.html', 'WDO MySql', 'Direct instance...'
+
+@prg 
+
+   /* We should always use connections from the pool via `WDO_Get( "MYSQL" )`, 
+      but if we ever need to use a different connection for a specific case, 
+      we can do so in this way. 
+   */
+
+	LOCAL o := WDO_MySql():New( "localhost", "harbour", "hb1234", "employees", 3306 )
+     
+	?? 'Connected !<hr>'
+      
+   ?? 'Version: ' +  o:VersionName() 
+   ? 'Server: ' + o:mysql_get_server_info() 
+	? o:GetDllVersion()
+   
+   o:end()     // Always you need close the connection...
+   
+@endprg

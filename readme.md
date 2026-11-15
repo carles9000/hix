@@ -24,6 +24,7 @@ sharing code, contributing to other projects, and building scalable solutions be
 no more friction from learning a new structure with every repo. The main goal here is to offer a 
 common path that works for everyone.
 
+--- 
 
 ## 📘 Documentation
 
@@ -31,10 +32,23 @@ Full documentation is available at: https://carles9000.github.io/hix/
 
 ---
 
+## ✔️ Last Version
+
+**HIX v2.4 - New Commpile System**
+
+2.4 HIX Compile unified subsystem is now the only compile path in the lib  
+
+2.3 WDO MySql & WDO Sqlite3
+
+  
+---
+
 ### ✏️ Notes 
 
+- To run the MySQL examples, please read the help entry at 
+https://carles9000.github.io/hix/wdo/mysql/installation/
 
-- The first version of HIX is completely incompatible with the current version because everything 
+- HIX is completely incompatible with the current version because everything 
 has been refactored. If you wish to download it, you can find it in this repository 
 https://github.com/carles9000/hix.legacy 
 
@@ -45,4 +59,5 @@ https://github.com/carles9000/hix.harbour
 
    - MSVC64 (Windows)  
    - MINGW64 (Windows)  
+   - GCC (Linux)  
 

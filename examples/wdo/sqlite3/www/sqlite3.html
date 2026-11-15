@@ -1,0 +1,95 @@
+@view 'header.html', 'WDO SQLite3', 'Prepare — bind variables (? and :name)'
+
+@prg
+
+   //  ------------------------------------------------------------
+   //  SQLite3 natively supports ?, :name, @name, $name placeholders.
+   //  BindParam resolves :name via sqlite3_bind_parameter_index --
+   //  no SQL rewrite, same semantics as MySql's emulated :name.
+   //  ------------------------------------------------------------
+
+   LOCAL oConn    := WDO_Get( "SQLITE" )
+   LOCAL oStmt, aRows, hRow
+   LOCAL cHireFrom := "2010-01-01"
+   LOCAL cGender   := "F"
+
+   IF oConn == NIL
+      ? 'Error: standalone conn not registered'
+      RETU NIL
+   ENDIF
+
+   //  Make sure the seed table from sqlite2 is present (idempotent).
+   oConn:Exec( "CREATE TABLE IF NOT EXISTS employees_demo ( " + ;
+               "  emp_no     INTEGER PRIMARY KEY, "           + ;
+               "  first_name VARCHAR(50) NOT NULL, "          + ;
+               "  last_name  VARCHAR(50) NOT NULL, "          + ;
+               "  gender     VARCHAR(1), "                    + ;
+               "  hire_date  DATE )" )
+
+   ?? '<h3>1) Positional placeholders <code>?</code></h3>'
+   ?  '<pre>SELECT emp_no, first_name, last_name, gender, hire_date FROM employees_demo'
+   ?  '  WHERE hire_date &gt; ? AND gender = ?'
+   ?  '  ORDER BY emp_no LIMIT 10</pre>'
+
+   oStmt := oConn:Prepare( "SELECT emp_no, first_name, last_name, gender, hire_date " + ;
+                           "FROM employees_demo " + ;
+                           "WHERE hire_date > ? AND gender = ? ORDER BY emp_no LIMIT 10" )
+
+   IF oStmt:lError
+      ? '<b>Prepare error:</b> ' + oStmt:cError
+      oStmt:Free()
+      RETU NIL
+   ENDIF
+
+   oStmt:BindParam( 1, cHireFrom )
+   oStmt:BindParam( 2, cGender   )
+   oStmt:Execute()
+
+   IF oStmt:lError
+      ? '<b>Execute error:</b> ' + oStmt:cError
+   ELSE
+      ?? "<pre>"
+      DO WHILE ! Empty( hRow := oStmt:Fetch_Assoc() )
+         ? hb_NToS( hRow[ 'emp_no' ] ) + '  ' + hRow[ 'first_name' ] + ' ' + hRow[ 'last_name' ] + ;
+           '  (' + hRow[ 'gender' ] + ', hired ' + hRow[ 'hire_date' ] + ')'
+      ENDDO
+      ?? "</pre>"
+   ENDIF
+
+   oStmt:Free()
+
+   //  ------------------------------------------------------------
+
+   ?? '<h3>2) Named placeholders <code>:name</code></h3>'
+   ?  '<pre>SELECT emp_no, first_name, last_name FROM employees_demo'
+   ?  '  WHERE gender = :gen AND hire_date BETWEEN :lo AND :hi'
+   ?  '  ORDER BY emp_no LIMIT 10</pre>'
+
+   oStmt := oConn:Prepare( "SELECT emp_no, first_name, last_name FROM employees_demo " + ;
+                           "WHERE gender = :gen AND hire_date BETWEEN :lo AND :hi " + ;
+                           "ORDER BY emp_no LIMIT 10" )
+
+   oStmt:BindParam( ":gen", "M"          )
+   oStmt:BindParam( ":lo",  "2000-01-01" )
+   oStmt:BindParam( ":hi",  "2020-12-31" )
+   oStmt:Execute()
+
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+
+   ?? oConn:View( aRows,, 'Men hired 2000-2020' )
+
+   //  ------------------------------------------------------------
+
+   ?? '<h3>3) Hostile input — single quote in value</h3>'
+   ?  'The value <code>O&apos;Brien</code> cannot break the SQL: it travels '
+   ?  'through <code>sqlite3_bind_text</code> separately from the compiled statement.'
+
+   oStmt := oConn:Prepare( "SELECT COUNT(*) AS n FROM employees_demo WHERE last_name = ?" )
+   oStmt:BindParam( 1, "O'Brien" )
+   oStmt:Execute()
+   hRow := oStmt:Fetch_Assoc()
+   ? '<b>Matches:</b> ' + hb_NToS( hRow[ "n" ] )
+   oStmt:Free()
+
+@endprg

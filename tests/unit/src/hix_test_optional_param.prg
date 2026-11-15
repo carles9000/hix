@@ -35,6 +35,10 @@ FUNCTION HIX_TestOptionalParam_Run()
    LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
    LOCAL oReq
 
+   // [A1.01] Whitelist: registrar acciones-por-nombre antes de HIX_RouteAdd
+   HIX_RouteRegisterAction( "HndOptUserId", {|o| HndOptUserId( o ) } )
+   HIX_RouteRegisterAction( "HndOptXY",     {|o| HndOptXY( o )     } )
+
    // Register routes with unique prefix to avoid conflicts
    HIX_RouteAdd( "top.req",   "/top_users/:id",  "HndOptUserId", "GET" )
    HIX_RouteAdd( "top.opt",   "/top_items/:id!", "HndOptUserId", "GET" )

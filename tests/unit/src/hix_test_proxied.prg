@@ -26,11 +26,22 @@ STATIC FUNCTION _ParseRequest( cRaw, cIP, lProxied )
    oReq:Read()
 RETURN oReq
 
+STATIC FUNCTION _ParseRequestSSL( cRaw, cIP, lProxied, lSSL )
+   LOCAL oIO, oReq
+   hb_default( @lProxied, .F. )
+   hb_default( @lSSL,     .F. )
+   oIO  := TMockIO():New( cRaw )
+   oIO:lUseSSL := lSSL
+   oReq := THixRequest():New( oIO, cIP, lProxied )
+   oReq:Read()
+RETURN oReq
+
 FUNCTION HIX_TestProxied_Run()
    LOCAL hCtx := { "total" => 0, "passed" => 0, "failed" => 0, "results" => {} }
    HIX_ProxyInit( "127.0.0.1" )
    _ProxiedSin( hCtx )
    _ProxiedCon( hCtx )
+   _ProxiedScheme( hCtx )
 RETURN hCtx
 
 STATIC PROCEDURE _ProxiedSin( hCtx )
@@ -74,4 +85,44 @@ STATIC PROCEDURE _ProxiedCon( hCtx )
       _MakeRequest( "/ip", "X-Forwarded-For: 9.9.9.9" + cCRLF ), ;
       "8.8.8.8", .T. )
    HixTU_Check( hCtx, oReq:RealIP() == "8.8.8.8", "Proxied: no-trusted XFF ignorado", "8.8.8.8", oReq:RealIP() )
+RETURN
+
+// ------------------------------------------------------------
+// v2.4.3 Fix 3 — cProtoScheme seeded from oIO:lUseSSL.
+// Antes del fix, un request HTTPS directo dejaba cProtoScheme=""
+// y HIX_SetCookie() no emitía el flag "Secure".
+// ------------------------------------------------------------
+STATIC PROCEDURE _ProxiedScheme( hCtx )
+   LOCAL oReq, cCRLF
+   cCRLF := Chr(13) + Chr(10)
+
+   // Caso A: HTTP plano directo (sin SSL, sin proxy) -> "http"
+   oReq := _ParseRequestSSL( _MakeRequest( "/x" ), "127.0.0.1", .F., .F. )
+   HixTU_Check( hCtx, oReq:cProtoScheme == "http", ;
+      "Scheme: plain TCP seeds http", "http", oReq:cProtoScheme )
+
+   // Caso B: TLS directo (sin proxy) -> "https" (regresion principal)
+   oReq := _ParseRequestSSL( _MakeRequest( "/x" ), "127.0.0.1", .F., .T. )
+   HixTU_Check( hCtx, oReq:cProtoScheme == "https", ;
+      "Scheme: direct TLS seeds https", "https", oReq:cProtoScheme )
+
+   // Caso C: proxy con X-Forwarded-Proto override (TCP plano por detras)
+   oReq := _ParseRequestSSL( ;
+      _MakeRequest( "/x", "X-Forwarded-Proto: https" + cCRLF ), ;
+      "127.0.0.1", .T., .F. )
+   HixTU_Check( hCtx, oReq:cProtoScheme == "https", ;
+      "Scheme: XFP overrides seed", "https", oReq:cProtoScheme )
+
+   // Caso D: proxy sin X-Forwarded-Proto pero TLS directo -> seed se preserva
+   oReq := _ParseRequestSSL( ;
+      _MakeRequest( "/x", "X-Forwarded-For: 9.8.7.6" + cCRLF ), ;
+      "127.0.0.1", .T., .T. )
+   HixTU_Check( hCtx, oReq:cProtoScheme == "https", ;
+      "Scheme: proxy empty XFP keeps TLS seed", "https", oReq:cProtoScheme )
+
+   // Caso E: Scheme() wrapper devuelve "http" por defecto si sigue vacio
+   // (sanity: con el fix nunca deberia quedar vacio en TCP mock)
+   oReq := _ParseRequestSSL( _MakeRequest( "/x" ), "127.0.0.1", .F., .F. )
+   HixTU_Check( hCtx, oReq:Scheme() == "http", ;
+      "Scheme(): wrapper devuelve http", "http", oReq:Scheme() )
 RETURN

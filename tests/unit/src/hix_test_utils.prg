@@ -22,6 +22,7 @@ CLASS TMockIO
    DATA cWritten     INIT ""
    DATA lClosed      INIT .F.
    DATA lWriteFail   INIT .F.
+   DATA lUseSSL      INIT .F.   // v2.4.3 — scheme fix (Fix 3)
 
    METHOD New( cHeaders, cBody )
    METHOD ReadHeaders( nTimeout )
@@ -96,6 +97,7 @@ CLASS TMockRequest
    DATA nResponseStatus INIT 200
    DATA cRawBody        INIT ""
    DATA oIO             INIT NIL
+   DATA cProtoScheme    INIT ""   // "" | "https" — controla IsHttps() en tests
 
    METHOD New( cPath, cMethod )
    METHOD Respond( xData, nStatus, cMime, hExtra )
@@ -109,6 +111,8 @@ CLASS TMockRequest
    METHOD ReadBody()
    METHOD JsonBody()
    METHOD Redirect( cUrl )
+   METHOD RealIP()    INLINE ::cIP
+   METHOD IsHttps()   INLINE ::cProtoScheme == "https"
 ENDCLASS
 
 METHOD New( cPath, cMethod ) CLASS TMockRequest

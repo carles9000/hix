@@ -1,0 +1,10 @@
+{
+  "load": [ "mymsgthrottle.prg", "mymsgguard.prg" ],
+
+  "setup":
+  {
+    "ratelimit": { "ip_per_min": 100, "window_s": 10 },
+    "csrf":      { "redirect": "", "ttl": 3600 },
+    "message":   { "window_s": 60 }
+  }
+}

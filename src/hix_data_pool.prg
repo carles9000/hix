@@ -34,6 +34,8 @@
                Copyright (c) 2026 Carles Aubia Floresví - HIX Server Project
  -----------------------------------------------------------*/
 
+#INCLUDE "hix_logger.ch"
+
 STATIC s_hPools := NIL
 STATIC s_mtxMgr := NIL
 
@@ -53,14 +55,17 @@ RETURN
 
 // ============================================================
 // HIX_PoolCreate -- create a named pool (idempotent).
+// [A3.4.9] nMaxSize: limite de entries (0 = sin limite, default).
 // ============================================================
-FUNCTION HIX_PoolCreate( cName )
+FUNCTION HIX_PoolCreate( cName, nMaxSize )
 
    _PoolMgrInit()
 
+   hb_default( @nMaxSize, 0 )
+
    hb_mutexLock( s_mtxMgr )
    IF ! hb_HHasKey( s_hPools, cName )
-      s_hPools[ cName ] := { "data" => { => }, "mtx" => hb_mutexCreate() }
+      s_hPools[ cName ] := { "data" => { => }, "mtx" => hb_mutexCreate(), "max" => nMaxSize }
    ENDIF
    hb_mutexUnlock( s_mtxMgr )
 
@@ -105,12 +110,20 @@ RETURN lExists
 FUNCTION HIX_PoolSet( cName, cKey, xValue )
 
    LOCAL hPool := _PoolEntry( cName )
+   LOCAL lOk   := .T.
 
    hb_mutexLock( hPool[ "mtx" ] )
-   hPool[ "data" ][ cKey ] := xValue
+   // [A3.4.9] Enforce max size: reject NEW keys when pool is full (updates allowed)
+   IF hPool[ "max" ] > 0 .AND. ! hb_HHasKey( hPool[ "data" ], cKey ) .AND. ;
+         Len( hPool[ "data" ] ) >= hPool[ "max" ]
+      lOk := .F.
+      le( "HIX_PoolSet: pool '" + hb_CStr( cName ) + "' full (" + hb_NToS( hPool[ "max" ] ) + ")" )
+   ELSE
+      hPool[ "data" ][ cKey ] := xValue
+   ENDIF
    hb_mutexUnlock( hPool[ "mtx" ] )
 
-RETURN NIL
+RETURN lOk
 
 
 FUNCTION HIX_PoolGet( cName, cKey, xDef )
@@ -177,10 +190,21 @@ RETURN nSize
 // ============================================================
 // Manual lock -- for multi-step operations that must be atomic.
 // Use HIX_Pool*Raw inside the locked block; NEVER atomic ops.
+// [A3.4.8] Timeout en segundos (default 30) para evitar bloqueo indefinido.
+//          Retorna .T. si se adquirio el lock, .F. si expiro el timeout.
 // ============================================================
-FUNCTION HIX_PoolLock( cName )
-   hb_mutexLock( _PoolEntry( cName )[ "mtx" ] )
-RETURN NIL
+FUNCTION HIX_PoolLock( cName, nTimeoutSec )
+
+   LOCAL lOk
+
+   hb_default( @nTimeoutSec, 30 )
+   lOk := hb_mutexLock( _PoolEntry( cName )[ "mtx" ], nTimeoutSec )
+
+   IF ! lOk
+      le( "HIX_PoolLock: timeout (" + hb_NToS( nTimeoutSec ) + "s) en pool '" + hb_CStr( cName ) + "'" )
+   ENDIF
+
+RETURN lOk
 
 
 FUNCTION HIX_PoolUnlock( cName )
@@ -192,8 +216,15 @@ RETURN NIL
 // Raw ops -- no locking; MUST be called under HIX_PoolLock.
 // ============================================================
 FUNCTION HIX_PoolSetRaw( cName, cKey, xValue )
-   _PoolEntry( cName )[ "data" ][ cKey ] := xValue
-RETURN NIL
+   LOCAL hPool := _PoolEntry( cName )
+   // [A3.4.9] Enforce max size (Raw variant — caller holds lock)
+   IF hPool[ "max" ] > 0 .AND. ! hb_HHasKey( hPool[ "data" ], cKey ) .AND. ;
+         Len( hPool[ "data" ] ) >= hPool[ "max" ]
+      le( "HIX_PoolSetRaw: pool '" + hb_CStr( cName ) + "' full (" + hb_NToS( hPool[ "max" ] ) + ")" )
+      RETURN .F.
+   ENDIF
+   hPool[ "data" ][ cKey ] := xValue
+RETURN .T.
 
 
 FUNCTION HIX_PoolGetRaw( cName, cKey, xDef )

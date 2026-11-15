@@ -192,6 +192,15 @@ return ltrim(str( nPrecio * nCantidad ))
 <hr>
 ```
 
+> **Compile errors in `@prg`** (v2.4.0+): if a `@prg` block fails to
+> compile, the `oError` reaching the global handler (`bOnError`) or the
+> `errorsys` template includes in `oError:cargo["hCompile"]` the complete
+> diagnostic of the `HIX_Compile*` subsystem (phase, snippet, line).
+> Importantly: `oError:cargo["line"]` already points to the **real line
+> in the HTML template**, not to the line in the intermediate transpiled
+> `.prg`. See [Errorsys → Extended cargo for view errors](../../programacion/errorsys.md#extended-cargo-for-view-errors)
+> and [Compile subsystem](../../programacion/compile.md).
+
 ## Summary of Directives
 
 | Group | Directives | Explanation |

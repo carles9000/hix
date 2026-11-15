@@ -18,7 +18,28 @@ STATIC s_aRouteOrder := NIL   // nombres de ruta ordenados por especificidad des
 STATIC s_mtxRoutes   := NIL   // mutex solo para escrituras
 STATIC s_hHandlers   := NIL   // handlers de error: { '404'=>b, '405'=>b }
 STATIC s_oRouteDisp  := NIL   // dispatcher lazy para acciones tipo fichero
+STATIC s_mtxRouteDisp := NIL  // audit A2.06 — protege lazy init de s_oRouteDisp
 STATIC s_cRouteSource := ""   // origen actual (para bootlog): fichero JSON, "system", ""
+
+// A1.01 — Whitelist de acciones string invocables por nombre.
+// Sustituye el macro-eval `&()` previo (RCE si el nombre venía de JSON).
+// Toda función referenciada por nombre desde una ruta (`HIX_RouteAdd(..., "MyFn", ...)`
+// o `"action":"MyFn"` en www/routes/*.json) debe registrarse antes con
+// HIX_RouteRegisterAction( "MyFn", @MyFn() ). Sin registro → rechazo con 500.
+STATIC s_hActionRegistry := NIL
+STATIC s_mtxActions      := NIL
+
+// Audit A2.06 — mutex eager al arranque del proceso via INIT PROCEDURE.
+// Sin esto, la creacion lazy de s_oRouteDisp en 2 call sites tiene race:
+// dos threads podian construir dos THixDispatcher divergentes (2 caches
+// de views) y el perdedor pisar al ganador via asignacion no-atomica.
+// STATICs deben declararse antes de cualquier FUNCTION/PROCEDURE, por eso
+// esta INIT va DESPUES de s_hActionRegistry/s_mtxActions.
+INIT PROCEDURE _HixRouterMutexInit()
+
+   s_mtxRouteDisp := hb_mutexCreate()
+
+RETURN
 
 // ============================================================
 // _HixRouteSetSource — marca el "origen" que se registrara en el
@@ -47,9 +68,16 @@ FUNCTION HIX_RoutesLoad()
    s_mtxRoutes  := hb_mutexCreate()
    s_hHandlers  := { => }
 
-   // ping: público (health checks de balanceadores)
+   IF s_hActionRegistry == NIL
+      s_hActionRegistry := { => }
+      hb_HCaseMatch( s_hActionRegistry, .F. )   // lookup case-insensitive por robustez
+      s_mtxActions      := hb_mutexCreate()
+   ENDIF
+
+   // ping: público (health checks de balanceadores + herramientas de carga
+   // cross-origin). Manda CORS wildcard y responde a OPTIONS/preflight.
    HIX_RouteAdd( "hix.slow",        '/hix-slow',        {| oReq | ( hb_idleSleep( 3 ), oReq:Respond( { "status" => "ok", "time" => time() } ) ) }, "GET" )
-   HIX_RouteAdd( "hix.ping",        HIX_PATH_PING,     {| oReq | oReq:Respond( { "status" => "ok", "server" => "HIX/" + HIX_Version(), 'now' => hb_TToS( hb_DateTime() ) } ) }, "GET" )
+   HIX_RouteAdd( "hix.ping",        HIX_PATH_PING,     {| oReq | _HixRoutePing( oReq ) }, "GET,OPTIONS" )
    // panel admin: solo si esta habilitado en config (admin.enabled=true)
 
    IF UConfig( "admin", "enabled", .T. )
@@ -95,7 +123,7 @@ RETURN s_hRoutes != NIL
 FUNCTION HIX_LoadRoutes()
 
    LOCAL oCfg, cRoot, cRoutesDir, aFiles, aFile, cFile, cJson, xData
-   LOCAL hRoute, cName, cPattern, cAction, cMethod, cMw, cScope
+   LOCAL hRoute, cName, cPattern, cAction, cMethod, cMw, cScope, lStream
    LOCAL aErrors, nLoaded, nTotal, lDup, cErr
 
    aErrors := {}
@@ -155,19 +183,23 @@ FUNCTION HIX_LoadRoutes()
 
          ENDIF
 
-         cName    := _HGet( hRoute, "name",       "" )
-         cPattern := _HGet( hRoute, "url",        "" )
+         // [A4.03] HB_HCaseMatch -> lookups O(1) en lugar de linear scan
+         HB_HCaseMatch( hRoute, .F. )
+
+         cName    := hb_HGetDef( hRoute, "name",       "" )
+         cPattern := hb_HGetDef( hRoute, "url",        "" )
 
          IF Empty( cPattern )
 
-            cPattern := _HGet( hRoute, "pattern", "" )
+            cPattern := hb_HGetDef( hRoute, "pattern", "" )
 
          ENDIF
 
-         cAction  := _HGet( hRoute, "action",     "" )
-         cMethod  := _HGet( hRoute, "method",     "*" )
-         cMw      := _HGet( hRoute, "middleware", "" )
-         cScope   := _HGet( hRoute, "scope",      "" )
+         cAction  := hb_HGetDef( hRoute, "action",     "" )
+         cMethod  := hb_HGetDef( hRoute, "method",     "*" )
+         cMw      := hb_HGetDef( hRoute, "middleware", "" )
+         cScope   := hb_HGetDef( hRoute, "scope",      "" )
+         lStream  := hb_HGetDef( hRoute, "stream",     .F. )
 
          nTotal++
 
@@ -194,7 +226,7 @@ FUNCTION HIX_LoadRoutes()
          l( "HIX_LoadRoutes: [ROUTE] " + PadR( cName, 32 ) + PadR( cMethod, 20 ) + cPattern + ;
             iif( Empty( cAction ), "", " -> " + cAction ) )
 
-         IF HIX_RouteAdd( cName, cPattern, cAction, cMethod, cMw, cScope, NIL, .T. )
+         IF HIX_RouteAdd( cName, cPattern, cAction, cMethod, cMw, cScope, NIL, .T., lStream )
 
             nLoaded++
 
@@ -225,17 +257,90 @@ FUNCTION HIX_LoadRoutes()
 RETURN nLoaded
 
 // ============================================================
+// HIX_RouteRegisterAction — whitelist para acciones string.
+// [A1.01] El router rechaza acciones-por-nombre no registradas.
+// Ejemplo:  HIX_RouteRegisterAction( "MyHandler", {|oReq| MyHandler(oReq) } )
+// bBlock puede ser un codeblock o un puntero a función (@Fn()).
+// Devuelve .T. si registrada, .F. si args inválidos.
+// ============================================================
+FUNCTION HIX_RouteRegisterAction( cName, bBlock )
+
+   IF ValType( cName ) != "C" .OR. Empty( cName )
+      le( "HIX_RouteRegisterAction: cName inválido" )
+      RETURN .F.
+   ENDIF
+
+   IF ValType( bBlock ) != "B"
+      le( "HIX_RouteRegisterAction: bBlock debe ser codeblock (@Fn() o {|o|Fn(o)})" )
+      RETURN .F.
+   ENDIF
+
+   IF s_hActionRegistry == NIL
+      // Boot temprano — inicializa mínimamente sin depender de HIX_RoutesLoad
+      s_hActionRegistry := { => }
+      hb_HCaseMatch( s_hActionRegistry, .F. )
+      s_mtxActions      := hb_mutexCreate()
+   ENDIF
+
+   hb_mutexLock( s_mtxActions )
+   s_hActionRegistry[ cName ] := bBlock
+   hb_mutexUnlock( s_mtxActions )
+
+RETURN .T.
+
+// ============================================================
+// HIX_RouteHasAction — .T. si cName está registrado.
+// ============================================================
+FUNCTION HIX_RouteHasAction( cName )
+
+   LOCAL lHas := .F.
+
+   IF s_hActionRegistry == NIL .OR. ValType( cName ) != "C"
+      RETURN .F.
+   ENDIF
+
+   hb_mutexLock( s_mtxActions )
+   lHas := hb_HHasKey( s_hActionRegistry, cName )
+   hb_mutexUnlock( s_mtxActions )
+
+RETURN lHas
+
+// ============================================================
+// HIX_RouteGetAction — devuelve el codeblock registrado o NIL.
+// ============================================================
+FUNCTION HIX_RouteGetAction( cName )
+
+   LOCAL bBlock := NIL
+
+   IF s_hActionRegistry == NIL .OR. ValType( cName ) != "C"
+      RETURN NIL
+   ENDIF
+
+   hb_mutexLock( s_mtxActions )
+   IF hb_HHasKey( s_hActionRegistry, cName )
+      bBlock := s_hActionRegistry[ cName ]
+   ENDIF
+   hb_mutexUnlock( s_mtxActions )
+
+RETURN bBlock
+
+// ============================================================
 // HIX_RouteAdd — registra una ruta.
 // cName    : identificador lógico único ("user.detail")
 // cPattern : URL con :vars o regex directa ("/users/:id")
-// bAction  : codeblock {|oReq|} o nombre de función (string)
+// bAction  : codeblock {|oReq|} o nombre de función (string).
+//            [A1.01] Las acciones-por-nombre requieren registro previo
+//            con HIX_RouteRegisterAction(). Sin registro → 500 en runtime.
 // cMethod  : "GET" | "GET,POST" | "*" (default: "*")
 // cMw      : nombre de función middleware — un solo nombre (opcional)
 // cScope   : string libre pasado al contexto (opcional)
 // uCargo   : dato libre pasado junto con hParams (opcional)
 // lReplace : .T. sobreescribe si ya existe (default: .F. → retorna .F.)
+// lStream  : .T. si la ruta es de streaming (SSE, long chunked, long-poll).
+//            El dispatcher usa server.stream_exec_timeout_ms (default 0)
+//            en vez del exec_timeout_ms global para no matar la conexión.
 // ============================================================
-FUNCTION HIX_RouteAdd( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, lReplace )
+FUNCTION HIX_RouteAdd( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, lReplace, lStream )
 
    LOCAL cRegexp, aVarNames := {}, pCompiled, nScore, cBootCargo
 
@@ -244,6 +349,7 @@ FUNCTION HIX_RouteAdd( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, l
    hb_default( @cScope,   ""   )
    hb_default( @uCargo,   NIL  )
    hb_default( @lReplace, .F.  )
+   hb_default( @lStream,  .F.  )
 
    IF Empty( cName )
 
@@ -306,7 +412,9 @@ FUNCTION HIX_RouteAdd( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, l
 
       ENDIF
 
-      ld( "Ruta reemplazada: " + cName )
+      // [A3.1.4] reemplazar una ruta existente durante la carga es sospechoso
+      // → warning para que sea visible sin DEBUG habilitado.
+      lw( "Ruta reemplazada: " + cName )
       _HixOrderRemove( cName )
 
    ENDIF
@@ -319,6 +427,7 @@ FUNCTION HIX_RouteAdd( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, l
       "middleware" => cMw,       ;
       "scope"      => cScope,    ;
       "cargo"      => uCargo,    ;
+      "stream"     => lStream,   ;
       "varnames"   => aVarNames, ;
       "score"      => nScore     ;
       }
@@ -340,7 +449,7 @@ FUNCTION HIX_RouteAdd( cName, cPattern, bAction, cMethod, cMw, cScope, uCargo, l
 
    ENDIF
 
-   ld( "Ruta registrada: [" + cMethod + "] " + cPattern + " → " + cName )
+   l( "Ruta registrada: [" + cMethod + "] " + cPattern + " → " + cName )
 
 RETURN .T.
 
@@ -407,7 +516,7 @@ FUNCTION HIX_RouteList()
    ENDIF
 
    hb_mutexLock( s_mtxRoutes )
-   hRoutes := s_hRoutes
+   hRoutes := hb_HClone( s_hRoutes )
    hb_mutexUnlock( s_mtxRoutes )
 
    FOR EACH cName IN hb_HKeys( hRoutes )
@@ -418,6 +527,7 @@ FUNCTION HIX_RouteList()
          "pattern" => hRoute[ "pattern" ],                  ;
          "method"  => hRoute[ "method" ],                   ;
          "scope"   => hRoute[ "scope" ],                    ;
+         "stream"  => hb_HGetDef( hRoute, "stream", .F. ), ;
          "cargo"   => hb_HGetDef( hRoute, "cargo", NIL ) ;
          }
       AAdd( aResult, hItem )
@@ -528,8 +638,21 @@ RETURN NIL
 // ============================================================
 FUNCTION HIX_RouteDispatch( oReq )
 
-   LOCAL hRoutes, aOrder, cName, hRoute, aMatches, hParams
+   LOCAL hRoutes, aOrder, cName, hRoute, aMatches, hParams, oCtx
    LOCAL lPathFound := .F., cAllowedMethods := ""
+   LOCAL cMatchPath
+
+   // [A3.1.7] normalizar path antes del match — elimina divergencia con dispatcher
+   oReq:cPath := HIX_PathNormalize( oReq:cPath )
+
+   // [A4.12] /users/ y /users son equivalentes para rutas API.
+   // Strip trailing slash solo para el match; oReq:cPath se preserva para que
+   // el dispatcher 404-fallback vea la barra y _HixResolveIndex pueda redirigir
+   // solicitudes de directorio correctamente (sin crear un redirect infinito).
+   cMatchPath := oReq:cPath
+   IF Len( cMatchPath ) > 1 .AND. Right( cMatchPath, 1 ) == "/"
+      cMatchPath := Left( cMatchPath, Len( cMatchPath ) - 1 )
+   ENDIF
 
    hb_mutexLock( s_mtxRoutes )
    hRoutes := hb_HClone( s_hRoutes )
@@ -539,7 +662,7 @@ FUNCTION HIX_RouteDispatch( oReq )
    FOR EACH cName IN aOrder
 
       hRoute   := hRoutes[ cName ]
-      aMatches := hb_regex( hRoute[ "regexp" ], oReq:cPath )
+      aMatches := hb_regex( hRoute[ "regexp" ], cMatchPath )
 
       IF ! Empty( aMatches )
 
@@ -555,7 +678,10 @@ FUNCTION HIX_RouteDispatch( oReq )
 
             ENDIF
 
-            _HixEvalAction( hRoute[ "action" ], oReq, hParams, cName )
+            _HixEvalAction( hRoute[ "action" ], oReq, hParams, cName, ;
+               iif( hb_HGetDef( hRoute, "stream", .F. ), ;
+                  UConfig( "server", "stream_exec_timeout_ms", 0 ), ;
+                  NIL ) )
             RETURN .T.
          ELSE
             // Acumular métodos permitidos para 405
@@ -573,8 +699,12 @@ FUNCTION HIX_RouteDispatch( oReq )
 
       IF hb_HHasKey( s_hHandlers, "405" )
 
+         // [A3.1.2] crear contexto mínimo para que USession/UJwt/U* funcionen
+         // desde el handler de error igual que en rutas normales.
          HIX_SetRequest( oReq )
-         HIX_SetContext( NIL )
+         oCtx := THixContext():New( oReq, "", "" )
+         HIX_SetContext( oCtx )
+         oReq:hData[ "_ctx" ] := oCtx
          Eval( s_hHandlers[ "405" ], oReq, cAllowedMethods )
          IF ! oReq:lResponded .AND. ! Empty( oReq:cEchoBuffer )
             oReq:Respond( oReq:cEchoBuffer, oReq:nResponseStatus, oReq:cResponseMime )
@@ -588,20 +718,29 @@ FUNCTION HIX_RouteDispatch( oReq )
 
    ELSE
 
-      IF hb_HHasKey( s_hHandlers, "404" )
+      // [A3.1.3] hello-page para "/" cuando no hay handler 404 o cuando el
+      // default_page no existe. Si existe www/<default_page>, cae al handler
+      // 404 (dispatcher) que lo sirve directamente.
+      IF oReq:cPath == "/" .AND. ( ! hb_HHasKey( s_hHandlers, "404" ) .OR. ;
+            ! hb_FileExists( UConfig( "paths", "root", "www" ) + hb_ps() + ;
+                             UConfig( "app", "default_page", "index.html" ) ) )
 
          HIX_SetRequest( oReq )
-         HIX_SetContext( NIL )
+         oReq:Respond( HIX_HelloPage(), 200, "html" )
+
+      ELSEIF hb_HHasKey( s_hHandlers, "404" )
+
+         // [A3.1.2] crear contexto mínimo para que USession/UJwt/U* funcionen
+         // desde el handler de error igual que en rutas normales.
+         HIX_SetRequest( oReq )
+         oCtx := THixContext():New( oReq, "", "" )
+         HIX_SetContext( oCtx )
+         oReq:hData[ "_ctx" ] := oCtx
          Eval( s_hHandlers[ "404" ], oReq )
          IF ! oReq:lResponded .AND. ! Empty( oReq:cEchoBuffer )
             oReq:Respond( oReq:cEchoBuffer, oReq:nResponseStatus, oReq:cResponseMime )
             HIX_EchoClear()
          ENDIF
-
-      ELSEIF oReq:cPath == "/"
-
-         HIX_SetRequest( oReq )
-         oReq:Respond( HIX_HelloPage(), 200, "html" )
 
       ELSE
          oReq:lKeepAlive := .F.
@@ -634,19 +773,21 @@ FUNCTION URoute( cName, ... )
 
    NEXT
 
+   hb_mutexLock( s_mtxRoutes )
    IF s_hRoutes == NIL .OR. ! hb_HHasKey( s_hRoutes, cName )
-
+      hb_mutexUnlock( s_mtxRoutes )
       lw( "URoute: ruta '" + cName + "' no encontrada" )
       RETURN ""
-
    ENDIF
+   hRoute := hb_HClone( s_hRoutes[ cName ] )
+   hb_mutexUnlock( s_mtxRoutes )
 
-   cUrl := s_hRoutes[ cName ][ "pattern" ]
+   cUrl := hRoute[ "pattern" ]
 
-   IF Len( aArgs ) < Len( s_hRoutes[ cName ][ "varnames" ] )
+   IF Len( aArgs ) < Len( hRoute[ "varnames" ] )
 
       lw( "URoute: ruta '" + cName + "' requiere " + ;
-         hb_NToS( Len( s_hRoutes[ cName ][ "varnames" ] ) ) + " parámetro(s)" )
+         hb_NToS( Len( hRoute[ "varnames" ] ) ) + " parámetro(s)" )
       RETURN ""
 
    ENDIF
@@ -697,6 +838,7 @@ RETURN xDef
 STATIC FUNCTION _HixPatternToRegexp( cPattern, aVarNames )
 
    LOCAL cResult := "", nPos := 1, nEnd, nClose, c, cVarName, lOptional, cConstraint
+   LOCAL nParenDepth := 0    // A1.25 — no escapar contenido dentro de () (regex grupo)
 
    aVarNames := {}
 
@@ -759,7 +901,28 @@ STATIC FUNCTION _HixPatternToRegexp( cPattern, aVarNames )
          AAdd( aVarNames, cVarName )
          nPos := nEnd
       ELSE
-         cResult += c
+         // A1.25 — escapar `.` literal en segmentos fuera de grupos ().
+         // Antes: "/v1.0/data" -> "^/v1.0/data$" hacía que `.` matchease
+         // cualquier char, permitiendo /v1X0/data. Ahora `.` va literal.
+         // Dentro de () respetamos el regex del usuario (feature existente:
+         // `/items/([0-9]+)` como grupo regex directo con captura _N).
+         // `*` fuera de () sigue siendo wildcard tipo path (`/api/*`).
+         DO CASE
+         CASE c == "("
+            nParenDepth++
+            cResult += c
+         CASE c == ")"
+            IF nParenDepth > 0 ; nParenDepth-- ; ENDIF
+            cResult += c
+         CASE nParenDepth > 0
+            cResult += c
+         CASE c == "*"
+            cResult += ".*"
+         CASE c == "."
+            cResult += Chr( 92 ) + c
+         OTHERWISE
+            cResult += c
+         ENDCASE
          nPos++
 
       ENDIF
@@ -767,6 +930,11 @@ STATIC FUNCTION _HixPatternToRegexp( cPattern, aVarNames )
    ENDDO
 
 RETURN cResult
+
+// Test hook público — expone _HixPatternToRegexp para audit tests.
+FUNCTION HIX_PatternToRegexpForTest( cPattern )
+   LOCAL aVars := {}
+RETURN _HixPatternToRegexp( cPattern, @aVars )
 
 // Comprueba si cMethod está permitido en cAllowed (comma-separated)
 STATIC FUNCTION _HixMethodAllowed( cAllowed, cMethod )
@@ -862,29 +1030,59 @@ STATIC FUNCTION _HixRunMiddleware( cMw, cScope, oReq )
 
 RETURN lOk
 
+// Audit A2.06 — helper interno con lock siempre-tomado. Reemplaza las
+// 2 secuencias `IF s_oRouteDisp == NIL ... ENDIF` inline que no tenian
+// sincronizacion. cRoot se lee de config solo en la primera creacion
+// (comportamiento identico al pre-fix).
+STATIC FUNCTION _HixEnsureRouteDisp()
+
+   LOCAL cRoot
+
+   hb_mutexLock( s_mtxRouteDisp )
+
+   IF s_oRouteDisp == NIL
+
+      cRoot := UConfig( "paths", "root", "www" )
+      s_oRouteDisp := THixDispatcher():New( cRoot )
+
+   ENDIF
+
+   hb_mutexUnlock( s_mtxRouteDisp )
+
+RETURN s_oRouteDisp
+
+// Public wrappers para tests A2.06 — el ref permite verificar
+// singleton, el reset permite empezar desde estado NIL sin depender
+// de tests previos.
+FUNCTION HIX_RouteDispRef()
+RETURN _HixEnsureRouteDisp()
+
+FUNCTION HIX_RouteDispReset()
+
+   hb_mutexLock( s_mtxRouteDisp )
+   s_oRouteDisp := NIL
+   hb_mutexUnlock( s_mtxRouteDisp )
+
+RETURN NIL
+
 // Dispatches the cOnFail route using the same request object.
 // The original headers, query params, and body remain accessible to the handler.
 STATIC FUNCTION _HixDispatchOnFail( oReq, cOnFail )
 
-   LOCAL cRoot
-
-   cRoot := UConfig( "paths", "root", "www" )
-
-   IF s_oRouteDisp == NIL
-
-      s_oRouteDisp := THixDispatcher():New( cRoot )
-
-   ENDIF
+   _HixEnsureRouteDisp()
 
    oReq:cPath := cOnFail
    s_oRouteDisp:Dispatch( oReq )
 
 RETURN NIL
 
-// Evalúa la action: codeblock, nombre de función (string) o ruta de fichero
-STATIC FUNCTION _HixEvalAction( bAction, oReq, hParams, cRouteName )
+// Evalúa la action: codeblock, nombre de función (string) o ruta de fichero.
+// nTimeoutMs (opcional) sobrescribe el timeout del dispatcher para esta
+// invocación. NIL = usar el default global (::nExecTimeout). Se propaga
+// desde el router solo para rutas marcadas "stream": true.
+STATIC FUNCTION _HixEvalAction( bAction, oReq, hParams, cRouteName, nTimeoutMs )
 
-   LOCAL bFunc, cExt, cRoot, cPhysical, xResult, cPath
+   LOCAL bFunc, cExt, cPhysical, xResult, cPath
    LOCAL hClass, cFileName, nAt, cDir, cFileSpec
 
    hb_default( @cRouteName, "" )
@@ -910,14 +1108,8 @@ STATIC FUNCTION _HixEvalAction( bAction, oReq, hParams, cRouteName )
 
          IF ! Empty( cExt )
 
-            // File path action — dispatch via extension
-            cRoot := UConfig( "paths", "root", "www" )
-
-            IF s_oRouteDisp == NIL
-
-               s_oRouteDisp := THixDispatcher():New( cRoot )
-
-            ENDIF
+            // Audit A2.06 — dispatcher creado thread-safe via helper.
+            _HixEnsureRouteDisp()
 
             // Parse method@class.prg notation (e.g. "controllers/index@customer.prg")
             cFileName := hb_FNameNameExt( bAction )
@@ -964,7 +1156,7 @@ STATIC FUNCTION _HixEvalAction( bAction, oReq, hParams, cRouteName )
                CASE cExt == ".html" .OR. cExt == ".htm"
                   USendHtml( s_oRouteDisp:ExecuteHtml( cPhysical ) )
                CASE cExt == ".prg"
-                  xResult := s_oRouteDisp:ExecutePrg( cPhysical, oReq, hClass )
+                  xResult := s_oRouteDisp:ExecutePrg( cPhysical, oReq, hClass, nTimeoutMs )
 
                IF ! oReq:lResponded .AND. ! Empty( xResult )
 
@@ -973,7 +1165,7 @@ STATIC FUNCTION _HixEvalAction( bAction, oReq, hParams, cRouteName )
                   ENDIF
 
                CASE cExt == ".hrb"
-                  xResult := s_oRouteDisp:ExecuteHrb( cPhysical )
+                  xResult := s_oRouteDisp:ExecuteHrb( cPhysical, nTimeoutMs, oReq )
 
                IF ! oReq:lResponded .AND. ! Empty( xResult )
 
@@ -996,7 +1188,16 @@ STATIC FUNCTION _HixEvalAction( bAction, oReq, hParams, cRouteName )
                   "Invalid route action '" + bAction + "' (missing extension) in route '" + cRouteName + "'", ;
                   "Router", 500, "EvalAction" ) )
             ELSE
-               bFunc := &( "{|o|" + bAction + "(o)}" )
+               // [A1.01] Whitelist estricta — sin macro-eval. La acción debe
+               // haberse registrado con HIX_RouteRegisterAction() antes.
+               bFunc := HIX_RouteGetAction( bAction )
+               IF bFunc == NIL
+                  lw( "Router: unregistered action '" + bAction + "' in route '" + cRouteName + ;
+                      "' — rechazado (llama a HIX_RouteRegisterAction() primero)" )
+                  HIX_Throw( HIX_NewError( ;
+                     "Unregistered action '" + bAction + "' in route '" + cRouteName + "'", ;
+                     "Router", 500, "EvalAction" ) )
+               ENDIF
                Eval( bFunc, oReq )
 
             ENDIF
@@ -1008,6 +1209,10 @@ STATIC FUNCTION _HixEvalAction( bAction, oReq, hParams, cRouteName )
       FINALLY
       // Cierra areas DBF incluso si la ejecucion aborto por excepcion.
       HIX_CloseDbfAreas()
+      // Devuelve al pool cualquier conexion WDO_Get() que el handler
+      // olvido cerrar (o perdio por excepcion). Fast-path ~1ns cuando
+      // no hay pools registrados.
+      WDO_ReleaseAllThread()
 
    END
 
@@ -1136,7 +1341,7 @@ STATIC FUNCTION _HixCacheDeleteDir( cDir )
 
          IF cExt == ".hrb" .OR. ( cExt == ".prg" .AND. Left( cName, 2 ) == "__" )
 
-            hb_vfErase( cFull )
+            HIX_SafeErase( cFull )
             nCount++
 
          ENDIF
@@ -1146,6 +1351,30 @@ STATIC FUNCTION _HixCacheDeleteDir( cDir )
    NEXT
 
 RETURN nCount
+
+// ============================================================
+// /hix-ping — health endpoint with baked-in CORS wildcard so
+// browser tools (load testers, dashboards) hosted on any origin
+// can reach it without extra middleware config. Also answers the
+// OPTIONS preflight so custom-header requests work.
+// ============================================================
+
+STATIC FUNCTION _HixRoutePing( oReq )
+
+   LOCAL hHeaders := { ;
+      "Access-Control-Allow-Origin"  => "*", ;
+      "Access-Control-Allow-Methods" => "GET,OPTIONS", ;
+      "Access-Control-Allow-Headers" => "Content-Type,Accept,Authorization" }
+
+   IF oReq:cMethod == "OPTIONS"
+      oReq:Respond( "", 204, NIL, hHeaders )
+   ELSE
+      oReq:Respond( ;
+         { "status" => "ok", "server" => "HIX/" + HIX_Version(), "now" => hb_TToS( hb_DateTime() ) }, ;
+         200, NIL, hHeaders )
+   ENDIF
+
+RETURN NIL
 
 // ============================================================
 // Dispatchers GET/POST para rutas de auth admin
@@ -1251,19 +1480,22 @@ STATIC FUNCTION _HixSysRouteAdd( oReq )
 
    ENDIF
 
-   cName    := _HGet( hBody, "name",       "" )
-   cPattern := _HGet( hBody, "url",        "" )
+   // [A4.03] HB_HCaseMatch -> lookups O(1)
+   HB_HCaseMatch( hBody, .F. )
+
+   cName    := hb_HGetDef( hBody, "name",       "" )
+   cPattern := hb_HGetDef( hBody, "url",        "" )
 
    IF Empty( cPattern )
 
-      cPattern := _HGet( hBody, "pattern", "" )
+      cPattern := hb_HGetDef( hBody, "pattern", "" )
 
    ENDIF
 
-   cAction  := _HGet( hBody, "action",     "" )
-   cMethod  := _HGet( hBody, "method",     "*" )
-   cMw      := _HGet( hBody, "middleware", "" )
-   cScope   := _HGet( hBody, "scope",      "" )
+   cAction  := hb_HGetDef( hBody, "action",     "" )
+   cMethod  := hb_HGetDef( hBody, "method",     "*" )
+   cMw      := hb_HGetDef( hBody, "middleware", "" )
+   cScope   := hb_HGetDef( hBody, "scope",      "" )
 
    // Reservado: nombres hix.* son exclusivos del sistema
 
@@ -1301,7 +1533,8 @@ STATIC FUNCTION _HixSysRouteDelete( oReq )
 
    ENDIF
 
-   cName := _HGet( hBody, "name", "" )
+   HB_HCaseMatch( hBody, .F. )
+   cName := hb_HGetDef( hBody, "name", "" )
 
    IF Empty( cName )
 
@@ -1315,42 +1548,118 @@ STATIC FUNCTION _HixSysRouteDelete( oReq )
 
 RETURN NIL
 
-// GET /hix-routes/reload — borra rutas de aplicación y recarga routes/*.json.
+// GET /hix-routes/reload — recarga routes/*.json sin ventana de 404.
+// Patrón atomic-swap: construye el nuevo mapa de rutas fuera del lock
+// (I/O + compilación de regexp), luego sustituye s_hRoutes en una sola
+// operación atómica bajo lock. Las peticiones concurrentes ven siempre
+// un mapa completo — nunca el estado intermedio "sin rutas de app".
 STATIC FUNCTION _HixSysRouteReload( oReq )
 
-   LOCAL nLoaded, cName, aDeleted
+   LOCAL nLoaded := 0, nDeleted := 0
+   LOCAL cName, hNewRoutes, hRoute, aVarNames
+   LOCAL cRoutesDir, aFiles, aFile, cFile, cJson, xData
+   LOCAL cPattern, cMethod, cAction, cMw, cScope, lStream
+   LOCAL cRegexp, pCompiled, nScore
 
-   // Recoger nombres de rutas de aplicacion (sin hix.*)
+   // --- Fase 1: construir nuevo mapa de rutas (sin lock, puede hacer I/O) ---
+
+   // Copiar rutas de sistema (hix.*) bajo lock breve
+   hNewRoutes := { => }
    hb_mutexLock( s_mtxRoutes )
-   aDeleted := {}
-
    FOR EACH cName IN hb_HKeys( s_hRoutes )
-
-      IF !( Left( cName, 4 ) == "hix." )
-
-         AAdd( aDeleted, cName )
-
+      IF Left( cName, 4 ) == "hix."
+         hNewRoutes[ cName ] := s_hRoutes[ cName ]
+      ELSE
+         nDeleted++
       ENDIF
-
    NEXT
-
-   // Borrar en el hash original (no reemplazar el puntero) y sincronizar order array
-
-   FOR EACH cName IN aDeleted
-
-      hb_HDel( s_hRoutes, cName )
-      _HixOrderRemove( cName )
-
-   NEXT
-
    hb_mutexUnlock( s_mtxRoutes )
 
-   nLoaded := HIX_LoadRoutes()
+   // Cargar rutas de aplicacion desde JSON en hNewRoutes (sin lock)
+   cRoutesDir := UConfig( "paths", "root", "www" ) + hb_ps() + "routes"
+
+   IF hb_vfDirExists( cRoutesDir )
+
+      aFiles := hb_vfDirectory( cRoutesDir + hb_ps() + "*.json" )
+
+      FOR EACH aFile IN aFiles
+
+         cFile := cRoutesDir + hb_ps() + aFile[ 1 ]
+         cJson := hb_MemoRead( cFile )
+
+         IF Empty( cJson ) ; LOOP ; ENDIF
+
+         xData := NIL
+         hb_jsonDecode( cJson, @xData )
+         IF ValType( xData ) != "A" ; LOOP ; ENDIF
+
+         FOR EACH hRoute IN xData
+
+            IF ValType( hRoute ) != "H" ; LOOP ; ENDIF
+            HB_HCaseMatch( hRoute, .F. )
+
+            cName    := hb_HGetDef( hRoute, "name",       "" )
+            cPattern := hb_HGetDef( hRoute, "url",        "" )
+            IF Empty( cPattern )
+               cPattern := hb_HGetDef( hRoute, "pattern", "" )
+            ENDIF
+            cAction  := hb_HGetDef( hRoute, "action",     "" )
+            cMethod  := Upper( hb_HGetDef( hRoute, "method",     "*" ) )
+            cMw      := hb_HGetDef( hRoute, "middleware", "" )
+            cScope   := hb_HGetDef( hRoute, "scope",      "" )
+            lStream  := hb_HGetDef( hRoute, "stream",     .F. )
+
+            IF Empty( cName ) .OR. Empty( cPattern ) ; LOOP ; ENDIF
+            IF Left( Lower( cName ), 4 ) == "hix."   ; LOOP ; ENDIF
+
+            IF cMethod == "*"
+               cMethod := "GET,POST,PUT,DELETE,OPTIONS"
+            ELSEIF ! "OPTIONS" $ cMethod
+               cMethod += ",OPTIONS"
+            ENDIF
+
+            IF Left( cPattern, 1 ) != "/" ; cPattern := "/" + cPattern ; ENDIF
+
+            cRegexp   := _HixPatternToRegexp( cPattern, @aVarNames )
+            pCompiled := hb_regexComp( "^" + cRegexp + "$" )
+            IF pCompiled == NIL ; LOOP ; ENDIF
+
+            nScore := _HixRouteScore( cPattern )
+
+            hNewRoutes[ cName ] := { ;
+               "pattern"    => cPattern,  ;
+               "regexp"     => pCompiled, ;
+               "action"     => cAction,   ;
+               "method"     => cMethod,   ;
+               "middleware" => cMw,       ;
+               "scope"      => cScope,    ;
+               "cargo"      => NIL,       ;
+               "stream"     => lStream,   ;
+               "varnames"   => aVarNames, ;
+               "score"      => nScore     ;
+               }
+
+            nLoaded++
+
+         NEXT
+
+      NEXT
+
+   ENDIF
+
+   // --- Fase 2: swap atómico bajo lock (sin I/O, operación rápida) ---
+   hb_mutexLock( s_mtxRoutes )
+   s_hRoutes     := hNewRoutes
+   s_aRouteOrder := {}
+   FOR EACH cName IN hb_HKeys( s_hRoutes )
+      _HixOrderInsert( cName, s_hRoutes[ cName ][ "score" ] )
+   NEXT
+   hb_mutexUnlock( s_mtxRoutes )
 
    oReq:Respond( { ;
-      "ok"            => .T.,           ;
-      "total_deleted" => Len( aDeleted ), ;
-      "total_loaded"  => nLoaded         ;
+      "ok"            => .T.,     ;
+      "total_deleted" => nDeleted, ;
+      "total_loaded"  => nLoaded   ;
       } )
 
 RETURN NIL
@@ -1362,12 +1671,17 @@ STATIC FUNCTION _HixSysRouteList( oReq, lAll )
    LOCAL cHtml := '', cLine, aNames, cName, hRoute
    LOCAL cAction, cMethod, cMw, cTitle
    LOCAL cEol := Chr( 10 )
+   LOCAL hSnapshot
 
    hb_default( @lAll, .F. )
 
+   hb_mutexLock( s_mtxRoutes )
+   hSnapshot := hb_HClone( s_hRoutes )
+   hb_mutexUnlock( s_mtxRoutes )
+
    aNames := {}
 
-   FOR EACH cName IN hb_HKeys( s_hRoutes )
+   FOR EACH cName IN hb_HKeys( hSnapshot )
 
       IF lAll .OR. !( Left( cName, 4 ) == "hix." )
 
@@ -1386,7 +1700,7 @@ STATIC FUNCTION _HixSysRouteList( oReq, lAll )
 
    FOR EACH cName IN aNames
 
-      hRoute  := s_hRoutes[ cName ]
+      hRoute  := hSnapshot[ cName ]
       cMethod := hb_HGetDef( hRoute, "method",     "*"  )
       cAction := hb_HGetDef( hRoute, "action",     ""   )
       cMw     := hb_HGetDef( hRoute, "middleware", ""   )

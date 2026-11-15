@@ -178,6 +178,10 @@ METHOD New( cFile, nLevel, lConsole, nMaxSize, nMaxFiles ) CLASS THixLogger
 
       ENDIF
 
+      // Log dir may live outside HIX_AppRoot() (e.g. system-wide log path).
+      // Register so log rotation can HIX_SafeErase old rotated files.
+      HIX_SafeRegisterDir( hb_FNameDir( cFile ) )
+
       ::hFile := FOpen( cFile, FO_READWRITE + FO_SHARED )
 
       IF ::hFile == F_ERROR
@@ -198,7 +202,7 @@ RETURN Self
 
 METHOD Write( cMsg, nLevel, cContext ) CLASS THixLogger
 
-   LOCAL cLine, cNewName, cDir, aFiles
+   LOCAL cLine, cNewName, cDir, aFiles, oError
 
    IF nLevel < ::nLevel
 
@@ -209,46 +213,63 @@ METHOD Write( cMsg, nLevel, cContext ) CLASS THixLogger
    cLine := ::_Format( cMsg, nLevel, cContext )
    hb_mutexLock( ::oMutex )
 
-   IF ::lConsole
+   // [A2.08] TRY/CATCH/FINALLY para garantizar hb_mutexUnlock incluso
+   // si FWrite / hb_vfRename / FCreate / hb_vfErase lanzan excepcion.
+   // Sin esto, un fallo de I/O deja el mutex permanentemente locked y
+   // el resto de threads que llamen Write() quedan colgados en cascada.
+   TRY
 
-      // Redirigido a _d() para no contaminar la consola del servidor
-      _d( cLine )
+      IF ::lConsole
 
-   ENDIF
+         // Redirigido a _d() para no contaminar la consola del servidor
+         _d( cLine )
 
-   IF ::hFile != NIL .AND. ::hFile != F_ERROR
+      ENDIF
 
-      FWrite( ::hFile, cLine + hb_eol() )
+      IF ::hFile != NIL .AND. ::hFile != F_ERROR
 
-      IF FSeek( ::hFile, 0, FS_RELATIVE ) > ::nMaxSize
+         FWrite( ::hFile, cLine + hb_eol() )
 
-         FClose( ::hFile )
-         cNewName := hb_FNameDir( ::cFile ) + hb_FNameName( ::cFile ) + "_" + ;
-            StrTran( hb_TToS( hb_DateTime() ), ".", "" ) + hb_FNameExt( ::cFile )
-         hb_vfRename( ::cFile, cNewName )
-         ::hFile := FCreate( ::cFile )
+         IF FSeek( ::hFile, 0, FS_RELATIVE ) > ::nMaxSize
 
-         IF ::nMaxFiles > 0
+            FClose( ::hFile )
+            cNewName := hb_FNameDir( ::cFile ) + hb_FNameName( ::cFile ) + "_" + ;
+               StrTran( hb_TToS( hb_DateTime() ), ".", "" ) + hb_FNameExt( ::cFile )
+            hb_vfRename( ::cFile, cNewName )
+            ::hFile := FCreate( ::cFile )
 
-            cDir   := hb_FNameDir( ::cFile )
-            aFiles := hb_vfDirectory( cDir + hb_FNameName( ::cFile ) + "_*" + hb_FNameExt( ::cFile ) )
-            ASort( aFiles,,,, {| a, b | a[ 1 ] < b[ 1 ] } )
+            IF ::nMaxFiles > 0
 
-            DO WHILE Len( aFiles ) > ::nMaxFiles
+               cDir   := hb_FNameDir( ::cFile )
+               aFiles := hb_vfDirectory( cDir + hb_FNameName( ::cFile ) + "_*" + hb_FNameExt( ::cFile ) )
+               ASort( aFiles,,,, {| a, b | a[ 1 ] < b[ 1 ] } )
 
-               hb_vfErase( cDir + aFiles[ 1 ][ 1 ] )
-               ADel( aFiles, 1 )
-               ASize( aFiles, Len( aFiles ) - 1 )
+               DO WHILE Len( aFiles ) > ::nMaxFiles
 
-            ENDDO
+                  HIX_SafeErase( cDir + aFiles[ 1 ][ 1 ] )
+                  ADel( aFiles, 1 )
+                  ASize( aFiles, Len( aFiles ) - 1 )
+
+               ENDDO
+
+            ENDIF
 
          ENDIF
 
       ENDIF
 
-   ENDIF
+   CATCH oError
 
-   hb_mutexUnlock( ::oMutex )
+      // Swallow: un logger que falla no debe romper al caller. Si el
+      // propio logger es el que peta, no podemos loguear la excepcion
+      // (evita recursion). El request continua sin log.
+      HB_SYMBOL_UNUSED( oError )
+
+   FINALLY
+
+      hb_mutexUnlock( ::oMutex )
+
+   END
 
 RETURN Self
 

@@ -1,0 +1,40 @@
+# ============================================================
+# app.hbp — Example HIX minimal "hi" app
+# ============================================================
+
+-n
+-w1
+-es2
+-inc
+-head=full
+-mt
+-workdir=.hbmk/${hb_compiler}/app
+
+-hbexe
+-oapp
+
+# Main
+src/app.prg
+
+# Resources file
+{msvc64}app.res
+{mingw64}app.rc
+
+# .hbx symbol hints — listing an .hbx as source makes hbmk2 auto-emit
+# REQUEST for every symbol declared inside, so functions used only from
+# dynamic .hrb controllers (dbCreate, NetErr, hb_RandInt, Curl_*, HPDF_*)
+# survive --gc-sections at link time on Linux and remain resolvable when
+# .hbc pulls hbcurl/hbhpdf unconditionally.
+{win}${hix}\hix_server.hbx
+{win}c:\harbour\include\harbour.hbx
+{win}c:\harbour\contrib\hbcurl\hbcurl.hbx
+{win}c:\harbour\contrib\hbhpdf\hbhpdf.hbx
+
+{unix}${hix}/hix_server.hbx
+{unix}${hb_inc}/harbour.hbx
+{unix}${hb_root}/contrib/hbcurl/hbcurl.hbx
+{unix}${hb_root}/contrib/hbhpdf/hbhpdf.hbx
+
+# Shared HIX linker + include config (incpaths, libpaths, libs,
+# platform filters, whole-archive on Linux, contribs).
+${hix}/hix_server.hbc

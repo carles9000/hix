@@ -1,0 +1,119 @@
+@view 'header.html', 'WDO SQLite3', 'Server info — library, DB file metadata and runtime stats'
+
+@prg
+
+   //  ------------------------------------------------------------
+   //  SQLite3 metadata dashboard (no SHOW STATUS / SHOW VARIABLES
+   //  on SQLite -- PRAGMA + sqlite_master cover the equivalent).
+   //
+   //    1) WDO binding info      -- Version, singleton metadata
+   //    2) Database file info    -- file, size, page stats
+   //    3) PRAGMA settings       -- journal_mode, synchronous, etc.
+   //    4) Tables in the DB      -- sqlite_master
+   //    5) Compile options       -- PRAGMA compile_options
+   //  ------------------------------------------------------------
+
+   LOCAL oConn := WDO_Get( "SQLITE" )
+   LOCAL oStmt, aRows, hRow, nSize
+
+   IF oConn == NIL
+      ? 'Error: standalone conn not registered'
+      RETU NIL
+   ENDIF
+
+   //  ------------------------------------------------------------
+   //  1) WDO client metadata
+   //  ------------------------------------------------------------
+
+   ?? '<h3>1) Binding WDO_Sqlite3</h3>'
+
+   ?? '<pre>'
+   ?  'WDO version .....: ' + oConn:VersionName()
+   ?  'SQLite library ..: ' + oConn:LibVersion()
+   ?  'DB file .........: ' + oConn:cFile
+   ?  'Pool key ........: ' + oConn:cPoolKey
+   ?  'Open conns ......: ' + hb_NToS( oConn:CountOpen() )
+   ?  'InTransaction ...: ' + iif( oConn:InTransaction(), 'T', 'F' )
+   ?? '</pre>'
+
+   //  ------------------------------------------------------------
+   //  2) File metadata (size on disk + page count)
+   //  ------------------------------------------------------------
+
+   ?? '<h3>2) Database file</h3>'
+
+   nSize := iif( oConn:cFile == ":memory:", 0, hb_FSize( oConn:cFile ) )
+
+   ?? '<pre>'
+   ?  'File on disk ....: ' + oConn:cFile
+   ?  'Size (bytes) ....: ' + hb_NToS( nSize )
+   ?? '</pre>'
+
+   oStmt := oConn:Query( "SELECT "               + ;
+      "( SELECT page_count FROM pragma_page_count() ) AS page_count, "   + ;
+      "( SELECT page_size  FROM pragma_page_size()  ) AS page_size, "    + ;
+      "( SELECT freelist_count FROM pragma_freelist_count() ) AS freelist_count" )
+   hRow := oStmt:Fetch_Assoc()
+   oStmt:Free()
+
+   ?? '<pre>'
+   ?  'Page count ......: ' + hb_NToS( hRow[ 'page_count'     ] )
+   ?  'Page size .......: ' + hb_NToS( hRow[ 'page_size'      ] )
+   ?  'Freelist count ..: ' + hb_NToS( hRow[ 'freelist_count' ] )
+   ?? '</pre>'
+
+   //  ------------------------------------------------------------
+   //  3) Runtime PRAGMAs
+   //  ------------------------------------------------------------
+
+   ?? '<h3>3) PRAGMA settings</h3>'
+
+   oStmt := oConn:Query( "SELECT "                       + ;
+      "( SELECT journal_mode FROM pragma_journal_mode() ) AS journal_mode, "    + ;
+      "( SELECT synchronous  FROM pragma_synchronous()  ) AS synchronous, "     + ;
+      "( SELECT foreign_keys FROM pragma_foreign_keys() ) AS foreign_keys, "    + ;
+      "( SELECT cache_size   FROM pragma_cache_size()   ) AS cache_size, "      + ;
+      "( SELECT user_version FROM pragma_user_version() ) AS user_version, "    + ;
+      "( SELECT encoding     FROM pragma_encoding()     ) AS encoding" )
+   hRow := oStmt:Fetch_Assoc()
+   oStmt:Free()
+
+   ?? '<pre>'
+   ?  'journal_mode ....: ' + hRow[ 'journal_mode' ]
+   ?  'synchronous .....: ' + hb_NToS( hRow[ 'synchronous'  ] )
+   ?  'foreign_keys ....: ' + hb_NToS( hRow[ 'foreign_keys' ] )
+   ?  'cache_size ......: ' + hb_NToS( hRow[ 'cache_size'   ] )
+   ?  'user_version ....: ' + hb_NToS( hRow[ 'user_version' ] )
+   ?  'encoding ........: ' + hRow[ 'encoding' ]
+   ?? '</pre>'
+
+   //  ------------------------------------------------------------
+   //  4) Tables in the current DB
+   //  ------------------------------------------------------------
+
+   ?? '<h3>4) Tables (sqlite_master)</h3>'
+
+   oStmt := oConn:Query( "SELECT name, type FROM sqlite_master " + ;
+                         "WHERE type IN ('table','view') ORDER BY name" )
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+
+   IF Empty( aRows )
+      ? '<i>No user tables yet. Visit <code>sqlite2.html</code> first to seed data.</i>'
+   ELSE
+      ?? oConn:View( aRows,, 'Tables and views' )
+   ENDIF
+
+   //  ------------------------------------------------------------
+   //  5) Compile-time options of the embedded SQLite build
+   //  ------------------------------------------------------------
+
+   ?? '<h3>5) PRAGMA compile_options</h3>'
+
+   oStmt := oConn:Query( "PRAGMA compile_options" )
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+
+   ?? oConn:View( aRows,, 'Compile options' )
+
+@endprg

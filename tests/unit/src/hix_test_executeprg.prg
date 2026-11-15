@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_test_executeprg.prg
   Author.....: Charly 9000
   Created....: 2026-06-04
@@ -28,9 +28,9 @@ STATIC PROCEDURE _CleanTmpRoot( cRoot )
    IF ! hb_DirExists( cRoot ) ; RETURN ; ENDIF
    aFiles := Directory( cRoot + "*.*" )
    FOR EACH aEntry IN aFiles
-      FErase( cRoot + aEntry[1] )
+      HIX_SafeErase( cRoot + aEntry[1] )
    NEXT
-   hb_DirDelete( hb_StrShrink( cRoot, 1 ) )
+   HIX_SafeDirDelete( hb_StrShrink( cRoot, 1 ) )
 RETURN
 
 STATIC FUNCTION _Disp( cRoot )

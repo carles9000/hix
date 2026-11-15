@@ -56,8 +56,8 @@ FUNCTION HIX_TestVCacheMetrics_Run()
    HIX_ViewCacheClear()
    HIX_SetConfig( oPrevConfig )
    hb_FileDelete( cViewFile )
-   hb_DirDelete( hb_StrShrink( cViewDir, 1 ) )
-   hb_DirDelete( hb_DirBase() + "hix_vcmtest" )
+   HIX_SafeDirDelete( hb_StrShrink( cViewDir, 1 ) )
+   HIX_SafeDirDelete( hb_DirBase() + "hix_vcmtest" )
 
    _VLog( "=== HIX_TestVCacheMetrics_Run end ===" )
 RETURN hCtx

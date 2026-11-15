@@ -90,11 +90,16 @@ STATIC FUNCTION _HixWorkerSSE( oReq )
 
       nTick := 0
 
-      IF ! oReq:oIO:Write( ": keep-alive" + Chr( 10 ) + Chr( 10 ) )
-
+      hb_mutexLock( oConn:oMutex )
+      IF oConn:lActive
+         IF ! oReq:oIO:Write( ": keep-alive" + Chr( 10 ) + Chr( 10 ) )
+            oConn:lActive := .F.
+            lActive       := .F.
+         ENDIF
+      ELSE
          lActive := .F.
-
       ENDIF
+      hb_mutexUnlock( oConn:oMutex )
 
       IF ( hb_DateTime() - tLast ) * 86400 > 3600
 

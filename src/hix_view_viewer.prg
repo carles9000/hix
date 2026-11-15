@@ -706,8 +706,7 @@ METHOD ExecuteHrb() CLASS Hix_View_Viewer
    LOCAL oPar, oSubError, pFunc, cCode, aCode, oErrorView, oError
 
 // Stack levels capturados en el WITH handler (antes de que el stack se deshaga)
-   LOCAL cPN0, cPN1, cPN2, cPN3
-   LOCAL nPL0, nPL1, nPL2, nPL3
+   LOCAL nFrIdx, nSkip
 
    IF empty( ::oHrb )
 
@@ -720,11 +719,16 @@ METHOD ExecuteHrb() CLASS Hix_View_Viewer
 
    BEGIN SEQUENCE WITH {| e |
 
-      nPL0 := ProcLine( 0 ) ; cPN0 := ProcName( 0 )
-      nPL1 := ProcLine( 1 ) ; cPN1 := ProcName( 1 )
-      nPL2 := ProcLine( 2 ) ; cPN2 := ProcName( 2 )
-      nPL3 := ProcLine( 3 ) ; cPN3 := ProcName( 3 )
-      nLine := iif( nPL1 > 0, nPL1, iif( nPL2 > 0, nPL2, iif( nPL3 > 0, nPL3, 0 ) ) )
+      // Saltar el frame 0 (este mismo codeblock handler); primer frame con
+      // linea util es el que corresponde al codigo transpiled (Hix_Template
+      // o __blockN cuando el error viene de un @prg block).
+      nLine := 0
+      FOR nFrIdx := 1 TO 9
+         IF ProcLine( nFrIdx ) > 0
+            nLine := ProcLine( nFrIdx )
+            EXIT
+         ENDIF
+      NEXT
       Break( e )
       RETURN NIL
       }
@@ -772,12 +776,28 @@ METHOD ExecuteHrb() CLASS Hix_View_Viewer
                cCode := hb_base64Decode( hb_ExecFromArray( pFunc ) )
                aCode := hb_jsondecode( cCode )
 
-               IF Len( aCode ) > 0 .AND. nLine <= Len( aCode )
+               IF ValType( aCode ) == "A" .AND. Len( aCode ) > 0
 
-                  oErrorView:cargo[ "line"       ] := aCode[ nLine ][ 1 ]  // n linea visible (template)
-                  oErrorView:cargo[ "line_code"  ] := aCode[ nLine ][ 2 ]
-                  oErrorView:cargo[ "line_index" ] := nLine               // indice en aLineMap
-                  oErrorView:cargo[ "aCode"      ] := aCode
+                  // Clamp: el compilador Harbour a veces reporta la linea posterior
+                  // al token que fallo (off-by-one) — puede caer fuera del mapa.
+                  IF nLine > Len( aCode ) ; nLine := Len( aCode ) ; ENDIF
+
+                  // Retroceder mientras la entrada del mapa sea marker de
+                  // preambulo, END OF PROGRAM o linea sin cuerpo (typicamente
+                  // linea vacia tras un RETURN en un @prg block).
+                  nSkip := 0
+                  DO WHILE nLine > 1 .AND. nSkip < 20 .AND. ;
+                        ( aCode[ nLine ][ 1 ] <= 0 .OR. Empty( aCode[ nLine ][ 2 ] ) )
+                     nLine--
+                     nSkip++
+                  ENDDO
+
+                  IF aCode[ nLine ][ 1 ] > 0 .AND. ! Empty( aCode[ nLine ][ 2 ] )
+                     oErrorView:cargo[ "line"       ] := aCode[ nLine ][ 1 ]  // linea template
+                     oErrorView:cargo[ "line_code"  ] := aCode[ nLine ][ 2 ]
+                     oErrorView:cargo[ "line_index" ] := nLine               // indice aLineMap
+                     oErrorView:cargo[ "aCode"      ] := aCode
+                  ENDIF
 
                ENDIF
 

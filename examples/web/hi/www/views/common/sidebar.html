@@ -1,0 +1,67 @@
+@args cItemActive := ''
+
+<div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="offcanvasSidebar"
+	aria-labelledby="offcanvasSidebarLabel" style="width: 250px;">
+	<div class="offcanvas-header">
+		<h5 class="offcanvas-title" id="offcanvasSidebarLabel">{{  UAuthUser("name") }}</h5>
+		<button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+	</div>
+	<div class="offcanvas-body">
+		<ul class="nav flex-column">
+
+			@if UHasRole( 'customers' )
+				<li class="nav-item">
+					<a class="nav-link text-white {{ if( cItemActive == 'customer', 'active', '' ) }}" href="/customer/search">
+						<i class="bi bi-gear me-2"></i> Customer (Form)
+					</a>
+				</li>
+			@endif
+
+			@if UHasRole( 'sales' )
+				<li class="nav-item">
+					<a class="nav-link text-white {{ if( cItemActive == 'module_a', 'active', '' ) }}" aria-current="page" href="/module_a">
+						<i class="bi bi-speedometer2 me-2"></i> Module A
+					</a>
+				</li>
+			@endif
+
+			@if UHasRole( 'sales' )
+				<li class="nav-item">
+					<a class="nav-link text-white {{ if( cItemActive == 'module_b', 'active', '' ) }}" href="/module_b">
+						<i class="bi bi-people me-2"></i> Module B
+					</a>
+				</li>
+			@endif
+
+			@if UHasRole( 'purchases' )
+				<li class="nav-item">
+					<a class="nav-link text-white {{ if( cItemActive == 'module_c', 'active', '' ) }}" href="/module_c">
+						<i class="bi bi-gear me-2"></i> Module C
+					</a>
+				</li>
+			@endif
+
+		</ul>
+	</div>
+</div>
+
+<style>
+	.sidebar {
+		min-height: calc(100vh - 56px);		
+		box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+	}
+
+	
+	.offcanvas-body .nav-link.active {
+		background-color: #e9ecef;	
+		color: #212529 !important;	
+		border-radius: 0.25rem;
+	}
+
+	
+	.offcanvas-body .nav-link:hover {
+		background-color: #bebfc0;	
+		color: #212529 !important;	
+		border-radius: 0.25rem;
+	}
+</style>

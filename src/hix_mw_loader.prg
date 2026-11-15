@@ -91,7 +91,7 @@ RETURN _MwHGet( s_hAppConfig, cKey, xDef )
 FUNCTION HIX_LoadMiddleware()
 
    LOCAL cRoot, cMwDir, cConfigFile, cJson, hConfig
-   LOCAL aLoad, hSetup, cFile, cPhysical, oHrb, pHandle, oErr
+   LOCAL aLoad, hSetup, cFile, cPhysical, oHrb, pHandle, oErr, hCmp
    LOCAL nLoaded, nTotal
 
    nLoaded := 0
@@ -168,11 +168,21 @@ FUNCTION HIX_LoadMiddleware()
       nTotal++
       cPhysical := cMwDir + cFile
 
-      oHrb := HIX_CompileFile( cPhysical )
+      hCmp := HIX_CompileCodeFromFile( cPhysical )
+
+      IF ! hCmp[ "ok" ]
+
+         lw( "HIX_LoadMiddleware: compile failed -> " + cFile )
+         HIX_BootLogAdd( "middlewares", "file", .F., cFile, hCmp[ "err" ] )
+         LOOP
+
+      ENDIF
+
+      oHrb := hCmp[ "hrb" ]
 
       IF Empty( oHrb )
 
-         lw( "HIX_LoadMiddleware: compile failed -> " + cFile )
+         lw( "HIX_LoadMiddleware: compile ok but no hrb -> " + cFile )
          HIX_BootLogAdd( "middlewares", "file", .F., cFile, _( "BOOT_LOADER_COMPILE_FAIL" ) )
          LOOP
 
@@ -215,7 +225,8 @@ RETURN nLoaded
 // ============================================================
 STATIC FUNCTION _MwApplySession( hSetup )
 
-   LOCAL hSess, cCookie, nTtl, nMax, cStorage
+   LOCAL hSess, cCookie, nTtl, nMax, cStorage, cPath
+   LOCAL cPrefix, lCrypt, cSeed, nGcDays
 
    hSess := _MwHGet( hSetup, "session", NIL )
 
@@ -229,9 +240,23 @@ STATIC FUNCTION _MwApplySession( hSetup )
    nTtl     := _MwHGet( hSess, "ttl",     0  )
    nMax     := _MwHGet( hSess, "max",     0  )
    cStorage := _MwHGet( hSess, "storage", "" )
-   HIX_MwSessionSetup( cCookie, nTtl, nMax, cStorage )
+   cPath    := UConfig( "paths", "session", "" )
+
+   // hix.json > session: prefix / crypt / seed / gc_days used to be parsed
+   // but never passed through, so "crypt": true was a no-op and session
+   // payloads stayed in plaintext on disk (v2.4.3 — portado de lediz/enhance).
+   cPrefix := UConfig( "session", "prefix",  "" )
+   cSeed   := UConfig( "session", "seed",    "" )
+   lCrypt  := ( UConfig( "session", "crypt", .F. ) == .T. )
+   nGcDays := UConfig( "session", "gc_days", 0 )
+
+   IF Empty( cPrefix ) ; cPrefix := NIL ; ENDIF   // NIL preserva el prefijo built-in
+   IF Empty( cSeed   ) ; cSeed   := NIL ; ENDIF   // NIL -> HIX_KeyGet("session")
+
+   HIX_MwSessionSetup( cCookie, nTtl, nMax, cStorage, cPath, cPrefix, lCrypt, cSeed, nGcDays )
    HIX_BootLogAdd( "middlewares", "config", .T., ;
-      "session: cookie=" + cCookie + " ttl=" + hb_NToS( nTtl ) + " storage=" + cStorage )
+      "session: cookie=" + cCookie + " ttl=" + hb_NToS( nTtl ) + ;
+      " storage=" + cStorage + " crypt=" + iif( lCrypt, "yes", "no" ) )
 
 RETURN NIL
 

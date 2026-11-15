@@ -13,34 +13,42 @@
 THREAD STATIC s_cBuffer
 THREAD STATIC s_cMime
 THREAD STATIC s_cStatus
+THREAD STATIC s_cBlockEcho     // buffer per-thread para @prg blocks
 
 // ------------------------------------------------------------
 // HIX_Echo — acumula valores en el buffer del request activo.
 // ------------------------------------------------------------
 FUNCTION HIX_Echo( ... )
 
-   LOCAL aP, i, oReq
+   LOCAL aP, i, oReq, nLen 
+   
 
    oReq := HIX_GetRequest()
    aP   := hb_AParams()
+   nLen := len( aP )
+   
 
    IF oReq != NIL
 
-      FOR i := 1 TO Len( aP )
+      FOR i := 1 TO nLen - 1
 
-         oReq:cEchoBuffer += UStr( aP[ i ] )
+         oReq:cEchoBuffer += UStr( aP[ i ] ) + ' '
 
       NEXT
+
+      oReq:cEchoBuffer += UStr( aP[ nLen ] )
 
    ELSE
-   
+
       hb_default( @s_cBuffer, "" )
 
-      FOR i := 1 TO Len( aP )
+      FOR i := 1 TO nLen - 1
 
-         s_cBuffer += UStr( aP[ i ] )
+         s_cBuffer += UStr( aP[ i ] ) + ' '
 
       NEXT
+
+      s_cBuffer += UStr( aP[ nLen ] )
 
    ENDIF
 
@@ -198,6 +206,46 @@ FUNCTION HIX_EchoClear()
       s_cStatus := 200
 
    ENDIF
+
+RETURN NIL
+
+// ------------------------------------------------------------
+// UEchoBlock — buffer per-thread propio para bloques @prg de una
+// vista. `?` y `??` del preambulo @prg se redirigen aqui para que
+// el output aparezca en el sitio exacto del bloque en __cOut, en
+// vez de emitirse antes via oReq:cEchoBuffer.
+// ------------------------------------------------------------
+FUNCTION UEchoBlock( ... )
+
+   LOCAL aP := hb_AParams()
+   LOCAL nLen := len( aP )
+   LOCAL i
+
+   hb_default( @s_cBlockEcho, "" )
+
+   FOR i := 1 TO nLen - 1
+      s_cBlockEcho += UStr( aP[ i ] ) + ' ' 
+   NEXT
+   
+   s_cBlockEcho += UStr( aP[ nLen ] )
+
+RETURN NIL
+
+// UEchoBlockFlush — devuelve el buffer acumulado y lo vacia.
+FUNCTION UEchoBlockFlush()
+
+   LOCAL cOut
+
+   hb_default( @s_cBlockEcho, "" )
+   cOut         := s_cBlockEcho
+   s_cBlockEcho := ""
+
+RETURN cOut
+
+// UEchoBlockClear — vacia el buffer sin devolver nada.
+FUNCTION UEchoBlockClear()
+
+   s_cBlockEcho := ""
 
 RETURN NIL
 

@@ -173,6 +173,29 @@ FUNCTION HIX_ErrorLogClose()
 
 RETURN NIL
 
+// [A2.07] Wrappers publicos para inspeccion desde tests.
+// Peek: retorna el contador actual (no requiere lock — snapshot informativo).
+// Reset: pone el contador a 0 bajo lock (test setup entre sub-checks).
+// Write: expone _HixWriteErrorLog para tests de concurrencia.
+FUNCTION HIX_ErrLogSeqPeek()
+RETURN s_nErrLogSeq
+
+FUNCTION HIX_ErrLogSeqReset()
+
+   IF s_oErrMutex != NIL
+      hb_mutexLock( s_oErrMutex )
+      s_nErrLogSeq := 0
+      hb_mutexUnlock( s_oErrMutex )
+   ELSE
+      s_nErrLogSeq := 0
+   ENDIF
+
+RETURN NIL
+
+FUNCTION HIX_ErrLogWrite( oErr )
+   _HixWriteErrorLog( oErr )
+RETURN NIL
+
 // ============================================================
 // HIX_ShowError — manejador principal de errores HTTP.
 // 1. Escribe log en disco.
@@ -458,10 +481,10 @@ hr {
       // cDesign := hb_defaultValue( oDesign:Description, "" ) + ;
       // iif( !Empty(hb_defaultValue(oDesign:FileName,"")), ;
       // " (" + oDesign:FileName + ")", "" )
-      cDesign := 'Description: ' + oDesign:description
-      cDesign += '<br>Operation: ' + oDesign:operation
+      cDesign := 'Description: ' + UHtmlEncode( hb_defaultValue( oDesign:description, "" ) )
+      cDesign += '<br>Operation: ' + UHtmlEncode( hb_defaultValue( oDesign:operation,   "" ) )
    ELSE
-      cDesign := hb_CStr( oDesign )
+      cDesign := UHtmlEncode( hb_CStr( oDesign ) )
 
    ENDIF
    
@@ -551,6 +574,12 @@ STATIC FUNCTION _HixWriteErrorLog( oErr )
    ENDIF
 
    dNow := hb_DateTime()
+
+   // [A2.07] seq++ + build entry + FWrite bajo el mismo lock: sin esto,
+   // dos errores concurrentes pueden leer el mismo valor de s_nErrLogSeq
+   // (RMW no atomico) y quedar con "Error #N" duplicado en el log.
+   hb_mutexLock( s_oErrMutex )
+
    s_nErrLogSeq++
 
    cEntry := "=== Error #" + hb_NToS( s_nErrLogSeq ) + " — " + dtoc( date() ) + ' ' + time() + " ===" + hb_eol() + ;
@@ -562,8 +591,8 @@ STATIC FUNCTION _HixWriteErrorLog( oErr )
       "File       : " + cFileName + ":" + cLine + hb_eol() + ;
       hb_eol()
 
-   hb_mutexLock( s_oErrMutex )
    FWrite( s_hErrLog, cEntry )
+
    hb_mutexUnlock( s_oErrMutex )
 
 RETURN NIL
@@ -868,3 +897,7 @@ FUNCTION HIX_ErrorName( nCode )
    ENDCASE
 
 RETURN "ERR_UNKNOWN"
+
+// Test hook — wraps STATIC _HixErrorSysDesignError for unit tests.
+FUNCTION HIX_ErrorDesignHtmlForTest( oDesign, oOrig )
+RETURN _HixErrorSysDesignError( oDesign, oOrig )

@@ -1,0 +1,158 @@
+@view 'header.html', 'WDO MySql', 'Server info - client, server metadata and engine status'
+
+@prg
+
+   //  ------------------------------------------------------------
+   //  MySql/MariaDB server metadata dashboard.
+   //
+   //    1) WDO binding info          -- Version, DLL, live connections
+   //    2) Server identity           -- VERSION(), USER(), DATABASE(), etc.
+   //    3) Status (SHOW STATUS)      -- Uptime, threads, queries
+   //    4) Variables (SHOW VARIABLES)-- max_connections, charset, sql_mode
+   //    5) SHOW DATABASES
+   //    6) SHOW ENGINES              -- tabular render with View()
+   //  ------------------------------------------------------------
+
+   LOCAL oConn := WDO_Get( "MYSQL" )
+   LOCAL oStmt, aRows, hRow, cDllSrc
+
+   IF oConn == NIL
+      ? 'Error: pool not registered or Acquire timeout'
+      RETU NIL
+   ENDIF
+
+   //  ------------------------------------------------------------
+   //  1) WDO client metadata (local, never sent to the server)
+   //  ------------------------------------------------------------
+
+   ?? '<h3>1) Binding WDO_MySql</h3>'
+
+   ?? '<pre>'
+   ?  'WDO version .....: ' + oConn:VersionName()
+   ?  'DLL version .....: ' + oConn:GetDllVersion()
+   ?  'DLL path ........: ' + oConn:DllPath()
+   DO CASE
+   CASE oConn:DllSource() == "override"       ; cDllSrc := "config.json / programmatic"
+   CASE oConn:DllSource() == "WDO_LIB_MYSQL"  ; cDllSrc := "env WDO_LIB_MYSQL"
+   CASE oConn:DllSource() == "WDO_PATH_MYSQL" ; cDllSrc := "env WDO_PATH_MYSQL"
+   CASE oConn:DllSource() == "exedir"         ; cDllSrc := "exe directory (auto)"
+   OTHERWISE                                  ; cDllSrc := oConn:DllSource()
+   ENDCASE
+   ?  'DLL source ......: ' + cDllSrc
+   ?  'Client info .....: ' + oConn:ClientInfo()
+   ?  'Server info .....: ' + oConn:ServerInfo()
+   ?  'Open connections : ' + hb_NToS( oConn:CountOpen() )
+   ?  'InTransaction ...: ' + iif( oConn:InTransaction(), 'T', 'F' )
+   ?? '</pre>'
+
+   //  ------------------------------------------------------------
+   //  2) Server identity (functions and @@ system vars)
+   //  ------------------------------------------------------------
+
+   ?? '<h3>2) Server identity</h3>'
+
+   oStmt := oConn:Query( "SELECT "                    + ;
+      "VERSION()              AS srv_version, "       + ;
+      "@@version_comment      AS srv_build, "         + ;
+      "@@hostname             AS srv_host, "          + ;
+      "@@port                 AS srv_port, "          + ;
+      "CURRENT_USER()         AS srv_curr_user, "     + ;
+      "USER()                 AS srv_user, "          + ;
+      "DATABASE()             AS srv_db, "            + ;
+      "@@character_set_server AS srv_charset, "       + ;
+      "@@collation_server     AS srv_collation, "     + ;
+      "@@time_zone            AS srv_tz, "            + ;
+      "NOW()                  AS srv_now" )
+
+   hRow := oStmt:Fetch_Assoc()
+   oStmt:Free()
+
+   ?? '<pre>'
+   ?  'VERSION() .......: ' + hRow[ 'srv_version'   ]
+   ?  '@@version_comment: ' + hRow[ 'srv_build'     ]
+   ?  '@@hostname ......: ' + hRow[ 'srv_host'      ]
+   ?  '@@port ..........: ' + hRow[ 'srv_port'      ]
+   ?  'CURRENT_USER() ..: ' + hRow[ 'srv_curr_user' ]
+   ?  'USER() ..........: ' + hRow[ 'srv_user'      ]
+   ?  'DATABASE() ......: ' + hRow[ 'srv_db'        ]
+   ?  '@@character_set .: ' + hRow[ 'srv_charset'   ]
+   ?  '@@collation .....: ' + hRow[ 'srv_collation' ]
+   ?  '@@time_zone .....: ' + hRow[ 'srv_tz'        ]
+   ?  'NOW() ...........: ' + hRow[ 'srv_now'       ]
+   ?? '</pre>'
+
+   //  ------------------------------------------------------------
+   //  3) Runtime status -- SHOW STATUS LIKE ...
+   //  ------------------------------------------------------------
+
+   ?? '<h3>3) SHOW STATUS</h3>'
+   ?  '<pre>SHOW STATUS WHERE Variable_name IN ('
+   ?  "   'Uptime', 'Threads_connected', 'Threads_running', "
+   ?  "   'Connections', 'Aborted_connects', "
+   ?  "   'Queries', 'Questions', 'Slow_queries', "
+   ?  "   'Bytes_sent', 'Bytes_received', "
+   ?  "   'Prepared_stmt_count' )</pre>"
+
+   oStmt := oConn:Query( "SHOW STATUS WHERE Variable_name IN ( " + ;
+      "'Uptime', 'Threads_connected', 'Threads_running', "        + ;
+      "'Connections', 'Aborted_connects', "                       + ;
+      "'Queries', 'Questions', 'Slow_queries', "                  + ;
+      "'Bytes_sent', 'Bytes_received', "                          + ;
+      "'Prepared_stmt_count' )" )
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+
+   ?? oConn:View( aRows,, 'Runtime status counters' )
+
+   //  ------------------------------------------------------------
+   //  4) Runtime configuration -- SHOW VARIABLES LIKE ...
+   //  ------------------------------------------------------------
+
+   ?? '<h3>4) SHOW VARIABLES</h3>'
+   ?  '<pre>SHOW VARIABLES WHERE Variable_name IN ('
+   ?  "   'max_connections', 'max_allowed_packet', 'wait_timeout', "
+   ?  "   'interactive_timeout', 'connect_timeout', "
+   ?  "   'character_set_client', 'character_set_connection', "
+   ?  "   'character_set_database', 'character_set_results', "
+   ?  "   'sql_mode', 'autocommit', 'transaction_isolation', "
+   ?  "   'default_storage_engine', 'datadir', 'basedir' )</pre>"
+
+   oStmt := oConn:Query( "SHOW VARIABLES WHERE Variable_name IN ( " + ;
+      "'max_connections', 'max_allowed_packet', 'wait_timeout', "    + ;
+      "'interactive_timeout', 'connect_timeout', "                    + ;
+      "'character_set_client', 'character_set_connection', "          + ;
+      "'character_set_database', 'character_set_results', "           + ;
+      "'sql_mode', 'autocommit', 'transaction_isolation', "           + ;
+      "'default_storage_engine', 'datadir', 'basedir' )" )
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+
+   ?? oConn:View( aRows,, 'System variables' )
+
+   //  ------------------------------------------------------------
+   //  5) Databases accessible to the connected user
+   //  ------------------------------------------------------------
+
+   ?? '<h3>5) SHOW DATABASES</h3>'
+
+   oStmt := oConn:Query( "SHOW DATABASES" )
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+
+   ?? oConn:View( aRows,, 'Databases visible to the user' )
+
+   //  ------------------------------------------------------------
+   //  6) Available storage engines
+   //  ------------------------------------------------------------
+
+   ?? '<h3>6) SHOW ENGINES</h3>'
+
+   oStmt := oConn:Query( "SHOW ENGINES" )
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+
+   ?? oConn:View( aRows,, 'Supported storage engines' )
+
+   oConn:Close()
+
+@endprg

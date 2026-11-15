@@ -9,16 +9,28 @@
 -head=full
 -mt
 -isrc/include
+-isrc/wdo/include
 -workdir=.hbmk/${hb_compiler}/server
 
 
 # Create library
 -hblib
--ohix_server
+-olib/${hb_compiler}/hix_server
+
+# Contrib deps — needed at Harbour compile-time to resolve
+# #include "hbssl.ch" / "hbcurl.ch" in hix_io.prg, hix_server.prg,
+# src/curl/ucurl.prg. On Windows it's redundant (INCLUDE env already
+# has c:\harbour\include), on Linux hbmk2 needs the .hbc to locate
+# the contrib include path.
+hbssl.hbc
+hbcurl.hbc
+hbsqlit3.hbc
 
 
 # Core (sin dependencias entre ellas)
 src/hix_trace.prg
+src/hix_dbg.prg
+src/hix_wapi_stubs.prg
 src/hix_logger.prg
 src/hix_data_pool.prg
 src/hix_bootlog.prg
@@ -31,6 +43,7 @@ src/hix_config_app.prg
 src/hix_keys.prg
 src/hix_metrics.prg
 src/hix_error.prg
+src/hix_safe_fs.prg
 src/hix_socket.prg
 src/hix_ip.prg
 src/hix_firewall.prg
@@ -80,9 +93,15 @@ src/hix_sse.prg
 src/hix_worker_otros.prg
 src/hix_zombie.prg
 src/hix_block.prg
-src/hix_prepro.prg
 src/hix_helpers.prg
 #src/hix_hrb_exports.prg
+
+# Compile — bridge to Harbour compiler + HRB runner
+src/compile/hix_compex.c
+src/compile/hix_frombufex.prg
+src/compile/hix_exrun.prg
+src/compile/hix_err_shim.prg
+src/compile/hix_preamble.prg
 
 # Monitor & Server
 src/hix_server.prg
@@ -111,8 +130,26 @@ src/validator/hix_val_helpers.prg
 # RDD Dbf 
 src/dbf/hix_dbf.prg
 
+# WDO Web Database Objects
+src/wdo/wdo.prg
+src/wdo/wdo_pool.prg
+src/wdo/wdo_metrics.prg
+src/wdo/legacy_func.c
+src/wdo/mysql/wdo_mysql.prg
+src/wdo/mysql/wdo_mysql_stmt.prg
+src/wdo/mysql/wdo_mysql_stmt_bin.prg
+src/wdo/mysql/wdo_mysql_pool.prg
+src/wdo/sqlite3/wdo_sqlite3.prg
+src/wdo/sqlite3/wdo_sqlite3_stmt.prg
+src/wdo/sqlite3/wdo_sqlite3_pool.prg
+src/wdo/wdo_config.prg
+src/wdo/wdo_error_handler_default.prg
+
 # Pdf 
 src/pdf/tpdf.prg
+
+# Curl 
+src/curl/ucurl.prg
 
 # Lang
 src/lang/hix_lang.prg

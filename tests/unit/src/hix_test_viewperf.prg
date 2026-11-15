@@ -148,7 +148,7 @@ STATIC PROCEDURE _BCleanup( cDir )
    hb_FileDelete( cDir + "bench_complex.html" )
    hb_FileDelete( cDir + "bench_complex.hrb" )
    hb_FileDelete( cDir + "plain.html" )
-   hb_DirDelete( hb_StrShrink( cDir, 1 ) )
+   HIX_SafeDirDelete( hb_StrShrink( cDir, 1 ) )
 RETURN
 
 // --------------------------------------------------------- //

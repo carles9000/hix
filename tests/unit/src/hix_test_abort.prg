@@ -1,4 +1,4 @@
-﻿/*-----------------------------------------------------------
+/*-----------------------------------------------------------
   File ......: hix_test_abort.prg
   Author.....: Charly 9000
   Created....: 2026-06-04
@@ -80,7 +80,7 @@ STATIC PROCEDURE _TestAbortOnTimeout( hCtx )
    HIX_SetConfig( oCfgSave )
    IF hb_FileExists( cPrgPath )  ; hb_FileDelete( cPrgPath )  ; ENDIF
    IF hb_FileExists( cFlagFile ) ; hb_FileDelete( cFlagFile ) ; ENDIF
-   IF hb_DirExists( hb_StrShrink( cTmpDir, 1 ) ) ; hb_DirDelete( hb_StrShrink( cTmpDir, 1 ) ) ; ENDIF
+   IF hb_DirExists( hb_StrShrink( cTmpDir, 1 ) ) ; HIX_SafeDirDelete( hb_StrShrink( cTmpDir, 1 ) ) ; ENDIF
 RETURN
 
 STATIC PROCEDURE _TestNormalCompletionNoAbort( hCtx )
@@ -140,5 +140,5 @@ STATIC PROCEDURE _TestNormalCompletionNoAbort( hCtx )
    HIX_SetConfig( oCfgSave )
    IF hb_FileExists( cPrgPath )  ; hb_FileDelete( cPrgPath )  ; ENDIF
    IF hb_FileExists( cFlagFile ) ; hb_FileDelete( cFlagFile ) ; ENDIF
-   IF hb_DirExists( hb_StrShrink( cTmpDir, 1 ) ) ; hb_DirDelete( hb_StrShrink( cTmpDir, 1 ) ) ; ENDIF
+   IF hb_DirExists( hb_StrShrink( cTmpDir, 1 ) ) ; HIX_SafeDirDelete( hb_StrShrink( cTmpDir, 1 ) ) ; ENDIF
 RETURN

@@ -70,6 +70,14 @@
 #define HIXM_REQ_MS_COUNT    "req_ms_count"
 #define HIXM_REQ_MS_MAX_AT   "req_ms_max_at"
 #define HIXM_REQ_MS_MAX_PATH "req_ms_max_path"
+#define HIXM_STREAM_MS_MAX      "stream_ms_max"
+#define HIXM_STREAM_MS_AVG      "stream_ms_avg"
+#define HIXM_STREAM_MS_COUNT    "stream_ms_count"
+#define HIXM_STREAM_MS_MAX_AT   "stream_ms_max_at"
+#define HIXM_STREAM_MS_MAX_PATH "stream_ms_max_path"
+#define HIXM_WS_MS_MAX          "ws_ms_max"
+#define HIXM_WS_MS_AVG          "ws_ms_avg"
+#define HIXM_WS_MS_COUNT        "ws_ms_count"
 #define HIXM_REQ_SLOWEST_DYN  "req_slowest_dyn"
 #define HIXM_REQ_SLOWEST_STAT "req_slowest_stat"
 #define HIX_METRICS_TOP_N     10
@@ -77,6 +85,8 @@
 #define HIXM_VCACHE_BYTES     "vcache_bytes"
 #define HIXM_VCACHE_HITS      "vcache_hits"
 #define HIXM_VCACHE_MISSES    "vcache_misses"
+#define HIXM_POOL_DIRTY_EXIT  "pool_dirty_exit"
+#define HIXM_WS_CB_ERRORS     "ws_cb_errors"
 
 // Tokens de detección de protocolo
 #define HIX_TOKEN_WS_UPGRADE  "upgrade: websocket"
@@ -134,14 +144,24 @@
 #define HIX_PATH_ROUTES_LISTALL   "/hix-routes/listall"
 
 // Códigos de error de lectura en THixRequest
-#define HIX_REQ_ERR_NONE    0   // sin error
-#define HIX_REQ_ERR_CLOSED  1   // socket cerrado o timeout
-#define HIX_REQ_ERR_BADREQ  2   // request line inválida
+#define HIX_REQ_ERR_NONE     0   // sin error
+#define HIX_REQ_ERR_CLOSED   1   // socket cerrado o timeout
+#define HIX_REQ_ERR_BADREQ   2   // request line inválida
+#define HIX_REQ_ERR_TOOLARGE 3   // Content-Length > HIX_MAX_BODY_SIZE (A1.23)
 
 // Límites de seguridad
 #define HIX_MAX_HEADER_SIZE    8192
 #define HIX_MAX_BODY_SIZE      10485760
 #define HIX_WS_MAX_FRAME_SIZE  65536
+#define HIX_MAX_JSON_DEPTH     64        // A1.24 — anti stack overflow en JSON anidado
+#define HIX_MAX_DIRECTIVE_DEPTH  64      // A4.05 — profundidad maxima @if/@for/@while anidados
+
+// Slowloris — total deadline for reading headers/body (A1.22).
+// Each recv() still has its own stall timeout (HIX_DEFAULT_READ_MS), but
+// these caps prevent an attacker from trickling bytes forever below that
+// per-recv threshold and holding a worker indefinitely.
+#define HIX_HEADERS_DEADLINE_MS 10000    // 10s absoluto para leer headers
+#define HIX_BODY_DEADLINE_MS    30000    // 30s absoluto para leer body
 
 // Chunked transfer encoding
 #define HIX_CHUNK_SIZE         65536    // 64KB por trozo

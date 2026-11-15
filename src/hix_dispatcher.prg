@@ -13,28 +13,44 @@
 #INCLUDE "hix_const.ch"
 #INCLUDE "hix_logger.ch"
 #INCLUDE "hbhrb.ch"
+#INCLUDE "fileio.ch"
 
 STATIC s_hAbortMx  := NIL
 STATIC s_hAbortMap := NIL
 
+// v2.4.3 — Hixstyle blacklist. Cuando aAllowDirs != NIL, estas extensiones
+// nunca se sirven como estatico (fugarian codigo o datos del backend) y
+// ningun path con un segmento que empiece por "." es servible (dotfiles
+// como .env, .htaccess, .git/config). PRG/HRB tienen su propia gate via
+// _HixExecAllowedForRelDir — no van en esta lista.
+STATIC s_aBlockedExts := { ;
+   "dbf", "cdx", "fpt", "dbt", "ntx",       ;   // Harbour/xBase data files
+   "hbp", "hbx", "hbs", "hbm", "hbc", "hbt",;   // Harbour project/toolchain
+   "ch",  "hbh",                            ;   // Harbour headers
+   "bak", "swp", "tmp", "old",              ;   // backups/editores
+   "pem", "key", "crt", "cer", "pfx", "p12" ;   // crypto material
+}
+
 CLASS THixDispatcher
 
-   DATA cRoot        INIT ""
-   DATA nExecTimeout INIT 30000   // ms; 0 = sin limite
-   DATA cDefaultPage INIT "index.html"   // pagina por defecto en directorio
-   DATA lExecPrg     INIT .T.            // .F. = bloquea ejecucion .prg/.hrb
-   DATA aDenyDirs    INIT {}             // subdirs bloqueadas (relativas al root)
-   DATA aAllowDirs   INIT NIL            // NIL=sin whitelist; array de hashes {dir,exec}
+   DATA cRoot         INIT ""
+   DATA nExecTimeout  INIT 30000   // ms; 0 = sin limite
+   DATA cDefaultPage  INIT "index.html"   // pagina por defecto en directorio
+   DATA lExecPrg      INIT .T.            // .F. = bloquea ejecucion .prg/.hrb
+   DATA aDenyDirs     INIT {}             // subdirs bloqueadas (relativas al root)
+   DATA aAllowDirs    INIT NIL            // NIL=sin whitelist; array de hashes {dir,exec}
+   DATA lAllowSymlinks INIT .F.           // [A1.03] .T. = permitir symlinks/junctions dentro del root
 
    METHOD New( cRoot )
    METHOD Dispatch( oReq )
    METHOD DenyDir(   cDir )
    METHOD AllowDir(  cDir, lAllowExec )
+   METHOD AllowSymlinks( lFlag )          // [A1.03] opt-in a servir a través de reparse points
    METHOD CheckPath( cSpec )   // NIL=bloqueado, string=path fisico resuelto
    METHOD GetACL()             // hash con la configuracion ACL actual
 
-   METHOD ExecutePrg(  cPath )
-   METHOD ExecuteHrb(  cPath )
+   METHOD ExecutePrg(  cPath, oReq, hClass, nTimeoutMs )
+   METHOD ExecuteHrb(  cPath, nTimeoutMs, oReq )
    METHOD ExecuteHtml( cPath )
    METHOD ExecuteView( cPath )
    METHOD ExecuteFile( cPath )
@@ -116,6 +132,20 @@ METHOD AllowDir( cDir, lAllowExec ) CLASS THixDispatcher
 RETURN Self
 
 // ------------------------------------------------------------
+// [A1.03] AllowSymlinks — opt-in explícito a servir a través de reparse points.
+// Por defecto (`.F.`) el dispatcher rechaza con 403 cualquier path físico
+// cuyo destino final o componente ancestral sea un symlink/junction, para
+// impedir escapes del root (`www\leaked -> C:\Windows\System32\config`).
+// El admin que necesite symlinks legítimos (mounts, deploys atómicos con
+// `current -> releases\XYZ`) activa el flag antes de `Start()`:
+//   oSrv:oDispatcher:AllowSymlinks( .T. )
+METHOD AllowSymlinks( lFlag ) CLASS THixDispatcher
+
+   ::lAllowSymlinks := hb_defaultValue( lFlag, .T. )
+
+RETURN Self
+
+// ------------------------------------------------------------
 // Comprueba si cSpec esta permitido segun el ACL del dispatcher.
 // Retorna el path fisico resuelto, o NIL si esta bloqueado.
 METHOD CheckPath( cSpec ) CLASS THixDispatcher
@@ -167,28 +197,25 @@ Tipo B — Zombie eterno:
 // ------------------------------------------------------------
 METHOD Dispatch( oReq ) CLASS THixDispatcher
 
-   LOCAL cPath, cPhysical, cExt, cResult, cMime, cEtag, nZ, lIsIndex, lDirExists
-   LOCAL hClass, nAt, cFileName, cDir, cIndexBase
-   LOCAL tBefore, nMs, cCompressed
-   LOCAL cRelDir, cEntry, nI
+   LOCAL cPath, cPhysical, cExt, cResult, cMime, nZ
+   LOCAL hClass, nAt, cFileName, cDir
+   LOCAL tBefore, nMs
+   LOCAL cRelDir
+   LOCAL cDecoded
 
-   cPath := oReq:cPath
+   // [A3.1.7] usar la función compartida (eliminado código duplicado de normalización)
+   cPath := HIX_PathNormalize( oReq:cPath )
 
-   cPath := StrTran( cPath, "\", "/" )
+   // [A1.02] Path traversal por URL-encoding.
+   // El check original ".." $ cPath se hacia sobre la ruta CRUDA. Un adversario
+   // que envie GET /%2e%2e/etc/passwd (o %2E%2E, %c0%ae, ..%2f) pasa el filtro
+   // porque el ".." no esta literal en la URL — luego el filesystem lo interpreta
+   // en algun eslabon posterior. Ademas %5c (backslash) y %00 (null-byte) son
+   // vectores clasicos de bypass en Windows/CGI. Solucion: percent-decode y
+   // chequear en la version decodificada tambien.
+   cDecoded := HIX_UrlDecode( cPath )
 
-   DO WHILE "//" $ cPath
-
-      cPath := StrTran( cPath, "//", "/" )
-
-   ENDDO
-
-   IF Empty( cPath ) .OR. Left( cPath, 1 ) != "/"
-
-      cPath := "/" + cPath
-
-   ENDIF
-
-   IF ".." $ cPath
+   IF ".." $ cPath .OR. ".." $ cDecoded .OR. "\" $ cDecoded .OR. Chr( 0 ) $ cDecoded
 
       lw( _( "DISP_PATH_TRAVERSAL", cPath ) )
       HIX_HttpError( oReq, 403 )
@@ -215,101 +242,15 @@ METHOD Dispatch( oReq ) CLASS THixDispatcher
 
    ENDDO
 
-   // Check DenyDirs: blacklist explicita (se comprueba antes que whitelist)
-
-   IF ! Empty( ::aDenyDirs )
-
-      FOR nI := 1 TO Len( ::aDenyDirs )
-
-         cEntry := ::aDenyDirs[ nI ]
-
-         IF cRelDir == cEntry .OR. Left( cRelDir, Len( cEntry ) + 1 ) == cEntry + hb_ps()
-
-            lw( "Dispatch: directorio denegado [" + cPath + "]" )
-            HIX_HttpError( oReq, 403 )
-            RETURN Self
-
-         ENDIF
-
-      NEXT
-
-   ENDIF
-
-   // Check AllowDirs (whitelist): si esta activa, solo pasan carpetas listadas.
-   // Excepciones: raiz "/" (para el hello page e index) y prefijos hixstyle ya
-   // reescritos a "public/*".
-
-   IF ::aAllowDirs != NIL .AND. ! Empty( cRelDir )
-
-      IF ! _HixWhitelistMatch( ::aAllowDirs, cRelDir )
-
-         lw( "Dispatch: directorio no en whitelist [" + cPath + "]" )
-         HIX_HttpError( oReq, 403 )
-         RETURN Self
-
-      ENDIF
-
-   ENDIF
-
-   lIsIndex   := .F.
-   cIndexBase := NIL
-   cDir       := iif( Right( cPhysical, 1 ) == hb_ps(), Left( cPhysical, Len( cPhysical ) - 1 ), cPhysical )
-   lDirExists := hb_DirExists( cDir )
-
-   IF lDirExists
-
-      IF Right( cPath, 1 ) != "/"
-
-         // Redirigir a la URL con barra final para que los paths relativos funcionen
-         oReq:Respond( "", 301, "html", { "Location" => cPath + "/" } )
-         RETURN Self
-
-      ENDIF
-
-      IF Right( cPhysical, 1 ) != hb_ps()
-
-         cPhysical += hb_ps()
-
-      ENDIF
-
-      cIndexBase := Left( cPhysical, Len( cPhysical ) - 1 )  // dir sin trailing sep
-      cPhysical  += ::cDefaultPage
-      lIsIndex   := .T.
-      
-   ELSEIF Right( cPath, 1 ) == "/"
-
-      IF Right( cPhysical, 1 ) != hb_ps()
-
-         cPhysical += hb_ps()
-
-      ENDIF
-
-      cIndexBase := Left( cPhysical, Len( cPhysical ) - 1 )  // dir sin trailing sep
-      cPhysical  += ::cDefaultPage
-      lIsIndex   := .T.
-
-   ENDIF
-
-   IF lIsIndex .AND. ! hb_FileExists( cPhysical )
-
-      cPhysical := hb_FNameDir( cPhysical ) + "index.prg"
-
-   ENDIF
-
-   IF lIsIndex .AND. ! hb_FileExists( cPhysical )
-
-      IF cPath == "/"
-
-         oReq:Respond( HIX_HelloPage(), 200, "html" )
-         
-      ELSE
-      
-         HIX_HttpError( oReq, 404 )
-
-      ENDIF
-
+   // [A4.01] ACL checks extraidos a _HixCheckACL
+   IF ! _HixCheckACL( oReq, cPath, cRelDir, ::aDenyDirs, ::aAllowDirs )
       RETURN Self
+   ENDIF
 
+   // [A4.01] Resolución directory→index extraida a _HixResolveIndex
+   cPhysical := _HixResolveIndex( oReq, cPhysical, cPath, ::cDefaultPage )
+   IF cPhysical == NIL
+      RETURN Self   // response ya enviada (redirect, 404, HelloPage)
    ENDIF
 
    // Detectar notacion metodo@clase.prg
@@ -351,6 +292,17 @@ METHOD Dispatch( oReq ) CLASS THixDispatcher
 
    ENDIF
 
+   // [A1.03] Symlink / junction escape del root.
+   // hb_FileExists retorna .T. si el link resuelve, pero el destino puede
+   // caer fuera del sandbox. Rechazar salvo opt-in explícito del admin.
+   IF ! _HixIsSafePath( cPhysical, ::cRoot, ::lAllowSymlinks )
+
+      lw( "Dispatch: reparse point bloqueado [" + cPath + "]" )
+      HIX_HttpError( oReq, 403 )
+      RETURN Self
+
+   ENDIF
+
    cExt := Lower( hb_FNameExt( cPhysical ) )
 
 
@@ -388,7 +340,17 @@ METHOD Dispatch( oReq ) CLASS THixDispatcher
 
       CASE cExt == ".prg"
 
-      IF ! ::lExecPrg .AND. ! _HixExecAllowedForRelDir( ::aAllowDirs, cRelDir )
+      // v2.4.3 — hixstyle: AllowDir manda. Clasico: lExecPrg global.
+      IF ::aAllowDirs != NIL
+
+         IF ! _HixExecAllowedForRelDir( ::aAllowDirs, cRelDir )
+
+            HIX_HttpError( oReq, 403 )
+            RETURN Self
+
+         ENDIF
+
+      ELSEIF ! ::lExecPrg
 
          HIX_HttpError( oReq, 403 )
          RETURN Self
@@ -399,7 +361,16 @@ METHOD Dispatch( oReq ) CLASS THixDispatcher
 
       CASE cExt == ".hrb"
 
-      IF ! ::lExecPrg .AND. ! _HixExecAllowedForRelDir( ::aAllowDirs, cRelDir )
+      IF ::aAllowDirs != NIL
+
+         IF ! _HixExecAllowedForRelDir( ::aAllowDirs, cRelDir )
+
+            HIX_HttpError( oReq, 403 )
+            RETURN Self
+
+         ENDIF
+
+      ELSEIF ! ::lExecPrg
 
          HIX_HttpError( oReq, 403 )
          RETURN Self
@@ -410,10 +381,8 @@ METHOD Dispatch( oReq ) CLASS THixDispatcher
 
       CASE cExt == ".html" .OR. cExt == ".htm"
 
-         // tBefore := hb_DateTime()
          tBefore := hb_Milliseconds()
          cResult := ::ExecuteHtml( cPhysical )
-         // nMs     := Int( ( hb_DateTime() - tBefore ) * 86400000 )
          nMs     := hb_Milliseconds() - tBefore
          HIX_MetricTimingStat( nMs, oReq:cPath )
 
@@ -426,64 +395,8 @@ METHOD Dispatch( oReq ) CLASS THixDispatcher
          HIX_MetricTimingStat( nMs, oReq:cPath )
 
       OTHERWISE
-         cMime := _HixMimeFromExt( cExt )
-         cEtag := _HixFileETag( cPhysical )
-
-      IF oReq:Header( "if-none-match" ) == cEtag
-
-         ld( "304 Not Modified: " + cPhysical )
-         oReq:Respond( "", 304, cMime, { "ETag" => cEtag } )
-         RETURN Self
-
-         ENDIF
-
-         // tBefore := hb_DateTime()
-         tBefore := hb_Milliseconds()
-
-      IF hb_FSize( cPhysical ) > HIX_CHUNK_THRESHOLD
-
-         ld( "Chunked [" + cExt + "]: " + cPhysical )
-
-         IF _HixCanGzip( cMime, oReq )
-
-            cResult     := hb_MemoRead( cPhysical )
-            cCompressed := HIX_GzipCompress( cResult )
-
-            IF cCompressed != NIL
-
-               ld( "Gzip large [" + cExt + "]: " + cPhysical )
-               oReq:Respond( cCompressed, 200, cMime, { ;
-                  "ETag"             => cEtag,             ;
-                  "Cache-Control"    => _HixCacheControl(), ;
-                  "Content-Encoding" => "gzip",             ;
-                  "Vary"             => "Accept-Encoding" } )
-            ELSE
-               oReq:RespondStart( cMime, 200, { "ETag" => cEtag, "Cache-Control" => _HixCacheControl() } )
-               _HixStreamFile( oReq, cPhysical )
-               oReq:RespondEnd()
-
-            ENDIF
-
-         ELSE
-            oReq:RespondStart( cMime, 200, { "ETag" => cEtag, "Cache-Control" => _HixCacheControl() } )
-            _HixStreamFile( oReq, cPhysical )
-            oReq:RespondEnd()
-
-         ENDIF
-
-      ELSE
-         cResult := ::ExecuteFile( cPhysical )
-         ld( "Dispatch OK [" + cExt + "]: " + cPhysical )
-         oReq:Respond( cResult, 200, cMime, { ;
-            "ETag"          => cEtag,               ;
-            "Cache-Control" => _HixCacheControl() } )
-
-         ENDIF
-
-         // nMs := Int( ( hb_DateTime() - tBefore ) * 86400000 )
-         nMs     := hb_Milliseconds() - tBefore
-         HIX_MetricTimingStat( nMs, oReq:cPath )
-
+         // [A4.01] Servicio de fichero estatico extraido a _HixServeStaticFile
+         _HixServeStaticFile( oReq, cPhysical, cExt )
          RETURN Self
 
    ENDCASE
@@ -518,46 +431,50 @@ RETURN Self
 // Error de compilacion: responde 500 directamente (no escapa al worker).
 // Error de runtime: propaga via HIX_Throw al worker HTTP.
 // ------------------------------------------------------------
-METHOD ExecutePrg( cPath, oReq, hClass ) CLASS THixDispatcher
+METHOD ExecutePrg( cPath, oReq, hClass, nTimeoutMs ) CLASS THixDispatcher
 
-   LOCAL oHrb
-   LOCAL oError, cHtml
+   LOCAL oHrb, cHtml, hCmp
+   LOCAL nMs := iif( nTimeoutMs == NIL, ::nExecTimeout, nTimeoutMs )
 
-   TRY
+   hCmp := HIX_CompileCodeFromFile( cPath )
 
-      oHrb := HIX_CompileFile( cPath )
-
-   CATCH oError
-
-      HIX_Throw( oError )
-
-   END
-
-   // Puede que no de error per no se genera hrb
-
-   IF empty( oHrb )
-
-      HIX_Throw( HIX_NewError( ;
-         "Compile error ", ;
-         "Dispatcher", 500, "Compiler" ) )
+   IF ! hCmp[ "ok" ]
+      // Compile failure: build a legacy oError from the diagnostic hash so the
+      // worker HTTP catches it like any other error. The hash itself travels
+      // under oError:cargo for consumers that render structured diagnostics.
+      HIX_Throw( HIX_CompileErrorFromHash( hCmp[ "err" ] ) )
       RETU ''
-
    ENDIF
 
+   oHrb := hCmp[ "hrb" ]
 
-   cHtml := _HixExecWithTimeout( oHrb, ::nExecTimeout, cPath, hClass, oReq )
+   IF Empty( oHrb )
+      HIX_Throw( HIX_NewError( "Compile error ", "Dispatcher", 500, "Compiler" ) )
+      RETU ''
+   ENDIF
+
+   cHtml := _HixExecWithTimeout( oHrb, nMs, cPath, hClass, oReq )
 
 RETURN cHtml
 
 // ------------------------------------------------------------
-METHOD ExecuteHrb( cPath ) CLASS THixDispatcher
+METHOD ExecuteHrb( cPath, nTimeoutMs, oReq ) CLASS THixDispatcher
 
    LOCAL oHrb
+   LOCAL nMs := iif( nTimeoutMs == NIL, ::nExecTimeout, nTimeoutMs )
+
+   // Sin oReq, _HixExecWithTimeout hacía HIX_SetRequest( NIL ) y el HRB
+   // perdía la petición. Las llamadas internas del dispatcher (fallback a
+   // .hrb desde ExecutePrg y _HixPreviewExec) se ejecutan en el hilo del
+   // worker con petición activa, así que recuperarla aquí es seguro.
+   IF oReq == NIL
+      oReq := HIX_GetRequest()
+   ENDIF
 
    l( "ExecuteHrb: " + cPath )
    oHrb := hb_MemoRead( cPath )
 
-RETURN _HixExecWithTimeout( oHrb, ::nExecTimeout, cPath )
+RETURN _HixExecWithTimeout( oHrb, nMs, cPath, NIL, oReq )
 
 // ------------------------------------------------------------
 METHOD ExecuteHtml( cPath ) CLASS THixDispatcher
@@ -590,6 +507,7 @@ METHOD ExecuteHtml( cPath ) CLASS THixDispatcher
       HIX_Throw( oError )
       FINALLY
       HIX_CloseDbfAreas()
+      WDO_ReleaseAllThread()
 
    END
 
@@ -606,8 +524,9 @@ METHOD ExecuteView( cPath ) CLASS THixDispatcher
       cHtml := UView( cPath )
       
    FINALLY
-   
+
       HIX_CloseDbfAreas()
+      WDO_ReleaseAllThread()
 
    END
 
@@ -645,6 +564,240 @@ RETURN hb_MemoRead( cPath )
 
 
 
+// ============================================================
+// [A4.01] _HixCheckACL — deny/allow dir checks extraidos de Dispatch.
+// Returns .T. = OK, .F. = blocked (response already sent).
+// ============================================================
+STATIC FUNCTION _HixCheckACL( oReq, cPath, cRelDir, aDenyDirs, aAllowDirs )
+
+   LOCAL nI, cEntry
+
+   IF ! Empty( aDenyDirs )
+
+      FOR nI := 1 TO Len( aDenyDirs )
+
+         cEntry := aDenyDirs[ nI ]
+
+         IF cRelDir == cEntry .OR. Left( cRelDir, Len( cEntry ) + 1 ) == cEntry + hb_ps()
+
+            lw( "Dispatch: directorio denegado [" + cPath + "]" )
+            HIX_HttpError( oReq, 403 )
+            RETURN .F.
+
+         ENDIF
+
+      NEXT
+
+   ENDIF
+
+   IF aAllowDirs != NIL
+
+      // Hixstyle whitelist activa: la raíz de www/ está siempre prohibida.
+      // Rutas válidas son controllers (via router, resueltos antes del
+      // dispatcher) o /public/* (via whitelist). Ningún fichero del root
+      // es servible — ni config.json, ni index.html, ni cualquier otro.
+      IF Empty( cRelDir )
+
+         lw( "Dispatch: acceso al root bloqueado [" + cPath + "]" )
+         HIX_HttpError( oReq, 403 )
+         RETURN .F.
+
+      ENDIF
+
+      IF ! _HixWhitelistMatch( aAllowDirs, cRelDir )
+
+         lw( "Dispatch: directorio no en whitelist [" + cPath + "]" )
+         HIX_HttpError( oReq, 403 )
+         RETURN .F.
+
+      ENDIF
+
+      // v2.4.3 — dotfile check (filename o cualquier segmento intermedio
+      // que empiece por "."). Cubre /public/.env, /public/.git/config, etc.
+      IF _HixPathHasDotfile( cPath )
+
+         lw( "Dispatch: dotfile bloqueado [" + cPath + "]" )
+         HIX_HttpError( oReq, 403 )
+         RETURN .F.
+
+      ENDIF
+
+      // v2.4.3 — blacklist de extensiones peligrosas (data/code/crypto).
+      IF _HixExtBlacklisted( cPath )
+
+         lw( "Dispatch: extension bloqueada [" + cPath + "]" )
+         HIX_HttpError( oReq, 403 )
+         RETURN .F.
+
+      ENDIF
+
+   ENDIF
+
+RETURN .T.
+
+// v2.4.3 — devuelve .T. si algun segmento del path (ignorando la "/" inicial)
+// empieza por ".". Usar sobre el cPath normalizado (ya decodificado).
+STATIC FUNCTION _HixPathHasDotfile( cPath )
+
+   LOCAL aSegs := hb_ATokens( SubStr( cPath, iif( Left( cPath, 1 ) == "/", 2, 1 ) ), "/" )
+   LOCAL cSeg
+
+   FOR EACH cSeg IN aSegs
+
+      IF Len( cSeg ) > 0 .AND. Left( cSeg, 1 ) == "."
+
+         RETURN .T.
+
+      ENDIF
+
+   NEXT
+
+RETURN .F.
+
+// v2.4.3 — devuelve .T. si la extension (sin punto, en minusculas) esta en
+// s_aBlockedExts. Rutas sin extension pasan.
+STATIC FUNCTION _HixExtBlacklisted( cPath )
+
+   LOCAL cExt := Lower( hb_FNameExt( cPath ) )
+
+   IF Len( cExt ) > 0 .AND. Left( cExt, 1 ) == "."
+
+      cExt := SubStr( cExt, 2 )
+
+   ENDIF
+
+   IF Empty( cExt )
+
+      RETURN .F.
+
+   ENDIF
+
+RETURN AScan( s_aBlockedExts, {| x | x == cExt } ) > 0
+
+
+// ============================================================
+// [A4.01] _HixResolveIndex — directory→index file resolution.
+// Returns resolved cPhysical, or NIL if response already sent.
+// ============================================================
+STATIC FUNCTION _HixResolveIndex( oReq, cPhysical, cPath, cDefaultPage )
+
+   LOCAL cDir       := iif( Right( cPhysical, 1 ) == hb_ps(), Left( cPhysical, Len( cPhysical ) - 1 ), cPhysical )
+   LOCAL lDirExists := hb_DirExists( cDir )
+   LOCAL lIsIndex   := .F.
+
+   IF lDirExists
+
+      IF Right( cPath, 1 ) != "/"
+
+         oReq:Respond( "", 301, "html", { "Location" => cPath + "/" } )
+         RETURN NIL
+
+      ENDIF
+
+      IF Right( cPhysical, 1 ) != hb_ps()
+         cPhysical += hb_ps()
+      ENDIF
+
+      cPhysical += cDefaultPage
+      lIsIndex  := .T.
+
+   ELSEIF Right( cPath, 1 ) == "/"
+
+      IF Right( cPhysical, 1 ) != hb_ps()
+         cPhysical += hb_ps()
+      ENDIF
+
+      cPhysical += cDefaultPage
+      lIsIndex  := .T.
+
+   ENDIF
+
+   IF lIsIndex .AND. ! hb_FileExists( cPhysical )
+      cPhysical := hb_FNameDir( cPhysical ) + "index.prg"
+   ENDIF
+
+   IF lIsIndex .AND. ! hb_FileExists( cPhysical )
+
+      IF cPath == "/"
+         oReq:Respond( HIX_HelloPage(), 200, "html" )
+      ELSE
+         HIX_HttpError( oReq, 404 )
+      ENDIF
+
+      RETURN NIL
+
+   ENDIF
+
+RETURN cPhysical
+
+
+// ============================================================
+// [A4.01] _HixServeStaticFile — ETag + gzip + chunked + direct.
+// Sends the response and returns; no return value consumed by caller.
+// ============================================================
+STATIC FUNCTION _HixServeStaticFile( oReq, cPhysical, cExt )
+
+   LOCAL cMime       := _HixMimeFromExt( cExt )
+   LOCAL cEtag       := _HixFileETag( cPhysical )
+   LOCAL tBefore, nMs, cResult, cCompressed
+
+   IF oReq:Header( "if-none-match" ) == cEtag
+
+      ld( "304 Not Modified: " + cPhysical )
+      // [A3.1.5] RFC 7232 §4.1: 304 incluye ETag, Cache-Control, Vary
+      oReq:Respond( "", 304, cMime, { ;
+         "ETag"          => cEtag,              ;
+         "Cache-Control" => _HixCacheControl(), ;
+         "Vary"          => "Accept-Encoding" } )
+      RETURN NIL
+
+   ENDIF
+
+   tBefore := hb_Milliseconds()
+
+   IF hb_FSize( cPhysical ) > HIX_CHUNK_THRESHOLD
+
+      ld( "Chunked [" + cExt + "]: " + cPhysical )
+
+      IF _HixCanGzip( cMime, oReq )
+
+         cResult     := hb_MemoRead( cPhysical )
+         cCompressed := HIX_GzipCompress( cResult )
+
+         IF cCompressed != NIL
+
+            ld( "Gzip large [" + cExt + "]: " + cPhysical )
+            oReq:Respond( cCompressed, 200, cMime, { ;
+               "ETag"             => cEtag,              ;
+               "Cache-Control"    => _HixCacheControl(), ;
+               "Content-Encoding" => "gzip",             ;
+               "Vary"             => "Accept-Encoding" } )
+         ELSE
+            oReq:RespondStart( cMime, 200, { "ETag" => cEtag, "Cache-Control" => _HixCacheControl() } )
+            _HixStreamFile( oReq, cPhysical )
+            oReq:RespondEnd()
+         ENDIF
+
+      ELSE
+         oReq:RespondStart( cMime, 200, { "ETag" => cEtag, "Cache-Control" => _HixCacheControl() } )
+         _HixStreamFile( oReq, cPhysical )
+         oReq:RespondEnd()
+      ENDIF
+
+   ELSE
+      cResult := hb_MemoRead( cPhysical )
+      ld( "Dispatch OK [" + cExt + "]: " + cPhysical )
+      oReq:Respond( cResult, 200, cMime, { ;
+         "ETag"          => cEtag,              ;
+         "Cache-Control" => _HixCacheControl() } )
+   ENDIF
+
+   nMs := hb_Milliseconds() - tBefore
+   HIX_MetricTimingStat( nMs, oReq:cPath )
+
+RETURN NIL
+
+
 // ------------------------------------------------------------
 // Ejecuta bExec en un sub-hilo con limite de nMs milisegundos.
 // nMs <= 0 -> ejecucion directa sin limite.
@@ -658,8 +811,11 @@ STATIC FUNCTION _HixExecWithTimeout( oHrb, nMs, cPath, hClass, oReq )
    hb_default( @cPath, "" )
 
    // Vincular oReq al hilo padre para que HIX_EchoGet/GetMime/GetStatus lean
-   // del objeto compartido tras el mutex (tanto en path directa como con timeout)
-   HIX_SetRequest( oReq )
+   // del objeto compartido tras el mutex (tanto en path directa como con timeout).
+   // Guard: no pisar la petición del hilo padre si el caller no la propagó.
+   IF oReq != NIL
+      HIX_SetRequest( oReq )
+   ENDIF
    HIX_EchoClear()
 
 
@@ -689,12 +845,20 @@ STATIC FUNCTION _HixExecWithTimeout( oHrb, nMs, cPath, hClass, oReq )
    nChildId := hb_threadId( hThread )
    _HixAbortMapSet( nChildId, .F. )
 
-   IF ! hb_mutexSubscribe( hMutex, nMs / 1000 )
+   // [A2.12] usar HIX_TimeoutSec para floor de 1ms — evita bloqueante
+   // infinito si nMs=0 o negativo.
+   IF ! hb_mutexSubscribe( hMutex, HIX_TimeoutSec( nMs ) )
 
-      // Timeout: senalizar abort al hijo, registrar zombie, lanzar 504
+      // Timeout: senalizar abort al hijo, registrar zombie, lanzar 504.
+      // A1.26 — hb_threadDetach al detachear el handle del hilo padre:
+      // sin esto, el thread queda registrado en el runtime hasta reap.
+      // Detach le dice al runtime que libere sus recursos cuando termine
+      // (equivalente pthread_detach). Sin detach ni join → handle leak
+      // silencioso que se acumula con cada timeout.
       _HixAbortMapSet( nChildId, .T. )
       aShared[ 3 ] := HIX_ZombieAdd( cPath, nMs, tStart )
       hb_mutexUnlock( hMutex )
+      hb_threadDetach( hThread )
       lw( "Timeout [" + hb_NToS( nMs ) + "ms]: " + cPath )
       HIX_Throw( HIX_NewError( ;
          "Execution timeout after " + hb_NToS( nMs ) + "ms", ;
@@ -702,9 +866,12 @@ STATIC FUNCTION _HixExecWithTimeout( oHrb, nMs, cPath, hClass, oReq )
 
    ENDIF
 
-   // Hijo termino normalmente: limpiar abort map y continuar
+   // Hijo termino normalmente: limpiar abort map, reap el hilo y continuar.
+   // A1.26 — hb_threadJoin evita el handle leak: aunque el hijo ya notificó
+   // el mutex, el runtime mantiene su estado hasta que alguien lo reap-ee.
    hb_mutexUnlock( hMutex )
    _HixAbortMapDel( nChildId )
+   hb_threadJoin( hThread )
 
    IF aShared[ 2 ] != NIL
 
@@ -740,6 +907,12 @@ STATIC FUNCTION _HixThreadExec( oHrb, hMutex, aShared, hClass, oReq, cPath )
    CATCH oE
 
    END
+
+   // Reclaim pooled connections acquired by this child thread before it
+   // dies. Needed because _Borrowed is THREAD STATIC: the parent's
+   // WDO_ReleaseAllThread() hook can't see slots acquired here, and if
+   // the parent timed out it has already detached us.
+   WDO_ReleaseAllThread()
 
    // Limpiar propia entrada del abort map antes de notificar al padre
    _HixAbortMapDel( hb_threadId() )
@@ -818,6 +991,7 @@ STATIC FUNCTION _HixRunHrb( oHrb, cPath  )
       ENDIF
 
       HIX_CloseDbfAreas()
+      WDO_ReleaseAllThread()
 
    END
 
@@ -854,7 +1028,7 @@ STATIC FUNCTION _HixCaptureRuntimeLine( oErr )
 
    IF nLine > 0
 
-      nLine -= HIX_PreambleLines()
+      nLine -= HIX_CompilePreambleLines()
 
       IF nLine < 1
 
@@ -1040,6 +1214,7 @@ STATIC FUNCTION _HixRunHrbClass( oHrb, cPath, hClass )
             HIX_Throw( oError )
             FINALLY
             HIX_CloseDbfAreas()
+            WDO_ReleaseAllThread()
 
          END
 
@@ -1340,6 +1515,78 @@ FUNCTION HIX_FileRoute( oDisp, cSpec )
 
 RETURN NIL
 
+// ------------------------------------------------------------
+// [A1.03] _HixIsSafePath — .T. si `cPhysical` puede servirse con seguridad
+// desde el sandbox `cRoot`, .F. si algún componente entre cRoot y cPhysical
+// (ambos inclusive) es un reparse point (symlink en Unix, symlink o junction
+// en Windows).
+//
+// El bit HB_FA_REPARSE (0x00000400) marca cualquier reparse point. Es
+// necesario recorrer los componentes porque `mklink /J www\legit C:\Windows`
+// convierte a `www\legit` en junction: hb_vfAttrGet sobre `www\legit\target.txt`
+// devuelve los atributos del fichero destino (que puede ser un fichero normal
+// dentro de System32) — no del link.
+//
+// Contrato:
+//   - cPhysical: path absoluto ya normalizado (colapsados `.` y `..`).
+//   - cRoot: root canonicalizado del dispatcher (misma normalización).
+//   - lAllowLinks == .T. → retorna .T. sin comprobar (opt-in del admin).
+//   - Fuera del root: retorna .T. (la validación de root es responsabilidad
+//     del llamador; este helper sólo se preocupa de reparse points en la
+//     cadena desde el root hasta el target).
+STATIC FUNCTION _HixIsSafePath( cPhysical, cRoot, lAllowLinks )
+
+   LOCAL cWalk, cRest, nSep, nAttr
+
+   IF lAllowLinks == .T. ; RETURN .T. ; ENDIF
+   IF Empty( cPhysical ) .OR. Empty( cRoot ) ; RETURN .T. ; ENDIF
+
+   // Normalizar sep. final del root (tras esto cRoot siempre acaba en hb_ps()).
+   IF Right( cRoot, 1 ) != hb_ps()
+      cRoot += hb_ps()
+   ENDIF
+
+   // Sólo aplica dentro del sandbox: fuera del root no hay nada que proteger
+   // aquí (la ACL previa ya habrá decidido). Comparación case-insensitive por
+   // Windows.
+   IF Lower( Left( cPhysical, Len( cRoot ) ) ) != Lower( cRoot )
+      RETURN .T.
+   ENDIF
+
+   // Empezar en el root y recorrer componentes hasta llegar a cPhysical.
+   // El propio root NO se comprueba: si el admin plantó el root sobre un link
+   // es su decisión declarada, no un vector de escape.
+   cWalk := Left( cPhysical, Len( cRoot ) - 1 )   // sin sep. final
+   cRest := SubStr( cPhysical, Len( cRoot ) + 1 )
+
+   DO WHILE ! Empty( cRest )
+
+      nSep := At( hb_ps(), cRest )
+
+      IF nSep == 0
+         cWalk += hb_ps() + cRest
+         cRest := ""
+      ELSE
+         cWalk += hb_ps() + Left( cRest, nSep - 1 )
+         cRest := SubStr( cRest, nSep + 1 )
+      ENDIF
+
+      nAttr := 0
+
+      IF hb_vfAttrGet( cWalk, @nAttr ) .AND. hb_bitAnd( nAttr, HB_FA_REPARSE ) != 0
+         RETURN .F.
+      ENDIF
+
+   ENDDO
+
+RETURN .T.
+
+// Test hook: expone _HixIsSafePath para tests unitarios. La STATIC no es
+// alcanzable desde otras unidades de compilación. No forma parte del API
+// público del dispatcher — usarla sólo desde tests.
+FUNCTION HIX_IsSafePath( cPhysical, cRoot, lAllowLinks )
+RETURN _HixIsSafePath( cPhysical, cRoot, lAllowLinks )
+
 // Resuelve cSpec a path fisico validando sandbox y ACL del dispatcher.
 // Retorna el path absoluto, o NIL si debe bloquearse (403).
 // Paths absolutos (X:... / /...) saltan el sandbox: responsabilidad del dev.
@@ -1436,8 +1683,21 @@ STATIC FUNCTION _HixResolveFilePath( oDisp, cSpec, lSkipDeny )
 
             cAlt := _HixTryPublicFallback( oDisp:cRoot, "/" + cSpec )
 
-            IF cAlt != NIL ; RETURN cAlt ; ENDIF
+            IF cAlt != NIL
+               // [A1.03] validar reparse points en el fallback
+               IF ! _HixIsSafePath( cAlt, oDisp:cRoot, oDisp:lAllowSymlinks )
+                  lw( "FileRoute: reparse point bloqueado [" + cSpec + "]" )
+                  RETURN NIL
+               ENDIF
+               RETURN cAlt
+            ENDIF
 
+         ENDIF
+
+         // [A1.03] validar reparse points en la rama principal
+         IF ! _HixIsSafePath( cPhysical, oDisp:cRoot, oDisp:lAllowSymlinks )
+            lw( "FileRoute: reparse point bloqueado [" + cSpec + "]" )
+            RETURN NIL
          ENDIF
 
          RETURN cPhysical
@@ -1453,8 +1713,21 @@ STATIC FUNCTION _HixResolveFilePath( oDisp, cSpec, lSkipDeny )
 
       cAlt := _HixTryPublicFallback( oDisp:cRoot, "/" + cSpec )
 
-      IF cAlt != NIL ; RETURN cAlt ; ENDIF
+      IF cAlt != NIL
+         // [A1.03] validar reparse points en el fallback
+         IF ! _HixIsSafePath( cAlt, oDisp:cRoot, oDisp:lAllowSymlinks )
+            lw( "FileRoute: reparse point bloqueado [" + cSpec + "]" )
+            RETURN NIL
+         ENDIF
+         RETURN cAlt
+      ENDIF
 
+   ENDIF
+
+   // [A1.03] validar reparse points en el path directo
+   IF ! _HixIsSafePath( cPhysical, oDisp:cRoot, oDisp:lAllowSymlinks )
+      lw( "FileRoute: reparse point bloqueado [" + cSpec + "]" )
+      RETURN NIL
    ENDIF
 
 RETURN cPhysical
@@ -1715,7 +1988,18 @@ STATIC FUNCTION _HixTryPublicFallback( cRoot, cPath )
 
    ENDIF
 
+   // [A3.1.6] si el path ya lleva /public/, buscar directamente en cRoot.
+   // Antes retornaba NIL → 404 aunque www/public/foo existiera, mientras
+   // que /foo (sin prefijo) sí lo encontraba. Fix: eliminar asimetría.
    IF Lower( Left( cPath, 8 ) ) == "/public/"
+
+      cPub := cRoot + hb_DirSepToOS( cPath )
+
+      IF hb_FileExists( cPub )
+
+         RETURN cPub
+
+      ENDIF
 
       RETURN NIL
 
