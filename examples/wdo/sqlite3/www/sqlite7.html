@@ -1,0 +1,162 @@
+@view 'header.html', 'WDO SQLite3', 'SQLCipher — Rekey + GetCipherInfo + key_ref'
+
+@prg
+
+   //  ------------------------------------------------------------
+   //  SQLCipher rotation demo.
+   //
+   //    1) Current cipher parameters        -- oConn:GetCipherInfo()
+   //    2) Rekey to a temporary passphrase  -- oConn:Rekey( cTmp )
+   //    3) Decrypt-in-place is refused      -- oConn:Rekey( "" ) => .F.
+   //    4) Rekey back to the original key   -- leaves the DB usable
+   //    5) key_ref via HIX_Keys             -- resolution walkthrough
+   //
+   //  Idempotent: each pageview rotates original -> temp -> original,
+   //  so refreshing never locks you out of the DB.
+   //  ------------------------------------------------------------
+
+   LOCAL oConn := WDO_Get( "SQLITE" )
+   LOCAL cOriginal, cTemp, lOk, nMs
+   LOCAL hInfo
+
+   IF oConn == NIL
+      ? 'Error: standalone conn not registered'
+      RETU NIL
+   ENDIF
+
+   //  Swallow SetError() breaks so Rekey() failures surface as .F. instead
+   //  of a 500 climb up the dispatcher error handler.
+   oConn:bError := {| oErr | HB_SYMBOL_UNUSED( oErr ), .T. }
+
+   IF ! oConn:IsEncrypted()
+      ?? '<div style="border:2px solid orange;padding:12px;margin:10px 0">'
+      ?  '<b>This page needs an encrypted database.</b>'
+      ?  'Enable SQLCipher first -- see the <b>SQLCipher (optional)</b> '
+      ?  'walkthrough in <code>examples/wdo/sqlite3/readme.md</code>:'
+      ?  '<pre>  1. Set databases.sqlite.key in www/config.json'
+      ?  '  2. Wipe www/data/demo.db*'
+      ?  '  3. Restart app.exe</pre>'
+      ?? '</div>'
+      RETU NIL
+   ENDIF
+
+   cOriginal := oConn:cKey
+   cTemp     := "hix-demo-rotated-" + hb_NToS( Int( hb_TToSec( hb_DateTime() ) ) )
+
+   //  ------------------------------------------------------------
+   //  1) Current cipher parameters
+   //  ------------------------------------------------------------
+
+   ?? '<h3>1) Current cipher parameters</h3>'
+   ?  'Active passphrase length: <b>' + hb_NToS( Len( cOriginal ) ) + ;
+      '</b> bytes (value hidden).'
+
+   hInfo := oConn:GetCipherInfo()
+   ?? oConn:View( { hInfo },, 'oConn:GetCipherInfo()' )
+
+   //  ------------------------------------------------------------
+   //  2) Rekey to a new passphrase
+   //  ------------------------------------------------------------
+
+   ?? '<h3>2) Rekey to a temporary passphrase</h3>'
+   ?  '<pre>oConn:Rekey( "' + cTemp + '" )</pre>'
+
+   nMs := hb_milliSeconds()
+   lOk := oConn:Rekey( cTemp )
+   nMs := hb_milliSeconds() - nMs
+
+   ?? '<pre>'
+   ?  'Result ..........: ' + iif( lOk, '.T. (ok)', '.F. (failed)' )
+   ?  'Elapsed .........: ' + hb_NToS( nMs ) + ' ms'
+   ?  'oConn:cKey now ..: ' + oConn:cKey
+   ?  'oConn:lEncrypted : ' + iif( oConn:lEncrypted, 'T', 'F' )
+   ?? '</pre>'
+
+   IF ! lOk
+      ?  '<b style="color:red">Rekey failed -- aborting so the DB stays on the original key.</b>'
+      RETU NIL
+   ENDIF
+
+   //  Verify GetCipherInfo is still coherent after the rotation
+   ?? oConn:View( { oConn:GetCipherInfo() },, 'GetCipherInfo() after Rekey' )
+
+   //  ------------------------------------------------------------
+   //  3) Decrypt-in-place is refused by SQLCipher
+   //  ------------------------------------------------------------
+
+   ?? '<h3>3) <code>Rekey("")</code> cannot decrypt in place</h3>'
+   ?  'SQLCipher explicitly rejects an empty rekey: the only supported path'
+   ?  'back to plaintext is <code>ATTACH</code> + <code>sqlcipher_export</code>'
+   ?  'into a fresh file (see readme &gt; <i>Reverting to plaintext</i>).'
+   ?  '<pre>oConn:Rekey( "" )</pre>'
+
+   lOk := oConn:Rekey( "" )
+
+   ?? '<pre>'
+   ?  'Result ..........: ' + iif( lOk, '.T. (unexpected!)', '.F. (as documented)' )
+   ?  'oConn:cKey still : ' + oConn:cKey + '   (unchanged)'
+   ?  'oConn:lEncrypted : ' + iif( oConn:lEncrypted, 'T', 'F' )
+   ?? '</pre>'
+
+   //  ------------------------------------------------------------
+   //  4) Rotate back to the original key so refreshes stay idempotent
+   //  ------------------------------------------------------------
+
+   ?? '<h3>4) Rotate back to the original passphrase</h3>'
+
+   nMs := hb_milliSeconds()
+   lOk := oConn:Rekey( cOriginal )
+   nMs := hb_milliSeconds() - nMs
+
+   ?? '<pre>'
+   ?  'oConn:Rekey( cOriginal ) -> ' + iif( lOk, '.T.', '.F.' )
+   ?  'Elapsed .........: ' + hb_NToS( nMs ) + ' ms'
+   ?  'oConn:cKey now ..: (' + hb_NToS( Len( oConn:cKey ) ) + ' bytes, restored)'
+   ?? '</pre>'
+
+   //  ------------------------------------------------------------
+   //  5) key_ref -- resolve the passphrase from HIX_Keys
+   //
+   //  Instead of hard-coding `databases.sqlite.key` in config.json,
+   //  move the passphrase to the `keys` block and reference it from the
+   //  driver config. HIX_InitPoolsFromConfig resolves `key_ref` via
+   //  HIX_KeyGet( cRef ) at pool bootstrap, before sqlite3_key.
+   //  ------------------------------------------------------------
+
+   ?? '<h3>5) key_ref via HIX_Keys</h3>'
+   ?  'Production layout keeps the passphrase out of <code>databases.sqlite.key</code>'
+   ?  'and places it under the top-level <code>keys</code> block in'
+   ?  '<code>www/config.json</code>:'
+
+   ?? '<pre>'
+   ?  '{'
+   ?  '  "keys": {'
+   ?  '    "sqlite3": "hix-demo-passphrase"'
+   ?  '  },'
+   ?  '  "databases": {'
+   ?  '    "sqlite": {'
+   ?  '      "driver":  "sqlite3",'
+   ?  '      "file":    "www/data/demo.db",'
+   ?  '      "key":     "",                <-- leave empty'
+   ?  '      "key_ref": "sqlite3"          <-- resolves via HIX_KeyGet'
+   ?  '    }'
+   ?  '  }'
+   ?  '}'
+   ?? '</pre>'
+
+   ?  'At runtime the driver reads <code>HIX_KeyGet("sqlite3")</code> and'
+   ?  'passes the resolved value to <code>sqlite3_key</code>. The file on disk'
+   ?  'is encrypted exactly the same as with <code>"key": "..."</code> -- only the'
+   ?  'source of the secret changes.'
+
+   ?? '<pre>'
+   ?  '// Example: register a transient key in-process'
+   ?  'HIX_KeySet( "sqlite3-demo", "runtime-only-passphrase" )'
+   ?  'HIX_KeyGet( "sqlite3-demo" )  // -> "runtime-only-passphrase"'
+   ?? '</pre>'
+
+   ?  '<i>The current example uses the inline <code>key</code> form for a'
+   ?  'zero-setup walkthrough. Switch to <code>key_ref</code> when the config'
+   ?  'file travels further than the DB (CI, shared repos, container images).</i>'
+
+@endprg

@@ -45,85 +45,137 @@ RETURN
 */
 FUNCTION HIX_Loaders()
 
-   LOCAL cRoot    := UConfig( "paths", "root", "www" )
-   LOCAL cDir     :=  hb_dirbase() + cRoot + hb_ps() + "loaders" + hb_ps()
+   LOCAL cRoot     := UConfig( "paths", "root", "www" )
+   LOCAL cDir      := hb_dirbase() + cRoot + hb_ps() + "loaders" + hb_ps()
+   LOCAL cCacheDir := hb_dirbase() + ".cached" + hb_ps() + "loaders" + hb_ps()
+   LOCAL lCacheDisk := UConfig( "hixstyle", "cache_disk", .T. )
 
    LOCAL n, aFiles, aItem, cFile, cExt, hItem, cFilePrg, cFileHrb, aInfo, nLenModules
    LOCAL aError   := {}
    LOCAL nPendent, nIteracio, lExit, lError, nOk, nKo, nModulesKo, oError
-   LOCAL cErrText, hErr
+   LOCAL cErrText, hErr, hCmp
    // [A3.4.5] Trabajar con arrays locales; swap atomico al final para
    // que workers concurrentes vean siempre un estado coherente.
    LOCAL aWork     := {}
    LOCAL hNewFuncs := { => }
 
-   aFiles := Directory( cDir + "*.prg" )
+   // Cache dir: alineado con views (.cached/views). Solo .hrb, sin sidecar.
+   // Solo creamos el directorio si vamos a persistir HRBs.
+   IF lCacheDisk
+      IF ! hb_DirExists( hb_StrShrink( cCacheDir, 1 ) )
+         hb_DirBuild( hb_StrShrink( cCacheDir, 1 ) )
+      ENDIF
+   ENDIF
 
-   // Compile if is necesary prg files
+   // Limpieza one-shot de artefactos legacy en www/loaders/ (migracion del
+   // esquema anterior donde se dejaban .hrb y .hrb.md5 junto al .prg).
+   // Se hace siempre: limpia residuos independientemente del modo cache.
+   _HixLoaderPurgeLegacy( cDir )
 
-   FOR EACH aItem IN aFiles
+   IF lCacheDisk
 
-      hItem  := { => }
-      cFile := aItem[ F_NAME ]
+      aFiles := Directory( cDir + "*.prg" )
+
+      // Compile if is necesary prg files
+
+      FOR EACH aItem IN aFiles
+
+         hItem  := { => }
+         cFile := aItem[ F_NAME ]
 
 
-      // Si ! exiteix hrb o hrb mes vell que el prg -> compilo
+         // Si ! exiteix hrb o hrb mes vell que el prg -> compilo
 
-      cFileHrb := cDir + HB_FNameExtSet( cFile ) + '.hrb'
+         cFileHrb := cCacheDir + HB_FNameExtSet( cFile ) + '.hrb'
 
-      aInfo := Directory( cFileHrb )
+         aInfo := Directory( cFileHrb )
 
-      // Si HRB no existe, compilamos prg
+         // Si HRB no existe, compilamos prg
 
-      IF empty( aInfo )
+         IF empty( aInfo )
 
-         IF ! HIX_LoaderCompile( cDir, cFile, @hItem )
-
-            Aadd( aWork, hItem  )
-
-         ENDIF
-
-      ELSE
-         // Si HRB es mas viejo que prg -> compilamos
-         // [A3.4.6] Si mtime dice "fresco", verificar tambien hash del PRG
-         //          para detectar backups con mtime artificialmente reciente.
-
-         IF dtos( aInfo[ 1 ][ F_DATE ] ) + aInfo[ 1 ][ F_TIME ] < dtos( aItem[ F_DATE ] ) + aItem[ F_TIME ] .OR. ;
-               ! _HixLoaderHashOk( cDir, cFile )
-
-            IF  ! HIX_LoaderCompile( cDir, cFile, @hItem  )
+            IF ! HIX_LoaderCompile( cDir, cCacheDir, cFile, @hItem, lCacheDisk )
 
                Aadd( aWork, hItem  )
 
             ENDIF
 
+         ELSE
+            // Si HRB es mas viejo que prg -> compilamos (mtime-only, como views)
+
+            IF dtos( aInfo[ 1 ][ F_DATE ] ) + aInfo[ 1 ][ F_TIME ] < dtos( aItem[ F_DATE ] ) + aItem[ F_TIME ]
+
+               IF  ! HIX_LoaderCompile( cDir, cCacheDir, cFile, @hItem, lCacheDisk )
+
+                  Aadd( aWork, hItem  )
+
+               ENDIF
+
+            ENDIF
+
          ENDIF
 
-      ENDIF
 
+      NEXT
 
-   NEXT
+      // Read HRB's desde el cache
 
-   // Read HRB's
+      aFiles   := Directory( cCacheDir + "*.hrb" )
 
-   aFiles   := Directory( cDir + "*.hrb" )
+      FOR EACH aItem IN aFiles
 
-   FOR EACH aItem IN aFiles
+         cFile := aItem[ F_NAME ]
 
-      cFile := aItem[ F_NAME ]
+         hItem := {  'file' => cFile, ;
+            'msg' => '', ;
+            'oHrb' =>  hb_Memoread( cCacheDir + cFile ), ;
+            'pSym' =>  NIL, ;
+            'process' => .F., ;
+            'loaded' => .F., ;
+            'oError' => NIL, ;
+            'error' => .F. }
 
-      hItem := {  'file' => cFile, ;
-         'msg' => '', ;
-         'oHrb' =>  hb_Memoread( cDir + cFile ), ;
-         'pSym' =>  NIL, ;
-         'process' => .F., ;
-         'loaded' => .F., ;
-         'oError' => NIL, ;
-         'error' => .F. }
+         Aadd( aWork, hItem )
 
-      Aadd( aWork, hItem )
+      NEXT
 
-   NEXT
+   ELSE
+
+      // Modo sin cache en disco: compilar cada .prg en memoria y rellenar
+      // aWork con los bytes HRB directamente — no se toca .cached/loaders/.
+
+      aFiles := Directory( cDir + "*.prg" )
+
+      FOR EACH aItem IN aFiles
+
+         cFile := aItem[ F_NAME ]
+
+         hItem := {  'file'    => HB_FNameExtSet( cFile ) + '.hrb', ;
+            'msg'     => '', ;
+            'oHrb'    => '', ;
+            'pSym'    => NIL, ;
+            'process' => .F., ;
+            'loaded'  => .F., ;
+            'oError'  => NIL, ;
+            'hErr'    => NIL, ;
+            'error'   => .F. }
+
+         hCmp := HIX_CompileCodeFromFile( cDir + cFile )
+
+         IF hCmp[ "ok" ]
+            hItem[ 'oHrb' ] := hCmp[ "hrb" ]
+         ELSE
+            hItem[ 'hErr' ]   := hCmp[ "err" ]
+            hItem[ 'oError' ] := HIX_CompileErrorFromHash( hCmp[ "err" ] )
+            hItem[ 'error' ]  := .T.
+            hItem[ 'process' ] := .T.
+         ENDIF
+
+         Aadd( aWork, hItem )
+
+      NEXT
+
+   ENDIF
 
    nLenModules   := len( aWork )
 
@@ -134,6 +186,8 @@ FUNCTION HIX_Loaders()
       s_aModules   := aWork
       s_hUserFuncs := hNewFuncs
       hb_mutexUnlock( s_mtxLoader )
+
+      HIX_BootLogAdd( "loaders", "mode", .T., iif( lCacheDisk, "cache_disk", "in-memory" ) )
 
       RETU .T.
 
@@ -212,6 +266,8 @@ FUNCTION HIX_Loaders()
    s_aModules   := aWork
    s_hUserFuncs := hNewFuncs
    hb_mutexUnlock( s_mtxLoader )
+
+   HIX_BootLogAdd( "loaders", "mode", .T., iif( lCacheDisk, "cache_disk", "in-memory" ) )
 
    // TEST Show Proccess...
 
@@ -309,28 +365,41 @@ RETURN NIL
 
 // -------------------------------------------- //
 
-// [A3.4.6] Verifica que el hash guardado en .hrb.md5 coincide con el PRG actual.
-// Devuelve .F. si no existe el sidecar o si el PRG ha cambiado.
-STATIC FUNCTION _HixLoaderHashOk( cDir, cFile )
+// Borra artefactos legacy (.hrb y .hrb.md5) que el esquema anterior dejaba
+// dentro de www/loaders/. Se ejecuta una vez al arrancar; solo toca ficheros
+// generados — no hay riesgo de perder trabajo del usuario.
+STATIC FUNCTION _HixLoaderPurgeLegacy( cDir )
 
-   LOCAL cFileNoExt := HB_FNameExtSet( cFile )
-   LOCAL cMd5File   := cDir + cFileNoExt + '.hrb.md5'
-   LOCAL cSaved, cNow
+   LOCAL aList, aItem, nCount := 0
 
-   IF ! File( cMd5File )
-      RETURN .F.   // no hay sidecar -> conservative: recompilar
+   aList := Directory( cDir + "*.hrb" )
+   FOR EACH aItem IN aList
+      IF FErase( cDir + aItem[ F_NAME ] ) == 0
+         nCount++
+      ENDIF
+   NEXT
+
+   aList := Directory( cDir + "*.hrb.md5" )
+   FOR EACH aItem IN aList
+      IF FErase( cDir + aItem[ F_NAME ] ) == 0
+         nCount++
+      ENDIF
+   NEXT
+
+   IF nCount > 0
+      l( "Loaders: purgados " + hb_NToS( nCount ) + ;
+         " artefactos legacy de " + cDir )
    ENDIF
 
-   cSaved := AllTrim( hb_MemoRead( cMd5File ) )
-   cNow   := hb_MD5( hb_MemoRead( cDir + cFile ) )
-
-RETURN cSaved == cNow
+RETURN nCount
 
 // -------------------------------------------- //
 
-STATIC FUNCTION HIX_LoaderCompile( cDir, cFile, hItem )
+STATIC FUNCTION HIX_LoaderCompile( cDir, cCacheDir, cFile, hItem, lCacheDisk )
 
    LOCAL oHrb, oErr, cFileNoExt, hCmp
+
+   hb_default( @lCacheDisk, .T. )
 
    hItem := {  'file' => cFile, ;
       'msg' => '', ;
@@ -359,13 +428,13 @@ STATIC FUNCTION HIX_LoaderCompile( cDir, cFile, hItem )
       RETURN .F.
    ENDIF
 
-   // Si compilamos el prg, salvamos el hrb en disco
-
    cFileNoExt := HB_FNameExtSet( cFile )
 
-   hb_memowrit( cDir + cFileNoExt + '.hrb', oHrb )
-   // [A3.4.6] Guardar hash del PRG para invalidacion futura por contenido
-   hb_memowrit( cDir + cFileNoExt + '.hrb.md5', hb_MD5( hb_MemoRead( cDir + cFile ) ) )
+   IF lCacheDisk
+      // Guardamos el .hrb en .cached/loaders/ (misma convencion que views).
+      // Invalidacion por mtime: no sidecar, no hash.
+      hb_memowrit( cCacheDir + cFileNoExt + '.hrb', oHrb )
+   ENDIF
 
    RETU .T.
 

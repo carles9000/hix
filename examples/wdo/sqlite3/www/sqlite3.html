@@ -1,30 +1,52 @@
-@view 'header.html', 'WDO SQLite3', 'Prepare — bind variables (? and :name)'
+@view 'header.html', 'WDO SQLite3', 'Prepare — bind variables (? / :name / @name / $name)'
 
 @prg
 
    //  ------------------------------------------------------------
-   //  SQLite3 natively supports ?, :name, @name, $name placeholders.
-   //  BindParam resolves :name via sqlite3_bind_parameter_index --
-   //  no SQL rewrite, same semantics as MySql's emulated :name.
+   //  SQLite3 natively supports ?, ?N, :name, @name and $name as
+   //  placeholders. BindParam resolves named parameters through
+   //  sqlite3_bind_parameter_index() -- no client-side SQL rewrite
+   //  (unlike PG, which rewrites ? / :name to $N before PQprepare).
+   //
+   //  A temporary demo table keeps the example idempotent.
    //  ------------------------------------------------------------
 
-   LOCAL oConn    := WDO_Get( "SQLITE" )
+   LOCAL oConn := WDO_Get( "SQLITE" )
    LOCAL oStmt, aRows, hRow
-   LOCAL cHireFrom := "2010-01-01"
-   LOCAL cGender   := "F"
 
    IF oConn == NIL
       ? 'Error: standalone conn not registered'
       RETU NIL
    ENDIF
 
-   //  Make sure the seed table from sqlite2 is present (idempotent).
-   oConn:Exec( "CREATE TABLE IF NOT EXISTS employees_demo ( " + ;
-               "  emp_no     INTEGER PRIMARY KEY, "           + ;
-               "  first_name VARCHAR(50) NOT NULL, "          + ;
-               "  last_name  VARCHAR(50) NOT NULL, "          + ;
-               "  gender     VARCHAR(1), "                    + ;
+   //  ------------------------------------------------------------
+   //  Bootstrap demo dataset -- self-contained, no dependency on
+   //  sqlite2.html having been visited first.
+   //  ------------------------------------------------------------
+
+   oConn:Exec( "DROP TABLE IF EXISTS employees_demo" )
+   oConn:Exec( "CREATE TABLE employees_demo ( "                                + ;
+               "  emp_no     INTEGER PRIMARY KEY AUTOINCREMENT, "              + ;
+               "  first_name VARCHAR(50) NOT NULL, "                           + ;
+               "  last_name  VARCHAR(50) NOT NULL, "                           + ;
+               "  gender     VARCHAR(1), "                                     + ;
                "  hire_date  DATE )" )
+
+   oConn:Exec( "INSERT INTO employees_demo(first_name, last_name, gender, hire_date) VALUES " + ;
+               "('Alice',   'Smith',    'F', '2001-03-15'), "                  + ;
+               "('Bob',     'Jones',    'M', '2003-07-22'), "                  + ;
+               "('Carol',   'Williams', 'F', '2005-11-04'), "                  + ;
+               "('Diana',   'Brown',    'F', '2007-02-19'), "                  + ;
+               "('Ernesto', 'Martin',   'M', '2009-06-01'), "                  + ;
+               "('Fatima',  'Khan',     'F', '2011-09-12'), "                  + ;
+               "('Gustavo', 'Perez',    'M', '2013-04-28'), "                  + ;
+               "('Hiroshi', 'Tanaka',   'M', '2015-08-05'), "                  + ;
+               "('Irene',   'Rossi',    'F', '2017-01-30'), "                  + ;
+               "('Jon',     'O''Connor', 'M', '2019-05-10')" )
+
+   //  ------------------------------------------------------------
+   //  1) Positional '?'
+   //  ------------------------------------------------------------
 
    ?? '<h3>1) Positional placeholders <code>?</code></h3>'
    ?  '<pre>SELECT emp_no, first_name, last_name, gender, hire_date FROM employees_demo'
@@ -41,8 +63,8 @@
       RETU NIL
    ENDIF
 
-   oStmt:BindParam( 1, cHireFrom )
-   oStmt:BindParam( 2, cGender   )
+   oStmt:BindParam( 1, "2005-01-01" )
+   oStmt:BindParam( 2, "F"          )
    oStmt:Execute()
 
    IF oStmt:lError
@@ -58,6 +80,8 @@
 
    oStmt:Free()
 
+   //  ------------------------------------------------------------
+   //  2) Named ':name'
    //  ------------------------------------------------------------
 
    ?? '<h3>2) Named placeholders <code>:name</code></h3>'
@@ -80,16 +104,49 @@
    ?? oConn:View( aRows,, 'Men hired 2000-2020' )
 
    //  ------------------------------------------------------------
+   //  3) Native '@name' / '$name' placeholders (SQLite-only sugar)
+   //  ------------------------------------------------------------
 
-   ?? '<h3>3) Hostile input — single quote in value</h3>'
-   ?  'The value <code>O&apos;Brien</code> cannot break the SQL: it travels '
+   ?? '<h3>3) Native <code>@name</code> / <code>$name</code> placeholders (SQLite style)</h3>'
+   ?  'SQLite accepts <code>:name</code>, <code>@name</code> and <code>$name</code> as '
+   ?  'equivalent named placeholders -- all three resolve through '
+   ?  '<code>sqlite3_bind_parameter_index</code>. The portable spelling is '
+   ?  '<code>:name</code> (also works on MySQL and PG via their rewrite layer).'
+   ?  '<pre>SELECT emp_no, first_name, last_name FROM employees_demo'
+   ?  '  WHERE hire_date &gt; @lo'
+   ?  '  ORDER BY emp_no LIMIT $max</pre>'
+
+   oStmt := oConn:Prepare( "SELECT emp_no, first_name, last_name FROM employees_demo " + ;
+                           "WHERE hire_date > @lo ORDER BY emp_no LIMIT $max" )
+
+   oStmt:BindParam( "@lo",  "2010-01-01" )
+   oStmt:BindParam( "$max", 5            )
+   oStmt:Execute()
+
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+
+   ?? oConn:View( aRows,, 'First 5 hired after 2010-01-01' )
+
+   //  ------------------------------------------------------------
+   //  4) Hostile input -- single quote in value
+   //  ------------------------------------------------------------
+
+   ?? '<h3>4) Hostile input -- single quote in value</h3>'
+   ?  'The value <code>O&apos;Connor</code> cannot break the SQL: it travels '
    ?  'through <code>sqlite3_bind_text</code> separately from the compiled statement.'
 
    oStmt := oConn:Prepare( "SELECT COUNT(*) AS n FROM employees_demo WHERE last_name = ?" )
-   oStmt:BindParam( 1, "O'Brien" )
+   oStmt:BindParam( 1, "O'Connor" )
    oStmt:Execute()
    hRow := oStmt:Fetch_Assoc()
    ? '<b>Matches:</b> ' + hb_NToS( hRow[ "n" ] )
    oStmt:Free()
+
+   //  ------------------------------------------------------------
+   //  Cleanup
+   //  ------------------------------------------------------------
+
+   oConn:Exec( "DROP TABLE IF EXISTS employees_demo" )
 
 @endprg

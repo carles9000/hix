@@ -129,6 +129,7 @@ plugins:
                     - Ratelimit: es/hixstyle/seguridad/ratelimit.md
                     - Sesiones: es/hixstyle/seguridad/sesiones.md
                     - Autenticacion: es/hixstyle/seguridad/autenticacion.md
+                    - Password storage: es/hixstyle/seguridad/password.md
                     - JWT: es/hixstyle/seguridad/jwt.md
                     - CSRF: es/hixstyle/seguridad/csrf.md
                     - Resources IDs: es/hixstyle/seguridad/resources-ids.md
@@ -215,6 +216,7 @@ plugins:
                     - Ratelimit: en/hixstyle/seguridad/ratelimit.md
                     - Sessions: en/hixstyle/seguridad/sesiones.md
                     - Authentication: en/hixstyle/seguridad/autenticacion.md
+                    - Password storage: en/hixstyle/seguridad/password.md
                     - JWT: en/hixstyle/seguridad/jwt.md
                     - CSRF: en/hixstyle/seguridad/csrf.md
                     - Resources IDs: en/hixstyle/seguridad/resources-ids.md
@@ -302,6 +304,7 @@ plugins:
                     - Ratelimit: it/hixstyle/seguridad/ratelimit.md
                     - Sessioni: it/hixstyle/seguridad/sesiones.md
                     - Autenticazione: it/hixstyle/seguridad/autenticacion.md
+                    - Archiviazione password: it/hixstyle/seguridad/password.md
                     - JWT: it/hixstyle/seguridad/jwt.md
                     - CSRF: it/hixstyle/seguridad/csrf.md
                     - Resources IDs: it/hixstyle/seguridad/resources-ids.md

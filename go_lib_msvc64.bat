@@ -16,6 +16,7 @@ if exist hix_server.hbx (
 ) else (
    echo Building hix_server.hbx wait...
    hbmk2 hix_server.hbp  -comp=msvc64 -hbx=hix_server.hbx
+   echo hix_server.hbx was created
 )
 
 pause

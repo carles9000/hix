@@ -9,7 +9,7 @@
     "port": 8080,
     "maxconn": 1024,
     "timeout": 30,
-    "name": "My Server",
+    "name": "HIX",
     "mode": "standalone",
     "trusted_proxies": "127.0.0.1 ::1",
     "allowed_hosts": "",
@@ -44,16 +44,16 @@
   "admin":
   {
     "enabled": true,
-    "user": "",
-    "password": "",
-    "secret": ""
+    "user": "admin",
+    "password": "66808f8948632ba60430ce888460f77b79623261c22f4f71becad5ad881158ea",
+    "secret": "ad689572c36bd022808466bcc324959298dd67b1cbfd3d39bc894c46097d5f69"
   },
   "detector":
   {
     "workers": 4,
     "queue_size": 256,
-    "peek_timeout_ms": 10,
-    "peek_bytes": 512
+    "peek_timeout_ms": 150,
+    "peek_bytes": 2048
   },
   "pool_http":
   {

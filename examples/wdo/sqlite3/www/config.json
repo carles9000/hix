@@ -10,13 +10,20 @@
   },
   "databases": {
     "sqlite": {
-      "driver":        "sqlite3",
-      "file":          "www/data/demo.db",
-      "create":        true,
-      "journal_mode":  "WAL",
-      "synchronous":   "NORMAL",
-      "foreign_keys":  true,
-      "berror":        "WdoErrorHandler"
+      "driver":                "sqlite3",
+      "file":                  "www/data/demo.db",
+      "create":                true,
+      "journal_mode":          "WAL",
+      "synchronous":           "NORMAL",
+      "foreign_keys":          true,
+      "busy_timeout_ms":       5000,
+      "key":                   "",
+      "key_ref":               "",
+      "cipher_kdf_iter":       0,
+      "cipher_page_size":      0,
+      "cipher_hmac_algorithm": "",
+      "cipher_kdf_algorithm":  "",
+      "berror":                "WdoErrorHandler"
     }
   }
 }

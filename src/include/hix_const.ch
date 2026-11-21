@@ -132,11 +132,13 @@
 #define HIX_PATH_MONITOR          "/hix-monitor"
 #define HIX_PATH_TRACE            "/hix-trace"
 #define HIX_PATH_CACHE_CLEAR      "/hix-cache-clear"
+#define HIX_PATH_INFO             "/hix-info"
 // Admin panel
 #define HIX_PATH_INDEX            "/hix-index"
 #define HIX_PATH_LOGIN            "/hix-login"
 #define HIX_PATH_LOGOUT           "/hix-logout"
 #define HIX_PATH_SETUP            "/hix-setup"
+#define HIX_PATH_SETUP_API        "/hix-setup-api"
 #define HIX_PATH_ROUTES_ADD       "/hix-routes/add"
 #define HIX_PATH_ROUTES_DELETE    "/hix-routes/delete"
 #define HIX_PATH_ROUTES_RELOAD    "/hix-routes/reload"

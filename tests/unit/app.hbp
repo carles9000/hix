@@ -46,6 +46,8 @@ src/hix_test_firewall.prg
 src/hix_test_flash.prg
 src/hix_test_gzip.prg
 src/hix_test_helpers.prg
+src/hix_test_info.prg
+src/hix_test_admin_setup_api.prg
 src/hix_test_usendchunk_propagate.prg
 src/hix_test_peer_alive.prg
 src/hix_test_hixstyle_acl.prg
@@ -54,8 +56,10 @@ src/hix_test_ip.prg
 src/hix_test_jwt.prg
 src/hix_test_jwt_scope.prg
 src/hix_test_keys.prg
+src/hix_test_password.prg
 src/hix_test_load_routes.prg
 src/hix_test_loader_session.prg
+src/hix_test_loader_cache.prg
 src/hix_test_multipart.prg
 src/hix_test_new_overrides.prg
 src/hix_test_mw.prg
@@ -119,9 +123,6 @@ src/hix_test_safe_fs.prg
 {unix}hbcurl.hbc
 
 
-
-# SQLite3 (WDO driver — lib references hbsqlit3 symbols)
-hbsqlit3.hbc
 
 # PDF
 {msvc64}hbhpdf.hbc

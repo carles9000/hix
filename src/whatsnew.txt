@@ -1,3 +1,37 @@
+2.5.0  FEATURE — familia WDO completada (los tres drivers production-ready
+       con misma superficie API):
+       (a) Prepared statements en WDO_PG (libpq nativa): Prepare /
+           BindParam / BindParams / BindLong / Execute / Fetch{,_Assoc} /
+           FetchAll / Free. API 1:1 con WDO_MySql; placeholders ?/:name/$N
+           aceptados. Suite PG 142/142 (+16 Phase 2bp).
+       (b) WDO_Sqlite3 reescrito como driver nativo hb_DynCall sobre
+           sqlcipher.dll (MinGW64 + OpenSSL 4). Añade SQLCipher
+           transparente via key/key_ref (AES-256-CBC + HMAC-SHA512),
+           Rekey, GetCipherInfo, IsEncrypted. Suite SQLite3 47/47 (+16).
+       (c) Cualquier controller puede intercambiar
+           WDO_Get("MYSQL") <-> WDO_Get("PG") <-> WDO_Get("APP")
+           sin tocar el pipeline Prepare/Bind/Execute/Fetch.
+       See changes/2.5.0.md.
+2.4.9  REFACTOR — HIX_Loaders() respeta hixstyle.cache_disk (alineado con
+       views/dispatcher). cache_disk=.F. compila en memoria sin tocar
+       .cached/loaders/. Default .T. preserva v2.4.8. 2312/2312.
+       See changes/2.4.9.md.
+2.4.8  REFACTOR — HIX_Loaders() cachea .hrb en .cached/loaders/ (igual que
+       views). Eliminado sidecar .hrb.md5, invalidación mtime-only y auto-
+       purga de artefactos legacy. 2310/2310. See changes/2.4.8.md.
+2.4.7  FEATURE — password storage core en la lib: HIX_PasswordHash /
+       Verify / NeedsRehash (PBKDF2-HMAC-SHA256 via libcrypto, 600k
+       iter OWASP 2026). Test unit 20 asserts. See changes/2.4.7.md.
+2.4.6  FEATURE — nueva API POST /hix-setup-api (JSON) para bootstrap
+       programático de credenciales admin. Responde 201/409/422 con
+       body JSON. Refactor compartido con /hix-setup. See changes/2.4.6.md.
+2.4.5  FEATURE — nueva API GET /hix-info (admin-gated) con el banner
+       de arranque en JSON vía HIX_InfoHash(). UX fix: POST /hix-setup
+       sobre admin ya configurado devuelve 409 + hint. See changes/2.4.5.md.
+2.4.4  FEATURE — WDO PostgreSQL driver (WDO_PG + WDO_PgStmt + pool).
+       libpq via hb_DynCall, API espejo del driver MySQL. Pool "PG"
+       vía WDO_InitPoolPg{,Ex} / WDO_Get("PG"). databases.<pool>.driver
+       = "pg" lo arranca desde hix.json. Tests 69/69. See changes/2.4.4.md.
 2.4.3  SECURITY HARDENING — 7 fixes: session crypt, UParam QS, TLS scheme,
        keys precedence, no secrets in config.json, CSRF session-bound,
        ACL ext/dotfile blacklist. 2231/2231. See changes/2.4.3.md.

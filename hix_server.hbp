@@ -24,7 +24,6 @@
 # the contrib include path.
 hbssl.hbc
 hbcurl.hbc
-hbsqlit3.hbc
 
 
 # Core (sin dependencias entre ellas)
@@ -49,6 +48,7 @@ src/hix_ip.prg
 src/hix_firewall.prg
 src/hix_proxy.prg
 src/hix_response.prg
+src/hix_password.prg
 
 # Pools & Workers
 src/hix_pool.prg
@@ -142,6 +142,9 @@ src/wdo/mysql/wdo_mysql_pool.prg
 src/wdo/sqlite3/wdo_sqlite3.prg
 src/wdo/sqlite3/wdo_sqlite3_stmt.prg
 src/wdo/sqlite3/wdo_sqlite3_pool.prg
+src/wdo/pg/wdo_pg.prg
+src/wdo/pg/wdo_pg_stmt.prg
+src/wdo/pg/wdo_pg_pool.prg
 src/wdo/wdo_config.prg
 src/wdo/wdo_error_handler_default.prg
 

@@ -2,36 +2,37 @@
   File ......: wdo_sqlite3_stmt.prg
   Author.....: Charly 9000
   Created....: 2026-10-05
-  Modified...: 2026-10-05
-  Version....: 1.0.0
+  Modified...: 2026-11-20
+  Version....: 2.0.0
   Description: Prepared-statement companion to WDO_Sqlite3.
-               Wraps sqlite3_prepare_v2 + step + bind + column.
-               Mirrors WDO_MySqlStmt's method surface where it
-               makes sense (Fetch/Fetch_Assoc/FetchAll/BindParam)
-               so controllers can swap drivers without churn.
+               Wraps sqlite3_prepare_v2 + step + bind + column
+               via native DynCall against sqlcipher.dll. Mirrors
+               WDO_PgStmt / WDO_MySqlStmt's method surface so
+               controllers can swap drivers without churn.
   Usage      : oStmt := oConn:Prepare( "SELECT * FROM u WHERE id=:id" )
                oStmt:BindParam( ":id", 42 )
                oStmt:Execute()
                hRow := oStmt:Fetch_Assoc()
   Notes      : SQLite natively supports `?`, `:name`, `@name`, `$name`
                placeholders. :name resolution goes through
-               sqlite3_bind_parameter_index -- no SQL rewrite needed.
-               Column indices are 1-based in the hbsqlit3 wrapper.
+               sqlite3_bind_parameter_index â€” no SQL rewrite needed.
+               Parameter indices are 1-based (SQLite native).
  -----------------------------------------------------------*/
 
 #include 'hix_const.ch'
 #include 'hix_logger.ch'
 #include 'hbclass.ch'
-#include 'hbsqlit3.ch'
+#include "hbdyn.ch"
+#include "wdo_sqlite3.ch"
 
 
 CLASS WDO_Sqlite3Stmt
 
    DATA oConn
-   DATA pDb
-   DATA pStmt
+   DATA pDb                            INIT NIL      //  sqlite3* (copy of oConn:pDb)
+   DATA pStmt                          INIT NIL      //  sqlite3_stmt*
    DATA cSql
-   DATA cTable                                       // optional, enables DbStruct()
+   DATA cTable                                       //  optional, enables DbStruct()
 
    DATA nColumns                       INIT 0
    DATA aColumnNames                   INIT {}
@@ -40,7 +41,10 @@ CLASS WDO_Sqlite3Stmt
    DATA lError                         INIT .F.
    DATA cError                         INIT ''
    DATA nAffectedRows                  INIT 0
-   DATA lDone                          INIT .F.      // step hit SQLITE_DONE
+   DATA lDone                          INIT .F.     //  step hit SQLITE_DONE
+   DATA lFreed                         INIT .F.
+   DATA lWeb                           INIT .T.
+   DATA aFields                        INIT {}
 
    METHOD New( oConn, cSql )           CONSTRUCTOR
    METHOD BindParam( xIdx, xVal, cType )
@@ -51,10 +55,33 @@ CLASS WDO_Sqlite3Stmt
    METHOD Fetch_Assoc()
    METHOD FetchAll( lAssoc )
    METHOD FCount()                     INLINE ::nColumns
-   METHOD Count()                      INLINE -1
+   METHOD Count()                      INLINE -1    //  unknown until done
+   METHOD Row_Count()                  INLINE ::nAffectedRows
    METHOD DbStruct()
    METHOD Reset()
    METHOD Free()
+   METHOD Destroy()                    INLINE ::Free()
+   METHOD End()                        INLINE ::Free()
+
+   //  DynCall wrappers (sqlite3 C API â€” stmt-level)
+   METHOD SqlitePrepare( cSql, pStmtOut )
+   METHOD SqliteStep()
+   METHOD SqliteFinalize()
+   METHOD SqliteReset()
+   METHOD SqliteClearBindings()
+   METHOD SqliteColumnCount()
+   METHOD SqliteColumnName( nCol )
+   METHOD SqliteColumnType( nCol )
+   METHOD SqliteColumnInt64( nCol )
+   METHOD SqliteColumnDouble( nCol )
+   METHOD SqliteColumnText( nCol )
+   METHOD SqliteColumnBytes( nCol )
+   METHOD SqliteBindNull( nIdx )
+   METHOD SqliteBindInt64( nIdx, nVal )
+   METHOD SqliteBindDouble( nIdx, nVal )
+   METHOD SqliteBindText( nIdx, cVal )
+   METHOD SqliteBindBlob( nIdx, cVal )
+   METHOD SqliteBindParameterIndex( cName )
 
 ENDCLASS
 
@@ -62,39 +89,46 @@ ENDCLASS
 
 METHOD New( oConn, cSql ) CLASS WDO_Sqlite3Stmt
 
-   LOCAL pStmt
+   LOCAL nRc
+   LOCAL pStmtOut := 0
 
    ::oConn := oConn
    ::pDb   := oConn:pDb
    ::cSql  := cSql
+   ::lWeb  := oConn:lWeb
 
-   pStmt := sqlite3_prepare( ::pDb, cSql )
+   IF ValType(::pDb) != "P"
+      ::lError := .T.
+      ::cError := _( 'WDO_ERR_SQLITE_PREPARE', "connection not open" )
+      RETU SELF
+   ENDIF
 
-   //  hbsqlit3 returns a Harbour pointer item wrapping NULL C pointer on
-   //  prepare error (not NIL). Empty() detects both NIL and null-ptr.
-   IF Empty( pStmt )
+   nRc := ::SqlitePrepare( cSql, @pStmtOut )
+
+   IF nRc != SQLITE_OK .OR. ValType( pStmtOut ) != "P"
       ::lError := .T.
       ::cError := _( 'WDO_ERR_SQLITE_PREPARE', ;
-                     hb_NToS( sqlite3_errcode( ::pDb ) ) + ": " + sqlite3_errmsg( ::pDb ) )
+                     hb_NToS( nRc ) + ": " + oConn:SqliteErrmsg() )
       oConn:SetError( ::cError )
       RETU SELF
    ENDIF
 
-   ::pStmt := pStmt
+   ::pStmt := pStmtOut
 
 RETU SELF
 
 //	-------------------------------------------------------  //
 //  BindParam( xIdx, xVal, cType )
 //
-//  xIdx: numeric 1-based index OR character ":name" / "name" (auto-prefixed).
+//  xIdx: numeric 1-based index OR character ":name" / "@name" / "$name".
+//        Bare "name" is auto-prefixed with ":".
 //  cType optional: "T" text, "I" int, "D" double, "B" blob, "N" null.
 //        Default: inferred from ValType(xVal). NIL always binds NULL.
 METHOD BindParam( xIdx, xVal, cType ) CLASS WDO_Sqlite3Stmt
 
    LOCAL nIdx, cVt, cName, nRc
 
-   IF ::pStmt == NIL
+   IF ValType(::pStmt) != "P"
       RETU .F.
    ENDIF
 
@@ -104,7 +138,7 @@ METHOD BindParam( xIdx, xVal, cType ) CLASS WDO_Sqlite3Stmt
       IF Left( cName, 1 ) != ":" .AND. Left( cName, 1 ) != "@" .AND. Left( cName, 1 ) != "$"
          cName := ":" + cName
       ENDIF
-      nIdx := sqlite3_bind_parameter_index( ::pStmt, cName )
+      nIdx := ::SqliteBindParameterIndex( cName )
       IF nIdx == 0
          ::lError := .T.
          ::cError := _( 'WDO_ERR_SQLITE_BIND', cName + " (not found)" )
@@ -117,7 +151,7 @@ METHOD BindParam( xIdx, xVal, cType ) CLASS WDO_Sqlite3Stmt
 
    //  Explicit NIL -> NULL regardless of cType.
    IF xVal == NIL
-      nRc := sqlite3_bind_null( ::pStmt, nIdx )
+      nRc := ::SqliteBindNull( nIdx )
       RETU nRc == SQLITE_OK
    ENDIF
 
@@ -130,7 +164,7 @@ METHOD BindParam( xIdx, xVal, cType ) CLASS WDO_Sqlite3Stmt
          cType := "I"
          xVal  := iif( xVal, 1, 0 )
       CASE cVt == "D"
-         //  Harbour date -> ISO text (YYYY-MM-DD).
+         //  Harbour date â†’ ISO text (YYYY-MM-DD).
          cType := "T"
          xVal  := hb_DToC( xVal, "YYYY-MM-DD" )
       CASE cVt == "T"
@@ -143,20 +177,21 @@ METHOD BindParam( xIdx, xVal, cType ) CLASS WDO_Sqlite3Stmt
 
    DO CASE
    CASE cType == "T"
-      nRc := sqlite3_bind_text( ::pStmt, nIdx, hb_CStr( xVal ) )
+      nRc := ::SqliteBindText( nIdx, hb_CStr( xVal ) )
    CASE cType == "I"
-      nRc := sqlite3_bind_int64( ::pStmt, nIdx, xVal )
+      nRc := ::SqliteBindInt64( nIdx, xVal )
    CASE cType == "D"
-      nRc := sqlite3_bind_double( ::pStmt, nIdx, xVal )
+      nRc := ::SqliteBindDouble( nIdx, xVal )
    CASE cType == "B"
-      nRc := sqlite3_bind_blob( ::pStmt, nIdx, xVal )
+      nRc := ::SqliteBindBlob( nIdx, xVal )
    OTHERWISE
-      nRc := sqlite3_bind_null( ::pStmt, nIdx )
+      nRc := ::SqliteBindNull( nIdx )
    ENDCASE
 
    IF nRc != SQLITE_OK
       ::lError := .T.
-      ::cError := _( 'WDO_ERR_SQLITE_BIND', hb_NToS( nRc ) + ": " + sqlite3_errmsg( ::pDb ) )
+      ::cError := _( 'WDO_ERR_SQLITE_BIND', ;
+                     hb_NToS( nRc ) + ": " + ::oConn:SqliteErrmsg() )
       ::oConn:SetError( ::cError )
       RETU .F.
    ENDIF
@@ -164,7 +199,7 @@ METHOD BindParam( xIdx, xVal, cType ) CLASS WDO_Sqlite3Stmt
 RETU .T.
 
 //	-------------------------------------------------------  //
-//  BindParams( {v1, v2, v3} ) — positional shortcut.
+//  BindParams( {v1, v2, v3} ) â€” positional shortcut.
 METHOD BindParams( aValues ) CLASS WDO_Sqlite3Stmt
 
    LOCAL i, nLen := Len( aValues )
@@ -178,43 +213,45 @@ METHOD BindParams( aValues ) CLASS WDO_Sqlite3Stmt
 RETU .T.
 
 //	-------------------------------------------------------  //
-//  BindLong: alias to BindParam text/blob. SQLite doesn't need chunking
-//  (sqlite3_bind_text takes a full buffer with SQLITE_TRANSIENT), so this
-//  is kept only for API parity with WDO_MySqlStmtBin.
+//  BindLong: alias to BindParam type "B". SQLite doesn't need chunking
+//  (sqlite3_bind_blob takes a full buffer with SQLITE_TRANSIENT), so
+//  this exists only for API parity with WDO_MySqlStmtBin.
 METHOD BindLong( nIdx, cData ) CLASS WDO_Sqlite3Stmt
 RETU ::BindParam( nIdx, cData, "B" )
 
 //	-------------------------------------------------------  //
 //  Execute: step once. For SELECT this positions on the first row (if
-//  any). For DML it drives the statement to SQLITE_DONE. Sets lEof when
-//  no more rows are available.
+//  any). For DML it drives the statement to SQLITE_DONE. Sets lEof
+//  when no more rows are available.
 METHOD Execute() CLASS WDO_Sqlite3Stmt
 
    LOCAL nRc, i, cName
 
-   IF ::pStmt == NIL
+   IF ValType(::pStmt) != "P"
       RETU .F.
    ENDIF
 
    hb_mutexLock( ::oConn:hMutex )
-   nRc := sqlite3_step( ::pStmt )
+   nRc := ::SqliteStep()
    hb_mutexUnlock( ::oConn:hMutex )
 
    ::lDone := ( nRc == SQLITE_DONE )
    ::lEof  := ::lDone
 
    IF nRc == SQLITE_ROW
-      ::nColumns     := sqlite3_column_count( ::pStmt )
+      ::nColumns     := ::SqliteColumnCount()
       ::aColumnNames := Array( ::nColumns )
       FOR i := 1 TO ::nColumns
-         cName := sqlite3_column_name( ::pStmt, i )
-         ::aColumnNames[ i ] := iif( cName == NIL, "col" + hb_NToS( i ), cName )
+         cName := ::SqliteColumnName( i - 1 )
+         ::aColumnNames[ i ] := iif( cName == NIL .OR. Empty( cName ), ;
+                                     "col" + hb_NToS( i ), cName )
       NEXT
    ELSEIF nRc == SQLITE_DONE
-      ::nAffectedRows := sqlite3_changes( ::pDb )
+      ::nAffectedRows := ::oConn:SqliteChanges()
    ELSE
       ::lError := .T.
-      ::cError := _( 'WDO_ERR_SQLITE_STEP', hb_NToS( nRc ) + ": " + sqlite3_errmsg( ::pDb ) )
+      ::cError := _( 'WDO_ERR_SQLITE_STEP', ;
+                     hb_NToS( nRc ) + ": " + ::oConn:SqliteErrmsg() )
       ::oConn:SetError( ::cError )
       RETU .F.
    ENDIF
@@ -227,18 +264,18 @@ METHOD Fetch() CLASS WDO_Sqlite3Stmt
 
    LOCAL aRow, i, nRc
 
-   IF ::pStmt == NIL .OR. ::lEof
+   IF ValType(::pStmt) != "P" .OR. ::lEof
       RETU NIL
    ENDIF
 
    aRow := Array( ::nColumns )
 
    FOR i := 1 TO ::nColumns
-      aRow[ i ] := _SqliteCellValue( ::pStmt, i )
+      aRow[ i ] := _Sqlite3CellValue( SELF, i - 1 )
    NEXT
 
    hb_mutexLock( ::oConn:hMutex )
-   nRc := sqlite3_step( ::pStmt )
+   nRc := ::SqliteStep()
    hb_mutexUnlock( ::oConn:hMutex )
 
    IF nRc != SQLITE_ROW
@@ -329,8 +366,8 @@ METHOD DbStruct() CLASS WDO_Sqlite3Stmt
          cType,                           ;
          nLen,                            ;
          nDec,                            ;
-         hb_HGetDef( hRow, "notnull", 0 ) == 1, ;
-         hb_HGetDef( hRow, "pk",      0 ) == 1, ;
+         Val( hb_CStr( hb_HGetDef( hRow, "notnull", 0 ) ) ) == 1, ;
+         Val( hb_CStr( hb_HGetDef( hRow, "pk",      0 ) ) ) == 1, ;
          hb_HGetDef( hRow, "dflt_value", NIL ) } )
    ENDDO
 
@@ -342,12 +379,12 @@ RETU aOut
 
 METHOD Reset() CLASS WDO_Sqlite3Stmt
 
-   IF ::pStmt == NIL
+   IF ValType(::pStmt) != "P"
       RETU .F.
    ENDIF
 
-   sqlite3_reset( ::pStmt )
-   sqlite3_clear_bindings( ::pStmt )
+   ::SqliteReset()
+   ::SqliteClearBindings()
    ::lEof   := .T.
    ::lError := .F.
    ::cError := ''
@@ -358,9 +395,10 @@ RETU .T.
 
 METHOD Free() CLASS WDO_Sqlite3Stmt
 
-   IF ::pStmt != NIL
-      sqlite3_finalize( ::pStmt )
+   IF ValType(::pStmt) == "P" .AND. ! ::lFreed
+      ::SqliteFinalize()
       ::pStmt := NIL
+      ::lFreed := .T.
    ENDIF
 
    ::lEof := .T.
@@ -368,22 +406,219 @@ METHOD Free() CLASS WDO_Sqlite3Stmt
 RETU NIL
 
 //	=======================================================  //
+//  DynCall wrappers (sqlite3 C API â€” stmt-level)
+//	=======================================================  //
+
+//  int sqlite3_prepare_v2(sqlite3*, const char *zSql, int nByte,
+//                         sqlite3_stmt **ppStmt, const char **pzTail)
+//  nByte=-1 â†’ zSql is NUL-terminated.
+//  pzTail=NULL â†’ we ignore remainder (SQL must be a single statement).
+METHOD SqlitePrepare( cSql, pStmtOut ) CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_prepare_v2", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_INT, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR, HB_DYN_CTYPE_CHAR_PTR, HB_DYN_CTYPE_INT,;
+                   HB_DYN_CTYPE_VOID_PTR, HB_DYN_CTYPE_VOID_PTR },;
+                   ::pDb, cSql, -1, @pStmtOut, NIL )
+
+//	-------------------------------------------------------  //
+//  int sqlite3_step(sqlite3_stmt*)
+
+METHOD SqliteStep() CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_step", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_INT, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR }, ::pStmt )
+
+//	-------------------------------------------------------  //
+//  int sqlite3_finalize(sqlite3_stmt*)
+
+METHOD SqliteFinalize() CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_finalize", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_INT, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR }, ::pStmt )
+
+//	-------------------------------------------------------  //
+//  int sqlite3_reset(sqlite3_stmt*)
+
+METHOD SqliteReset() CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_reset", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_INT, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR }, ::pStmt )
+
+//	-------------------------------------------------------  //
+//  int sqlite3_clear_bindings(sqlite3_stmt*)
+
+METHOD SqliteClearBindings() CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_clear_bindings", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_INT, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR }, ::pStmt )
+
+//	-------------------------------------------------------  //
+//  int sqlite3_column_count(sqlite3_stmt*)
+
+METHOD SqliteColumnCount() CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_column_count", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_INT, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR }, ::pStmt )
+
+//	-------------------------------------------------------  //
+//  const char *sqlite3_column_name(sqlite3_stmt*, int N)
+//  N is 0-based.
+
+METHOD SqliteColumnName( nCol ) CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_column_name", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_CHAR_PTR, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR, HB_DYN_CTYPE_INT },;
+                   ::pStmt, nCol )
+
+//	-------------------------------------------------------  //
+//  int sqlite3_column_type(sqlite3_stmt*, int)
+
+METHOD SqliteColumnType( nCol ) CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_column_type", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_INT, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR, HB_DYN_CTYPE_INT },;
+                   ::pStmt, nCol )
+
+//	-------------------------------------------------------  //
+//  sqlite3_int64 sqlite3_column_int64(sqlite3_stmt*, int)
+
+METHOD SqliteColumnInt64( nCol ) CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_column_int64", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_LLONG, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR, HB_DYN_CTYPE_INT },;
+                   ::pStmt, nCol )
+
+//	-------------------------------------------------------  //
+//  double sqlite3_column_double(sqlite3_stmt*, int)
+
+METHOD SqliteColumnDouble( nCol ) CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_column_double", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_DOUBLE, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR, HB_DYN_CTYPE_INT },;
+                   ::pStmt, nCol )
+
+//	-------------------------------------------------------  //
+//  const unsigned char *sqlite3_column_text(sqlite3_stmt*, int)
+//  SQLite stores TEXT as UTF-8; CHAR_PTR reads until the first NUL.
+
+METHOD SqliteColumnText( nCol ) CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_column_text", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_CHAR_PTR, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR, HB_DYN_CTYPE_INT },;
+                   ::pStmt, nCol )
+
+//	-------------------------------------------------------  //
+//  int sqlite3_column_bytes(sqlite3_stmt*, int)
+
+METHOD SqliteColumnBytes( nCol ) CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_column_bytes", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_INT, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR, HB_DYN_CTYPE_INT },;
+                   ::pStmt, nCol )
+
+//	-------------------------------------------------------  //
+//  int sqlite3_bind_null(sqlite3_stmt*, int)
+
+METHOD SqliteBindNull( nIdx ) CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_bind_null", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_INT, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR, HB_DYN_CTYPE_INT },;
+                   ::pStmt, nIdx )
+
+//	-------------------------------------------------------  //
+//  int sqlite3_bind_int64(sqlite3_stmt*, int, sqlite3_int64)
+
+METHOD SqliteBindInt64( nIdx, nVal ) CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_bind_int64", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_INT, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR, HB_DYN_CTYPE_INT, HB_DYN_CTYPE_LLONG },;
+                   ::pStmt, nIdx, nVal )
+
+//	-------------------------------------------------------  //
+//  int sqlite3_bind_double(sqlite3_stmt*, int, double)
+
+METHOD SqliteBindDouble( nIdx, nVal ) CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_bind_double", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_INT, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR, HB_DYN_CTYPE_INT, HB_DYN_CTYPE_DOUBLE },;
+                   ::pStmt, nIdx, nVal )
+
+//	-------------------------------------------------------  //
+//  int sqlite3_bind_text(sqlite3_stmt*, int, const char*, int, void(*)(void*))
+//
+//  Last arg is the destructor pointer. We pass SQLITE_TRANSIENT (-1
+//  cast to pointer) so SQLite makes its own copy of the string, since
+//  we can't guarantee the Harbour string's lifetime past the call.
+
+METHOD SqliteBindText( nIdx, cVal ) CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_bind_text", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_INT, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR, HB_DYN_CTYPE_INT, HB_DYN_CTYPE_CHAR_PTR,;
+                   HB_DYN_CTYPE_INT, HB_DYN_CTYPE_LLONG },;
+                   ::pStmt, nIdx, cVal, Len( cVal ), SQLITE_TRANSIENT )
+
+//	-------------------------------------------------------  //
+//  int sqlite3_bind_blob(sqlite3_stmt*, int, const void*, int, void(*)(void*))
+
+METHOD SqliteBindBlob( nIdx, cVal ) CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_bind_blob", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_INT, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR, HB_DYN_CTYPE_INT, HB_DYN_CTYPE_CHAR_PTR,;
+                   HB_DYN_CTYPE_INT, HB_DYN_CTYPE_LLONG },;
+                   ::pStmt, nIdx, cVal, Len( cVal ), SQLITE_TRANSIENT )
+
+//	-------------------------------------------------------  //
+//  int sqlite3_bind_parameter_index(sqlite3_stmt*, const char *zName)
+
+METHOD SqliteBindParameterIndex( cName ) CLASS WDO_Sqlite3Stmt
+
+RETU hb_DynCall( { "sqlite3_bind_parameter_index", ::oConn:pLib, ;
+                   hb_bitOr( HB_DYN_CTYPE_INT, ::oConn:nSysCallConv ),;
+                   HB_DYN_CTYPE_VOID_PTR, HB_DYN_CTYPE_CHAR_PTR },;
+                   ::pStmt, cName )
+
+//	=======================================================  //
 //  Helpers
 //	=======================================================  //
 
-STATIC FUNCTION _SqliteCellValue( pStmt, nIdx )
+//  Reads column value by native SQLite datatype. nIdx is 0-based (the
+//  raw sqlite3_column_* API). Returns NIL for SQLITE_NULL.
+STATIC FUNCTION _Sqlite3CellValue( oStmt, nIdx )
 
-   LOCAL nType := sqlite3_column_type( pStmt, nIdx )
+   LOCAL nType := oStmt:SqliteColumnType( nIdx )
 
    DO CASE
    CASE nType == SQLITE_INTEGER
-      RETU sqlite3_column_int64( pStmt, nIdx )
+      RETU oStmt:SqliteColumnInt64( nIdx )
    CASE nType == SQLITE_FLOAT
-      RETU sqlite3_column_double( pStmt, nIdx )
+      RETU oStmt:SqliteColumnDouble( nIdx )
    CASE nType == SQLITE_TEXT
-      RETU sqlite3_column_text( pStmt, nIdx )
+      RETU oStmt:SqliteColumnText( nIdx )
    CASE nType == SQLITE_BLOB
-      RETU sqlite3_column_blob( pStmt, nIdx )
+      //  Blobs can contain embedded NULs; CHAR_PTR truncates at the
+      //  first NUL. Returning the TEXT representation is a safe default
+      //  for now â€” proper blob support needs a dedicated hb_DynCall
+      //  reading `sqlite3_column_bytes` + an allocated buffer, which
+      //  hb_DynCall doesn't expose directly. Callers that need raw
+      //  blobs should extend this helper.
+      RETU oStmt:SqliteColumnText( nIdx )
    ENDCASE
 
 RETU NIL

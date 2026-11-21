@@ -115,6 +115,7 @@ FUNCTION HIX_InitLang()    // English is default value
    hLang[ 'ADMIN_ERR_USER_EMPTY'         ] := "Username cannot be empty"
    hLang[ 'ADMIN_ERR_PASSWORD_SHORT'     ] := "Password must be at least 6 characters"
    hLang[ 'ADMIN_ERR_PASSWORD_MISMATCH'  ] := "Passwords do not match"
+   hLang[ 'ADMIN_ERR_ALREADY_CONFIGURED' ] := "Admin is already configured. Use /hix-login, or clear the admin section in hix.json to reset."
 
    // ---- Boot log ----
    hLang[ 'BOOT_LOG_TITLE'            ] := "=== HIX Boot Log ==="

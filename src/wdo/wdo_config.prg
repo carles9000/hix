@@ -97,6 +97,10 @@ FUNCTION HIX_InitPoolsFromConfig( lAbortOnFail )
       CASE cDriver == "sqlite3" .OR. cDriver == "sqlite"
          lOk := WDO_InitSqlite3Ex( cKey, hEntry )
 
+      CASE cDriver == "pg" .OR. cDriver == "pgsql" .OR. ;
+           cDriver == "postgres" .OR. cDriver == "postgresql"
+         lOk := WDO_InitPoolPgEx( cKey, hEntry )
+
       OTHERWISE
          lw( _( 'WDO_ERR_DRIVER_UNKNOWN', cDriver, cKey ) )
          HIX_Dbg( "[WDO_Config] InitPoolsFromConfig: driver '" + cDriver + ;

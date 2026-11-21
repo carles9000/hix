@@ -116,4 +116,26 @@
 
    ?? oConn:View( aRows,, 'Compile options' )
 
+   //  ------------------------------------------------------------
+   //  6) SQLCipher info -- empty hash if the DB is plaintext.
+   //
+   //  To enable transparent encryption, set in www/config.json:
+   //      "key":     "my-passphrase"      (or)
+   //      "key_ref": "sqlite3"            (resolved from HIX_Keys)
+   //  ------------------------------------------------------------
+
+   ?? '<h3>6) SQLCipher info</h3>'
+
+   ?? '<pre>'
+   ?  'IsEncrypted .....: ' + iif( oConn:IsEncrypted(), 'T', 'F' )
+   ?? '</pre>'
+
+   IF oConn:IsEncrypted()
+      ?? oConn:View( { oConn:GetCipherInfo() },, 'Cipher parameters in effect' )
+   ELSE
+      ? '<i>The DB is plaintext. Set <code>databases.sqlite.key</code> '
+      ? 'or <code>databases.sqlite.key_ref</code> in <code>www/config.json</code> '
+      ? 'to enable SQLCipher (AES-256-CBC + HMAC-SHA512 per page).</i>'
+   ENDIF
+
 @endprg

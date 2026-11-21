@@ -7,8 +7,8 @@
                Mozilla Public License, v. 2.0. (https://mozilla.org/MPL/2.0/).
                Copyright (c) 2026 Carles Aubia Floresví - HIX Server Project
  -----------------------------------------------------------*/
-#DEFINE HIX_VERSION_SERVER                "2.4"
-#DEFINE HIX_SUBVERSION_SERVER             ".3"
+#DEFINE HIX_VERSION_SERVER                "2.5"
+#DEFINE HIX_SUBVERSION_SERVER             ""       // ".01"
 #DEFINE HIX_LOG_MODULE HIX_MOD_SERVER
 #DEFINE SW_SHOW                              5
 
@@ -1272,9 +1272,58 @@ RETURN lDormant
 FUNCTION HIX_HixstyleDormant()
 RETURN _HixServerDormantHixstyle()
 
+// ============================================================
+// HIX_InfoHash -- devuelve en un hash los mismos pares clave/valor
+// que ShowInit() imprime en pantalla al arrancar. Fuente de verdad
+// para el endpoint /hix-info y para cualquier consumidor que quiera
+// la info de arranque sin re-parsear el banner.
+// ============================================================
+FUNCTION HIX_InfoHash()
+
+   LOCAL hRet  := { => }
+   LOCAL hVer  := { => }
+   LOCAL hRdd  := { => }
+   LOCAL hLang := { => }
+   LOCAL hSrv  := { => }
+   LOCAL cRdd  := ""
+
+   AEval( rddList(), {| X | cRdd += iif( Empty( cRdd ), "", "," ) + X } )
+
+   hVer[ "hix" ]      := "HIX " + HIX_VERSION_SERVER + HIX_SUBVERSION_SERVER + " " + HIX_DATECOMPILE()
+   hVer[ "harbour" ]  := VERSION() + " / " + HB_BUILDDATE()
+   hVer[ "openssl" ]  := SSLEAY_VERSION( HB_SSLEAY_VERSION )
+   hVer[ "curl" ]     := HIX_OptFunc( "CURL_VERSION",      "n/a (hbcurl not linked)" )
+   hVer[ "harupdf" ]  := HIX_OptFunc( "HPDF_VERSION_TEXT", "n/a (hbhpdf not linked)" )
+   hVer[ "compiler" ] := HB_COMPILER()
+   hRet[ "versions" ] := hVer
+
+   hRdd[ "list" ]    := cRdd
+   hRdd[ "default" ] := RddSetDefault()
+   hRet[ "rdd" ]     := hRdd
+
+   IF ! Empty( WDO_Loaded() )
+      hRet[ "wdo" ] := { ;
+         "loaded" => WDO_Loaded(), ;
+         "info"   => WDO_InfoList() }
+   ENDIF
+
+   hLang[ "name" ]     := hb_oemtoansi( hb_langName() )
+   hLang[ "codepage" ] := hb_SetCodePage()
+   hLang[ "cdpuni" ]   := hb_cdpUniID( hb_SetCodePage() )
+   hRet[ "language" ]  := hLang
+
+   hSrv[ "startup" ]         := DToC( Date() ) + " " + Time()
+   hSrv[ "app_path" ]        := hb_DirBase()
+   hSrv[ "app_name" ]        := UConfig( "server", "name", "HIX" )
+   hSrv[ "root" ]            := UConfig( "paths", "root", "www" )
+   hSrv[ "hixstyle_active" ] := UConfig( "hixstyle", "enabled", .F. )
+   hRet[ "server" ]          := hSrv
+
+RETURN hRet
+
 static function HIX_Info( nRow, cCode, cValue, nCol )
 
-   hb_default( @nCol, 25 )
+   hb_default( @nCol, 27 )
 
 	// 254  ■
 	// 251  √

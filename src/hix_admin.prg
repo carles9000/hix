@@ -120,43 +120,77 @@ RETURN NIL
 // ============================================================
 FUNCTION HIX_AdminSetupPost( oReq )
 
-   LOCAL hForm := oReq:FormBody()
-   LOCAL cUser := AllTrim( hb_HGetDef( hForm, "user",      "" ) )
-   LOCAL cPass := hb_HGetDef( hForm, "password",  "" )
+   LOCAL hForm  := oReq:FormBody()
+   LOCAL cUser  := AllTrim( hb_HGetDef( hForm, "user",      "" ) )
+   LOCAL cPass  := hb_HGetDef( hForm, "password",  "" )
    LOCAL cPass2 := hb_HGetDef( hForm, "password2", "" )
-   LOCAL cErr  := ""
-   LOCAL hCfg
+   LOCAL cErr   := ""
 
    IF _HixAdminHasCredentials()
 
-      oReq:Redirect( HIX_PATH_LOGIN )
+      oReq:Respond( _HixAdminSetupPage( _( 'ADMIN_ERR_ALREADY_CONFIGURED' ) ), 409, "html" )
       RETURN NIL
 
    ENDIF
 
-   DO CASE
+   IF cPass != cPass2
+      oReq:Respond( _HixAdminSetupPage( _( 'ADMIN_ERR_PASSWORD_MISMATCH' ) ), 422, "html" )
+      RETURN NIL
+   ENDIF
 
-      CASE Empty( cUser )   ; cErr := _( 'ADMIN_ERR_USER_EMPTY' )
-      CASE Len( cPass ) < 6 ; cErr := _( 'ADMIN_ERR_PASSWORD_SHORT' )
-      CASE cPass != cPass2  ; cErr := _( 'ADMIN_ERR_PASSWORD_MISMATCH' )
+   IF ! _HixAdminSetupApply( cUser, cPass, @cErr )
 
-   ENDCASE
-
-   IF ! Empty( cErr )
-
+      DO CASE
+         CASE cErr == "user_empty"      ; cErr := _( 'ADMIN_ERR_USER_EMPTY' )
+         CASE cErr == "password_short"  ; cErr := _( 'ADMIN_ERR_PASSWORD_SHORT' )
+         OTHERWISE                      ; cErr := _( 'ADMIN_ERR_ALREADY_CONFIGURED' )
+      ENDCASE
       oReq:Respond( _HixAdminSetupPage( cErr ), 422, "html" )
       RETURN NIL
 
    ENDIF
 
-   hCfg := HIX_GetConfig()
-   hCfg[ "admin" ][ "user" ]     := cUser
-   hCfg[ "admin" ][ "secret" ]   := Lower( hb_HMAC_SHA256( hb_TToS( hb_DateTime() ) + cUser, cPass ) )  // [A3.4.3]
-   hCfg[ "admin" ][ "password" ] := Lower( hb_HMAC_SHA256( cPass, hCfg[ "admin" ][ "secret" ] ) )        // [A3.4.3]
-   HIX_SaveConfig()
-
-   l( "Admin configurado para usuario: " + cUser )
    oReq:Redirect( HIX_PATH_LOGIN )
+
+RETURN NIL
+
+// ============================================================
+// HIX_AdminSetupApi — POST /hix-setup-api
+// Variante JSON de /hix-setup. Solo responde si no hay credenciales.
+// Body: JSON { user, password }  o form-urlencoded user=...&password=...
+// ============================================================
+FUNCTION HIX_AdminSetupApi( oReq )
+
+   LOCAL hBody := NIL
+   LOCAL cUser := ""
+   LOCAL cPass := ""
+   LOCAL cErr  := ""
+
+   IF _HixAdminHasCredentials()
+      oReq:Respond( { "ok" => .F., "error" => "already_configured" }, 409, "json" )
+      RETURN NIL
+   ENDIF
+
+   IF oReq:IsJson()
+      hBody := oReq:JsonBody()
+   ENDIF
+   IF ! HB_ISHASH( hBody )
+      hBody := oReq:FormBody()
+   ENDIF
+   IF ! HB_ISHASH( hBody )
+      hBody := { => }
+   ENDIF
+
+   cUser := AllTrim( hb_HGetDef( hBody, "user",     "" ) )
+   cPass := hb_HGetDef( hBody, "password", "" )
+
+   IF ! _HixAdminSetupApply( cUser, cPass, @cErr )
+      oReq:Respond( { "ok" => .F., "error" => cErr }, ;
+                    iif( cErr == "already_configured", 409, 422 ), "json" )
+      RETURN NIL
+   ENDIF
+
+   oReq:Respond( { "ok" => .T., "user" => cUser }, 201, "json" )
 
 RETURN NIL
 
@@ -166,6 +200,34 @@ RETURN NIL
 
 STATIC FUNCTION _HixAdminHasCredentials()
 RETURN ! Empty( UConfig( "admin", "user", "" ) ) .AND. ! Empty( UConfig( "admin", "password", "" ) )
+
+// Aplica user/password en hix.json. Devuelve .T. si OK; si falla rellena cErr
+// con un código estable: "already_configured" | "user_empty" | "password_short".
+STATIC FUNCTION _HixAdminSetupApply( cUser, cPass, cErr )
+
+   LOCAL hCfg
+
+   cErr := ""
+
+   IF _HixAdminHasCredentials()
+      cErr := "already_configured"
+      RETURN .F.
+   ENDIF
+
+   DO CASE
+      CASE Empty( cUser )   ; cErr := "user_empty"      ; RETURN .F.
+      CASE Len( cPass ) < 6 ; cErr := "password_short"  ; RETURN .F.
+   ENDCASE
+
+   hCfg := HIX_GetConfig()
+   hCfg[ "admin" ][ "user" ]     := cUser
+   hCfg[ "admin" ][ "secret" ]   := Lower( hb_HMAC_SHA256( hb_TToS( hb_DateTime() ) + cUser, cPass ) )  // [A3.4.3]
+   hCfg[ "admin" ][ "password" ] := Lower( hb_HMAC_SHA256( cPass, hCfg[ "admin" ][ "secret" ] ) )       // [A3.4.3]
+   HIX_SaveConfig()
+
+   l( "Admin configurado para usuario: " + cUser )
+
+RETURN .T.
 
 STATIC FUNCTION _HixNowSecs()
 RETURN ( Date() - hb_SToD( "19700101" ) ) * 86400 + Int( Seconds() )

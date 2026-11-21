@@ -2,28 +2,38 @@
   File ......: wdo_sqlite3_pool.prg
   Author.....: Charly 9000
   Created....: 2026-10-05
-  Modified...: 2026-10-05
-  Version....: 1.0.0
-  Description: Bootstrap for SQLite3 standalone connections.
-               Not a pool -- SQLite3 serializes concurrent access
-               internally and the HIX worker threads share one
-               singleton via the WDO_RegisterConn registry. Name
-               mirrors wdo_mysql_pool.prg for callsite symmetry.
-  Usage      : WDO_InitSqlite3( cFile [, lCreate [, bError]] )
+  Modified...: 2026-11-20
+  Version....: 2.0.0
+  Description: Bootstrap for SQLite3 / SQLCipher standalone
+               connections. Not a pool — SQLite serializes
+               concurrent access internally and the HIX worker
+               threads share one singleton via WDO_RegisterConn.
+               Name mirrors wdo_mysql_pool.prg for callsite
+               symmetry.
+  Usage      : WDO_InitSqlite3( cFile [, lCreate [, bError [, cKey]]] )
                -- OR, hash variant used by HIX_InitPoolsFromConfig --
                WDO_InitSqlite3Ex( cKey, hParams )
                ...
                WDO_EndSqlite3( cKey )
   Notes      : hParams keys recognized by WDO_InitSqlite3Ex:
-                 file           (string, required unless :memory:)
-                 create         (bool, default .T.)
-                 journal_mode   (string, default "WAL")
-                 synchronous    (string, default "NORMAL")
-                 foreign_keys   (bool, default .T.)
-                 to_utf8        (bool, default .T.)
-                 berror         (string: function name)
-                 berror_block   (block shortcut, used by positional)
-                 table          (default cTable passed to new Stmts)
+                 file                   (string, ":memory:" default)
+                 create                 (bool, default .T.)
+                 journal_mode           (string, default "WAL")
+                 synchronous            (string, default "NORMAL")
+                 foreign_keys           (bool, default .T.)
+                 to_utf8                (bool, default .T.)
+                 busy_timeout_ms        (int, default 5000)
+                 dll                    (string, path override)
+                 -- SQLCipher --
+                 key                    (string, plaintext passphrase)
+                 key_ref                (string, resolved via HIX_KeyGet)
+                 cipher_kdf_iter        (int, 0 = SQLCipher default)
+                 cipher_page_size       (int, 0 = SQLCipher default)
+                 cipher_hmac_algorithm  (string, default HMAC_SHA512)
+                 cipher_kdf_algorithm   (string, default PBKDF2_HMAC_SHA512)
+                 berror                 (string: function name)
+                 berror_block           (block shortcut, used by positional)
+                 table                  (default cTable passed to new Stmts)
  -----------------------------------------------------------*/
 
 #include 'hix_const.ch'
@@ -36,7 +46,7 @@
 //  Positional convenience wrapper.
 //	=======================================================  //
 
-FUNCTION WDO_InitSqlite3( cFile, lCreate, bError )
+FUNCTION WDO_InitSqlite3( cFile, lCreate, bError, cKey )
 
    LOCAL hParams := { => }
 
@@ -50,6 +60,10 @@ FUNCTION WDO_InitSqlite3( cFile, lCreate, bError )
       hParams[ "berror_block" ] := bError
    ENDIF
 
+   IF cKey != NIL .AND. ! Empty( cKey )
+      hParams[ "key" ] := cKey
+   ENDIF
+
 RETU WDO_InitSqlite3Ex( WDO_SQLITE3_KEY, hParams )
 
 
@@ -60,8 +74,10 @@ RETU WDO_InitSqlite3Ex( WDO_SQLITE3_KEY, hParams )
 FUNCTION WDO_InitSqlite3Ex( cKey, hParams )
 
    LOCAL oConn
-   LOCAL cFile, cJournal, cSync, cBErrorName
+   LOCAL cFile, cJournal, cSync, cBErrorName, cDll
+   LOCAL cCipherKey, cCipherKeyRef, cCipherHmac, cCipherKdf
    LOCAL lCreate, lForeignKeys, lToUtf8
+   LOCAL nKdfIter, nPageSize, nBusyMs
    LOCAL bError
 
    IF Empty( cKey )
@@ -72,13 +88,21 @@ FUNCTION WDO_InitSqlite3Ex( cKey, hParams )
       hParams := { => }
    ENDIF
 
-   cFile        := hb_HGetDef( hParams, "file",         ":memory:" )
-   lCreate      := hb_HGetDef( hParams, "create",       .T. )
-   cJournal     := hb_HGetDef( hParams, "journal_mode", "WAL" )
-   cSync        := hb_HGetDef( hParams, "synchronous",  "NORMAL" )
-   lForeignKeys := hb_HGetDef( hParams, "foreign_keys", .T. )
-   lToUtf8      := hb_HGetDef( hParams, "to_utf8",      .T. )
-   cBErrorName  := hb_HGetDef( hParams, "berror",       "" )
+   cFile         := hb_HGetDef( hParams, "file",                  ":memory:" )
+   lCreate       := hb_HGetDef( hParams, "create",                .T. )
+   cJournal      := hb_HGetDef( hParams, "journal_mode",          "WAL" )
+   cSync         := hb_HGetDef( hParams, "synchronous",           "NORMAL" )
+   lForeignKeys  := hb_HGetDef( hParams, "foreign_keys",          .T. )
+   lToUtf8       := hb_HGetDef( hParams, "to_utf8",               .T. )
+   nBusyMs       := hb_HGetDef( hParams, "busy_timeout_ms",       5000 )
+   cDll          := hb_HGetDef( hParams, "dll",                   "" )
+   cCipherKey    := hb_HGetDef( hParams, "key",                   "" )
+   cCipherKeyRef := hb_HGetDef( hParams, "key_ref",               "" )
+   nKdfIter      := hb_HGetDef( hParams, "cipher_kdf_iter",       0 )
+   nPageSize     := hb_HGetDef( hParams, "cipher_page_size",      0 )
+   cCipherHmac   := hb_HGetDef( hParams, "cipher_hmac_algorithm", "" )
+   cCipherKdf    := hb_HGetDef( hParams, "cipher_kdf_algorithm",  "" )
+   cBErrorName   := hb_HGetDef( hParams, "berror",                "" )
 
    IF hb_HHasKey( hParams, "berror_block" )
       bError := hParams[ "berror_block" ]
@@ -103,15 +127,24 @@ FUNCTION WDO_InitSqlite3Ex( cKey, hParams )
    HIX_Dbg( "[WDO_Sqlite3Pool] InitSqlite3Ex[" + cKey + "]: file=" + cFile + ;
             " create=" + iif( lCreate, "T", "F" ) + ;
             " journal=" + cJournal + " sync=" + cSync + ;
-            " fk=" + iif( lForeignKeys, "T", "F" ) )
+            " fk=" + iif( lForeignKeys, "T", "F" ) + ;
+            " encrypted=" + iif( ! Empty( cCipherKey ) .OR. ! Empty( cCipherKeyRef ), "T", "F" ) )
 
-   oConn := WDO_Sqlite3():New( cFile, lCreate )
+   oConn := WDO_Sqlite3():New( cFile, lCreate, iif( Empty( cDll ), NIL, cDll ) )
 
-   oConn:cJournalMode  := cJournal
-   oConn:cSynchronous  := cSync
-   oConn:lForeignKeys  := lForeignKeys
-   oConn:lToUtf8       := lToUtf8
-   oConn:cPoolKey      := Lower( cKey )
+   oConn:cJournalMode     := cJournal
+   oConn:cSynchronous     := cSync
+   oConn:lForeignKeys     := lForeignKeys
+   oConn:lToUtf8          := lToUtf8
+   oConn:nBusyTimeoutMs   := nBusyMs
+   oConn:cPoolKey         := Lower( cKey )
+
+   oConn:cKey             := cCipherKey
+   oConn:cKeyRef          := cCipherKeyRef
+   oConn:nKdfIter         := nKdfIter
+   oConn:nCipherPageSize  := nPageSize
+   oConn:cHmacAlg         := cCipherHmac
+   oConn:cKdfAlg          := cCipherKdf
 
    IF bError != NIL
       oConn:bError := bError
@@ -128,7 +161,8 @@ FUNCTION WDO_InitSqlite3Ex( cKey, hParams )
    WDO_RegisterConn( cKey, oConn )
 
    l( _( 'WDO_LOG_SQLITE_INIT', cKey, cFile ) )
-   HIX_Dbg( "[WDO_Sqlite3Pool] InitSqlite3Ex[" + cKey + "]: END OK" )
+   HIX_Dbg( "[WDO_Sqlite3Pool] InitSqlite3Ex[" + cKey + "]: END OK" + ;
+            iif( oConn:lEncrypted, " (encrypted)", "" ) )
 
 RETU .T.
 

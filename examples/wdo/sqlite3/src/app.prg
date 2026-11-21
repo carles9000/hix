@@ -2,15 +2,18 @@
   File ......: app.prg
   Author.....: Charly 9000
   Created....: 2026-05-24
-  Modified...: 2026-09-29
-  Version....: 1.2.0
-  Description: WDO - Web Database Objects. 
+  Modified...: 2026-11-21
+  Version....: 2.5.0
+  Description: WDO - Web Database Objects. Boots the HIX server
+               with a shared SQLite3 / SQLCipher singleton declared
+               under "databases" in www/config.json. Handlers served
+               from www/ grab the live connection via
+               WDO_Get("sqlite") (case-insensitive) -- SQLite3
+               serialises access internally, so a pool is not needed.
   Usage      : go_msvc64.bat && app.exe
   Notes      : Pool config lives in www/config.json under the
                "databases" section. HIX_InitPoolsFromConfig()
-               reads it and levants every declared pool. To go
-               back to the legacy programmatic form, see the
-               commented block below.
+               reads it and levants every declared pool / singleton.
  -----------------------------------------------------------*/
 
 #include "hbclass.ch"
@@ -50,7 +53,7 @@ RETURN NIL
 //  default (Slack alert, retry, Sentry, WDO metrics tagging, ...).
 //  Then reference "berror": "WdoErrorHandler" as this example does.
 //
-//  Called by WDO:SetError() on any WDO_MySql failure (bad Query,
+//  Called by WDO:SetError() on any WDO_Sqlite3 failure (bad Query,
 //  reconnect fail, etc.) reached from a handler that pulled its
 //  connection from the pool. oConn is the affected connection -- NIL
 //  if the error came from a phase without one (e.g. factory).

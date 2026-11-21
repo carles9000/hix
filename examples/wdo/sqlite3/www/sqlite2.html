@@ -95,6 +95,9 @@
 
    ENDIF
 
+   //  Cleanup -- keep the example idempotent across refreshes.
+   oConn:Exec( "DROP TABLE IF EXISTS employees_demo" )
+
    //  No Close() -- the singleton stays alive for all workers.
 
 

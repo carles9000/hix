@@ -2,8 +2,8 @@
   File ......: app.prg
   Author.....: Charly 9000
   Created....: 2026-05-24
-  Modified...: 2026-09-29
-  Version....: 1.2.0
+  Modified...: 2026-11-21
+  Version....: 2.5.0
   Description: WDO - Web Database Objects. Boots the HIX server
                with a pre-warmed MySQL connection pool declared
                under "databases" in www/config.json. Handlers

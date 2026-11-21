@@ -1,0 +1,216 @@
+# WDO SQLite3 — Transacciones
+
+WDO soporta transacciones explícitas con `BeginTrans / Commit / Rollback` y un método de conveniencia `Transaction(bCode)` que gestiona el commit/rollback automáticamente.
+
+## Concurrencia en SQLite3 — una diferencia clave
+
+!!! warning "SQLite serializa las escrituras"
+    A diferencia de MySQL o PostgreSQL, SQLite permite **un solo writer** a la vez. En modo WAL, múltiples lectores pueden coexistir con ese writer, pero si dos hilos intentan iniciar una transacción de escritura simultáneamente, el segundo espera hasta que el primero libere el lock.
+
+    Si la espera supera `busy_timeout_ms`, SQLite retorna `SQLITE_BUSY`. Configura `busy_timeout_ms >= 5000` en producción para absorber picos de escritura concurrente.
+
+## BeginTrans / Commit
+
+El patrón básico para un flujo que siempre tiene éxito:
+
+```harbour
+LOCAL oConn := WDO_Get( "APP" )
+
+IF oConn == NIL ; RETURN USendError( 503, "DB unavailable" ) ; ENDIF
+
+oConn:BeginTrans()
+
+oConn:Exec( "UPDATE cuentas SET saldo = saldo - 200 WHERE propietario = 'alice'" )
+oConn:Exec( "UPDATE cuentas SET saldo = saldo + 200 WHERE propietario = 'bob'"   )
+
+oConn:Commit()
+
+oConn:Close()
+```
+
+## BeginTrans / Rollback
+
+Cuando hay una condición de negocio que obliga a deshacer:
+
+```harbour
+oConn:BeginTrans()
+
+oConn:Exec( "UPDATE cuentas SET saldo = saldo - 5000 WHERE propietario = 'alice'" )
+
+LOCAL oStmt := oConn:Query( "SELECT saldo FROM cuentas WHERE propietario = 'alice'" )
+LOCAL hRow  := oStmt:Fetch_Assoc()
+oStmt:Free()
+
+IF Val( hRow[ "saldo" ] ) < 0
+   oConn:Rollback()   // deshacer el UPDATE
+   RETURN USendError( 422, "Saldo insuficiente" )
+ELSE
+   oConn:Commit()
+ENDIF
+
+oConn:Close()
+```
+
+## TRY / FINALLY — patrón recomendado
+
+En handlers reales, combina `BeginTrans` con `TRY / FINALLY` para garantizar que la transacción siempre se cierra aunque salte una excepción:
+
+```harbour
+FUNCTION TransferirFondos()
+
+   LOCAL oConn   := WDO_Get( "APP" )
+   LOCAL nOrigen := Val( UPost( "from_id", "0" ) )
+   LOCAL nDestino:= Val( UPost( "to_id",   "0" ) )
+   LOCAL nImporte:= Val( UPost( "importe",  "0" ) )
+   LOCAL oErr    := NIL
+   LOCAL lOk     := .F.
+
+   IF oConn == NIL ; RETURN USendError( 503, "DB unavailable" ) ; ENDIF
+
+   oConn:BeginTrans()
+
+   TRY
+      oConn:Exec( "UPDATE cuentas SET saldo = saldo - " + ;
+                  hb_NToS( nImporte ) + " WHERE id = " + hb_NToS( nOrigen )  )
+
+      oConn:Exec( "UPDATE cuentas SET saldo = saldo + " + ;
+                  hb_NToS( nImporte ) + " WHERE id = " + hb_NToS( nDestino ) )
+
+      oConn:Commit()
+      lOk := .T.
+
+   CATCH oErr
+      oConn:Rollback()
+      le( "TransferirFondos: " + oErr:description )
+   FINALLY
+      oConn:Close()
+   END
+
+   IF ! lOk
+      RETURN USendError( 500, "Transferencia fallida" )
+   ENDIF
+
+RETURN USendJson( { "ok" => .T. } )
+```
+
+## Transaction(bCode) — azúcar sintáctico
+
+`oConn:Transaction(bCode)` hace todo el ciclo automáticamente:
+
+- Llama `BeginTrans`.
+- Evalúa el codeblock.
+- Si termina sin excepción → `Commit`.
+- Si se lanza una excepción → `Rollback` y re-lanza la excepción para que el caller la gestione.
+
+```harbour
+LOCAL oConn := WDO_Get( "APP" )
+
+IF oConn == NIL ; RETURN USendError( 503, "DB unavailable" ) ; ENDIF
+
+TRY
+   oConn:Transaction( {| o | ;
+      o:Exec( "UPDATE cuentas SET saldo = saldo - 200 WHERE propietario = 'alice'" ), ;
+      o:Exec( "UPDATE cuentas SET saldo = saldo + 200 WHERE propietario = 'bob'"   ) ;
+   } )
+CATCH oErr
+   oConn:Close()
+   RETURN USendError( 500, oErr:description )
+END
+
+oConn:Close()
+USendJson( { "ok" => .T. } )
+```
+
+## Transacciones con Prepared Statements
+
+Los prepared statements son completamente compatibles con transacciones — operan sobre la misma conexión singleton:
+
+```harbour
+oConn:BeginTrans()
+
+TRY
+   LOCAL oStmt := oConn:Prepare( "INSERT INTO pedidos (uid, total) VALUES (?, ?)" )
+   oStmt:BindParam( 1, nUid,   "i" )
+   oStmt:BindParam( 2, nTotal, "n" )
+   oStmt:Execute()
+   LOCAL nPedidoId := oConn:Last_Insert_Id()
+   oStmt:Free()
+
+   oStmt := oConn:Prepare( "INSERT INTO lineas_pedido (pedido_id, sku) VALUES (?, ?)" )
+   FOR EACH cSku IN aSkus
+      oStmt:BindParam( 1, nPedidoId, "i" )
+      oStmt:BindParam( 2, cSku,      "s" )
+      oStmt:Execute()
+      oStmt:Reset()
+   NEXT
+   oStmt:Free()
+
+   oConn:Commit()
+
+CATCH oErr
+   IF oStmt != NIL ; oStmt:Free() ; ENDIF
+   oConn:Rollback()
+END
+
+oConn:Close()
+```
+
+## INSERT masivo — las transacciones son críticas
+
+!!! tip "Velocidad: 100× con transacción explícita"
+    Por defecto SQLite opera en modo autocommit: cada `INSERT` es una transacción implícita con un fsync al disco. Para insertar 10 000 filas sin transacción explícita se producen 10 000 fsyncs.
+
+    Con una transacción explícita solo hay **un fsync** al hacer `Commit()`. La diferencia en velocidad es de dos órdenes de magnitud:
+
+    ```harbour
+    oConn:BeginTrans()
+
+    oStmt := oConn:Prepare( "INSERT INTO datos (a, b) VALUES (?, ?)" )
+    FOR i := 1 TO 10000
+       oStmt:BindParam( 1, aA[ i ], "s" )
+       oStmt:BindParam( 2, aB[ i ], "n" )
+       oStmt:Execute()
+       oStmt:Reset()
+    NEXT
+    oStmt:Free()
+
+    oConn:Commit()   // un solo fsync
+    ```
+
+## Estado de la transacción
+
+```harbour
+oConn:InTransaction()   // .T. si hay una transacción abierta
+```
+
+Útil en handlers que pueden ser llamados desde dentro o fuera de un contexto transaccional.
+
+## SQLITE_BUSY — qué hacer
+
+Si una transacción de escritura no puede adquirir el lock en `busy_timeout_ms` milisegundos, el driver lanza un error con código SQLite `SQLITE_BUSY` (5) o `SQLITE_LOCKED` (6):
+
+```harbour
+TRY
+   oConn:BeginTrans()
+   // ...
+   oConn:Commit()
+CATCH oErr
+   IF "busy" $ Lower( oErr:description ) .OR. "locked" $ Lower( oErr:description )
+      RETURN USendError( 503, "Base de datos ocupada. Reintenta en un momento." )
+   ENDIF
+   RETURN USendError( 500, oErr:description )
+END
+```
+
+!!! info "busy_timeout_ms por defecto"
+    El driver configura `PRAGMA busy_timeout = 5000` al abrir la conexión (configurable en `config.json`). Con este valor, SQLite reintenta automáticamente durante 5 segundos antes de retornar `SQLITE_BUSY`. Para la mayoría de apps esto es suficiente.
+
+## Referencia rápida
+
+| Método | Descripción |
+|--------|-------------|
+| `oConn:BeginTrans()` | Inicia la transacción (`BEGIN`) |
+| `oConn:Commit()` | Confirma los cambios (`COMMIT`) |
+| `oConn:Rollback()` | Deshace los cambios (`ROLLBACK`) |
+| `oConn:Transaction(bCode)` | Azúcar: begin + eval + commit/rollback automático |
+| `oConn:InTransaction()` | `.T.` si hay transacción abierta |

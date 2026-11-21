@@ -37,3 +37,21 @@ MySQL connection pool declared under `databases.mysql` in
 
 Server listens on **http://127.0.0.1:8081** by default.
 Browse `/index.html` for the demo index.
+
+## Pages covered
+
+| URL             | Feature                                           |
+|-----------------|---------------------------------------------------|
+| `/mysql0.html`  | Pool connection (`WDO_Get("MYSQL")`)              |
+| `/mysql1.html`  | Direct `WDO_MySql():New()` instance               |
+| `/mysql2.html`  | `Query` / `Fetch_Assoc` / `DbStruct` / `FetchAll` |
+| `/mysql3.html`  | `Prepare` + `BindParam` (`?` positional)          |
+| `/mysql4.html`  | `Prepare` + loop (bulk insert, re-Execute)        |
+| `/mysql5.html`  | Transactions (`BeginTrans` / `Transaction(bCode)`)|
+| `/mysql6.html`  | Server info (`SHOW VARIABLES`, `SHOW STATUS`)     |
+
+> Note: there is no `/mysql7.html`. Transport encryption for MySQL is
+> handled at the server (`require_secure_transport`) and libmysql TLS
+> flags level only -- both set via connection string / config, with no
+> per-request API surface. See `examples/wdo/readme.md` for the unified
+> feature matrix across drivers.

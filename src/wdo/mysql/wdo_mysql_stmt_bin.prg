@@ -1077,6 +1077,39 @@ HB_FUNC( WDO_BINDPOKESTRPTR )
 }
 
 /*
+ * Return a Harbour HB_IT_POINTER whose value is NULL. Needed to pass
+ * a proper NULL to hb_DynCall slots declared as HB_DYN_CTYPE_VOID_PTR
+ * (which read the Harbour item as a pointer, not a numeric).
+ */
+HB_FUNC( WDO_PTRNULL )
+{
+   hb_retptr( NULL );
+}
+
+/*
+ * Debug helper -- read the pointer stored at p + nOff and return the
+ * C string it points to. If the pointer is NULL returns the literal
+ * "<NULL>". If p itself is NULL returns "<pBuf=NULL>". Used to probe
+ * whether BINDPOKESTRPTR captured a live buffer.
+ */
+HB_FUNC( WDO_BINDPEEKSTRCONTENT )
+{
+   char * p = ( char * ) hb_parptr( 1 );
+   HB_ISIZ nOff = hb_parns( 2 );
+   char * pStr;
+   if( !p )
+   {
+      hb_retc( "<pBuf=NULL>" );
+      return;
+   }
+   memcpy( &pStr, p + nOff, sizeof( void * ) );
+   if( !pStr )
+      hb_retc( "<NULL>" );
+   else
+      hb_retc( pStr );
+}
+
+/*
  * Store the address of ( pOther + nOffOther ) inside p at offset nOff.
  * Used to point MYSQL_BIND.length / .is_null at slots inside the
  * pValues buffer.

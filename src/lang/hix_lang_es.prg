@@ -120,6 +120,7 @@ FUNCTION LangStrings_ES()
    hLang[ 'ADMIN_ERR_USER_EMPTY'         ] := "El usuario no puede estar vacio"
    hLang[ 'ADMIN_ERR_PASSWORD_SHORT'     ] := "La contrasena debe tener al menos 6 caracteres"
    hLang[ 'ADMIN_ERR_PASSWORD_MISMATCH'  ] := "Las contrasenas no coinciden"
+   hLang[ 'ADMIN_ERR_ALREADY_CONFIGURED' ] := "Admin ya configurado. Usa /hix-login, o borra la seccion admin en hix.json para resetear."
 
    // ---- WDO / MySQL ----
    hLang[ 'WDO_LOG_POOL_INIT_FAIL'      ] := "WDO_Pool[{1}] Init: conexion #{2} fallo al abrir{3}"
