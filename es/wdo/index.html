@@ -31,7 +31,7 @@
       
       
       <link rel="icon" href="../../assets/hix.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
     
     
       
@@ -39,10 +39,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -2029,6 +2029,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../hixstyle/seguridad/password/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Password storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../hixstyle/seguridad/jwt/" class="md-nav__link">
         
   
@@ -2442,10 +2470,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#drivers-disponibles" class="md-nav__link">
+  <a href="#los-tres-motores" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Drivers disponibles
+        Los tres motores
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-comun-referencia-rapida" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API común — referencia rápida
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuracion-declarativa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuración declarativa
       
     </span>
   </a>
@@ -2471,6 +2521,45 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Primeros pasos">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mysql-mariadb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL / MariaDB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sqlite3-sqlcipher" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQLite3 / SQLCipher
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3083,10 +3172,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#drivers-disponibles" class="md-nav__link">
+  <a href="#los-tres-motores" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Drivers disponibles
+        Los tres motores
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-comun-referencia-rapida" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API común — referencia rápida
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuracion-declarativa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuración declarativa
       
     </span>
   </a>
@@ -3112,6 +3223,45 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Primeros pasos">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mysql-mariadb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL / MariaDB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sqlite3-sqlcipher" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQLite3 / SQLCipher
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3141,59 +3291,149 @@
 <li>El sistema operativo tiene un rango limitado de puertos efímeros (~16.000 en Windows).</li>
 <li>Tras unos miles de peticiones rápidas, el SO ya no puede asignar más puertos → error 10048 / <code>WSAEADDRINUSE</code>.</li>
 </ul>
-<p>WDO resuelve esto con un <strong>pool de conexiones</strong>: abre N sockets al arrancar la app, los mantiene vivos y los presta a los hilos que los necesitan. Cada "cierre" devuelve la conexión al pool, nunca al sistema operativo.</p>
-<p>Este problema no es exclusivo de Harbour. PHP, Node.js, Python y Java todos usan pooling por exactamente la misma razón.</p>
-<h2 id="drivers-disponibles">Drivers disponibles<a class="headerlink" href="#drivers-disponibles" title="Permanent link">&para;</a></h2>
+<p>WDO resuelve esto con un <strong>pool de conexiones</strong> (MySQL, PostgreSQL) o un <strong>singleton con mutex</strong> (SQLite3): abre N sockets al arrancar la app, los mantiene vivos y los presta a los hilos que los necesitan.</p>
+<h2 id="los-tres-motores">Los tres motores<a class="headerlink" href="#los-tres-motores" title="Permanent link">&para;</a></h2>
+<p>Los tres drivers comparten la misma superficie de API: <code>WDO_Get()</code>, <code>Query()</code>, <code>Exec()</code>, <code>Prepare()</code>, <code>BindParam()</code>, <code>Execute()</code>, <code>FetchAll()</code>, <code>BeginTrans()</code>, <code>Transaction()</code>, <code>Free()</code>. El código de un handler es prácticamente idéntico entre los tres.</p>
 <table>
 <thead>
 <tr>
 <th>Driver</th>
-<th>Estado</th>
+<th>Modelo</th>
 <th>Clave JSON</th>
+<th>Estado</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>MySQL / MariaDB</strong></td>
-<td>Production-ready</td>
+<td><strong><a href="mysql/">MySQL / MariaDB</a></strong></td>
+<td>Pool N conexiones</td>
 <td><code>"driver": "mysql"</code> o <code>"driver": "mariadb"</code></td>
+<td>Production-ready</td>
 </tr>
 <tr>
-<td>PostgreSQL</td>
-<td>Reservado</td>
-<td>—</td>
+<td><strong><a href="pg/">PostgreSQL</a></strong></td>
+<td>Pool N conexiones</td>
+<td><code>"driver": "pg"</code></td>
+<td>Production-ready</td>
 </tr>
 <tr>
-<td>SQLite</td>
-<td>Reservado</td>
-<td>—</td>
-</tr>
-<tr>
-<td>MSSQL</td>
-<td>Reservado</td>
-<td>—</td>
+<td><strong><a href="sqlite3/">SQLite3 / SQLCipher</a></strong></td>
+<td>Singleton + mutex</td>
+<td><code>"driver": "sqlite3"</code></td>
+<td>Production-ready</td>
 </tr>
 </tbody>
 </table>
+<div class="admonition tip">
+<p class="admonition-title">¿Qué driver elegir?</p>
+<ul>
+<li><strong>SQLite3</strong> — Apps pequeñas/medianas, desarrollo local, datos embebidos. Sin servidor externo. Soporta cifrado completo del fichero con SQLCipher.</li>
+<li><strong>PostgreSQL</strong> — Alta concurrencia, features avanzadas (JSONB, GIS, full-text, pgcrypto), replicación.</li>
+<li><strong>MySQL / MariaDB</strong> — Ecosistema consolidado, hosting compartido, apps que ya usan MySQL.</li>
+</ul>
+</div>
+<h2 id="api-comun-referencia-rapida">API común — referencia rápida<a class="headerlink" href="#api-comun-referencia-rapida" title="Permanent link">&para;</a></h2>
+<p>El patrón es idéntico entre los tres drivers:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos=" 1 "></span></a>// Adquirir conexión (pool) o referencia (sqlite3)
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos=" 2 "></span></a>oConn := WDO_Get( "APP" )
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a>IF oConn == NIL ; RETURN USendError( 503, "DB unavailable" ) ; ENDIF
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos=" 4 "></span></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a>// Query directa
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos=" 6 "></span></a>oStmt := oConn:Query( "SELECT id, nombre FROM productos WHERE activo = 1" )
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos=" 7 "></span></a>aRows := oStmt:FetchAll( .T. )   // .T. = array de hashes
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos=" 8 "></span></a>oStmt:Free()
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9"></a><a href="#__codelineno-0-9"><span class="linenos" data-linenos=" 9 "></span></a>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10"></a><a href="#__codelineno-0-10"><span class="linenos" data-linenos="10 "></span></a>// Prepared statement (protección SQL injection)
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11"></a><a href="#__codelineno-0-11"><span class="linenos" data-linenos="11 "></span></a>oStmt := oConn:Prepare( "SELECT id FROM usuarios WHERE email = ?" )
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12"></a><a href="#__codelineno-0-12"><span class="linenos" data-linenos="12 "></span></a>oStmt:BindParam( 1, cEmail )
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13"></a><a href="#__codelineno-0-13"><span class="linenos" data-linenos="13 "></span></a>oStmt:Execute()
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14"></a><a href="#__codelineno-0-14"><span class="linenos" data-linenos="14 "></span></a>hRow := oStmt:Fetch_Assoc()
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15"></a><a href="#__codelineno-0-15"><span class="linenos" data-linenos="15 "></span></a>oStmt:Free()
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16"></a><a href="#__codelineno-0-16"><span class="linenos" data-linenos="16 "></span></a>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17"></a><a href="#__codelineno-0-17"><span class="linenos" data-linenos="17 "></span></a>// DML
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18"></a><a href="#__codelineno-0-18"><span class="linenos" data-linenos="18 "></span></a>oConn:Exec( "DELETE FROM sesiones WHERE expira &lt; NOW()" )
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19"></a><a href="#__codelineno-0-19"><span class="linenos" data-linenos="19 "></span></a>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20"></a><a href="#__codelineno-0-20"><span class="linenos" data-linenos="20 "></span></a>// Transacción
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21"></a><a href="#__codelineno-0-21"><span class="linenos" data-linenos="21 "></span></a>oConn:Transaction( {|o|
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22"></a><a href="#__codelineno-0-22"><span class="linenos" data-linenos="22 "></span></a>   o:Exec( "UPDATE cuentas SET saldo = saldo - 100 WHERE id = 1" ),
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23"></a><a href="#__codelineno-0-23"><span class="linenos" data-linenos="23 "></span></a>   o:Exec( "UPDATE cuentas SET saldo = saldo + 100 WHERE id = 2" )
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24"></a><a href="#__codelineno-0-24"><span class="linenos" data-linenos="24 "></span></a>} )
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25"></a><a href="#__codelineno-0-25"><span class="linenos" data-linenos="25 "></span></a>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26"></a><a href="#__codelineno-0-26"><span class="linenos" data-linenos="26 "></span></a>oConn:Close()   // devuelve al pool (MySQL/PG) o no-op (SQLite3)
+</span></code></pre></div>
+<h2 id="configuracion-declarativa">Configuración declarativa<a class="headerlink" href="#configuracion-declarativa" title="Permanent link">&para;</a></h2>
+<p>Con <code>hixstyle.enabled=true</code>, los drivers se arrancan desde <code>hix.json</code> (o <code>www/config.json</code>) sin código en la app:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1"></a><a href="#__codelineno-1-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="p">{</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2"></a><a href="#__codelineno-1-2"><span class="linenos" data-linenos=" 2 "></span></a><span class="w">  </span><span class="nt">"databases"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3"></a><a href="#__codelineno-1-3"><span class="linenos" data-linenos=" 3 "></span></a><span class="w">    </span><span class="nt">"APP"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4"></a><a href="#__codelineno-1-4"><span class="linenos" data-linenos=" 4 "></span></a><span class="w">      </span><span class="nt">"driver"</span><span class="p">:</span><span class="w">    </span><span class="s2">"sqlite3"</span><span class="p">,</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5"></a><a href="#__codelineno-1-5"><span class="linenos" data-linenos=" 5 "></span></a><span class="w">      </span><span class="nt">"file"</span><span class="p">:</span><span class="w">      </span><span class="s2">"www/data/app.db"</span><span class="p">,</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6"></a><a href="#__codelineno-1-6"><span class="linenos" data-linenos=" 6 "></span></a><span class="w">      </span><span class="nt">"key_ref"</span><span class="p">:</span><span class="w">   </span><span class="s2">"sqlite3"</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7"></a><a href="#__codelineno-1-7"><span class="linenos" data-linenos=" 7 "></span></a><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8"></a><a href="#__codelineno-1-8"><span class="linenos" data-linenos=" 8 "></span></a><span class="w">    </span><span class="nt">"PG"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9"></a><a href="#__codelineno-1-9"><span class="linenos" data-linenos=" 9 "></span></a><span class="w">      </span><span class="nt">"driver"</span><span class="p">:</span><span class="w">    </span><span class="s2">"pg"</span><span class="p">,</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10"></a><a href="#__codelineno-1-10"><span class="linenos" data-linenos="10 "></span></a><span class="w">      </span><span class="nt">"host"</span><span class="p">:</span><span class="w">      </span><span class="s2">"127.0.0.1"</span><span class="p">,</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11"></a><a href="#__codelineno-1-11"><span class="linenos" data-linenos="11 "></span></a><span class="w">      </span><span class="nt">"user"</span><span class="p">:</span><span class="w">      </span><span class="s2">"postgres"</span><span class="p">,</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12"></a><a href="#__codelineno-1-12"><span class="linenos" data-linenos="12 "></span></a><span class="w">      </span><span class="nt">"db"</span><span class="p">:</span><span class="w">        </span><span class="s2">"myapp"</span><span class="p">,</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13"></a><a href="#__codelineno-1-13"><span class="linenos" data-linenos="13 "></span></a><span class="w">      </span><span class="nt">"pool_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14"></a><a href="#__codelineno-1-14"><span class="linenos" data-linenos="14 "></span></a><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15"></a><a href="#__codelineno-1-15"><span class="linenos" data-linenos="15 "></span></a><span class="w">    </span><span class="nt">"MYSQL"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16"></a><a href="#__codelineno-1-16"><span class="linenos" data-linenos="16 "></span></a><span class="w">      </span><span class="nt">"driver"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mysql"</span><span class="p">,</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17"></a><a href="#__codelineno-1-17"><span class="linenos" data-linenos="17 "></span></a><span class="w">      </span><span class="nt">"host"</span><span class="p">:</span><span class="w">   </span><span class="s2">"127.0.0.1"</span><span class="p">,</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18"></a><a href="#__codelineno-1-18"><span class="linenos" data-linenos="18 "></span></a><span class="w">      </span><span class="nt">"user"</span><span class="p">:</span><span class="w">   </span><span class="s2">"myapp"</span><span class="p">,</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19"></a><a href="#__codelineno-1-19"><span class="linenos" data-linenos="19 "></span></a><span class="w">      </span><span class="nt">"db"</span><span class="p">:</span><span class="w">     </span><span class="s2">"myapp"</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20"></a><a href="#__codelineno-1-20"><span class="linenos" data-linenos="20 "></span></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21"></a><a href="#__codelineno-1-21"><span class="linenos" data-linenos="21 "></span></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22"></a><a href="#__codelineno-1-22"><span class="linenos" data-linenos="22 "></span></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Los tres pools/singletons pueden coexistir en el mismo proceso. <code>WDO_Get("APP")</code>, <code>WDO_Get("PG")</code> y <code>WDO_Get("MYSQL")</code> son independientes.</p>
 <h2 id="estructura-de-ficheros-fuente">Estructura de ficheros fuente<a class="headerlink" href="#estructura-de-ficheros-fuente" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos=" 1 "></span></a>src/wdo/
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos=" 2 "></span></a>  wdo_pool.prg              Pool genérico thread-safe
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3"></a><a href="#__codelineno-0-3"><span class="linenos" data-linenos=" 3 "></span></a>  wdo_config.prg            Bootstrap declarativo desde config.json
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4"></a><a href="#__codelineno-0-4"><span class="linenos" data-linenos=" 4 "></span></a>  wdo.prg                   Registro global y helpers U*
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5"></a><a href="#__codelineno-0-5"><span class="linenos" data-linenos=" 5 "></span></a>  mysql/
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6"></a><a href="#__codelineno-0-6"><span class="linenos" data-linenos=" 6 "></span></a>    wdo_mysql.prg           Driver MySQL/MariaDB (New/Open/Query/Close)
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7"></a><a href="#__codelineno-0-7"><span class="linenos" data-linenos=" 7 "></span></a>    wdo_mysql_pool.prg      Factory del pool MySQL
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8"></a><a href="#__codelineno-0-8"><span class="linenos" data-linenos=" 8 "></span></a>    wdo_mysql_stmt.prg      Prepared statements — Alt B (texto)
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9"></a><a href="#__codelineno-0-9"><span class="linenos" data-linenos=" 9 "></span></a>    wdo_mysql_stmt_bin.prg  Prepared statements — Alt A (binario nativo)
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10"></a><a href="#__codelineno-0-10"><span class="linenos" data-linenos="10 "></span></a>    include/
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11"></a><a href="#__codelineno-0-11"><span class="linenos" data-linenos="11 "></span></a>      wdo_mysql_bind.ch     Constantes de tipos para Alt A
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1"></a><a href="#__codelineno-2-1"><span class="linenos" data-linenos=" 1 "></span></a>src/wdo/
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2"></a><a href="#__codelineno-2-2"><span class="linenos" data-linenos=" 2 "></span></a>  wdo_pool.prg              Pool genérico thread-safe
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3"></a><a href="#__codelineno-2-3"><span class="linenos" data-linenos=" 3 "></span></a>  wdo_config.prg            Bootstrap declarativo desde config.json
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4"></a><a href="#__codelineno-2-4"><span class="linenos" data-linenos=" 4 "></span></a>  wdo.prg                   Registro global y funciones WDO_Get / WDO_PoolStats
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5"></a><a href="#__codelineno-2-5"><span class="linenos" data-linenos=" 5 "></span></a>  mysql/
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6"></a><a href="#__codelineno-2-6"><span class="linenos" data-linenos=" 6 "></span></a>    wdo_mysql.prg           Driver MySQL/MariaDB (New/Open/Query/Close)
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7"></a><a href="#__codelineno-2-7"><span class="linenos" data-linenos=" 7 "></span></a>    wdo_mysql_pool.prg      Factory del pool MySQL
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8"></a><a href="#__codelineno-2-8"><span class="linenos" data-linenos=" 8 "></span></a>    wdo_mysql_stmt.prg      Prepared statements texto
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9"></a><a href="#__codelineno-2-9"><span class="linenos" data-linenos=" 9 "></span></a>    wdo_mysql_stmt_bin.prg  Prepared statements binario nativo (blobs)
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10"></a><a href="#__codelineno-2-10"><span class="linenos" data-linenos="10 "></span></a>  pg/
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11"></a><a href="#__codelineno-2-11"><span class="linenos" data-linenos="11 "></span></a>    wdo_pg.prg              Driver PostgreSQL vía libpq
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12"></a><a href="#__codelineno-2-12"><span class="linenos" data-linenos="12 "></span></a>    wdo_pg_pool.prg         Factory del pool PG
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13"></a><a href="#__codelineno-2-13"><span class="linenos" data-linenos="13 "></span></a>    wdo_pg_stmt.prg         Prepared statements (PQprepare / PQexecPrepared)
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14"></a><a href="#__codelineno-2-14"><span class="linenos" data-linenos="14 "></span></a>  sqlite3/
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15"></a><a href="#__codelineno-2-15"><span class="linenos" data-linenos="15 "></span></a>    wdo_sqlite3.prg         Driver SQLite3/SQLCipher (singleton)
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16"></a><a href="#__codelineno-2-16"><span class="linenos" data-linenos="16 "></span></a>    wdo_sqlite3_stmt.prg    Prepared statements (sqlite3_prepare_v2)
 </span></code></pre></div>
 <h2 id="primeros-pasos">Primeros pasos<a class="headerlink" href="#primeros-pasos" title="Permanent link">&para;</a></h2>
-<p>Si es tu primera vez con WDO, empieza aquí:</p>
+<p>Elige tu driver y sigue su documentación:</p>
+<h3 id="mysql-mariadb">MySQL / MariaDB<a class="headerlink" href="#mysql-mariadb" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong><a href="mysql/">MySQL — Concepto y Pool</a></strong> — entiende el modelo antes de escribir código.</li>
+<li><strong><a href="mysql/">Concepto y Pool</a></strong> — entiende el modelo antes de escribir código.</li>
 <li><strong><a href="mysql/config/">Configuración</a></strong> — cómo declarar el pool en <code>config.json</code>.</li>
 <li><strong><a href="mysql/uso/">Uso del pool</a></strong> — cómo usar <code>WDO_Get</code> en tus handlers.</li>
+<li><strong><a href="mysql/prepared/">Prepared Statements</a></strong> — protección SQL injection y bulk insert.</li>
+<li><strong><a href="mysql/transacciones/">Transacciones</a></strong> — <code>BeginTrans</code>, <code>Commit</code>, <code>Rollback</code>.</li>
+<li><strong><a href="mysql/troubleshooting/">Troubleshooting</a></strong> — errores frecuentes y soluciones.</li>
+</ol>
+<h3 id="postgresql">PostgreSQL<a class="headerlink" href="#postgresql" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong><a href="pg/">Concepto y Pool</a></strong> — pool vs <code>New()</code>, TCP preflight probe.</li>
+<li><strong><a href="pg/config/">Configuración</a></strong> — <code>sslmode</code>, <code>application_name</code>, <code>client_encoding</code>.</li>
+<li><strong><a href="pg/uso/">Uso del pool</a></strong> — API completa, NOTICEs, <code>RETURNING</code>.</li>
+<li><strong><a href="pg/prepared/">Prepared Statements</a></strong> — tres dialectos: <code>?</code>, <code>:name</code>, <code>$N</code>.</li>
+<li><strong><a href="pg/transacciones/">Transacciones</a></strong> — <code>BeginTrans</code>, <code>Transaction(bCode)</code>, savepoints.</li>
+<li><strong><a href="pg/troubleshooting/">Troubleshooting</a></strong> — <code>pg_hba.conf</code>, sslmode, NOTICEs.</li>
+</ol>
+<h3 id="sqlite3-sqlcipher">SQLite3 / SQLCipher<a class="headerlink" href="#sqlite3-sqlcipher" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong><a href="sqlite3/">Concepto y Singleton</a></strong> — singleton vs pool, WAL mode, casos de uso.</li>
+<li><strong><a href="sqlite3/config/">Configuración</a></strong> — <code>key_ref</code>, WAL sidecars, rutas relativas.</li>
+<li><strong><a href="sqlite3/uso/">Uso</a></strong> — <code>IsTable()</code>, <code>Changes()</code>, <code>Count()=-1</code>.</li>
+<li><strong><a href="sqlite3/prepared/">Prepared Statements</a></strong> — 4 estilos de placeholder, <code>Reset()</code>.</li>
+<li><strong><a href="sqlite3/transacciones/">Transacciones</a></strong> — <code>SQLITE_BUSY</code>, bulk insert.</li>
+<li><strong><a href="sqlite3/cifrado/">Cifrado SQLCipher</a></strong> — AES-256, <code>Rekey()</code>, <code>GetCipherInfo()</code>.</li>
+<li><strong><a href="sqlite3/troubleshooting/">Troubleshooting</a></strong> — sidecars WAL, clave errónea, <code>Count()=-1</code>.</li>
 </ol>
 
 
@@ -3248,10 +3488,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.top", "navigation.instant", "navigation.instant.progress", "navigation.tracking", "toc.follow", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.top", "navigation.instant", "navigation.instant.progress", "navigation.tracking", "toc.follow", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
         <script src="../../javascripts/extra.js"></script>
       
