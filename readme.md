@@ -34,11 +34,9 @@ Full documentation is available at: https://carles9000.github.io/hix/
 
 ## ✔️ Last Version
 
-**HIX v2.4 - New Commpile System**
+**HIX v2.5 - WDO (Web Database Objects)**
 
-2.4 HIX Compile unified subsystem is now the only compile path in the lib  
-
-2.3 WDO MySql & WDO Sqlite3
+2.5 Ready to use: MySql, Sqlite3, PostgreSQL
 
   
 ---
@@ -47,10 +45,6 @@ Full documentation is available at: https://carles9000.github.io/hix/
 
 - To run the MySQL examples, please read the help entry at 
 https://carles9000.github.io/hix/wdo/mysql/installation/
-
-- HIX is completely incompatible with the current version because everything 
-has been refactored. If you wish to download it, you can find it in this repository 
-https://github.com/carles9000/hix.legacy 
 
 - You can download Harbour binaries from here 
 https://github.com/carles9000/hix.harbour 
