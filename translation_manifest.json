@@ -853,6 +853,211 @@
           "translator": "minimax-m3"
         }
       }
+    },
+    "wdo/pg/index.md": {
+      "es_sha": "c9b4c22118686d9dbdc4bbafc32938af27174f32",
+      "translations": {
+        "en": {
+          "sha": "ebec0ea5677666ef2be2f91922e02339e968d11d",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        },
+        "it": {
+          "sha": "2583b62dba9ce9ef55f5e4bc27204c8841c13b3e",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        }
+      }
+    },
+    "wdo/pg/config.md": {
+      "es_sha": "e15e6fb770fb511a15178f86170731c04df77c3e",
+      "translations": {
+        "en": {
+          "sha": "8e5acdfc52cd9deec6f4a0fe2531d408d4a3625a",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        },
+        "it": {
+          "sha": "9abe3859088867bde715638df2a9c141f0b2b0c8",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        }
+      }
+    },
+    "wdo/pg/uso.md": {
+      "es_sha": "8416d633eb1c1a669ed2fbaebbe04e62bc8922ed",
+      "translations": {
+        "en": {
+          "path": "wdo/pg/usage.md",
+          "sha": "4b95286e1e0a6d1d9069b097e225a56e9bee6fec",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        },
+        "it": {
+          "path": "wdo/pg/utilizzo.md",
+          "sha": "37f62ab9bc71cc30270ae11fdee79b73fa8b19c7",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        }
+      }
+    },
+    "wdo/pg/prepared.md": {
+      "es_sha": "7fda49e3707ffc25189313f893d37729c6ba9950",
+      "translations": {
+        "en": {
+          "sha": "7bf9a7fdbc15168d594b0c5a629e601b275340b9",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        },
+        "it": {
+          "sha": "a77d8e989b4e52f6c1ede039f6e5afe5b102a554",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        }
+      }
+    },
+    "wdo/pg/transacciones.md": {
+      "es_sha": "35f2da455fbdd6f568150dbcf53a95058f633644",
+      "translations": {
+        "en": {
+          "path": "wdo/pg/transactions.md",
+          "sha": "a5d93732142a7633e4ae980910c167fc1b6a1394",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        },
+        "it": {
+          "path": "wdo/pg/transazioni.md",
+          "sha": "bf71a50ffa3d373cf405359a0365c09d391daa07",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        }
+      }
+    },
+    "wdo/pg/troubleshooting.md": {
+      "es_sha": "29f0fbcbd17434b7794d8f153d1e876e7b3bcbf0",
+      "translations": {
+        "en": {
+          "sha": "9d2d34109f572ecaff7402faa302b40bbd76d4db",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        },
+        "it": {
+          "sha": "639b0d933e3e973a74c0d61b0f7e6fd9de26668c",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        }
+      }
+    },
+    "wdo/sqlite3/index.md": {
+      "es_sha": "c9d5908e93ddf321c81a9f51d38e5da0464e961a",
+      "translations": {
+        "en": {
+          "sha": "8fecd88e9250188790c79eaac5f5abbac88b98c8",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        },
+        "it": {
+          "sha": "714846e57f447484998bf6dc176950a0cc280c45",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        }
+      }
+    },
+    "wdo/sqlite3/config.md": {
+      "es_sha": "4f826a391f256dc4adeb35d67e51b5f0dc9e8f40",
+      "translations": {
+        "en": {
+          "sha": "256e89b357a5fc6c6625ad579bbda17d6b5b9da9",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        },
+        "it": {
+          "sha": "79591b5101134cbc6c4410d98799564339976874",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        }
+      }
+    },
+    "wdo/sqlite3/uso.md": {
+      "es_sha": "8dd9643133b167c880ae616725d8cc689c7f65dc",
+      "translations": {
+        "en": {
+          "path": "wdo/sqlite3/usage.md",
+          "sha": "f2cd115462d3af8979b14386469896a097262340",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        },
+        "it": {
+          "path": "wdo/sqlite3/utilizzo.md",
+          "sha": "c11a1ce5d37ff54aed3db6a0b959d8b27f57c991",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        }
+      }
+    },
+    "wdo/sqlite3/prepared.md": {
+      "es_sha": "3b658512533fb4a9f1d9304d8c765d645ebe61dc",
+      "translations": {
+        "en": {
+          "sha": "39cb3831a3a1606c61418fc747e3c13997fbf705",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        },
+        "it": {
+          "sha": "3a1ec7a829042f5061758c7d699cfa875d35229f",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        }
+      }
+    },
+    "wdo/sqlite3/transacciones.md": {
+      "es_sha": "ec2f419f69e842eacbb1bad305e0bdfbd2aca897",
+      "translations": {
+        "en": {
+          "path": "wdo/sqlite3/transactions.md",
+          "sha": "985deaa710842450dbedc434ada727164cc464a3",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        },
+        "it": {
+          "path": "wdo/sqlite3/transazioni.md",
+          "sha": "99a9c19f7e8b63195ad9d0832d4679b0ce8e956f",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        }
+      }
+    },
+    "wdo/sqlite3/troubleshooting.md": {
+      "es_sha": "6c0dc889fc968d9c6fd6b9716f13315a4243a04c",
+      "translations": {
+        "en": {
+          "sha": "e98fc41d6defac4346340ebf2f7c8e484ec39bfa",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        },
+        "it": {
+          "sha": "086fd3e908740f316740180773b2abf5f1a67d71",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        }
+      }
+    },
+    "wdo/sqlite3/cifrado.md": {
+      "es_sha": "8f80551218459fea3218947491d2b3c98fa60592",
+      "translations": {
+        "en": {
+          "path": "wdo/sqlite3/encryption.md",
+          "sha": "24d0abdf8685fab5d1158c08fa84f5caf3fca0e9",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        },
+        "it": {
+          "path": "wdo/sqlite3/crittografia.md",
+          "sha": "f13b470ae6d847125ef457544da297e618ebf7f6",
+          "translated_at": "2026-11-22T00:00:00Z",
+          "translator": "claude-sonnet-4-6"
+        }
+      }
     }
   },
   "pivot": "es",

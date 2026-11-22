@@ -31,7 +31,7 @@
     
     
       
-        <title>WDO SQLite3 — Uso del singleton - Web Server</title>
+        <title>WDO SQLite3 — Uso - Web Server</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#wdo-sqlite3-uso-del-singleton" class="md-skip">
+        <a href="#wdo-sqlite3-uso" class="md-skip">
           Saltar a contenido
         </a>
       
@@ -113,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              WDO SQLite3 — Uso del singleton
+              WDO SQLite3 — Uso
             
           </span>
         </div>
@@ -3097,13 +3097,41 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#concurrencia-como-funciona-el-mutex" class="md-nav__link">
+  <a href="#concurrencia-mutex-singleton-vs-pool-real" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Concurrencia — cómo funciona el mutex
+        Concurrencia — mutex singleton vs pool real
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Concurrencia — mutex singleton vs pool real">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#modo-singleton-pool_size-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modo singleton (pool_size: 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modo-pool-pool_size-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modo pool (pool_size &gt; 1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3174,8 +3202,17 @@
 
 
 
-<h1 id="wdo-sqlite3-uso-del-singleton">WDO SQLite3 — Uso del singleton<a class="headerlink" href="#wdo-sqlite3-uso-del-singleton" title="Permanent link">&para;</a></h1>
-<p>Una vez configurado el singleton en <code>config.json</code>, usarlo en los handlers es directo. <code>WDO_Get("APP")</code> siempre retorna la misma instancia — no hay checkout de slot.</p>
+<h1 id="wdo-sqlite3-uso">WDO SQLite3 — Uso<a class="headerlink" href="#wdo-sqlite3-uso" title="Permanent link">&para;</a></h1>
+<p>Una vez configurada la BD en <code>config.json</code>, usarla en los handlers es directo. <code>WDO_Get("APP")</code> retorna una conexión lista para operar.</p>
+<div class="admonition info">
+<p class="admonition-title">Singleton vs pool — <code>pool_size</code></p>
+<p>El driver opera en dos modos según <code>pool_size</code> (ver <a href="../config/#pool_size">Configuración</a>):</p>
+<ul>
+<li><strong><code>pool_size: 1</code></strong> (default) — <strong>singleton</strong>. <code>WDO_Get("APP")</code> devuelve siempre la misma instancia. Un solo handle contra el fichero; el driver serializa internamente con mutex.</li>
+<li><strong><code>pool_size: N &gt; 1</code></strong> — <strong>pool real</strong>. N conexiones contra el mismo fichero; cada hilo reserva una durante el request. Necesario cuando dos handlers concurrentes pueden tener <code>Transaction()</code> solapadas (ver <a href="../transacciones/">Transacciones</a>). Añadido en v2.5.3.</li>
+</ul>
+<p>En ambos modos la API del handler es idéntica: <code>WDO_Get</code> + <code>Close()</code>. El driver gestiona la reserva/liberación automáticamente.</p>
+</div>
 <h2 id="plantilla-basica-de-handler">Plantilla básica de handler<a class="headerlink" href="#plantilla-basica-de-handler" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos=" 1 "></span></a>FUNCTION ProductosList()
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2"></a><a href="#__codelineno-0-2"><span class="linenos" data-linenos=" 2 "></span></a>
@@ -3199,8 +3236,12 @@
 </span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20"></a><a href="#__codelineno-0-20"><span class="linenos" data-linenos="20 "></span></a>RETURN USendJson( aRows )
 </span></code></pre></div>
 <div class="admonition info">
-<p class="admonition-title">Close() es un no-op en singleton</p>
-<p>A diferencia del pool MySQL/PG, <code>oConn:Close()</code> en SQLite3 singleton no cierra el socket ni devuelve nada al pool. Se llama por convención de código para mantener la portabilidad entre drivers.</p>
+<p class="admonition-title">Close() — comportamiento según modo</p>
+<ul>
+<li><strong>Singleton (<code>pool_size: 1</code>)</strong>: <code>oConn:Close()</code> es no-op; la conexión vive de bootstrap a shutdown.</li>
+<li><strong>Pool (<code>pool_size &gt; 1</code>)</strong>: <code>oConn:Close()</code> libera el slot al pool para que otro hilo pueda usarlo. En cualquier caso, el dispatcher HIX hace <code>WDO_ReleaseAllThread()</code> al final de cada request, así que <strong>no es obligatorio</strong> llamarlo explícitamente.</li>
+</ul>
+<p>Mantener el patrón <code>oConn:Close()</code> en los handlers facilita portar el código entre SQLite / PG / MySQL.</p>
 </div>
 <h2 id="api-del-driver">API del driver<a class="headerlink" href="#api-del-driver" title="Permanent link">&para;</a></h2>
 <h3 id="queries-de-lectura">Queries de lectura<a class="headerlink" href="#queries-de-lectura" title="Permanent link">&para;</a></h3>
@@ -3298,16 +3339,25 @@
 </span><span id="__span-7-23"><a id="__codelineno-7-23" name="__codelineno-7-23"></a><a href="#__codelineno-7-23"><span class="linenos" data-linenos="23 "></span></a>//   "encrypted"  =&gt; .F.
 </span><span id="__span-7-24"><a id="__codelineno-7-24" name="__codelineno-7-24"></a><a href="#__codelineno-7-24"><span class="linenos" data-linenos="24 "></span></a>// }
 </span></code></pre></div>
-<h2 id="concurrencia-como-funciona-el-mutex">Concurrencia — cómo funciona el mutex<a class="headerlink" href="#concurrencia-como-funciona-el-mutex" title="Permanent link">&para;</a></h2>
+<h2 id="concurrencia-mutex-singleton-vs-pool-real">Concurrencia — mutex singleton vs pool real<a class="headerlink" href="#concurrencia-mutex-singleton-vs-pool-real" title="Permanent link">&para;</a></h2>
+<h3 id="modo-singleton-pool_size-1">Modo singleton (<code>pool_size: 1</code>)<a class="headerlink" href="#modo-singleton-pool_size-1" title="Permanent link">&para;</a></h3>
 <p>Todos los workers de HIX comparten la misma instancia <code>WDO_Sqlite3</code>. El driver mantiene un mutex interno (<code>oConn:hMutex</code>) que se adquiere en <code>Execute()</code> y se libera en el mismo <code>Execute()</code> o en <code>Fetch*()</code>. Esto significa:</p>
 <ul>
 <li><strong>Reads concurrentes:</strong> múltiples workers pueden estar en la fase de <code>Fetch</code> simultáneamente (el mutex solo cubre la fase de <code>sqlite3_step</code>).</li>
 <li><strong>Writes serializados:</strong> <code>Exec()</code> y el <code>Execute()</code> de un prepared DML adquieren el mutex exclusivo.</li>
 <li><strong>Sin interbloqueos:</strong> el mutex es no recursivo; no llames a métodos del driver desde dentro de un codeblock Transaction anidado.</li>
+<li><strong>Transacciones NO aisladas entre hilos.</strong> El mutex cubre operaciones sueltas; entre <code>BeginTrans()</code> y <code>Commit()</code> el lock se libera. Ver <a href="../transacciones/#aislamiento-de-transacciones">Transacciones § Aislamiento</a>.</li>
+</ul>
+<h3 id="modo-pool-pool_size-1">Modo pool (<code>pool_size &gt; 1</code>)<a class="headerlink" href="#modo-pool-pool_size-1" title="Permanent link">&para;</a></h3>
+<p>Cada hilo reserva su propia conexión al entrar al handler. No hay mutex compartido entre hilos: cada conexión opera sobre su propio handle <code>sqlite3*</code>. SQLite coordina los writes a nivel de fichero vía <code>busy_timeout_ms</code>.</p>
+<ul>
+<li><strong>Reads concurrentes:</strong> N hilos leen en paralelo sin bloquearse mutuamente.</li>
+<li><strong>Writes serializados a nivel de fichero:</strong> SQLite permite un solo writer; si dos hilos hacen <code>UPDATE</code> simultáneo, el segundo espera <code>busy_timeout_ms</code> antes de retornar <code>SQLITE_BUSY</code>.</li>
+<li><strong>Transacciones aisladas:</strong> cada hilo tiene su <code>BEGIN/COMMIT</code> local; no hay interleaving posible.</li>
 </ul>
 <div class="admonition warning">
 <p class="admonition-title">No uses Lock/Unlock directamente</p>
-<p>Los métodos <code>oConn:Lock()</code> y <code>oConn:Unlock()</code> son de uso interno del driver. Invocarlos manualmente en código de aplicación puede producir interbloqueos.</p>
+<p>Los métodos <code>oConn:Lock()</code> y <code>oConn:Unlock()</code> son de uso interno del driver (modo singleton). Invocarlos manualmente en código de aplicación puede producir interbloqueos. En modo pool estos métodos son no-op.</p>
 </div>
 <h2 id="patrones-frecuentes">Patrones frecuentes<a class="headerlink" href="#patrones-frecuentes" title="Permanent link">&para;</a></h2>
 <h3 id="leer-un-registro-por-id">Leer un registro por ID<a class="headerlink" href="#leer-un-registro-por-id" title="Permanent link">&para;</a></h3>

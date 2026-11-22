@@ -20,9 +20,9 @@
         
           <link rel="alternate" href="./" hreflang="es">
         
-          <link rel="alternate" href="/hix/" hreflang="en">
+          <link rel="alternate" href="../../../../wdo/sqlite3/config/" hreflang="en">
         
-          <link rel="alternate" href="/hix/it/" hreflang="it">
+          <link rel="alternate" href="../../../../it/wdo/sqlite3/config/" hreflang="it">
         
       
       
@@ -166,13 +166,13 @@
           </li>
         
           <li class="md-select__item">
-            <a href="/hix/" hreflang="en" class="md-select__link">
+            <a href="../../../../wdo/sqlite3/config/" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
         
           <li class="md-select__item">
-            <a href="/hix/it/" hreflang="it" class="md-select__link">
+            <a href="../../../../it/wdo/sqlite3/config/" hreflang="it" class="md-select__link">
               Italiano
             </a>
           </li>
@@ -3142,7 +3142,7 @@
 
 
 <h1 id="wdo-sqlite3-configuracion">WDO SQLite3 — Configuración<a class="headerlink" href="#wdo-sqlite3-configuracion" title="Permanent link">&para;</a></h1>
-<p>Hay tres formas de inicializar el singleton SQLite3. La recomendada es la declarativa desde <code>hix.json</code> (o <code>www/config.json</code> con hixstyle).</p>
+<p>Hay tres formas de inicializar el driver SQLite3 (singleton o pool). La recomendada es la declarativa desde <code>hix.json</code> (o <code>www/config.json</code> con hixstyle).</p>
 <h2 id="metodo-1-declarativo-recomendado">Método 1 — Declarativo (recomendado)<a class="headerlink" href="#metodo-1-declarativo-recomendado" title="Permanent link">&para;</a></h2>
 <p>Añade la sección <code>databases</code> en <code>hix.json</code>:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1"></a><a href="#__codelineno-0-1"><span class="linenos" data-linenos=" 1 "></span></a><span class="p">{</span>
@@ -3217,6 +3217,21 @@
 <td><code>busy_timeout_ms</code></td>
 <td><code>5000</code></td>
 <td>Tiempo máximo de espera si otro proceso tiene el fichero bloqueado</td>
+</tr>
+<tr>
+<td><a name="pool_size"></a><code>pool_size</code></td>
+<td><code>1</code></td>
+<td><code>1</code> = singleton (una conexión compartida, mutex por operación); <code>&gt; 1</code> = pool real de N conexiones con reserva por request. Ver <a href="../transacciones/#aislamiento-de-transacciones">Transacciones § Aislamiento</a>. Añadido en v2.5.3.</td>
+</tr>
+<tr>
+<td><code>timeout_ms</code></td>
+<td><code>5000</code></td>
+<td>Timeout de reserva del pool (solo con <code>pool_size &gt; 1</code>): si todas las conexiones están ocupadas, cuánto espera <code>WDO_Get</code> antes de retornar <code>NIL</code></td>
+</tr>
+<tr>
+<td><code>ping</code></td>
+<td><code>false</code></td>
+<td>Ping on-acquire del pool (solo con <code>pool_size &gt; 1</code>): verifica que la conexión sigue viva antes de entregarla al handler</td>
 </tr>
 <tr>
 <td><code>debug</code></td>
