@@ -146,10 +146,12 @@
 #define HIX_PATH_ROUTES_LISTALL   "/hix-routes/listall"
 
 // Códigos de error de lectura en THixRequest
-#define HIX_REQ_ERR_NONE     0   // sin error
-#define HIX_REQ_ERR_CLOSED   1   // socket cerrado o timeout
-#define HIX_REQ_ERR_BADREQ   2   // request line inválida
-#define HIX_REQ_ERR_TOOLARGE 3   // Content-Length > HIX_MAX_BODY_SIZE (A1.23)
+#define HIX_REQ_ERR_NONE           0   // sin error
+#define HIX_REQ_ERR_CLOSED         1   // socket cerrado o timeout
+#define HIX_REQ_ERR_BADREQ         2   // request line inválida / headers malformados
+#define HIX_REQ_ERR_TOOLARGE       3   // Content-Length > HIX_MAX_BODY_SIZE (A1.23)
+#define HIX_REQ_ERR_TE_UNSUPPORTED 4   // Transfer-Encoding de entrada no soportado (Claim 3 / F3)
+#define HIX_REQ_ERR_TRUNCATED      5   // cuerpo recibido < Content-Length (Claim 3 / F4)
 
 // Límites de seguridad
 #define HIX_MAX_HEADER_SIZE    8192

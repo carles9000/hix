@@ -24,6 +24,9 @@
                  to_utf8                (bool, default .T.)
                  busy_timeout_ms        (int, default 5000)
                  dll                    (string, path override)
+                 pool_size              (int, default 1 — >1 activa pool real)
+                 timeout_ms             (int, default 5000 — pool Acquire)
+                 ping                   (bool, default .F. — pool ping)
                  -- SQLCipher --
                  key                    (string, plaintext passphrase)
                  key_ref                (string, resolved via HIX_KeyGet)
@@ -73,11 +76,11 @@ RETU WDO_InitSqlite3Ex( WDO_SQLITE3_KEY, hParams )
 
 FUNCTION WDO_InitSqlite3Ex( cKey, hParams )
 
-   LOCAL oConn
+   LOCAL oConn, oPool, bFactory, nOk
    LOCAL cFile, cJournal, cSync, cBErrorName, cDll
    LOCAL cCipherKey, cCipherKeyRef, cCipherHmac, cCipherKdf
-   LOCAL lCreate, lForeignKeys, lToUtf8
-   LOCAL nKdfIter, nPageSize, nBusyMs
+   LOCAL lCreate, lForeignKeys, lToUtf8, lPing
+   LOCAL nKdfIter, nPageSize, nBusyMs, nPoolSize, nTimeoutMs
    LOCAL bError
 
    IF Empty( cKey )
@@ -103,6 +106,9 @@ FUNCTION WDO_InitSqlite3Ex( cKey, hParams )
    cCipherHmac   := hb_HGetDef( hParams, "cipher_hmac_algorithm", "" )
    cCipherKdf    := hb_HGetDef( hParams, "cipher_kdf_algorithm",  "" )
    cBErrorName   := hb_HGetDef( hParams, "berror",                "" )
+   nPoolSize     := hb_HGetDef( hParams, "pool_size",             1 )
+   nTimeoutMs    := hb_HGetDef( hParams, "timeout_ms",            5000 )
+   lPing         := hb_HGetDef( hParams, "ping",                  .F. )
 
    IF hb_HHasKey( hParams, "berror_block" )
       bError := hParams[ "berror_block" ]
@@ -124,11 +130,60 @@ FUNCTION WDO_InitSqlite3Ex( cKey, hParams )
       _EnsureParentDir( cFile )
    ENDIF
 
+   //  ":memory:" cannot be shared across multiple connections — each New()
+   //  opens its own private memory DB. Force singleton to preserve semantics.
+   IF cFile == ":memory:" .AND. nPoolSize > 1
+      HIX_Dbg( "[WDO_Sqlite3Pool] InitSqlite3Ex[" + cKey + "]: :memory: + pool_size>1 " + ;
+               "unsupported, forcing singleton" )
+      nPoolSize := 1
+   ENDIF
+
    HIX_Dbg( "[WDO_Sqlite3Pool] InitSqlite3Ex[" + cKey + "]: file=" + cFile + ;
             " create=" + iif( lCreate, "T", "F" ) + ;
             " journal=" + cJournal + " sync=" + cSync + ;
             " fk=" + iif( lForeignKeys, "T", "F" ) + ;
+            " pool_size=" + hb_NToS( nPoolSize ) + ;
             " encrypted=" + iif( ! Empty( cCipherKey ) .OR. ! Empty( cCipherKeyRef ), "T", "F" ) )
+
+   //	-------------------------------------------------------  //
+   //  Rama pool real (pool_size > 1). Cada conexión tiene su propio
+   //  sqlite3* handle contra el mismo fichero (WAL permite N escritores
+   //  serializados). sqlcipher.dll se carga una vez vía refcount.
+   //	-------------------------------------------------------  //
+   IF nPoolSize > 1
+
+      bFactory := {| nIdx | ;
+         HB_SYMBOL_UNUSED( nIdx ), ;
+         _WdoSqlite3PoolNew( cFile, lCreate, iif( Empty( cDll ), NIL, cDll ), ;
+                             cJournal, cSync, lForeignKeys, lToUtf8, nBusyMs, ;
+                             cCipherKey, cCipherKeyRef, nKdfIter, nPageSize, ;
+                             cCipherHmac, cCipherKdf, bError, cKey ) }
+
+      oPool := WDO_Pool():New( cKey, nPoolSize, nTimeoutMs, lPing, bFactory )
+
+      nOk := oPool:Init()
+
+      l( "WDO SQLite3 pool init: " + hb_NToS( nOk ) + "/" + hb_NToS( nPoolSize ) + ;
+         " file=" + cFile )
+
+      IF nOk == 0
+         le( _( 'WDO_LOG_SQLITE_INIT_FAIL', cKey, cFile ) )
+         HIX_Dbg( "[WDO_Sqlite3Pool] InitSqlite3Ex[" + cKey + "]: FAILED, no connections opened" )
+         RETU .F.
+      ENDIF
+
+      WDO_RegisterPool( cKey, oPool )
+
+      HIX_Dbg( "[WDO_Sqlite3Pool] InitSqlite3Ex[" + cKey + "]: END OK pool=" + ;
+               hb_NToS( nOk ) + "/" + hb_NToS( nPoolSize ) )
+
+      RETU .T.
+   ENDIF
+
+   //	-------------------------------------------------------  //
+   //  Rama singleton (pool_size <= 1): comportamiento histórico,
+   //  back-compat con tests y apps existentes.
+   //	-------------------------------------------------------  //
 
    oConn := WDO_Sqlite3():New( cFile, lCreate, iif( Empty( cDll ), NIL, cDll ) )
 
@@ -173,11 +228,22 @@ RETU .T.
 
 FUNCTION WDO_EndSqlite3( cKey )
 
+   LOCAL hStats
+
    hb_default( @cKey, WDO_SQLITE3_KEY )
 
    HIX_Dbg( "[WDO_Sqlite3Pool] EndSqlite3[" + cKey + "]: BEGIN" )
 
-   WDO_UnregisterConn( cKey )
+   //  Primero intentamos como pool. WDO_PoolStats devuelve NIL si no
+   //  hay pool registrado bajo cKey → caemos a UnregisterConn.
+   hStats := WDO_PoolStats( cKey )
+   IF hStats != NIL
+      HIX_Dbg( "[WDO_Sqlite3Pool] EndSqlite3[" + cKey + "]: pool size=" + ;
+               hb_NToS( hStats[ "size" ] ) + " busy=" + hb_NToS( hStats[ "busy" ] ) )
+      WDO_UnregisterPool( cKey )
+   ELSE
+      WDO_UnregisterConn( cKey )
+   ENDIF
 
    HIX_Dbg( "[WDO_Sqlite3Pool] EndSqlite3[" + cKey + "]: END" )
 
@@ -191,6 +257,47 @@ RETU NIL
 FUNCTION WDO_GetSqlite3( cKey )
    hb_default( @cKey, WDO_SQLITE3_KEY )
 RETU WDO_Get( cKey )
+
+
+//	=======================================================  //
+//  Pool factory. Invoked once per slot during WDO_Pool:Init(). Builds
+//  a fully-configured WDO_Sqlite3 instance and runs Open(). The pool
+//  rejects conns where lConnect=.F., so a failed Open() drops the slot
+//  without aborting the whole bootstrap.
+//	=======================================================  //
+
+STATIC FUNCTION _WdoSqlite3PoolNew( cFile, lCreate, cDll, cJournal, cSync, ;
+                                    lForeignKeys, lToUtf8, nBusyMs, ;
+                                    cCipherKey, cCipherKeyRef, nKdfIter, nPageSize, ;
+                                    cCipherHmac, cCipherKdf, bError, cKey )
+
+   LOCAL oConn := WDO_Sqlite3():New( cFile, lCreate, cDll )
+
+   IF oConn == NIL
+      RETU NIL
+   ENDIF
+
+   oConn:cJournalMode     := cJournal
+   oConn:cSynchronous     := cSync
+   oConn:lForeignKeys     := lForeignKeys
+   oConn:lToUtf8          := lToUtf8
+   oConn:nBusyTimeoutMs   := nBusyMs
+   oConn:cPoolKey         := Lower( cKey )
+
+   oConn:cKey             := cCipherKey
+   oConn:cKeyRef          := cCipherKeyRef
+   oConn:nKdfIter         := nKdfIter
+   oConn:nCipherPageSize  := nPageSize
+   oConn:cHmacAlg         := cCipherHmac
+   oConn:cKdfAlg          := cCipherKdf
+
+   IF bError != NIL
+      oConn:bError := bError
+   ENDIF
+
+   oConn:Open()
+
+RETU oConn
 
 
 //	=======================================================  //

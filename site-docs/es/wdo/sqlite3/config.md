@@ -1,6 +1,6 @@
 # WDO SQLite3 — Configuración
 
-Hay tres formas de inicializar el singleton SQLite3. La recomendada es la declarativa desde `hix.json` (o `www/config.json` con hixstyle).
+Hay tres formas de inicializar el driver SQLite3 (singleton o pool). La recomendada es la declarativa desde `hix.json` (o `www/config.json` con hixstyle).
 
 ## Método 1 — Declarativo (recomendado)
 
@@ -51,6 +51,9 @@ RETURN
 | `synchronous` | `"NORMAL"` | `FULL` / `NORMAL` / `OFF`. NORMAL = buen balance durabilidad/velocidad |
 | `foreign_keys` | `true` | Activa `PRAGMA foreign_keys=ON` |
 | `busy_timeout_ms` | `5000` | Tiempo máximo de espera si otro proceso tiene el fichero bloqueado |
+| <a name="pool_size"></a>`pool_size` | `1` | `1` = singleton (una conexión compartida, mutex por operación); `> 1` = pool real de N conexiones con reserva por request. Ver [Transacciones § Aislamiento](transacciones.md#aislamiento-de-transacciones). Añadido en v2.5.3. |
+| `timeout_ms` | `5000` | Timeout de reserva del pool (solo con `pool_size > 1`): si todas las conexiones están ocupadas, cuánto espera `WDO_Get` antes de retornar `NIL` |
+| `ping` | `false` | Ping on-acquire del pool (solo con `pool_size > 1`): verifica que la conexión sigue viva antes de entregarla al handler |
 | `debug` | `false` | Activa `HIX_Dbg()` globalmente; escribe trazas en `dbg.log` |
 | `berror` | — | Nombre de función Harbour para manejar errores del driver |
 | `dll` | — | Ruta explícita a `sqlcipher.dll` (override de la resolución automática) |

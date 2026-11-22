@@ -1,0 +1,155 @@
+@view 'header.html', 'WDO PostgreSQL', 'TLS (sslmode) + pg_stat_ssl diagnostics'
+
+@prg
+
+   //  ------------------------------------------------------------
+   //  PostgreSQL does not encrypt the database file at rest the way
+   //  SQLCipher does -- "encryption" with PostgreSQL means two orthogonal
+   //  things:
+   //
+   //    1) TLS on the wire     -- libpq `sslmode` + certificates.
+   //                              Config-only, inspected via pg_stat_ssl.
+   //    2) Column-level crypto -- pgcrypto extension, `pgp_sym_encrypt`
+   //                              and friends, driven from SQL.
+   //
+   //  This page documents (1) -- what to set in www/config.json,
+   //  what pg_stat_ssl reports about the current session, and how
+   //  pgcrypto (2) is called from SQL.
+   //  ------------------------------------------------------------
+
+   LOCAL oConn := WDO_Get( "PG" )
+   LOCAL oStmt, hRow, hConn, aRows
+
+   IF oConn == NIL
+      ? 'Error: PG pool not registered'
+      RETU NIL
+   ENDIF
+
+   //  ------------------------------------------------------------
+   //  1) Current connection -- host / user / sslmode requested
+   //  ------------------------------------------------------------
+
+   ?? '<h3>1) Current connection</h3>'
+
+   hConn := oConn:GetConnectionInfo()
+
+   ?? '<pre>'
+   ?  'Host .............: ' + hb_HGetDef( hConn, "host",     "?" )
+   ?  'Port .............: ' + hb_HGetDef( hConn, "port",     "?" )
+   ?  'Database .........: ' + hb_HGetDef( hConn, "db",       "?" )
+   ?  'User .............: ' + hb_HGetDef( hConn, "user",     "?" )
+   ?  'Client encoding ..: ' + hb_HGetDef( hConn, "encoding", "?" )
+   ?  'sslmode requested : ' + iif( Empty( oConn:cSslMode ), ;
+                                    '(default)', oConn:cSslMode )
+   ?? '</pre>'
+
+   //  ------------------------------------------------------------
+   //  2) Session TLS state via pg_stat_ssl
+   //
+   //  Reports what libpq actually negotiated for THIS backend session,
+   //  including cipher suite and protocol version. If sslmode is
+   //  "disable" or the server rejects TLS, `ssl` is false.
+   //  ------------------------------------------------------------
+
+   ?? '<h3>2) Session TLS state -- <code>pg_stat_ssl</code></h3>'
+
+   oStmt := oConn:Query( "SELECT ssl::text    AS ssl, "       + ;
+                         "       version      AS version, "   + ;
+                         "       cipher       AS cipher, "    + ;
+                         "       bits::text   AS bits, "      + ;
+                         "       client_dn    AS client_dn "  + ;
+                         "FROM pg_stat_ssl "                  + ;
+                         "WHERE pid = pg_backend_pid()" )
+
+   IF oStmt != NIL .AND. ! oStmt:lError
+      hRow := oStmt:Fetch_Assoc()
+      oStmt:Free()
+      IF hRow != NIL
+         ?? oConn:View( { hRow },, 'pg_stat_ssl for this backend' )
+      ELSE
+         ? '<i>pg_stat_ssl returned no rows -- extension unavailable?</i>'
+      ENDIF
+   ELSE
+      ? '<b>pg_stat_ssl query failed:</b> ' + oConn:cError
+   ENDIF
+
+   //  ------------------------------------------------------------
+   //  3) Enabling TLS -- what to change in www/config.json
+   //
+   //  All keys propagate to libpq via the connection string built in
+   //  WDO_PG:Open(). The driver does not parse the certs itself --
+   //  libpq handles the handshake, verification and SNI.
+   //  ------------------------------------------------------------
+
+   ?? '<h3>3) Enabling TLS -- config layout</h3>'
+
+   ?? '<pre>'
+   ?  '{'
+   ?  '  "databases": {'
+   ?  '    "pg": {'
+   ?  '      "host":              "db.internal",'
+   ?  '      "sslmode":           "verify-full",   <-- was "disable"'
+   ?  '      "sslrootcert":       "certs/ca.pem",'
+   ?  '      "sslcert":           "certs/client.crt",'
+   ?  '      "sslkey":            "certs/client.key",'
+   ?  '      "sslpassword":       "..."            <-- only if sslkey is encrypted'
+   ?  '    }'
+   ?  '  }'
+   ?  '}'
+   ?? '</pre>'
+
+   ?  '<code>sslmode</code> values (strictest last):'
+   ?? '<pre>'
+   ?  '  disable       no TLS at all (current setting)'
+   ?  '  allow         plaintext first, TLS only if server refuses'
+   ?  '  prefer        TLS first, plaintext fallback (libpq default)'
+   ?  '  require       TLS mandatory; server cert is NOT verified'
+   ?  '  verify-ca     TLS + verify server cert chain against sslrootcert'
+   ?  '  verify-full   verify-ca + hostname match -- production default'
+   ?? '</pre>'
+
+   //  ------------------------------------------------------------
+   //  4) Column-level crypto via pgcrypto
+   //
+   //  Independent of sslmode -- values stay encrypted in the storage
+   //  and in physical replicas. Requires `CREATE EXTENSION pgcrypto`
+   //  on the DB. Shown here as a no-op probe so the page renders even
+   //  without the extension installed.
+   //  ------------------------------------------------------------
+
+   ?? '<h3>4) Column-level crypto -- <code>pgcrypto</code></h3>'
+
+   oStmt := oConn:Query( "SELECT extname, extversion FROM pg_extension " + ;
+                         "WHERE extname = 'pgcrypto'" )
+   IF oStmt != NIL .AND. ! oStmt:lError
+      aRows := oStmt:FetchAll( .T. )
+      oStmt:Free()
+      IF Empty( aRows )
+         ? '<i>pgcrypto is <b>not</b> installed on this DB. Enable with:</i>'
+         ?? '<pre>CREATE EXTENSION pgcrypto;</pre>'
+      ELSE
+         ?? oConn:View( aRows,, 'pgcrypto extension installed' )
+
+         //  Round-trip demo: pgp_sym_encrypt / pgp_sym_decrypt
+         oStmt := oConn:Query( "SELECT "                                                       + ;
+            "  'hix-demo-secret'::text AS plain, "                                             + ;
+            "  encode( pgp_sym_encrypt( 'hix-demo-secret', 'my-passphrase' ), 'hex' ) "        + ;
+            "    AS ciphertext_hex, "                                                          + ;
+            "  pgp_sym_decrypt( pgp_sym_encrypt( 'hix-demo-secret', 'my-passphrase' ), "       + ;
+            "                   'my-passphrase' )::text AS roundtrip" )
+
+         IF oStmt != NIL .AND. ! oStmt:lError
+            hRow := oStmt:Fetch_Assoc()
+            oStmt:Free()
+            ?? oConn:View( { hRow },, 'pgp_sym_encrypt round-trip' )
+         ENDIF
+      ENDIF
+   ENDIF
+
+   ?  '<i>Unlike SQLCipher, pgcrypto leaves the DB file plaintext --'
+   ?  'only the matching columns are opaque on disk, in WAL and in'
+   ?  'replicas. For at-rest protection of the whole cluster use'
+   ?  'filesystem-level encryption (LUKS, BitLocker) or the TDE'
+   ?  'extensions shipped by EDB/PGPro -- outside the scope of libpq.</i>'
+
+@endprg

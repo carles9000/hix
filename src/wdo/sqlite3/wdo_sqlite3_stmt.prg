@@ -175,17 +175,33 @@ METHOD BindParam( xIdx, xVal, cType ) CLASS WDO_Sqlite3Stmt
       ENDCASE
    ENDIF
 
+   //  Normalizar case + alias documentados (i/n/s además de I/D/T).
+   cType := Upper( AllTrim( cType ) )
+   DO CASE
+   CASE cType == "S" ; cType := "T"   //  string → text
+   CASE cType == "N" ; cType := "D"   //  numeric → double
+   ENDCASE
+
    DO CASE
    CASE cType == "T"
       nRc := ::SqliteBindText( nIdx, hb_CStr( xVal ) )
    CASE cType == "I"
       nRc := ::SqliteBindInt64( nIdx, xVal )
    CASE cType == "D"
-      nRc := ::SqliteBindDouble( nIdx, xVal )
+      //  hb_DynCall no soporta doubles en XMM registers (x64 Win):
+      //  los pasa como dos HB_U32 → sqlite3_bind_double recibe basura.
+      //  Workaround: bind como texto numérico y dejar que la afinidad
+      //  de columna (REAL / NUMERIC) convierta en SQLite.
+      nRc := ::SqliteBindText( nIdx, hb_NToS( xVal ) )
    CASE cType == "B"
       nRc := ::SqliteBindBlob( nIdx, xVal )
    OTHERWISE
-      nRc := ::SqliteBindNull( nIdx )
+      //  Tipo desconocido: antes caía a NULL silencioso.
+      //  Ahora error explícito para evitar pérdida de datos.
+      ::lError := .T.
+      ::cError := _( 'WDO_ERR_SQLITE_BIND', "unknown type '" + cType + "'" )
+      ::oConn:SetError( ::cError )
+      RETU .F.
    ENDCASE
 
    IF nRc != SQLITE_OK

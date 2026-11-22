@@ -1,0 +1,22 @@
+@view 'header.html', 'WDO PostgreSQL', 'Example simple connection (pool)...'
+
+@prg
+
+   LOCAL oConn := WDO_Get( "PG" )
+
+   IF oConn == NIL
+      ? 'Error: pool not registered or Acquire timeout'
+      RETU NIL
+   ENDIF
+
+   ?? 'Connected (from pool) !<hr>'
+
+   ?? 'Version: '   + oConn:VersionName()
+   ?  'Server: '    + oConn:ServerInfo()
+   ?  'Client: '    + oConn:ClientInfo()
+   ?  'DLL ....: '  + oConn:GetDllVersion()
+   ?  'Encoding: '  + oConn:GetEncoding()
+
+   oConn:Close()
+
+@endprg

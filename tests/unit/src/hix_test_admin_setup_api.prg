@@ -26,7 +26,7 @@ FUNCTION HIX_TestAdminSetupApi_Run()
       _TestAlreadyConfigured( hCtx )
       _TestUserEmpty( hCtx )
       _TestPasswordShort( hCtx )
-      _TestHmacSignature( hCtx )
+      _TestPbkdf2Record( hCtx )
       _TestSuccessFormBody( hCtx )
 
    FINALLY
@@ -77,12 +77,15 @@ STATIC PROCEDURE _TestSuccessJson( hCtx )
    hCfg := HIX_GetConfig()
    HixTU_Check( hCtx, hCfg[ "admin" ][ "user" ] == "admin", ;
       "SetupApi: hCfg admin.user written", "admin", hCfg[ "admin" ][ "user" ] )
-   HixTU_Check( hCtx, ! Empty( hCfg[ "admin" ][ "password" ] ), ;
-      "SetupApi: hCfg admin.password non-empty", "non-empty", ;
-      iif( Empty( hCfg[ "admin" ][ "password" ] ), "(empty)", "ok" ) )
+   HixTU_Check( hCtx, ! Empty( hb_HGetDef( hCfg[ "admin" ], "passhash", "" ) ), ;
+      "SetupApi: hCfg admin.passhash non-empty", "non-empty", ;
+      iif( Empty( hb_HGetDef( hCfg[ "admin" ], "passhash", "" ) ), "(empty)", "ok" ) )
    HixTU_Check( hCtx, ! Empty( hCfg[ "admin" ][ "secret" ] ), ;
       "SetupApi: hCfg admin.secret non-empty", "non-empty", ;
       iif( Empty( hCfg[ "admin" ][ "secret" ] ), "(empty)", "ok" ) )
+   HixTU_Check( hCtx, ! hb_HHasKey( hCfg[ "admin" ], "password" ), ;
+      "SetupApi: legacy admin.password removido", "no-key", ;
+      iif( hb_HHasKey( hCfg[ "admin" ], "password" ), "STILL-PRESENT", "ok" ) )
 
 RETURN
 
@@ -155,9 +158,9 @@ STATIC PROCEDURE _TestPasswordShort( hCtx )
 
 RETURN
 
-STATIC PROCEDURE _TestHmacSignature( hCtx )
+STATIC PROCEDURE _TestPbkdf2Record( hCtx )
 
-   LOCAL oMock, hCfg, cPass, cExpected
+   LOCAL oMock, hCfg, cPass, hRec
 
    cPass := "myPlainPwd42"
 
@@ -170,10 +173,35 @@ STATIC PROCEDURE _TestHmacSignature( hCtx )
    HIX_AdminSetupApi( oMock )
 
    hCfg := HIX_GetConfig()
-   cExpected := Lower( hb_HMAC_SHA256( cPass, hCfg[ "admin" ][ "secret" ] ) )
 
-   HixTU_Check( hCtx, hCfg[ "admin" ][ "password" ] == cExpected, ;
-      "SetupApi: password = HMAC_SHA256(plain, secret)", cExpected, hCfg[ "admin" ][ "password" ] )
+   HixTU_Check( hCtx, hb_HGetDef( hCfg[ "admin" ], "passalg", "" ) == "PBKDF2-SHA256", ;
+      "SetupApi: admin.passalg = PBKDF2-SHA256", "PBKDF2-SHA256", ;
+      hb_HGetDef( hCfg[ "admin" ], "passalg", "?" ) )
+
+   HixTU_Check( hCtx, hb_HGetDef( hCfg[ "admin" ], "passiter", 0 ) >= 600000, ;
+      "SetupApi: admin.passiter >= 600000", ">=600000", ;
+      hb_NToS( hb_HGetDef( hCfg[ "admin" ], "passiter", 0 ) ) )
+
+   HixTU_Check( hCtx, Len( hb_HGetDef( hCfg[ "admin" ], "salt", "" ) ) == 32, ;
+      "SetupApi: admin.salt = 32 hex chars", "32", ;
+      hb_NToS( Len( hb_HGetDef( hCfg[ "admin" ], "salt", "" ) ) ) )
+
+   HixTU_Check( hCtx, Len( hb_HGetDef( hCfg[ "admin" ], "passhash", "" ) ) == 64, ;
+      "SetupApi: admin.passhash = 64 hex chars", "64", ;
+      hb_NToS( Len( hb_HGetDef( hCfg[ "admin" ], "passhash", "" ) ) ) )
+
+   hRec := { ;
+      "PASSALG"  => hCfg[ "admin" ][ "passalg"  ], ;
+      "PASSITER" => hCfg[ "admin" ][ "passiter" ], ;
+      "SALT"     => hCfg[ "admin" ][ "salt"     ], ;
+      "PASSHASH" => hCfg[ "admin" ][ "passhash" ]  ;
+   }
+
+   HixTU_Check( hCtx, HIX_PasswordVerify( cPass, hRec ), ;
+      "SetupApi: HIX_PasswordVerify(plain, record) → .T.", ".T.", ".F." )
+
+   HixTU_Check( hCtx, ! HIX_PasswordVerify( "wrong-pass", hRec ), ;
+      "SetupApi: HIX_PasswordVerify(wrong, record) → .F.", ".F.", ".T." )
 
 RETURN
 
@@ -202,12 +230,19 @@ RETURN
 STATIC PROCEDURE _ClearAdminCreds()
 
    LOCAL hCfg := HIX_GetConfig()
+   LOCAL aLegacyKeys := { "password", "passhash", "passalg", "passiter", "salt" }
+   LOCAL cKey
 
    IF ! hb_HHasKey( hCfg, "admin" )
       hCfg[ "admin" ] := { => }
    ENDIF
-   hCfg[ "admin" ][ "user"     ] := ""
-   hCfg[ "admin" ][ "password" ] := ""
-   hCfg[ "admin" ][ "secret"   ] := ""
+   hCfg[ "admin" ][ "user"   ] := ""
+   hCfg[ "admin" ][ "secret" ] := ""
+
+   FOR EACH cKey IN aLegacyKeys
+      IF hb_HHasKey( hCfg[ "admin" ], cKey )
+         hb_HDel( hCfg[ "admin" ], cKey )
+      ENDIF
+   NEXT
 
 RETURN

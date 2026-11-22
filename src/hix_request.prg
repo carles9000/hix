@@ -131,6 +131,7 @@ METHOD Read() CLASS THixRequest
    LOCAL cRaw, nEnd, cFirstLine, aParts, nQ, nCRLF2
    LOCAL aLines, cLine, nPos, nStart, cConn
    LOCAL cFwd, cReal, cFwdHeader, hFwd, aFwd, cCandidate, cProto
+   LOCAL hSeenSingle, cHdrKey, cHdrVal, cTE, cCL, nParsedLen
 
    cRaw := ::oIO:ReadHeaders()
 
@@ -178,7 +179,8 @@ METHOD Read() CLASS THixRequest
 
    IF nStart > 0
 
-      aLines := hb_ATokens( SubStr( cRaw, nStart + 2 ), Chr( 10 ) )
+      aLines      := hb_ATokens( SubStr( cRaw, nStart + 2 ), Chr( 10 ) )
+      hSeenSingle := { => }   // F1: tracking de cabeceras single-value
 
       FOR EACH cLine IN aLines
 
@@ -194,13 +196,83 @@ METHOD Read() CLASS THixRequest
 
          IF nPos > 0
 
-            ::hHeaders[ Lower( AllTrim( Left( cLine, nPos - 1 ) ) ) ] := ;
-               AllTrim( SubStr( cLine, nPos + 1 ) )
+            cHdrKey := Lower( AllTrim( Left( cLine, nPos - 1 ) ) )
+            cHdrVal := AllTrim( SubStr( cLine, nPos + 1 ) )
+
+            // Claim 3 / F1 — RFC 9112 §6.1: rechazar duplicados en cabeceras
+            // single-value. Smuggling vector clásico (dos Content-Length,
+            // dos Host) — zero tolerance, aunque los valores coincidan.
+            IF cHdrKey == "content-length" .OR. ;
+               cHdrKey == "transfer-encoding" .OR. ;
+               cHdrKey == "host"
+
+               IF hb_HHasKey( hSeenSingle, cHdrKey )
+                  lw( _( "REQ_DUP_HEADER", cHdrKey ) )
+                  ::nReadError := HIX_REQ_ERR_BADREQ
+                  ::lKeepAlive := .F.
+                  RETURN .F.
+               ENDIF
+               hSeenSingle[ cHdrKey ] := .T.
+
+               // F2 — Content-Length no puede llevar coma (lista de
+               // valores) aunque sean iguales. "10, 10" es un vector
+               // conocido que algunos parsers aceptan.
+               IF cHdrKey == "content-length" .AND. "," $ cHdrVal
+                  lw( _( "REQ_INVALID_CONTENT_LENGTH", cHdrVal ) )
+                  ::nReadError := HIX_REQ_ERR_BADREQ
+                  ::lKeepAlive := .F.
+                  RETURN .F.
+               ENDIF
+
+            ENDIF
+
+            ::hHeaders[ cHdrKey ] := cHdrVal
 
          ENDIF
 
       NEXT
 
+   ENDIF
+
+   // Claim 3 / F2-F3 — HTTP framing strict (RFC 9112 §6.1).
+   cTE := AllTrim( hb_HGetDef( ::hHeaders, "transfer-encoding", "" ) )
+   cCL := iif( hb_HHasKey( ::hHeaders, "content-length" ), ::hHeaders[ "content-length" ], NIL )
+
+   // F3 defense-in-depth — Transfer-Encoding + Content-Length es ambigüedad
+   // garantizada (smuggling clásico). Rechazar antes de inspeccionar TE.
+   IF ! Empty( cTE ) .AND. cCL != NIL
+      lw( _( "REQ_TE_AND_CL_CONFLICT" ) )
+      ::nReadError := HIX_REQ_ERR_BADREQ
+      ::lKeepAlive := .F.
+      RETURN .F.
+   ENDIF
+
+   // F3 — HIX no decodifica chunked ni acepta ningún TE de entrada en v1.
+   // RFC 9112 deprecó "identity"; cualquier otro valor requiere parser
+   // del protocolo que no tenemos. Responder 501.
+   IF ! Empty( cTE )
+      lw( _( "REQ_TE_UNSUPPORTED" ) + ": " + cTE )
+      ::nReadError := HIX_REQ_ERR_TE_UNSUPPORTED
+      ::lKeepAlive := .F.
+      RETURN .F.
+   ENDIF
+
+   // F2 — validar Content-Length estricto (solo [0-9]+). Val() aceptaba
+   // hex, signos, whitespace interno — todos inputs que divergen entre
+   // parsers y habilitan smuggling.
+   IF cCL != NIL
+      nParsedLen := _HixParseContentLength( cCL )
+      IF nParsedLen == -1
+         lw( _( "REQ_INVALID_CONTENT_LENGTH", cCL ) )
+         ::nReadError := HIX_REQ_ERR_BADREQ
+         ::lKeepAlive := .F.
+         RETURN .F.
+      ELSEIF nParsedLen == -2
+         // Oversized — el worker ya tiene rama 413. Reutilizamos.
+         ::nReadError := HIX_REQ_ERR_TOOLARGE
+         ::lKeepAlive := .F.
+         RETURN .F.
+      ENDIF
    ENDIF
 
    // ---- Keep-alive ----
@@ -345,8 +417,29 @@ METHOD ReadBody() CLASS THixRequest
 
    IF nRemain > 0
 
-      cMore := ::oIO:Read( nRemain )
-      cData += iif( cMore == NIL, "", cMore )
+      // Bucle de lectura hasta completar Content-Length — Read() puede
+      // devolver menos bytes que los solicitados (TCP fragmentation,
+      // backpressure del cliente). Solo salimos si Read() retorna NIL o
+      // "", que indican EOF/cierre del peer.
+      DO WHILE nRemain > 0
+         cMore := ::oIO:Read( nRemain )
+         // NO usar Empty() — Space(N) matchea Empty pero son N bytes
+         // legítimos del body. Solo NIL/"" indica EOF del peer.
+         IF cMore == NIL .OR. Len( cMore ) == 0
+            EXIT
+         ENDIF
+         cData   += cMore
+         nRemain := nLen - Len( cData )
+      ENDDO
+
+      // Claim 3 / F4 — cuerpo truncado: peer cerró antes de enviar los
+      // bytes anunciados. Cerramos keep-alive para no corromper el
+      // siguiente request en el socket. RFC 9112 §6.1.
+      IF Len( cData ) < nLen
+         lw( _( "REQ_BODY_TRUNCATED", hb_ntos( Len( cData ) ), hb_ntos( nLen ) ) )
+         ::nReadError := HIX_REQ_ERR_TRUNCATED
+         ::lKeepAlive := .F.
+      ENDIF
    ELSEIF nRemain < 0
       cData := Left( cData, nLen )
 
@@ -492,7 +585,13 @@ METHOD Header( cKey, xDef ) CLASS THixRequest
 RETURN hb_HGetDef( ::hHeaders, Lower( cKey ), xDef )
 
 METHOD ContentLength() CLASS THixRequest
-RETURN Val( ::Header( "content-length", "0" ) )
+   LOCAL nLen
+   // Claim 3 / F2 — parsing estricto. Read() ya rechaza requests con
+   // Content-Length inválido antes de llegar aquí; esta rama es
+   // defensiva por si se instancia THixRequest sin pasar por Read()
+   // (tests) o si el header llega vacío.
+   nLen := _HixParseContentLength( ::Header( "content-length", "" ) )
+RETURN iif( nLen < 0, 0, nLen )
 
 METHOD ContentType() CLASS THixRequest
 RETURN Lower( ::Header( "content-type", "" ) )
@@ -1094,4 +1193,40 @@ METHOD Destroy() CLASS THixSessionProxy
    HIX_SessionDestroy( ::oCtx )
 
 RETURN NIL
+
+// ------------------------------------------------------------
+// _HixParseContentLength — strict parser para Content-Length.
+// RFC 9112 §6.1: solo dígitos ASCII. Val() aceptaba hex ("0x10"),
+// signos, comas y whitespace interno — todos vectores de smuggling.
+// Retorna:  nLen >= 0  → valor válido
+//           -1         → inválido (sintaxis mala)
+//           -2         → válido pero excede HIX_MAX_BODY_SIZE
+// ------------------------------------------------------------
+STATIC FUNCTION _HixParseContentLength( cRaw )
+
+   LOCAL cTrim, nLen, i, c
+
+   IF cRaw == NIL
+      RETU -1
+   ENDIF
+
+   cTrim := AllTrim( cRaw )
+   IF Empty( cTrim )
+      RETU -1
+   ENDIF
+
+   FOR i := 1 TO Len( cTrim )
+      c := SubStr( cTrim, i, 1 )
+      IF c < "0" .OR. c > "9"
+         RETU -1
+      ENDIF
+   NEXT
+
+   nLen := Val( cTrim )
+
+   IF nLen > HIX_MAX_BODY_SIZE
+      RETU -2
+   ENDIF
+
+RETU nLen
 

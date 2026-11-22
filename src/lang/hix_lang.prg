@@ -170,8 +170,14 @@ FUNCTION HIX_InitLang()    // English is default value
    hLang[ 'SRV_ACL_FILE_ROUTES'    ] := "=== File Routes ==="
 
    // ---- Request errors ----
-   hLang[ 'REQ_BODY_TOO_LARGE' ] := "Body too large: {1}"
-   hLang[ 'REQ_JSON_INVALID'   ] := "JsonBody: invalid JSON -- {1}"
+   hLang[ 'REQ_BODY_TOO_LARGE'        ] := "Body too large: {1}"
+   hLang[ 'REQ_JSON_INVALID'          ] := "JsonBody: invalid JSON -- {1}"
+   hLang[ 'REQ_BODY_TRUNCATED'        ] := "Request body truncated: read {1} of {2} bytes -- closing keep-alive"
+   hLang[ 'REQ_TE_UNSUPPORTED'        ] := "Transfer-Encoding not supported"
+   hLang[ 'REQ_DUP_CONTENT_LENGTH'    ] := "Duplicate Content-Length header rejected"
+   hLang[ 'REQ_INVALID_CONTENT_LENGTH'] := "Invalid Content-Length value: {1}"
+   hLang[ 'REQ_TE_AND_CL_CONFLICT'    ] := "Transfer-Encoding and Content-Length cannot coexist (RFC 9112)"
+   hLang[ 'REQ_DUP_HEADER'            ] := "Duplicate header rejected: {1}"
 
    // ---- Dispatcher ----
    hLang[ 'DISP_PATH_TRAVERSAL'  ] := "Path traversal blocked: {1}"
@@ -227,5 +233,6 @@ FUNCTION HIX_InitLang()    // English is default value
    hLang[ 'WDO_ERR_SQLITE_PREPARE'      ] := "SQLite3 Prepare: {1}"
    hLang[ 'WDO_ERR_SQLITE_STEP'         ] := "SQLite3 Step: {1}"
    hLang[ 'WDO_ERR_SQLITE_BIND'         ] := "SQLite3 Bind: {1}"
+   hLang[ 'WDO_ERR_SQLITE_TRANSACTION_ABORT' ] := "SQLite3 Transaction aborted: {1}"
 
 RETURN hLang

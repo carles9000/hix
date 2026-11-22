@@ -1,0 +1,38 @@
+@view 'header.html', 'WDO PostgreSQL', 'Direct instance...'
+
+@prg
+
+   /* We should always use connections from the pool via `WDO_Get( "PG" )`,
+      but if we ever need to use a different connection for a specific case,
+      we can do so in this way.
+
+      NOTE: `WDO_PgNewGuard( .F. )` silences the WARN emitted when New() is
+      called inside an active request. Enable it ONLY if you know what you
+      do: the pool path is always preferred.
+   */
+
+   LOCAL o
+
+   WDO_PgNewGuard( .F. )
+
+   o := WDO_PG():New( "127.0.0.1", "postgres", "postgres", "postgres", 5432 )
+   o:cSslMode := "disable"
+   o:Open()
+
+   WDO_PgNewGuard( .T. )
+
+   IF ! o:lConnect
+      ? '<b>Connect error:</b> ' + o:cError
+      RETU NIL
+   ENDIF
+
+   ?? 'Connected !<hr>'
+
+   ?? 'Version: ' + o:VersionName()
+   ?  'Server: '  + o:ServerInfo()
+   ?  'Client: '  + o:ClientInfo()
+   ?  o:GetDllVersion()
+
+   o:Close()     // Always close the direct instance...
+
+@endprg

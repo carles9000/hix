@@ -9,6 +9,46 @@ WDO soporta transacciones explícitas con `BeginTrans / Commit / Rollback` y un 
 
     Si la espera supera `busy_timeout_ms`, SQLite retorna `SQLITE_BUSY`. Configura `busy_timeout_ms >= 5000` en producción para absorber picos de escritura concurrente.
 
+## Aislamiento de transacciones
+
+El driver opera en dos modos según `pool_size` ([config](config.md#pool_size)). Cada modo da garantías de aislamiento distintas:
+
+### Singleton (`pool_size: 1`, default)
+
+Una sola conexión compartida entre todos los hilos. El mutex interno protege **operaciones sueltas** pero **no mantiene el lock entre `BeginTrans()` y `Commit()`** — entre ambas llamadas otros hilos pueden intercalar `Exec` / `Query` sobre la misma conexión. SQLite documenta que *una única conexión no aísla operaciones propias* ([sqlite.org/isolation](https://www.sqlite.org/isolation.html)).
+
+Consecuencia práctica: si dos handlers concurrentes ejecutan `Transaction()` a la vez, los `BEGIN` del segundo chocan con `::lInTrans = .T.` del primero y retornan `.F.` silenciosamente, o peor — un `SELECT` del hilo B puede leer estado intermedio no commitado del hilo A.
+
+Este modo es válido para apps con un worker, scripts CLI, o cargas donde la concurrencia sobre la BD es nula.
+
+### Pool (`pool_size: N > 1`, recomendado para HIX multi-worker)
+
+Cada hilo reserva su propia conexión al entrar al handler. `BEGIN/COMMIT` operan sobre handles independientes; SQLite coordina los writes a nivel de fichero vía `busy_timeout_ms`.
+
+- **Aislamiento real:** las transacciones de distintos hilos nunca interleavan.
+- **`SQLITE_BUSY` posible:** dos `Transaction()` de escritura concurrentes sobre el mismo fichero compiten por el lock a nivel de SQLite. Con `busy_timeout_ms: 5000` SQLite reintenta durante 5 segundos antes de rendirse.
+- **Reads en paralelo:** modo WAL permite múltiples lectores simultáneos.
+- **Cifrado compatible:** SQLCipher aplica el mismo `PRAGMA key` a cada conexión del pool; la DLL se carga una sola vez compartida vía refcount.
+
+Configuración recomendada para producción multi-worker:
+
+```json
+"databases": {
+   "APP": {
+      "driver":          "sqlite3",
+      "file":            "www/data/app.db",
+      "journal_mode":    "WAL",
+      "busy_timeout_ms": 5000,
+      "pool_size":       4
+   }
+}
+```
+
+!!! tip "Elige `pool_size` según workers HTTP"
+    Como regla práctica, `pool_size` ≈ número de workers HTTP que pueden tocar la BD simultáneamente. 4-8 es suficiente para la mayoría de apps; subir por encima de eso raramente ayuda porque SQLite igualmente serializa writes a nivel de fichero.
+
+Añadido en v2.5.3 (Claim 2 — aislamiento transaccional).
+
 ## BeginTrans / Commit
 
 El patrón básico para un flujo que siempre tiene éxito:
@@ -99,31 +139,30 @@ RETURN USendJson( { "ok" => .T. } )
 
 - Llama `BeginTrans`.
 - Evalúa el codeblock.
-- Si termina sin excepción → `Commit`.
-- Si se lanza una excepción → `Rollback` y re-lanza la excepción para que el caller la gestione.
+- Si termina sin excepción → `Commit` y retorna `.T.`.
+- Si se lanza una excepción → `Rollback`, deja la descripción
+  original en `oConn:cError` (formato `"SQLite3 Transaction
+  aborted: <descripción>"`) y retorna `.F.`. La excepción **no**
+  se re-lanza — el caller decide qué hacer leyendo el `.F.`.
 
 ```harbour
 LOCAL oConn := WDO_Get( "APP" )
 
 IF oConn == NIL ; RETURN USendError( 503, "DB unavailable" ) ; ENDIF
 
-TRY
-   oConn:Transaction( {| o | ;
+IF ! oConn:Transaction( {| o | ;
       o:Exec( "UPDATE cuentas SET saldo = saldo - 200 WHERE propietario = 'alice'" ), ;
       o:Exec( "UPDATE cuentas SET saldo = saldo + 200 WHERE propietario = 'bob'"   ) ;
    } )
-CATCH oErr
-   oConn:Close()
-   RETURN USendError( 500, oErr:description )
-END
+   RETURN USendError( 500, oConn:cError )
+ENDIF
 
-oConn:Close()
 USendJson( { "ok" => .T. } )
 ```
 
 ## Transacciones con Prepared Statements
 
-Los prepared statements son completamente compatibles con transacciones — operan sobre la misma conexión singleton:
+Los prepared statements son completamente compatibles con transacciones — operan sobre la misma conexión reservada por el request:
 
 ```harbour
 oConn:BeginTrans()

@@ -1,0 +1,164 @@
+@view 'header.html', 'WDO PostgreSQL', 'Server info - client, server metadata and runtime status'
+
+@prg
+
+   //  ------------------------------------------------------------
+   //  PostgreSQL server metadata dashboard.
+   //
+   //    1) WDO binding info          -- Version, DLL, live connections
+   //    2) Server identity           -- version(), current_user, now()
+   //    3) pg_stat_activity          -- active connections snapshot
+   //    4) pg_settings               -- max_connections, timeouts, etc.
+   //    5) pg_database               -- databases visible to the user
+   //    6) pg_available_extensions   -- tabular render with View()
+   //  ------------------------------------------------------------
+
+   LOCAL oConn := WDO_Get( "PG" )
+   LOCAL oStmt, aRows, hRow, cDllSrc
+
+   IF oConn == NIL
+      ? 'Error: pool not registered or Acquire timeout'
+      RETU NIL
+   ENDIF
+
+   //  ------------------------------------------------------------
+   //  1) WDO client metadata (local, never sent to the server)
+   //  ------------------------------------------------------------
+
+   ?? '<h3>1) Binding WDO_PG</h3>'
+
+   ?? '<pre>'
+   ?  'WDO version .....: ' + oConn:VersionName()
+   ?  'DLL version .....: ' + oConn:GetDllVersion()
+   ?  'DLL path ........: ' + oConn:DllPath()
+   DO CASE
+   CASE oConn:DllSource() == "override"     ; cDllSrc := "config.json / programmatic"
+   CASE oConn:DllSource() == "HIX_PG_DLL"   ; cDllSrc := "env HIX_PG_DLL"
+   CASE oConn:DllSource() == "WDO_PG_DLL"   ; cDllSrc := "env WDO_PG_DLL"
+   CASE oConn:DllSource() == "exedir"       ; cDllSrc := "exe directory (auto)"
+   OTHERWISE                                ; cDllSrc := oConn:DllSource()
+   ENDCASE
+   ?  'DLL source ......: ' + cDllSrc
+   ?  'Client info .....: ' + oConn:ClientInfo()
+   ?  'Server info .....: ' + oConn:ServerInfo()
+   ?  'Encoding ........: ' + oConn:GetEncoding()
+   ?  'Open connections : ' + hb_NToS( WDO_PgCountOpen() )
+   ?  'InTransaction ...: ' + iif( oConn:InTransaction(), 'T', 'F' )
+   ?? '</pre>'
+
+   //  ------------------------------------------------------------
+   //  2) Server identity
+   //  ------------------------------------------------------------
+
+   ?? '<h3>2) Server identity</h3>'
+
+   oStmt := oConn:Query( "SELECT "                                 + ;
+      "version()                           AS srv_version, "       + ;
+      "current_setting('server_version')   AS srv_shortver, "      + ;
+      "inet_server_addr()::text            AS srv_host, "          + ;
+      "inet_server_port()::text            AS srv_port, "          + ;
+      "current_user                        AS srv_curr_user, "     + ;
+      "session_user                        AS srv_user, "          + ;
+      "current_database()                  AS srv_db, "            + ;
+      "current_setting('server_encoding')  AS srv_charset, "       + ;
+      "current_setting('default_text_search_config') AS srv_collation, " + ;
+      "current_setting('TimeZone')         AS srv_tz, "            + ;
+      "now()::text                         AS srv_now" )
+
+   hRow := oStmt:Fetch_Assoc()
+   oStmt:Free()
+
+   ?? '<pre>'
+   ?  'version() .......: ' + hRow[ 'srv_version'   ]
+   ?  'server_version ..: ' + hRow[ 'srv_shortver'  ]
+   ?  'inet_server_addr : ' + hRow[ 'srv_host'      ]
+   ?  'inet_server_port : ' + hRow[ 'srv_port'      ]
+   ?  'current_user ....: ' + hRow[ 'srv_curr_user' ]
+   ?  'session_user ....: ' + hRow[ 'srv_user'      ]
+   ?  'current_database : ' + hRow[ 'srv_db'        ]
+   ?  'server_encoding .: ' + hRow[ 'srv_charset'   ]
+   ?  'text_search .....: ' + hRow[ 'srv_collation' ]
+   ?  'TimeZone ........: ' + hRow[ 'srv_tz'        ]
+   ?  'now() ...........: ' + hRow[ 'srv_now'       ]
+   ?? '</pre>'
+
+   //  ------------------------------------------------------------
+   //  3) Active sessions -- pg_stat_activity
+   //  ------------------------------------------------------------
+
+   ?? '<h3>3) pg_stat_activity</h3>'
+   ?  '<pre>SELECT pid, usename, application_name, client_addr, state, '
+   ?  '       backend_start FROM pg_stat_activity'
+   ?  '  WHERE datname = current_database()'
+   ?  '  ORDER BY backend_start</pre>'
+
+   oStmt := oConn:Query( "SELECT pid::text AS pid, usename, application_name, " + ;
+                         "COALESCE(client_addr::text, 'local') AS client_addr, " + ;
+                         "COALESCE(state, '') AS state, " + ;
+                         "backend_start::text AS backend_start " + ;
+                         "FROM pg_stat_activity " + ;
+                         "WHERE datname = current_database() " + ;
+                         "ORDER BY backend_start" )
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+
+   ?? oConn:View( aRows,, 'Active sessions on this database' )
+
+   //  ------------------------------------------------------------
+   //  4) Runtime configuration -- pg_settings
+   //  ------------------------------------------------------------
+
+   ?? '<h3>4) pg_settings</h3>'
+   ?  '<pre>SELECT name, setting, unit FROM pg_settings WHERE name IN ( ... )</pre>'
+
+   oStmt := oConn:Query( "SELECT name, setting, " + ;
+                         "COALESCE(unit, '') AS unit " + ;
+                         "FROM pg_settings WHERE name IN ( " + ;
+                         "'max_connections', 'shared_buffers', 'work_mem', " + ;
+                         "'effective_cache_size', 'maintenance_work_mem', " + ;
+                         "'statement_timeout', 'idle_in_transaction_session_timeout', " + ;
+                         "'client_encoding', 'server_encoding', " + ;
+                         "'TimeZone', 'DateStyle', 'default_transaction_isolation', " + ;
+                         "'data_directory', 'config_file' ) " + ;
+                         "ORDER BY name" )
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+
+   ?? oConn:View( aRows,, 'System variables' )
+
+   //  ------------------------------------------------------------
+   //  5) Databases visible to the connected user
+   //  ------------------------------------------------------------
+
+   ?? '<h3>5) pg_database</h3>'
+
+   oStmt := oConn:Query( "SELECT datname, " + ;
+                         "pg_get_userbyid(datdba) AS owner, " + ;
+                         "pg_encoding_to_char(encoding) AS encoding, " + ;
+                         "datcollate, datctype " + ;
+                         "FROM pg_database WHERE datistemplate = false " + ;
+                         "ORDER BY datname" )
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+
+   ?? oConn:View( aRows,, 'Databases visible to the user' )
+
+   //  ------------------------------------------------------------
+   //  6) Available extensions
+   //  ------------------------------------------------------------
+
+   ?? '<h3>6) pg_available_extensions</h3>'
+
+   oStmt := oConn:Query( "SELECT name, default_version, " + ;
+                         "COALESCE(installed_version, '') AS installed_version, " + ;
+                         "COALESCE(comment, '') AS comment " + ;
+                         "FROM pg_available_extensions " + ;
+                         "ORDER BY name LIMIT 30" )
+   aRows := oStmt:FetchAll( .T. )
+   oStmt:Free()
+
+   ?? oConn:View( aRows,, 'Available extensions (first 30)' )
+
+   oConn:Close()
+
+@endprg

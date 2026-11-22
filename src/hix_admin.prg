@@ -56,7 +56,7 @@ FUNCTION HIX_AdminLoginPost( oReq )
    LOCAL cUser := AllTrim( hb_HGetDef( hForm, "user",     "" ) )
    LOCAL cPass := hb_HGetDef( hForm, "password", "" )
    LOCAL cNext := hb_HGetDef( hForm, "next",     HIX_PATH_STATUS )
-   LOCAL cAdminUser, cAdminPass, cAdminSecret, nMinutes
+   LOCAL cAdminUser, cAdminSecret, nMinutes
    LOCAL nTs, cSign, cCookieVal
 
    IF ! _HixAdminHasCredentials()
@@ -66,22 +66,27 @@ FUNCTION HIX_AdminLoginPost( oReq )
 
    ENDIF
 
-   cAdminUser   := UConfig( "admin", "user",            "" )
-   cAdminPass   := UConfig( "admin", "password",        "" )
-   cAdminSecret := UConfig( "admin", "secret",          "" )
+   cAdminUser   := UConfig( "admin", "user",       "" )
+   cAdminSecret := UConfig( "admin", "secret",     "" )
    nMinutes     := UConfig( "session", "lifetime", 60 )
 
    IF Lower( cUser ) == Lower( cAdminUser ) .AND. ;
-         Lower( hb_HMAC_SHA256( cPass, cAdminSecret ) ) == Lower( cAdminPass )  // [A3.4.3]
+         _HixAdminVerifyPassword( cPass )
+
+      // Rehash transparente si el registro quedó obsoleto (coste bajo o legacy).
+      _HixAdminMaybeRehash( cPass )
+
+      // Re-leer secret por si el upgrade legacy lo rotó.
+      cAdminSecret := UConfig( "admin", "secret", "" )
 
       nTs        := _HixNowSecs()
       cSign      := _HixAdminSign( cAdminSecret, nTs )
       cCookieVal := hb_NToS( nTs ) + ":" + cSign
       HIX_SetCookie( oReq, "hix_admin", cCookieVal, nMinutes * 60 )
       oReq:Redirect( iif( Empty( cNext ), HIX_PATH_STATUS, cNext ) )
-      
+
    ELSE
-   
+
       lw( _( "ADMIN_LOGIN_FAILED", cUser ) )
       oReq:Respond( _HixAdminLoginPage( _( 'ADMIN_ERR_CREDENTIALS' ), cNext ), 401, "html" )
 
@@ -199,13 +204,23 @@ RETURN NIL
 // ============================================================
 
 STATIC FUNCTION _HixAdminHasCredentials()
-RETURN ! Empty( UConfig( "admin", "user", "" ) ) .AND. ! Empty( UConfig( "admin", "password", "" ) )
+
+   LOCAL cUser := UConfig( "admin", "user", "" )
+
+   IF Empty( cUser )
+      RETURN .F.
+   ENDIF
+
+   // Nuevo formato (v2.5.1+): passhash. Legacy (v2.5.0): password.
+RETURN ! Empty( UConfig( "admin", "passhash", "" ) ) .OR. ;
+       ! Empty( UConfig( "admin", "password", "" ) )
 
 // Aplica user/password en hix.json. Devuelve .T. si OK; si falla rellena cErr
-// con un código estable: "already_configured" | "user_empty" | "password_short".
+// con un código estable: "already_configured" | "user_empty" | "password_short" |
+// "hash_failure".
 STATIC FUNCTION _HixAdminSetupApply( cUser, cPass, cErr )
 
-   LOCAL hCfg
+   LOCAL hCfg, hRec
 
    cErr := ""
 
@@ -219,15 +234,122 @@ STATIC FUNCTION _HixAdminSetupApply( cUser, cPass, cErr )
       CASE Len( cPass ) < 6 ; cErr := "password_short"  ; RETURN .F.
    ENDCASE
 
+   hRec := HIX_PasswordHash( cPass )
+   IF hRec == NIL
+      cErr := "hash_failure"
+      RETURN .F.
+   ENDIF
+
    hCfg := HIX_GetConfig()
    hCfg[ "admin" ][ "user" ]     := cUser
-   hCfg[ "admin" ][ "secret" ]   := Lower( hb_HMAC_SHA256( hb_TToS( hb_DateTime() ) + cUser, cPass ) )  // [A3.4.3]
-   hCfg[ "admin" ][ "password" ] := Lower( hb_HMAC_SHA256( cPass, hCfg[ "admin" ][ "secret" ] ) )       // [A3.4.3]
+   hCfg[ "admin" ][ "secret" ]   := _HixAdminNewSecret()
+   IF Empty( hCfg[ "admin" ][ "secret" ] )
+      cErr := "hash_failure"
+      RETURN .F.
+   ENDIF
+   hCfg[ "admin" ][ "passalg" ]  := hRec[ "PASSALG" ]
+   hCfg[ "admin" ][ "passiter" ] := hRec[ "PASSITER" ]
+   hCfg[ "admin" ][ "salt" ]     := hRec[ "SALT" ]
+   hCfg[ "admin" ][ "passhash" ] := hRec[ "PASSHASH" ]
+
+   IF hb_HHasKey( hCfg[ "admin" ], "password" )
+      hb_HDel( hCfg[ "admin" ], "password" )
+   ENDIF
+
    HIX_SaveConfig()
 
    l( "Admin configurado para usuario: " + cUser )
 
 RETURN .T.
+
+// Genera un secret fresco (32 chars hex, 16 bytes de entropía).
+// Usa OpenSSL RAND_bytes vía _HIX_PASSWORDSALT. Si libcrypto no está
+// disponible devuelve "" y _HixAdminSetupApply reporta hash_failure.
+STATIC FUNCTION _HixAdminNewSecret()
+
+   LOCAL cSalt := _HIX_PASSWORDSALT()
+
+   IF HB_ISSTRING( cSalt ) .AND. Len( cSalt ) == 16
+      RETURN Lower( hb_StrToHex( cSalt ) )
+   ENDIF
+
+RETURN ""
+
+// Verifica password contra formato nuevo (PBKDF2) o legacy (HMAC-SHA256).
+// Legacy upgrade se dispara desde HIX_AdminLoginPost via _HixAdminMaybeRehash.
+STATIC FUNCTION _HixAdminVerifyPassword( cPass )
+
+   LOCAL hRec, cLegacyPass, cLegacySecret
+
+   // 1) Nuevo formato PBKDF2
+   IF ! Empty( UConfig( "admin", "passhash", "" ) )
+      hRec := { ;
+         "PASSALG"  => UConfig( "admin", "passalg",  "" ), ;
+         "PASSITER" => UConfig( "admin", "passiter", 0  ), ;
+         "SALT"     => UConfig( "admin", "salt",     "" ), ;
+         "PASSHASH" => UConfig( "admin", "passhash", "" )  ;
+      }
+      RETURN HIX_PasswordVerify( cPass, hRec )
+   ENDIF
+
+   // 2) Legacy v2.5.0 — HMAC-SHA256(pass, secret), constant-time compare.
+   cLegacyPass   := UConfig( "admin", "password", "" )
+   cLegacySecret := UConfig( "admin", "secret",   "" )
+
+   IF Empty( cLegacyPass ) .OR. Empty( cLegacySecret )
+      RETURN .F.
+   ENDIF
+
+RETURN HIX_ConstantEq( Lower( hb_HMAC_SHA256( cPass, cLegacySecret ) ), ;
+                       Lower( cLegacyPass ) )
+
+// Rehash transparente al login OK:
+// - Legacy → PBKDF2 + nuevo secret (invalida cookies previas).
+// - PBKDF2 con coste obsoleto → re-deriva con nRounds vigente.
+STATIC FUNCTION _HixAdminMaybeRehash( cPass )
+
+   LOCAL hCfg, hRec, hRecNew, lLegacy
+
+   lLegacy := Empty( UConfig( "admin", "passhash", "" ) ) .AND. ;
+              ! Empty( UConfig( "admin", "password", "" ) )
+
+   IF ! lLegacy
+      hRec := { ;
+         "PASSALG"  => UConfig( "admin", "passalg",  "" ), ;
+         "PASSITER" => UConfig( "admin", "passiter", 0  ), ;
+         "SALT"     => UConfig( "admin", "salt",     "" ), ;
+         "PASSHASH" => UConfig( "admin", "passhash", "" )  ;
+      }
+      IF ! HIX_PasswordNeedsRehash( hRec )
+         RETURN NIL
+      ENDIF
+   ENDIF
+
+   hRecNew := HIX_PasswordHash( cPass )
+   IF hRecNew == NIL
+      RETURN NIL
+   ENDIF
+
+   hCfg := HIX_GetConfig()
+   hCfg[ "admin" ][ "passalg" ]  := hRecNew[ "PASSALG" ]
+   hCfg[ "admin" ][ "passiter" ] := hRecNew[ "PASSITER" ]
+   hCfg[ "admin" ][ "salt" ]     := hRecNew[ "SALT" ]
+   hCfg[ "admin" ][ "passhash" ] := hRecNew[ "PASSHASH" ]
+
+   IF lLegacy
+      // Rotar secret: invalida cookies emitidas con el secret viejo.
+      hCfg[ "admin" ][ "secret" ] := _HixAdminNewSecret()
+      IF hb_HHasKey( hCfg[ "admin" ], "password" )
+         hb_HDel( hCfg[ "admin" ], "password" )
+      ENDIF
+      lw( "Admin password upgraded from legacy HMAC to PBKDF2" )
+   ELSE
+      l( "Admin password record upgraded" )
+   ENDIF
+
+   HIX_SaveConfig()
+
+RETURN NIL
 
 STATIC FUNCTION _HixNowSecs()
 RETURN ( Date() - hb_SToD( "19700101" ) ) * 86400 + Int( Seconds() )
@@ -256,7 +378,7 @@ STATIC FUNCTION _HixAdminVerify( cCookie, cSecret, nMinutes )
    nTs       := Val( aParts[ 1 ] )
    cExpected := _HixAdminSign( cSecret, nTs )
 
-   IF cExpected != aParts[ 2 ]
+   IF ! HIX_ConstantEq( cExpected, aParts[ 2 ] )
 
       RETURN .F.
 

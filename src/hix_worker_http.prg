@@ -148,8 +148,19 @@ STATIC FUNCTION _HixHTTPProcessOne( oIO, cIP, lKeepAlive, lStreamMode )
 
          HIX_ResponseRaw( oIO, hb_jsonEncode( { "error" => _( 'ERR_BAD_REQUEST' ) } ), "json", 400, .F. )
 
+      ELSEIF oReq:nReadError == HIX_REQ_ERR_TE_UNSUPPORTED
+
+         // Claim 3 / F3 — Transfer-Encoding de entrada no soportado.
+         HIX_ResponseRaw( oIO, hb_jsonEncode( { "error" => _( "REQ_TE_UNSUPPORTED" ) } ), "json", 501, .F. )
+
+      ELSEIF oReq:nReadError == HIX_REQ_ERR_TOOLARGE
+
+         // Claim 3 / F2 — Content-Length > HIX_MAX_BODY_SIZE detectado en Read().
+         HIX_ResponseRaw( oIO, hb_jsonEncode( { "error" => "Payload Too Large" } ), "json", 413, .F. )
+
       ENDIF
 
+      lKeepAlive := .F.
       RETURN .F.
 
    ENDIF

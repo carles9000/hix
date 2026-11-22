@@ -1,6 +1,14 @@
-# WDO SQLite3 — Uso del singleton
+# WDO SQLite3 — Uso
 
-Una vez configurado el singleton en `config.json`, usarlo en los handlers es directo. `WDO_Get("APP")` siempre retorna la misma instancia — no hay checkout de slot.
+Una vez configurada la BD en `config.json`, usarla en los handlers es directo. `WDO_Get("APP")` retorna una conexión lista para operar.
+
+!!! info "Singleton vs pool — `pool_size`"
+    El driver opera en dos modos según `pool_size` (ver [Configuración](config.md#pool_size)):
+
+    - **`pool_size: 1`** (default) — **singleton**. `WDO_Get("APP")` devuelve siempre la misma instancia. Un solo handle contra el fichero; el driver serializa internamente con mutex.
+    - **`pool_size: N > 1`** — **pool real**. N conexiones contra el mismo fichero; cada hilo reserva una durante el request. Necesario cuando dos handlers concurrentes pueden tener `Transaction()` solapadas (ver [Transacciones](transacciones.md)). Añadido en v2.5.3.
+
+    En ambos modos la API del handler es idéntica: `WDO_Get` + `Close()`. El driver gestiona la reserva/liberación automáticamente.
 
 ## Plantilla básica de handler
 
@@ -27,8 +35,11 @@ FUNCTION ProductosList()
 RETURN USendJson( aRows )
 ```
 
-!!! info "Close() es un no-op en singleton"
-    A diferencia del pool MySQL/PG, `oConn:Close()` en SQLite3 singleton no cierra el socket ni devuelve nada al pool. Se llama por convención de código para mantener la portabilidad entre drivers.
+!!! info "Close() — comportamiento según modo"
+    - **Singleton (`pool_size: 1`)**: `oConn:Close()` es no-op; la conexión vive de bootstrap a shutdown.
+    - **Pool (`pool_size > 1`)**: `oConn:Close()` libera el slot al pool para que otro hilo pueda usarlo. En cualquier caso, el dispatcher HIX hace `WDO_ReleaseAllThread()` al final de cada request, así que **no es obligatorio** llamarlo explícitamente.
+
+    Mantener el patrón `oConn:Close()` en los handlers facilita portar el código entre SQLite / PG / MySQL.
 
 ## API del driver
 
@@ -146,16 +157,27 @@ hClient := oConn:GetClientInfo()
 // }
 ```
 
-## Concurrencia — cómo funciona el mutex
+## Concurrencia — mutex singleton vs pool real
+
+### Modo singleton (`pool_size: 1`)
 
 Todos los workers de HIX comparten la misma instancia `WDO_Sqlite3`. El driver mantiene un mutex interno (`oConn:hMutex`) que se adquiere en `Execute()` y se libera en el mismo `Execute()` o en `Fetch*()`. Esto significa:
 
 - **Reads concurrentes:** múltiples workers pueden estar en la fase de `Fetch` simultáneamente (el mutex solo cubre la fase de `sqlite3_step`).
 - **Writes serializados:** `Exec()` y el `Execute()` de un prepared DML adquieren el mutex exclusivo.
 - **Sin interbloqueos:** el mutex es no recursivo; no llames a métodos del driver desde dentro de un codeblock Transaction anidado.
+- **Transacciones NO aisladas entre hilos.** El mutex cubre operaciones sueltas; entre `BeginTrans()` y `Commit()` el lock se libera. Ver [Transacciones § Aislamiento](transacciones.md#aislamiento-de-transacciones).
+
+### Modo pool (`pool_size > 1`)
+
+Cada hilo reserva su propia conexión al entrar al handler. No hay mutex compartido entre hilos: cada conexión opera sobre su propio handle `sqlite3*`. SQLite coordina los writes a nivel de fichero vía `busy_timeout_ms`.
+
+- **Reads concurrentes:** N hilos leen en paralelo sin bloquearse mutuamente.
+- **Writes serializados a nivel de fichero:** SQLite permite un solo writer; si dos hilos hacen `UPDATE` simultáneo, el segundo espera `busy_timeout_ms` antes de retornar `SQLITE_BUSY`.
+- **Transacciones aisladas:** cada hilo tiene su `BEGIN/COMMIT` local; no hay interleaving posible.
 
 !!! warning "No uses Lock/Unlock directamente"
-    Los métodos `oConn:Lock()` y `oConn:Unlock()` son de uso interno del driver. Invocarlos manualmente en código de aplicación puede producir interbloqueos.
+    Los métodos `oConn:Lock()` y `oConn:Unlock()` son de uso interno del driver (modo singleton). Invocarlos manualmente en código de aplicación puede producir interbloqueos. En modo pool estos métodos son no-op.
 
 ## Patrones frecuentes
 

@@ -50,10 +50,18 @@ STATIC soMutex
 STATIC s_hDownReported := NIL
 STATIC s_mtxDown
 
+//  Shared sqlcipher.dll handles — refcount por path resuelto. Permite al
+//  pool N>1 cargar la DLL una sola vez y compartirla entre instancias.
+//  { cDllLower => { pLib, nRefcount } }. HB_LibFree sólo cuando refcount=0.
+STATIC s_hSharedLibs    := NIL
+STATIC s_mtxLib
+
 INIT PROCEDURE _WDO_Sqlite3Init()
    soMutex         := hb_mutexCreate()
    s_mtxDown       := hb_mutexCreate()
+   s_mtxLib        := hb_mutexCreate()
    s_hDownReported := {=>}
+   s_hSharedLibs   := {=>}
 RETURN
 
 
@@ -75,6 +83,11 @@ CLASS WDO_Sqlite3 FROM WDO
    DATA lConnect                       INIT .F.
    DATA lInUse                         INIT .F.
    DATA lInTrans                       INIT .F.
+
+   //  .T. cuando la conexión está registrada como singleton en
+   //  sh_StandaloneConns via WDO_RegisterConn(). Mientras esté a .T.,
+   //  Close() es un no-op — el teardown real pasa por WDO_UnregisterConn.
+   DATA lStandalone                    INIT .F.
    DATA tLastUsed
    DATA lPersistent                    INIT .F.
    DATA lLog                           INIT .F.
@@ -225,7 +238,7 @@ METHOD Open() CLASS WDO_Sqlite3
       RETU NIL
    ENDIF
 
-   ::pLib := hb_LibLoad( cDll )
+   ::pLib := _WdoSqlite3AcquireLib( cDll )
 
    IF ValType( ::pLib ) <> "P"
       _WdoSqlite3ReportDllFail( cDll, "failed to load" )
@@ -247,7 +260,7 @@ METHOD Open() CLASS WDO_Sqlite3
          ::SqliteClose()
       ENDIF
       ::pDb := NIL
-      HB_LibFree( ::pLib )
+      _WdoSqlite3ReleaseLib( ::pLib, ::cDllPath )
       ::pLib := NIL
       RETU NIL
    ENDIF
@@ -271,7 +284,7 @@ METHOD Open() CLASS WDO_Sqlite3
       IF nRc != SQLITE_OK
          ::SetError( _( 'WDO_ERR_SQLITE_OPEN', "sqlite3_key rc=" + hb_NToS( nRc ) ) )
          ::SqliteClose()
-         HB_LibFree( ::pLib )
+         _WdoSqlite3ReleaseLib( ::pLib, ::cDllPath )
          ::pLib := NIL
          ::pDb := NIL
          RETU NIL
@@ -300,7 +313,7 @@ METHOD Open() CLASS WDO_Sqlite3
          ::SetError( _( 'WDO_ERR_SQLITE_OPEN', ;
                         "key verification failed rc=" + hb_NToS( nRc ) + ": " + ::SqliteErrmsg() ) )
          ::SqliteClose()
-         HB_LibFree( ::pLib )
+         _WdoSqlite3ReleaseLib( ::pLib, ::cDllPath )
          ::pLib := NIL
          ::pDb := NIL
          RETU NIL
@@ -350,6 +363,13 @@ METHOD Close() CLASS WDO_Sqlite3
       RETU NIL
    ENDIF
 
+   //  Singleton registered via WDO_RegisterConn → no-op (contrato publicado).
+   //  Sólo WDO_UnregisterConn() puede ejecutar el teardown real: desactiva
+   //  este flag antes de llamar Close(), permitiendo que caiga abajo.
+   IF ::lStandalone
+      RETU NIL
+   ENDIF
+
    lWasConnected := ::lConnect
 
    IF ValType( ::pLib ) == "P"
@@ -360,7 +380,7 @@ METHOD Close() CLASS WDO_Sqlite3
          ::SqliteClose()
       ENDIF
 
-      HB_LibFree( ::pLib )
+      _WdoSqlite3ReleaseLib( ::pLib, ::cDllPath )
 
       ::pLib        := NIL
       ::pDb := NIL
@@ -618,6 +638,10 @@ METHOD Transaction( bCode ) CLASS WDO_Sqlite3
       lOk := ::Commit()
    CATCH oErr
       ::Rollback()
+      //  Preservar el error para que el handler pueda loguear o
+      //  responder 500 con detalle. Antes se tragaba silenciosamente.
+      ::SetError( _( 'WDO_ERR_SQLITE_TRANSACTION_ABORT', oErr:description ) )
+      lw( "WDO_Sqlite3:Transaction aborted: " + oErr:description )
       lOk := .F.
    END
 
@@ -1077,6 +1101,76 @@ STATIC FUNCTION _WdoSqlite3ReportKeyFail( cFile, nRc, cMsg )
       OutStd( "==> Error: SQLCipher key verification failed for " + cFile + ;
               " (rc=" + hb_NToS( nRc ) + ": " + cMsg + ")" + hb_eol() )
    ENDIF
+
+RETU NIL
+
+//	-------------------------------------------------------  //
+//  Shared DLL refcount. The pool loads sqlcipher.dll one single
+//  time and all N instances share the same pLib handle. HB_LibFree
+//  runs only when the last Close() drops refcount to 0.
+//
+//  Keyed by lowercased DLL path so a test override (env var or
+//  explicit cDllPath) coexists with the production path.
+
+STATIC FUNCTION _WdoSqlite3AcquireLib( cDll )
+
+   LOCAL cKey   := Lower( cDll )
+   LOCAL aEntry
+   LOCAL pLib   := NIL
+
+   hb_mutexLock( s_mtxLib )
+
+   IF hb_HHasKey( s_hSharedLibs, cKey )
+      aEntry := s_hSharedLibs[ cKey ]
+      aEntry[ 2 ]++
+      pLib := aEntry[ 1 ]
+   ELSE
+      pLib := hb_LibLoad( cDll )
+      IF ValType( pLib ) == "P"
+         s_hSharedLibs[ cKey ] := { pLib, 1 }
+      ENDIF
+   ENDIF
+
+   hb_mutexUnlock( s_mtxLib )
+
+RETU pLib
+
+//	-------------------------------------------------------  //
+
+STATIC FUNCTION _WdoSqlite3ReleaseLib( pLib, cDll )
+
+   LOCAL cKey
+   LOCAL aEntry
+
+   IF pLib == NIL
+      RETU NIL
+   ENDIF
+
+   //  Defensive: if the caller lost cDll, fall back to HB_LibFree.
+   //  The pool always passes cDll so this branch covers error paths.
+   IF cDll == NIL .OR. Empty( cDll )
+      HB_LibFree( pLib )
+      RETU NIL
+   ENDIF
+
+   cKey := Lower( cDll )
+
+   hb_mutexLock( s_mtxLib )
+
+   IF hb_HHasKey( s_hSharedLibs, cKey )
+      aEntry := s_hSharedLibs[ cKey ]
+      aEntry[ 2 ]--
+      IF aEntry[ 2 ] <= 0
+         HB_LibFree( aEntry[ 1 ] )
+         hb_HDel( s_hSharedLibs, cKey )
+      ENDIF
+   ELSE
+      //  Not tracked (e.g. direct New() outside the pool with no
+      //  prior Acquire) — free the handle the caller owns.
+      HB_LibFree( pLib )
+   ENDIF
+
+   hb_mutexUnlock( s_mtxLib )
 
 RETU NIL
 

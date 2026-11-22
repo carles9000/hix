@@ -37,7 +37,16 @@ FUNCTION LangStrings_ES()
    hLang[ 'VAL_CODEBLOCK_ERR' ] := "El campo {1} no supero la validacion personalizada"
 
    // ---- HTTP / middleware error messages ----
-   hLang[ 'ERR_CSRF_MSG' ] := "Peticion invalida, recarga la pagina"
+   hLang[ 'ERR_BAD_REQUEST'           ] := "Solicitud incorrecta"
+   hLang[ 'ERR_INTERNAL_SERVER_ERROR' ] := "Error interno del servidor"
+   hLang[ 'ERR_FILE_NOT_FOUND'        ] := "Fichero no encontrado"
+   hLang[ 'ERR_TOO_MANY_PENDING'      ] := "Demasiadas ejecuciones pendientes"
+   hLang[ 'ERR_PAYLOAD_TOO_LARGE'     ] := "payload_too_large"
+   hLang[ 'ERR_MAINTENANCE'           ] := "maintenance"
+   hLang[ 'ERR_CSRF_INVALID'          ] := "csrf_invalid"
+   hLang[ 'ERR_CSRF_REQUIRES_SESSION' ] := "csrf_requires_session"
+   hLang[ 'ERR_CSRF_MSG'              ] := "Peticion invalida, recarga la pagina"
+   hLang[ 'ERR_PARAM_NOT_FOUND'       ] := "Parametro '{1}' no encontrado"
 
    // ---- Boot log ----
    hLang[ 'BOOT_LOG_TITLE'            ] := "=== HIX Boot Log ==="
@@ -92,8 +101,14 @@ FUNCTION LangStrings_ES()
    hLang[ 'SRV_ACL_FILE_ROUTES'    ] := "=== Rutas de fichero ==="
 
    // ---- Request errors ----
-   hLang[ 'REQ_BODY_TOO_LARGE' ] := "Body demasiado grande: {1}"
-   hLang[ 'REQ_JSON_INVALID'   ] := "JsonBody: JSON invalido -- {1}"
+   hLang[ 'REQ_BODY_TOO_LARGE'         ] := "Body demasiado grande: {1}"
+   hLang[ 'REQ_JSON_INVALID'           ] := "JsonBody: JSON invalido -- {1}"
+   hLang[ 'REQ_BODY_TRUNCATED'         ] := "Body de la peticion truncado: leidos {1} de {2} bytes -- cerrando keep-alive"
+   hLang[ 'REQ_TE_UNSUPPORTED'         ] := "Transfer-Encoding no soportado"
+   hLang[ 'REQ_DUP_CONTENT_LENGTH'     ] := "Header Content-Length duplicado rechazado"
+   hLang[ 'REQ_INVALID_CONTENT_LENGTH' ] := "Valor Content-Length invalido: {1}"
+   hLang[ 'REQ_TE_AND_CL_CONFLICT'     ] := "Transfer-Encoding y Content-Length no pueden coexistir (RFC 9112)"
+   hLang[ 'REQ_DUP_HEADER'             ] := "Header duplicado rechazado: {1}"
 
    // ---- Dispatcher ----
    hLang[ 'DISP_PATH_TRAVERSAL'  ] := "Path traversal bloqueado: {1}"
@@ -107,6 +122,13 @@ FUNCTION LangStrings_ES()
    hLang[ 'WS_DISCONNECTED' ] := "WS desconectado: {1}"
    hLang[ 'SSE_OPENED'      ] := "SSE stream abierto: {1} channel={2}"
    hLang[ 'SSE_CLOSED'      ] := "SSE stream cerrado: {1}"
+
+   // ---- DBF errors ----
+   hLang[ 'DBF_ERR_NO_FILE'       ] := "Fichero DBF no encontrado"
+   hLang[ 'DBF_ERR_NO_FIELDS'     ] := "No hay campos seleccionados"
+   hLang[ 'DBF_ERR_TAG_NOT_FOUND' ] := "El tag no existe: {1}"
+   hLang[ 'DBF_ERR_CDX_NOT_FOUND' ] := "El CDX no existe: {1}"
+   hLang[ 'DBF_ERR_LOCK'          ] := "Error de bloqueo"
 
    // ---- Admin UI ----
    hLang[ 'ADMIN_PANEL_TITLE'            ] := "Panel de administracion"
@@ -147,5 +169,15 @@ FUNCTION LangStrings_ES()
       'WDO_MySql:New llamado dentro de un handler HTTP. ' + ;
       'Usa WDO_Get("MYSQL") + oConn:Close() para evitar agotar los puertos TCP. ' + ;
       'Ver docs/mysql/pool_vs_open.md.'
+
+   // ---- SQLite3 driver ----
+   hLang[ 'WDO_LOG_SQLITE_INIT'              ] := "WDO_InitSqlite3[{1}]: abierto '{2}'"
+   hLang[ 'WDO_LOG_SQLITE_INIT_FAIL'         ] := "WDO_InitSqlite3[{1}]: fallo al abrir '{2}'"
+   hLang[ 'WDO_ERR_SQLITE_OPEN'              ] := "SQLite3: no se puede abrir la base de datos '{1}'"
+   hLang[ 'WDO_ERR_SQLITE_EXEC'              ] := "SQLite3 Exec: {1}"
+   hLang[ 'WDO_ERR_SQLITE_PREPARE'           ] := "SQLite3 Prepare: {1}"
+   hLang[ 'WDO_ERR_SQLITE_STEP'              ] := "SQLite3 Step: {1}"
+   hLang[ 'WDO_ERR_SQLITE_BIND'              ] := "SQLite3 Bind: {1}"
+   hLang[ 'WDO_ERR_SQLITE_TRANSACTION_ABORT' ] := "SQLite3 Transaccion abortada: {1}"
 
 RETURN hLang

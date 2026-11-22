@@ -490,6 +490,12 @@ FUNCTION WDO_RegisterConn( cKey, oConn )
    sh_StandaloneConns[ cUKey ] := oConn
    hb_mutexUnlock( so_MutexConn )
 
+   // Marcar la conexión como singleton — su Close() queda neutralizado
+   // hasta que WDO_UnregisterConn() invierta el flag.
+   IF hb_isObject( oConn ) .AND. __objHasMsg( oConn, "lStandalone" )
+      oConn:lStandalone := .T.
+   ENDIF
+
    HIX_Dbg( "[WDO_Pool] RegisterConn: '" + cUKey + "' standalone registered" )
 
 RETU NIL
@@ -510,6 +516,10 @@ FUNCTION WDO_UnregisterConn( cKey )
    hb_mutexUnlock( so_MutexConn )
 
    IF oConn != NIL .AND. hb_isObject( oConn )
+      // Desactivar el guard para que Close() ejecute el teardown real.
+      IF __objHasMsg( oConn, "lStandalone" )
+         oConn:lStandalone := .F.
+      ENDIF
       TRY
          oConn:Close()
       CATCH
