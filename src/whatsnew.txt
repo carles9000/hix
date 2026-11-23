@@ -2,19 +2,7 @@
        + Set-Cookie al nacer la sesión; TFlash:_Sync comparte el bag
        del formId entre instancias. See changes/2.5.5.md.
 2.5.0  FEATURE — familia WDO completada (los tres drivers production-ready
-       con misma superficie API):
-       (a) Prepared statements en WDO_PG (libpq nativa): Prepare /
-           BindParam / BindParams / BindLong / Execute / Fetch{,_Assoc} /
-           FetchAll / Free. API 1:1 con WDO_MySql; placeholders ?/:name/$N
-           aceptados. Suite PG 142/142 (+16 Phase 2bp).
-       (b) WDO_Sqlite3 reescrito como driver nativo hb_DynCall sobre
-           sqlcipher.dll (MinGW64 + OpenSSL 4). Añade SQLCipher
-           transparente via key/key_ref (AES-256-CBC + HMAC-SHA512),
-           Rekey, GetCipherInfo, IsEncrypted. Suite SQLite3 47/47 (+16).
-       (c) Cualquier controller puede intercambiar
-           WDO_Get("MYSQL") <-> WDO_Get("PG") <-> WDO_Get("APP")
-           sin tocar el pipeline Prepare/Bind/Execute/Fetch.
-       See changes/2.5.0.md.
+       con misma superficie API): MySql, PostgreSql, Sqlite3.
 2.4.9  REFACTOR — HIX_Loaders() respeta hixstyle.cache_disk (alineado con
        views/dispatcher). cache_disk=.F. compila en memoria sin tocar
        .cached/loaders/. Default .T. preserva v2.4.8. 2312/2312.

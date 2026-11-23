@@ -149,6 +149,21 @@ plugins:
                     - Prepared Statements: es/wdo/mysql/prepared.md
                     - Transacciones: es/wdo/mysql/transacciones.md
                     - Troubleshooting: es/wdo/mysql/troubleshooting.md
+                - PostgreSQL:
+                    - Concepto y Pool: es/wdo/pg/index.md
+                    - Configuración: es/wdo/pg/config.md
+                    - Uso del pool: es/wdo/pg/uso.md
+                    - Prepared Statements: es/wdo/pg/prepared.md
+                    - Transacciones: es/wdo/pg/transacciones.md
+                    - Troubleshooting: es/wdo/pg/troubleshooting.md
+                - SQLite3:
+                    - Concepto y Pool: es/wdo/sqlite3/index.md
+                    - Configuración: es/wdo/sqlite3/config.md
+                    - Uso del pool: es/wdo/sqlite3/uso.md
+                    - Prepared Statements: es/wdo/sqlite3/prepared.md
+                    - Transacciones: es/wdo/sqlite3/transacciones.md
+                    - Cifrado: es/wdo/sqlite3/cifrado.md
+                    - Troubleshooting: es/wdo/sqlite3/troubleshooting.md
             - API:
                 - Admin: es/api/admin.md
             - Sistema:
@@ -236,6 +251,21 @@ plugins:
                     - Prepared Statements: en/wdo/mysql/prepared.md
                     - Transactions: en/wdo/mysql/transactions.md
                     - Troubleshooting: en/wdo/mysql/troubleshooting.md
+                - PostgreSQL:
+                    - Concept and Pool: en/wdo/pg/index.md
+                    - Configuration: en/wdo/pg/config.md
+                    - Pool Usage: en/wdo/pg/usage.md
+                    - Prepared Statements: en/wdo/pg/prepared.md
+                    - Transactions: en/wdo/pg/transactions.md
+                    - Troubleshooting: en/wdo/pg/troubleshooting.md
+                - SQLite3:
+                    - Concept and Pool: en/wdo/sqlite3/index.md
+                    - Configuration: en/wdo/sqlite3/config.md
+                    - Pool Usage: en/wdo/sqlite3/usage.md
+                    - Prepared Statements: en/wdo/sqlite3/prepared.md
+                    - Transactions: en/wdo/sqlite3/transactions.md
+                    - Encryption: en/wdo/sqlite3/encryption.md
+                    - Troubleshooting: en/wdo/sqlite3/troubleshooting.md
             - API:
                 - Admin: en/api/admin.md
             - System:
@@ -324,6 +354,21 @@ plugins:
                     - Prepared Statements: it/wdo/mysql/prepared.md
                     - Transazioni: it/wdo/mysql/transazioni.md
                     - Troubleshooting: it/wdo/mysql/troubleshooting.md
+                - PostgreSQL:
+                    - Concetto e Pool: it/wdo/pg/index.md
+                    - Configurazione: it/wdo/pg/config.md
+                    - Utilizzo del pool: it/wdo/pg/utilizzo.md
+                    - Prepared Statements: it/wdo/pg/prepared.md
+                    - Transazioni: it/wdo/pg/transazioni.md
+                    - Troubleshooting: it/wdo/pg/troubleshooting.md
+                - SQLite3:
+                    - Concetto e Pool: it/wdo/sqlite3/index.md
+                    - Configurazione: it/wdo/sqlite3/config.md
+                    - Utilizzo del pool: it/wdo/sqlite3/utilizzo.md
+                    - Prepared Statements: it/wdo/sqlite3/prepared.md
+                    - Transazioni: it/wdo/sqlite3/transazioni.md
+                    - Crittografia: it/wdo/sqlite3/crittografia.md
+                    - Troubleshooting: it/wdo/sqlite3/troubleshooting.md
             - API:
                 - Admin: it/api/admin.md
             - Sistema:
