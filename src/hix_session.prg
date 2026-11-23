@@ -132,11 +132,25 @@ RETURN NIL
 FUNCTION HIX_MwSession( oCtx )
 
    LOCAL cSid, hEntry, nNow
+   LOCAL lNew := .F.
 
    // [B1.S4] warning si se usa sin Setup (s_hStore NIL y no fue configurado)
    IF ! s_lConfigApplied
       lw( "HIX_MwSession: llamado sin HIX_MwSessionSetup() — usando defaults" )
    ENDIF
+
+   // La sesión se establece UNA SOLA VEZ por request, tanto si se llega
+   // vía middleware registrado en la ruta como vía proxy perezoso
+   // (USession()/UFlash() → THixSessionProxy). Re-ejecutar sin cookie
+   // válida mintaba un SID nuevo a mitad de request y reiniciaba el
+   // estado en memoria: los datos no guardados se perdían y los tokens
+   // CSRF quedaban ligados a un SID que el navegador nunca conoció.
+   IF hb_HHasKey( oCtx:hData, "_sid" ) .AND. ! Empty( oCtx:hData[ "_sid" ] )
+
+      RETURN .T.
+
+   ENDIF
+
    _HixSessionInitStore()
 
    cSid := _HixSidStrip( oCtx:oReq:Cookie( s_cName, "" ) )
@@ -154,6 +168,7 @@ FUNCTION HIX_MwSession( oCtx )
 
          cSid   := _HixSessionNewId()
          hEntry := { "exp" => _HixSessionExp( nNow ), "data" => { => } }
+         lNew   := .T.
 
       ENDIF
 
@@ -181,6 +196,7 @@ FUNCTION HIX_MwSession( oCtx )
          cSid   := _HixSessionNewId()
          hEntry := { "exp" => _HixSessionExp( nNow ), "data" => { => } }
          s_hStore[ cSid ] := hEntry
+         lNew   := .T.
 
       ENDIF
 
@@ -192,6 +208,24 @@ FUNCTION HIX_MwSession( oCtx )
    // [B1.S1] clonar hash de sesión — evita que dos requests del mismo SID
    // muten el mismo hash compartido (AJAX paralelo, dos pestañas).
    oCtx:hData[ "session" ] := hb_HClone( hEntry[ "data" ] )
+
+   IF lNew
+
+      // Sesión nueva: anunciar la IDENTIDAD al navegador (Set-Cookie) y
+      // dejar constancia de la entrada vacía en modo fichero (en memoria
+      // ya quedó insertada arriba). Esto es independiente de Save():
+      // los datos de la app sólo se persisten con un Save() explícito.
+      // Sin este anuncio, la respuesta que entrega un token CSRF sale
+      // sin cookie y el primer POST válido es rechazado.
+      HIX_SetCookie( oCtx:oReq, s_cName, _HixSidWithRoute( cSid ), s_nTtl )
+
+      IF s_cStorage == "file"
+
+         _HixSessionFileWrite( cSid, hEntry )
+
+      ENDIF
+
+   ENDIF
 
 RETURN .T.
 

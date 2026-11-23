@@ -1,3 +1,6 @@
+2.5.5  BUG FIX — login CSRF con sesión lazy: HIX_MwSession idempotente
+       + Set-Cookie al nacer la sesión; TFlash:_Sync comparte el bag
+       del formId entre instancias. See changes/2.5.5.md.
 2.5.0  FEATURE — familia WDO completada (los tres drivers production-ready
        con misma superficie API):
        (a) Prepared statements en WDO_PG (libpq nativa): Prepare /

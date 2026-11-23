@@ -22,8 +22,10 @@ CLASS TFlash
    HIDDEN:
    DATA oSess
    DATA cFormId
-   DATA hBag        // copia local del bag en memoria
+   DATA hBag        // bag del formId (referencia compartida en la sesión)
    DATA lDirty      // indica si hay cambios pendientes de guardar
+
+   METHOD _Sync( lWrite )  // mantiene ::hBag enlazado con la sesión
 
    EXPORTED:
    METHOD New( cFormId )
@@ -61,7 +63,12 @@ METHOD New( cFormId ) CLASS TFlash
 
    ENDIF
 
-   // Extrae el bag de este formId en memoria local
+   // Si el bag del formId ya existe en la sesión se comparte por
+   // referencia; si no, se crea local y _Sync() lo enlazará en la
+   // primera escritura. Así, varias instancias UFlash() con el mismo
+   // formId trabajan siempre sobre el mismo bag y no se pisan los
+   // mensajes al Save().
+   // Requiere que la sesión se establezca una única vez por petición.
 
    IF hb_HHasKey( hFlash, ::cFormId )
 
@@ -76,6 +83,49 @@ METHOD New( cFormId ) CLASS TFlash
 RETURN Self
 
 // ------------------------------------------------------------
+// _Sync( lWrite ) — mantiene ::hBag enlazado por referencia con el
+// bag del formId en el estado de sesión de la petición:
+//   · Si el bag existe y es OTRO objeto (p.ej. un Save lo eliminó
+//     por vacío y otra instancia lo volvió a crear), fusiona las
+//     escrituras propias y reconecta. Un bag desconectado solo
+//     puede contener claves escritas por esta instancia, así que
+//     la fusión nunca resucita mensajes consumidos.
+//   · Si no existe, lo (re)enlaza cuando hay algo que compartir
+//     (lWrite .T. o contenido propio). En lecturas sin contenido
+//     no crea nada, para no dejar bags vacíos en la sesión.
+// ------------------------------------------------------------
+METHOD _Sync( lWrite ) CLASS TFlash
+
+   LOCAL hFlash := ::oSess:Get( FLASH_SESSION_KEY )
+
+   __defaultNIL( @lWrite, .F. )
+
+   IF ValType( hFlash ) != "H"
+
+      hFlash := { => }
+
+   ENDIF
+
+   IF hb_HHasKey( hFlash, ::cFormId )
+
+      IF !( hFlash[ ::cFormId ] == ::hBag )
+
+         hb_HMerge( hFlash[ ::cFormId ], ::hBag )   // preserva escrituras propias
+         ::hBag := hFlash[ ::cFormId ]
+         ::oSess:Set( FLASH_SESSION_KEY, hFlash )
+
+      ENDIF
+
+   ELSEIF lWrite .OR. ! Empty( ::hBag )
+
+      hFlash[ ::cFormId ] := ::hBag
+      ::oSess:Set( FLASH_SESSION_KEY, hFlash )
+
+   ENDIF
+
+RETURN Self
+
+// ------------------------------------------------------------
 // PÚBLICOS
 // ------------------------------------------------------------
 
@@ -85,6 +135,8 @@ RETURN ::cFormId
 // Set( key, val ) — acumula sin guardar
 // Set( hash )     — merge de todos los pares + auto-Save()
 METHOD Set( cKey, xVal ) CLASS TFlash
+
+   ::_Sync( .T. )
 
    IF ValType( cKey ) == "H"
 
@@ -105,6 +157,8 @@ METHOD Get( cKey, xDefault ) CLASS TFlash
 
    __defaultNIL( @xDefault, "" )
 
+   ::_Sync( .F. )
+
    IF hb_HHasKey( ::hBag, cKey )
 
       xVal := ::hBag[ cKey ]
@@ -124,10 +178,13 @@ RETURN xVal
 
 METHOD Has( cKey ) CLASS TFlash
 
+   ::_Sync( .F. )
 
 RETURN hb_HHasKey( ::hBag, cKey ) .AND. ! Empty( ::hBag[ cKey ] )
 
 METHOD Delete( cKey ) CLASS TFlash
+
+   ::_Sync( .F. )
 
    IF hb_HHasKey( ::hBag, cKey )
 
@@ -140,7 +197,8 @@ RETURN Self
 
 METHOD Clear() CLASS TFlash
 
-   ::hBag   := { => }
+   ::_Sync( .F. )
+   hb_HClear( ::hBag )   // vacía in situ: mantiene la referencia compartida
    ::lDirty := .T.
 
 RETURN Self
@@ -155,6 +213,8 @@ METHOD Save() CLASS TFlash
       RETURN Self   // nada cambió, no tocamos la sesión
 
    ENDIF
+
+   ::_Sync( .T. )
 
    hFlash := ::oSess:Get( FLASH_SESSION_KEY )
 
